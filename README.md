@@ -1,8 +1,8 @@
 # MedAgent - Autonomous Drug Discovery Research Assistant
 
-**Day 1: API Tool Wrappers** ✅ | **Day 2 - Phase 1: Agent Foundation** ✅ | **Day 2 - Phase 2: Autonomous Reasoning** ✅
+**Day 1: API Tool Wrappers** ✅
 
-MedAgent is a **fully autonomous** AI-powered drug discovery research assistant that leverages agentic AI to help researchers explore scientific literature, clinical trials, and chemical databases. This is a real agentic AI system with self-directed learning, not just a wrapper around an LLM.
+MedAgent is an autonomous AI-powered drug discovery research assistant that leverages agentic AI to help researchers explore scientific literature, clinical trials, and chemical databases. This is a real agentic AI system, not just a wrapper around an LLM.
 
 ## 🎯 What is MedAgent?
 
@@ -16,38 +16,8 @@ MedAgent solves the problem of information overload in biomedical research by pr
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    MedAgent System                       │
-├─────────────────────────────────────────────────────────┤
-│                                                          │
-│  ┌────────────────────────────────────────────────┐    │
-│  │         Agent Orchestration Layer              │    │
-│  │        (LangGraph - Coming Day 2)              │    │
-│  └────────────────────────────────────────────────┘    │
-│                        │                                 │
-│  ┌─────────────────────┼────────────────────────────┐  │
-│  │                Tool Layer (Day 1 ✅)             │  │
-│  │  ┌─────────┐  ┌──────────────┐  ┌───────────┐  │  │
-│  │  │ PubMed  │  │ Clinical     │  │  ChEMBL   │  │  │
-│  │  │  Tool   │  │ Trials Tool  │  │   Tool    │  │  │
-│  │  └────┬────┘  └──────┬───────┘  └─────┬─────┘  │  │
-│  └───────┼──────────────┼─────────────────┼────────┘  │
-│          │              │                 │            │
-│  ┌───────┼──────────────┼─────────────────┼────────┐  │
-│  │    Utility Layer                                 │  │
-│  │  • Rate Limiting  • Retry Logic  • Caching      │  │
-│  │  • Logging        • Error Handling              │  │
-│  └──────────────────────────────────────────────────┘  │
-│                        │                                 │
-│  ┌─────────────────────┼────────────────────────────┐  │
-│  │              External APIs                       │  │
-│  │  ┌─────────┐  ┌──────────────┐  ┌───────────┐  │  │
-│  │  │ PubMed  │  │ ClinicalTrials│ │  ChEMBL   │  │  │
-│  │  │ E-utils │  │   .gov API    │  │    API    │  │  │
-│  │  └─────────┘  └───────────────┘  └───────────┘  │  │
-│  └──────────────────────────────────────────────────┘  │
-│                                                          │
-└─────────────────────────────────────────────────────────┘
+![Screenshot](assets/sys_architecture.png)
+
 ```
 
 ## 📋 Features (Day 1)
@@ -122,48 +92,6 @@ cp .env.example .env
 ```
 
 ## 📚 Quick Start
-
-### Phase 2: Autonomous Agent (Recommended!)
-
-The fastest way to use MedAgent is with the fully autonomous agent:
-
-```python
-from agent.graph import MedAgent
-
-# Create autonomous agent
-agent = MedAgent(max_iterations=5, temperature=0.3)
-
-# Ask a research question
-result = agent.run("What are EGFR inhibitors for non-small cell lung cancer?")
-
-# Get the final report
-print(result["final_report"])
-
-# Show the agent's reasoning process
-agent.print_reasoning_trace(result, detailed=True)
-
-# Save report to file
-filepath = agent.save_report(result)
-print(f"Report saved to: {filepath}")
-```
-
-**What the agent does autonomously:**
-1. Analyzes your query to extract targets, diseases, and query type
-2. Creates a research strategy and selects appropriate tools
-3. Calls APIs (PubMed, ClinicalTrials, ChEMBL) with optimized queries
-4. Synthesizes findings from multiple sources
-5. Self-reflects on quality and decides if more research is needed
-6. Iteratively improves until confident or max iterations reached
-7. Generates a professional markdown report with citations
-
-**Run the interactive demo:**
-```bash
-python examples/demo_agent.py
-```
-
-### Phase 1: Direct Tool Usage
-
-You can also use individual tools directly:
 
 ### Example 1: Search PubMed
 
@@ -280,39 +208,8 @@ python examples/test_chembl.py
 
 ## 🧪 Testing
 
-### Phase 2 Tests (Autonomous Agent)
-
 ```bash
-# Run Phase 2 comprehensive tests
-python test_phase2.py
-
-# Tests include:
-# 1. Query analysis node (LLM extraction)
-# 2. Planning node (autonomous tool selection)
-# 3. Tool execution node (real API calls)
-# 4. Synthesis node (cross-referencing)
-# 5. Verification node (self-reflection)
-# 6. Report generation node
-# 7. End-to-end agent test (full workflow)
-```
-
-### Phase 1 Tests (Agent Foundation)
-
-```bash
-# Run Phase 1 foundation tests
-python test_phase1.py
-
-# Tests include:
-# 1. LLM connection
-# 2. Agent initialization
-# 3. State flow
-# 4. End-to-end smoke test
-```
-
-### Tool Tests (Day 1)
-
-```bash
-# Run all tool tests
+# Run all tests
 pytest tests/ -v
 
 # Run specific tool tests
@@ -356,13 +253,6 @@ MedAgent/
 │   ├── test_pubmed.py
 │   ├── test_clinical_trials.py
 │   └── test_chembl.py
-│
-├── agent/                       # Agent orchestration (Phase 2 ✅)
-│   ├── __init__.py
-│   ├── state.py                 # Agent state definition
-│   ├── graph.py                 # LangGraph workflow with 6 nodes
-│   ├── nodes.py                 # 6 reasoning nodes with LLM
-│   └── prompts.py               # System prompts for each node
 │
 ├── examples/                    # Usage examples
 │   ├── test_pubmed.py
@@ -450,22 +340,12 @@ mypy tools/ utils/
 - [x] Comprehensive tests
 - [x] Usage examples
 
-### ✅ Day 2 - Phase 1: Agent Foundation (COMPLETED)
-- [x] Integrate Google Gemini 1.5 Flash (FREE tier)
-- [x] Define complete AgentState structure
-- [x] Build LangGraph skeleton
-- [x] Create placeholder reasoning node
-- [x] End-to-end testing framework
-
-### ✅ Day 2 - Phase 2: Autonomous Reasoning (COMPLETED)
-- [x] Real query analysis (LLM-powered extraction)
-- [x] Research planning node (autonomous tool selection)
-- [x] Tool orchestration (LLM-generated queries)
-- [x] Multi-step reasoning (6 reasoning nodes)
-- [x] Result synthesis (cross-referencing findings)
-- [x] Self-reflection and verification (autonomous decision-making)
-- [x] Report generation (professional markdown reports)
-- [x] Self-directed learning loop (iterative improvement)
+### 📅 Day 2: Agent Orchestration
+- [ ] Integrate Google Gemini 1.5 Flash
+- [ ] Build LangGraph agent workflow
+- [ ] Multi-step research capabilities
+- [ ] Query planning and decomposition
+- [ ] Result synthesis and summarization
 
 ### 📅 Day 3: Frontend & Evaluation
 - [ ] Web interface (Streamlit/Gradio)
