@@ -15,10 +15,8 @@ MedAgent solves the problem of information overload in biomedical research by pr
 
 ## 🏗️ Architecture
 
-```
 ![Screenshot](assets/sys_architecture.png)
 
-```
 
 ## 📋 Features (Day 1)
 
