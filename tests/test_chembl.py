@@ -250,7 +250,7 @@ class TestChEMBLErrorHandling:
         result = chembl_tool.search_by_indication("test")
 
         assert result.success is False
-        assert "timeout" in result.error.lower()
+        assert "timed out" in result.error.lower()
 
 
 class TestChEMBLCaching:

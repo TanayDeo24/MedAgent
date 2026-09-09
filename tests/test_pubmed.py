@@ -188,7 +188,7 @@ class TestPubMedErrorHandling:
         result = pubmed_tool.search_pubmed("test")
 
         assert result.success is False
-        assert "timeout" in result.error.lower()
+        assert "timed out" in result.error.lower()
 
 
 class TestPubMedCaching:

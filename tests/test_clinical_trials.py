@@ -267,7 +267,7 @@ class TestClinicalTrialsErrorHandling:
         result = clinical_trials_tool.search_trials(condition="test")
 
         assert result.success is False
-        assert "timeout" in result.error.lower()
+        assert "timed out" in result.error.lower()
 
 
 class TestClinicalTrialsCaching:
