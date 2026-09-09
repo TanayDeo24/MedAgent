@@ -6,11 +6,16 @@ Nemotron LLM for use in the MedAgent autonomous research assistant.
 
 import os
 import threading
+import time
 from typing import Optional
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from dotenv import load_dotenv
 
 from utils.rate_limiter import wait_for_rate_limit
+from utils.retry_handler import calculate_backoff
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,6 +30,74 @@ NVIDIA_MODEL = "nvidia/nemotron-3-super-120b-a12b"
 # hard limit even though steady-state usage was fine.
 NVIDIA_RATE_LIMIT_RPM = 35
 NVIDIA_RATE_LIMIT_KEY = "nvidia_nim_llm"
+
+# Hard per-call timeout, enforced independently of ChatNVIDIA's own
+# `timeout` constructor parameter. That parameter was observed live to NOT
+# bound an already-open connection that stops sending data (a real 60-case
+# evaluation batch hung for 90+ minutes on a single call, ChatNVIDIA's
+# timeout=30 never firing) - see EVAL_HANG_FIX_COMPLETE.md for the full
+# incident. 90s is generous enough for Nemotron's known long internal
+# reasoning_content chains on synthesis/report/hallucination-judge calls
+# (observed 15-55s for legitimate large-prompt calls in this same incident's
+# own logs) while still being a real, enforced ceiling instead of an
+# advisory one.
+LLM_CALL_TIMEOUT_SECONDS = 90
+# 1 initial attempt + 2 retries. Not infinite - if the endpoint is reliably
+# unresponsive, failing fast (and letting the calling node's existing
+# try/except handle it like any other LLM error) beats stalling the batch
+# again just with extra steps first.
+LLM_CALL_MAX_ATTEMPTS = 3
+
+
+class LLMCallTimeoutError(Exception):
+    """Raised when an LLM call exceeds LLM_CALL_TIMEOUT_SECONDS on every
+    retry attempt (each attempt made with a freshly-constructed client)."""
+
+
+def _invoke_with_hard_timeout(llm: ChatNVIDIA, args: tuple, kwargs: dict, timeout: float):
+    """Run llm.invoke(*args, **kwargs) with a real, enforced wall-clock cap.
+
+    Uses a daemon `threading.Thread` rather than
+    `concurrent.futures.ThreadPoolExecutor` deliberately: if the underlying
+    call truly never returns (as observed - a stuck socket read that
+    outlived ChatNVIDIA's own `timeout=30` entirely), ThreadPoolExecutor
+    registers an atexit handler that joins every worker thread from every
+    pool ever created before the interpreter can exit. A stuck worker there
+    would silently reproduce this exact hang at process-exit time instead of
+    mid-batch - trading a visible hang for an invisible one. A daemon thread
+    carries no such join-at-exit obligation: if it never finishes, the OS
+    simply reclaims it when the process ends, and this function has already
+    moved on because it only waits up to `timeout` via `thread.join()`.
+
+    Returns:
+        (completed: bool, result: Any) - completed=False means the timeout
+        was hit and the thread was abandoned (still possibly running, but
+        no longer waited on).
+
+    Raises:
+        Whatever exception `llm.invoke()` itself raised, if it completed
+        within the timeout but failed (e.g. a real 503) - re-raised here so
+        callers see the same exception type they always would.
+    """
+    outcome: dict = {}
+
+    def _target():
+        try:
+            outcome["value"] = llm.invoke(*args, **kwargs)
+        except Exception as e:
+            outcome["error"] = e
+
+    thread = threading.Thread(target=_target, daemon=True)
+    thread.start()
+    thread.join(timeout=timeout)
+
+    if thread.is_alive():
+        return False, None
+
+    if "error" in outcome:
+        raise outcome["error"]
+
+    return True, outcome.get("value")
 
 _llm_call_lock = threading.Lock()
 _llm_call_count = 0
@@ -54,29 +127,70 @@ def reset_llm_call_count() -> None:
 
 
 class _RateLimitedChatNVIDIA:
-    """Wraps a ChatNVIDIA instance so every invoke() call is rate-limited
-    and counted.
+    """Wraps a ChatNVIDIA instance so every invoke() call is rate-limited,
+    counted, and bounded by a real hard timeout with fresh-connection retry.
 
     Applied here, at the point get_llm() constructs the client, rather than
-    at each node's call site - so the limit is a permanent, global safeguard
-    for every current and future caller of get_llm(), not just evaluation
-    runs (though that's where it matters most in practice).
+    at each node's call site - so all of this is a permanent, global
+    safeguard for every current and future caller of get_llm(), not just
+    evaluation runs (though that's where it matters most in practice).
     """
 
-    def __init__(self, llm: ChatNVIDIA):
+    def __init__(self, llm: ChatNVIDIA, construct_kwargs: dict):
         self._llm = llm
+        # Kept so a timed-out attempt can discard this client and build a
+        # genuinely fresh one for the retry, rather than reusing whatever
+        # connection/session state made the original call hang - the 8
+        # stale CLOSE_WAIT sockets observed during the incident this fixes
+        # suggest connection reuse may itself have been part of what went
+        # stale, not just an unlucky single request.
+        self._construct_kwargs = construct_kwargs
 
     def invoke(self, *args, **kwargs):
         global _llm_call_count
-        # capacity=1.0 (no burst allowance) is required, not optional, here:
-        # TokenBucket's default capacity equals `rate`, and 35 RPM as a
-        # per-second rate is 0.583 - a bucket capped at 0.583 tokens can
-        # never reach the 1 token a single call consumes, so consume(1)
-        # would fail forever without an explicit capacity >= 1.
-        wait_for_rate_limit(NVIDIA_RATE_LIMIT_KEY, NVIDIA_RATE_LIMIT_RPM / 60.0, capacity=1.0)
-        with _llm_call_lock:
-            _llm_call_count += 1
-        return self._llm.invoke(*args, **kwargs)
+        last_exc: Optional[Exception] = None
+
+        for attempt in range(LLM_CALL_MAX_ATTEMPTS):
+            # capacity=1.0 (no burst allowance) is required, not optional,
+            # here: TokenBucket's default capacity equals `rate`, and 35 RPM
+            # as a per-second rate is 0.583 - a bucket capped at 0.583
+            # tokens can never reach the 1 token a single call consumes, so
+            # consume(1) would fail forever without an explicit capacity >= 1.
+            wait_for_rate_limit(NVIDIA_RATE_LIMIT_KEY, NVIDIA_RATE_LIMIT_RPM / 60.0, capacity=1.0)
+            with _llm_call_lock:
+                _llm_call_count += 1
+
+            try:
+                completed, result = _invoke_with_hard_timeout(
+                    self._llm, args, kwargs, LLM_CALL_TIMEOUT_SECONDS
+                )
+            except Exception as e:
+                # A real error (e.g. a 503) that surfaced within the
+                # timeout - not what this fix targets, let it propagate
+                # exactly as before so existing per-node try/except handling
+                # is unaffected.
+                raise
+
+            if completed:
+                return result
+
+            last_exc = LLMCallTimeoutError(
+                f"LLM call did not return within {LLM_CALL_TIMEOUT_SECONDS}s "
+                f"(attempt {attempt + 1}/{LLM_CALL_MAX_ATTEMPTS})"
+            )
+            logger.warning(
+                f"[LLM TIMEOUT] Call exceeded {LLM_CALL_TIMEOUT_SECONDS}s "
+                f"(attempt {attempt + 1}/{LLM_CALL_MAX_ATTEMPTS}) - discarding "
+                f"client and retrying with a fresh connection"
+            )
+            # Discard the stale client/session entirely rather than retrying
+            # on it - see _construct_kwargs comment above.
+            self._llm = ChatNVIDIA(**self._construct_kwargs)
+
+            if attempt < LLM_CALL_MAX_ATTEMPTS - 1:
+                time.sleep(calculate_backoff(attempt))
+
+        raise last_exc
 
     def __getattr__(self, name):
         return getattr(self._llm, name)
@@ -129,16 +243,19 @@ def get_llm(
             "Get an API key from: https://build.nvidia.com/"
         )
 
-    # Initialize the LLM, wrapped so every invoke() is rate-limited and
-    # counted (see _RateLimitedChatNVIDIA above)
-    llm = ChatNVIDIA(
+    # Initialize the LLM, wrapped so every invoke() is rate-limited, counted,
+    # and hard-timeout-bounded with fresh-client retry (see
+    # _RateLimitedChatNVIDIA above). construct_kwargs is kept by the wrapper
+    # so it can build a genuinely fresh ChatNVIDIA client if a call hangs.
+    construct_kwargs = dict(
         model=model,
         api_key=api_key,
         temperature=temperature,
         max_tokens=max_tokens,
         timeout=timeout,
     )
-    return _RateLimitedChatNVIDIA(llm)
+    llm = ChatNVIDIA(**construct_kwargs)
+    return _RateLimitedChatNVIDIA(llm, construct_kwargs)
 
 
 def test_llm_connection() -> bool:
