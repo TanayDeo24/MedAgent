@@ -215,7 +215,10 @@ class AgentMetrics:
         if not results:
             return 0.0
 
-        latencies = [r.get("latency_seconds", 0) for r in results]
+        # `or 0` handles results with an explicit None latency (e.g. a
+        # reconstructed-from-log result whose process was killed before its
+        # latency could ever be recorded), not just a missing key.
+        latencies = [(r.get("latency_seconds") or 0) for r in results]
         return sum(latencies) / len(latencies)
 
     @staticmethod
@@ -236,8 +239,13 @@ class AgentMetrics:
         if not results:
             return 0.0
 
+        # `or 0` (not just a `.get(..., 0)` default) because some result
+        # sources - e.g. evaluation/evaluator.py's timeout/reconstructed
+        # results - store confidence_score as an explicit None (genuinely
+        # unmeasured) rather than omitting the key entirely, which `.get`'s
+        # default alone wouldn't catch.
         confidences = [
-            r.get("state", {}).get("confidence_score", 0)
+            (r.get("state", {}).get("confidence_score") or 0)
             for r in results
         ]
 
