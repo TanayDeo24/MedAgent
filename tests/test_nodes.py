@@ -7,7 +7,7 @@ in isolation rather than how `agent/nodes.py` consumes their parsed output.
 
 from unittest.mock import Mock, patch
 
-from agent.nodes import report_generation_node
+from agent.nodes import report_generation_node, query_analysis_node, tool_execution_node
 
 
 def _base_state(tool_results):
@@ -37,7 +37,10 @@ def test_chembl_citations_use_parsed_field_names(mock_get_llm):
     actual field values.
     """
     mock_llm = Mock()
-    mock_llm.invoke.return_value = Mock(content="# Research Report\n\nBody text.")
+    mock_llm.invoke.return_value = Mock(
+        content="# Research Report\n\nBody text.",
+        usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
+    )
     mock_get_llm.return_value = mock_llm
 
     tool_results = {
@@ -100,7 +103,10 @@ def test_chembl_citation_id_never_na_when_chembl_id_present(mock_get_llm):
     violated for every ChEMBL entry, regardless of name/backfill status.
     """
     mock_llm = Mock()
-    mock_llm.invoke.return_value = Mock(content="# Research Report\n\nBody text.")
+    mock_llm.invoke.return_value = Mock(
+        content="# Research Report\n\nBody text.",
+        usage_metadata={"input_tokens": 100, "output_tokens": 50, "total_tokens": 150},
+    )
     mock_get_llm.return_value = mock_llm
 
     tool_results = {
@@ -117,3 +123,65 @@ def test_chembl_citation_id_never_na_when_chembl_id_present(mock_get_llm):
         if entry.get("chembl_id"):
             assert citation["id"] == entry["chembl_id"]
             assert citation["id"] != "N/A"
+
+
+@patch("agent.nodes.get_llm")
+def test_token_usage_accumulates_across_calls(mock_get_llm):
+    """total_tokens_used (Phase 2, item 2) was declared on AgentState but
+    never populated by any node. Verify _accumulate_tokens actually adds
+    each call's real usage_metadata into the running state total, and that
+    a second call adds on top of the first rather than overwriting it.
+    """
+    mock_llm = Mock()
+    mock_llm.invoke.return_value = Mock(
+        content='{"query_type": "general_research", "confidence": 0.5}',
+        usage_metadata={"input_tokens": 40, "output_tokens": 10, "total_tokens": 50},
+    )
+    mock_get_llm.return_value = mock_llm
+
+    state = {
+        "query": "What are EGFR inhibitors?",
+        "intermediate_thoughts": [],
+        "errors": [],
+        "messages": [],
+        "total_tokens_used": 0,
+    }
+
+    state = query_analysis_node(state)
+    assert state["total_tokens_used"] == 50
+
+    # A second LLM call (simulated by invoking the node's underlying
+    # accumulation again with the same mocked response) must add to the
+    # running total, not reset it.
+    from agent.nodes import _accumulate_tokens
+    _accumulate_tokens(state, mock_llm.invoke.return_value)
+    assert state["total_tokens_used"] == 100
+
+
+def test_hallucinated_tool_name_recorded_as_precision_miss():
+    """Regression guard for the Nemotron tool-hallucination fix (Phase 2,
+    item 3). Previously an invalid tool name (e.g. "pubchem") was only a
+    warning log line and never appeared in tool_call_history, so
+    AgentMetrics.tool_precision (which reads tool_call_history) silently
+    never counted it as a miss. It must now show up there so real
+    evaluation numbers reflect it instead of the hallucination vanishing.
+    """
+    state = {
+        "query": "What are EGFR inhibitors?",
+        "tools_to_call": ["pubchem"],  # not a real tool - hallucinated
+        "research_plan": "{}",
+        "tool_results": {},
+        "tool_call_history": [],
+        "intermediate_thoughts": [],
+        "errors": [],
+        "current_step": 0,
+        "max_iterations": 3,
+    }
+
+    result_state = tool_execution_node(state)
+
+    assert len(result_state["tool_call_history"]) == 1
+    entry = result_state["tool_call_history"][0]
+    assert entry["tool"] == "pubchem"
+    assert entry["success"] is False
+    assert "pubchem" not in ("pubmed", "clinical_trials", "chembl")

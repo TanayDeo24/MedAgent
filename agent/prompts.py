@@ -95,13 +95,26 @@ Based on the query and analysis, create a step-by-step research plan.
 - Each tool should answer a specific part of the query
 - Avoid redundant tool calls
 
+**VALID TOOL NAMES - THIS IS THE COMPLETE LIST:**
+The ONLY valid values for "tool" below are exactly these three strings:
+- "pubmed"
+- "clinical_trials"
+- "chembl"
+
+There is no fourth tool. Do NOT invent, guess, or reference any other tool
+name (e.g. "pubchem", "drugbank", "uniprot", "fda_database") even if it
+sounds like it would be useful or plausible for this query - no such tool
+exists in this system and selecting it will cause that step to fail with
+zero results. If none of the three tools above seem like a perfect fit,
+choose the closest match from the three rather than naming something else.
+
 Return your research plan as valid JSON with this exact structure:
 
 {{
   "research_strategy": "Brief 1-2 sentence description of your overall approach",
   "tools_to_use": [
     {{
-      "tool": "tool_name",
+      "tool": "pubmed|clinical_trials|chembl",
       "priority": 1,
       "rationale": "Why use this tool and what it will find",
       "expected_output": "What information we expect to get"

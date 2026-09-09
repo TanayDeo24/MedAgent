@@ -495,7 +495,27 @@ def tool_execution_node(state: AgentState) -> AgentState:
 
     for tool_name in tools_to_call:
         if tool_name not in tool_instances:
+            # Nemotron occasionally hallucinates a tool name that doesn't
+            # exist (e.g. "pubchem"). Previously this was only a warning
+            # log line - the attempt vanished with no trace in state, so
+            # AgentMetrics.tool_precision (which reads tool_call_history)
+            # never saw it and couldn't count it as a precision miss.
+            # Recording it here (before any LLM/API call is made for it)
+            # makes hallucinated tool selection show up in the real
+            # evaluation numbers instead of silently disappearing.
             logger.warning(f"[TOOL EXECUTION] Unknown tool: {tool_name}")
+            state["tool_call_history"].append({
+                "tool": tool_name,
+                "query": None,
+                "params": {},
+                "success": False,
+                "results_count": 0,
+                "error": f"Invalid tool name '{tool_name}' - not one of pubmed/clinical_trials/chembl",
+                "timestamp": None,
+            })
+            state["intermediate_thoughts"].append(
+                f"✗ {tool_name}: Invalid tool name (hallucinated - not a real tool)"
+            )
             continue
 
         try:
