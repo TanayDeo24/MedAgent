@@ -78,30 +78,38 @@ class RateLimiter:
         self.buckets: Dict[str, TokenBucket] = {}
         self.lock = threading.Lock()
 
-    def get_bucket(self, key: str, rate: float) -> TokenBucket:
+    def get_bucket(self, key: str, rate: float, capacity: float = None) -> TokenBucket:
         """Get or create a token bucket for the given key.
 
         Args:
             key: Unique identifier for the bucket
             rate: Token refill rate
+            capacity: Maximum tokens the bucket can hold (defaults to `rate`,
+                matching TokenBucket's own default). Must be passed explicitly
+                whenever `rate` is below the number of tokens a single call
+                consumes (e.g. a sub-1-per-second rate like 35 RPM = 0.583/s
+                with the default single-token consume()) - otherwise the
+                bucket can never accumulate enough tokens to satisfy a single
+                consume() call and wait_for_token() blocks forever.
 
         Returns:
             Token bucket instance
         """
         with self.lock:
             if key not in self.buckets:
-                self.buckets[key] = TokenBucket(rate)
+                self.buckets[key] = TokenBucket(rate, capacity)
             return self.buckets[key]
 
-    def wait(self, key: str, rate: float, tokens: int = 1) -> None:
+    def wait(self, key: str, rate: float, tokens: int = 1, capacity: float = None) -> None:
         """Wait for and consume tokens.
 
         Args:
             key: Bucket identifier
             rate: Token refill rate
             tokens: Number of tokens to consume
+            capacity: Maximum tokens the bucket can hold (see get_bucket)
         """
-        bucket = self.get_bucket(key, rate)
+        bucket = self.get_bucket(key, rate, capacity)
         if not bucket.consume(tokens):
             logger.debug(f"Rate limit reached for {key}, waiting...")
             bucket.wait_for_token(tokens)
@@ -136,7 +144,7 @@ def rate_limit(key: str, rate: float):
     return decorator
 
 
-def wait_for_rate_limit(key: str, rate: float) -> None:
+def wait_for_rate_limit(key: str, rate: float, capacity: float = None) -> None:
     """Manually wait for rate limit.
 
     Useful when you need to rate limit without using a decorator.
@@ -144,9 +152,12 @@ def wait_for_rate_limit(key: str, rate: float) -> None:
     Args:
         key: Unique identifier for this rate limit
         rate: Maximum calls per second
+        capacity: Maximum tokens the bucket can hold (see
+            RateLimiter.get_bucket for why this matters for rates below 1
+            call/second)
 
     Example:
         wait_for_rate_limit("pubmed_api", 3)
         response = requests.get(url)
     """
-    _rate_limiter.wait(key, rate)
+    _rate_limiter.wait(key, rate, capacity=capacity)
