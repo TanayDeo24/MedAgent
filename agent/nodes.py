@@ -62,21 +62,6 @@ def _parse_llm_json(llm_response: str, node_name: str) -> Dict[str, Any]:
         raise ValueError(f"{node_name} failed to return valid JSON: {e}")
 
 
-# Maximum number of ChEMBL get_drug_info() lookups to make per tool call when
-# backfilling missing compound names (see _backfill_chembl_names below).
-# Capped rather than unbounded because:
-#   - Report tables and citations in report_generation_node only ever surface
-#     a handful of compounds anyway, so backfilling low-ranked hits buys
-#     little.
-#   - Each backfill is a separate rate-limited ChEMBL API call (observed
-#     150ms-8s in practice), so an uncapped backfill over a 20-50 result
-#     search could add tens of seconds of latency to a single node for
-#     marginal benefit.
-# 5 covers the compounds most likely to actually appear in the final report
-# while keeping worst-case added latency bounded to a handful of extra calls.
-CHEMBL_BACKFILL_MAX = 5
-
-
 def _backfill_chembl_names(
     chembl_tool: ChEMBLTool,
     entries: List[Dict[str, Any]],
@@ -92,6 +77,12 @@ def _backfill_chembl_names(
     search result didn't. This mutates `entries` in place (filling in real
     data where get_drug_info has it) and never invents a placeholder for
     compounds ChEMBL genuinely has no name for.
+
+    Every missing-name entry gets a backfill attempt - there's no separate
+    cap here, because the number of candidates is already bounded by
+    whatever max_results the caller passed to the search (typically 20-50),
+    which itself already bounds the added latency (each attempt is one
+    rate-limited ChEMBL API call, observed 100ms-8s in practice).
 
     Args:
         chembl_tool: The ChEMBLTool instance to call get_drug_info() on
@@ -117,7 +108,7 @@ def _backfill_chembl_names(
         "still_missing": 0,
     }
 
-    for entry in missing[:CHEMBL_BACKFILL_MAX]:
+    for entry in missing:
         stats["attempted"] += 1
         try:
             detail = chembl_tool.get_drug_info(entry["chembl_id"])
@@ -147,9 +138,6 @@ def _backfill_chembl_names(
             # get_drug_info itself has no usable name for this compound -
             # leave the entry as-is rather than inventing a placeholder.
             stats["still_missing"] += 1
-
-    # Entries past the cap were never attempted, so they're still missing too.
-    stats["still_missing"] += max(0, stats["missing_before"] - stats["attempted"])
 
     return stats
 
