@@ -1,0 +1,1009 @@
+{
+  "source": "reconstructed from logs/medagent.log + /tmp/full_eval_run.log",
+  "batch_window": [
+    "2026-09-09T16:52:00",
+    "2026-09-09T19:47:00"
+  ],
+  "cases": [
+    {
+      "test_case_id": 1,
+      "query": "What are FDA-approved EGFR inhibitors?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=EGFR&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "drugbank",
+        "fda_labels",
+        "pubchem"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 183.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=EGFR&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 2,
+      "query": "What is pembrolizumab used for?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 820.0,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 3,
+      "query": "Find BTK inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)",
+          "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.4,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 20,
+      "latency_seconds": 314.7,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30); chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 4,
+      "query": "Find BTK inhibitors in Phase 2 or 3 clinical trials for autoimmune diseases",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=BTK&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "literature"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.4,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 37,
+      "latency_seconds": 662.9,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=BTK&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 5,
+      "query": "What are the clinical trials for erlotinib in non-small cell lung cancer?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 402.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 6,
+      "query": "Which kinase inhibitors are approved for melanoma?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 1,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=melanoma&limit=20",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dmelanoma&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 128.5,
+      "iterations": 1,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=melanoma&limit=20; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dmelanoma&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 7,
+      "query": "Find PD-1/PD-L1 inhibitors with completed Phase 3 trials",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcancer&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+PD-1%2FPD-L1+inhibitors+with+completed+Phase+3+trials&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 290.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcancer&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+PD-1%2FPD-L1+inhibitors+with+completed+Phase+3+trials&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 8,
+      "query": "Which protein kinase inhibitors failed in clinical trials due to cardiotoxicity?",
+      "difficulty": "hard",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/molecule.json?target_chembl_id=CHEMBL241&limit=20",
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=protein+kinase&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "pubmed"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 269.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/molecule.json?target_chembl_id=CHEMBL241&limit=20; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=protein+kinase&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 9,
+      "query": "Compare the efficacy of first-generation vs second-generation EGFR TKIs in EGFR-mutant NSCLC",
+      "difficulty": "hard",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 6,
+      "latency_seconds": 101.2,
+      "iterations": 1,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 10,
+      "query": "Find new cancer drugs",
+      "difficulty": "ambiguous",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20",
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 311.7,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 11,
+      "query": "What is the mechanism of action of metformin in type 2 diabetes?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "drugbank",
+        "kegg",
+        "pubmed"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 97.6,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 12,
+      "query": "What is known about the pathophysiology of long COVID?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 20,
+      "latency_seconds": 91.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 13,
+      "query": "What clinical trials are currently recruiting for Alzheimer's disease?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 164.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 14,
+      "query": "Find completed Phase 3 trials for rheumatoid arthritis biologics",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100"
+        ]
+      },
+      "tools_used": [
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 104.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 15,
+      "query": "Find JAK inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 42,
+      "citation_coverage": 1.0,
+      "results_count": 42,
+      "latency_seconds": 264.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 16,
+      "query": "What compounds target the androgen receptor?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 291.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 17,
+      "query": "List approved HMG-CoA reductase inhibitors (statins)",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 308.5,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 18,
+      "query": "Find small molecule inhibitors of BRAF",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "europe_pmc",
+        "pubchem"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 20,
+      "latency_seconds": 131.9,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 19,
+      "query": "Find approved ALK inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+approved+ALK+inhibitors&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 236.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+approved+ALK+inhibitors&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 20,
+      "query": "Find VEGF inhibitors approved for macular degeneration",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 188.5,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 21,
+      "query": "Find approved TNF-alpha inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "drugbank",
+        "fda",
+        "pubchem"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 140.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 22,
+      "query": "What is ibrutinib used for?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 165.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 23,
+      "query": "What are the known resistance mechanisms to imatinib in chronic myeloid leukemia?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 0.6666666666666666,
+      "results_count": 30,
+      "latency_seconds": 205.0,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 24,
+      "query": "Review the role of the gut microbiome in inflammatory bowel disease treatment",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 60,
+      "citation_coverage": 1.0,
+      "results_count": 60,
+      "latency_seconds": 333.5,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 25,
+      "query": "What is the status of trials for CAR-T cell therapy in multiple myeloma?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 214.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 26,
+      "query": "What PARP inhibitors are used for BRCA-mutant ovarian cancer?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 24,
+      "citation_coverage": 1.0,
+      "results_count": 24,
+      "latency_seconds": 165.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 27,
+      "query": "Find SGLT2 inhibitors and their trial status for heart failure",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 226.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 28,
+      "query": "What is the evidence for metformin in cancer prevention?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 152.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 29,
+      "query": "What GLP-1 receptor agonists are approved for obesity?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 60,
+      "citation_coverage": 1.0,
+      "results_count": 60,
+      "latency_seconds": 225.6,
+      "iterations": 1,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 30,
+      "query": "Find trials of anti-CD20 antibodies for multiple sclerosis",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 225.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    },
+    {
+      "test_case_id": 31,
+      "query": "What are the cardiovascular risks associated with COX-2 inhibitors?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "status": "completed_reconstructed",
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 41,
+      "citation_coverage": 1.0,
+      "results_count": 41,
+      "latency_seconds": null,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged via evaluation/reconstruct_from_logs.py after the batch this case belongs to was interrupted before it could write its own results. confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether a post-hoc step like the hallucination judge for it ever returned)."
+    }
+  ]
+}

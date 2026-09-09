@@ -56,7 +56,10 @@ Thumbs.db
 reports/
 outputs/
 data/
-experiments/
+# experiments/results/ is committed deliberately (real evaluation output,
+# see RESULTS.md) - only ignore other/future experiments/ subdirectories.
+experiments/*
+!experiments/results/
 
 # Test results
 test_results*.json
