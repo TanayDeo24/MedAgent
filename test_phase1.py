@@ -5,7 +5,7 @@ This script tests all Phase 1 components to ensure the agent
 foundation is working correctly before moving to Phase 2.
 
 Tests:
-1. LLM Connection - Can we reach Gemini API?
+1. LLM Connection - Can we reach the NVIDIA NIM API?
 2. Agent Initialization - Does the graph build correctly?
 3. State Flow - Does state pass through the graph?
 4. End-to-End - Can we run a real query?
@@ -48,33 +48,33 @@ def test_1_llm_connection() -> Tuple[bool, str]:
 
     Verifies that:
     - Can load API key from environment
-    - Can initialize Gemini LLM
+    - Can initialize NVIDIA NIM (Nemotron) LLM
     - Can send a simple prompt and get response
     """
     print_test_header("1. LLM Connection Test")
 
     try:
         # Test connection
-        print("Attempting to connect to Gemini API...")
+        print("Attempting to connect to NVIDIA NIM API...")
         connection_ok = test_llm_connection()
 
         if not connection_ok:
-            return False, "Failed to connect to Gemini API"
+            return False, "Failed to connect to NVIDIA NIM API"
 
         # Try a simple prompt
         print("Sending test prompt...")
         llm = get_llm()
-        response = llm.invoke("Say 'Hello from Gemini!' and nothing else.")
+        response = llm.invoke("Say 'Hello from Nemotron!' and nothing else.")
 
         print(f"Response: {response.content}")
 
-        if "gemini" in response.content.lower() or "hello" in response.content.lower():
+        if "nemotron" in response.content.lower() or "hello" in response.content.lower():
             return True, f"LLM responded: {response.content}"
         else:
             return False, f"Unexpected response: {response.content}"
 
     except ValueError as e:
-        if "GOOGLE_API_KEY" in str(e):
+        if "NVIDIA_API_KEY" in str(e):
             return False, "API key not found. Check .env file."
         return False, str(e)
 
@@ -330,7 +330,7 @@ def main():
         print("=" * 70)
         print("\nDebug steps:")
         print("  1. Check error messages above")
-        print("  2. Verify .env file has GOOGLE_API_KEY")
+        print("  2. Verify .env file has NVIDIA_API_KEY")
         print("  3. Ensure all dependencies installed: pip install -r requirements.txt")
         print("  4. Check logs/medagent.log for details")
         return 1

@@ -1,44 +1,42 @@
-"""LLM configuration for MedAgent using Google Gemini 1.5 Flash.
+"""LLM configuration for MedAgent using NVIDIA NIM (Nemotron).
 
-This module provides utilities to initialize and configure the Google Gemini LLM
-for use in the MedAgent autonomous research assistant.
+This module provides utilities to initialize and configure the NVIDIA NIM-hosted
+Nemotron LLM for use in the MedAgent autonomous research assistant.
 """
 
 import os
 from typing import Optional
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+
+NVIDIA_MODEL = "nvidia/nemotron-3-super-120b-a12b"
 
 
 def get_llm(
     temperature: float = 0.3,
     max_tokens: int = 2048,
     timeout: int = 30,
-    model: str = "gemini-pro"
-) -> ChatGoogleGenerativeAI:
-    """Initialize Google Gemini 1.5 Flash LLM with specified parameters.
+    model: str = NVIDIA_MODEL
+) -> ChatNVIDIA:
+    """Initialize NVIDIA NIM Nemotron LLM with specified parameters.
 
-    Uses the FREE tier of Google Gemini which has the following limits:
-    - 15 requests per minute
-    - 1,500 requests per day
-    - 1M token context window
-    - No cost for usage within limits
+    Uses NVIDIA's hosted NIM endpoint for the Nemotron model family.
 
     Args:
         temperature: Controls randomness (0.0 = deterministic, 1.0 = creative).
                     Default 0.3 for balanced reasoning.
         max_tokens: Maximum tokens in response. Default 2048.
         timeout: Request timeout in seconds. Default 30.
-        model: Gemini model name. Default "gemini-1.5-flash".
+        model: NVIDIA NIM model name. Default "nvidia/nemotron-3-super-120b-a12b".
 
     Returns:
-        Configured ChatGoogleGenerativeAI instance ready for use.
+        Configured ChatNVIDIA instance ready for use.
 
     Raises:
-        ValueError: If GOOGLE_API_KEY environment variable is not set.
+        ValueError: If NVIDIA_API_KEY environment variable is not set.
 
     Example:
         >>> from config.llm_config import get_llm
@@ -47,30 +45,29 @@ def get_llm(
         >>> print(response.content)
 
     Note:
-        To get a free API key:
-        1. Visit https://makersuite.google.com/app/apikey
-        2. Sign in with Google account
-        3. Create API key
-        4. Add to .env file as: GOOGLE_API_KEY=your_key_here
+        To get an NVIDIA API key:
+        1. Visit https://build.nvidia.com/
+        2. Sign in / create an account
+        3. Generate an API key for NIM endpoints
+        4. Add to .env file as: NVIDIA_API_KEY=your_key_here
     """
     # Get API key from environment
-    api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = os.getenv("NVIDIA_API_KEY")
 
     if not api_key:
         raise ValueError(
-            "GOOGLE_API_KEY not found in environment variables.\n"
+            "NVIDIA_API_KEY not found in environment variables.\n"
             "Please add your API key to the .env file:\n"
-            "  GOOGLE_API_KEY=your_key_here\n\n"
-            "Get a free API key from: https://makersuite.google.com/app/apikey"
+            "  NVIDIA_API_KEY=your_key_here\n\n"
+            "Get an API key from: https://build.nvidia.com/"
         )
 
     # Initialize and return the LLM
-    # Using gemini-flash-latest (FREE tier, fast, capable)
-    return ChatGoogleGenerativeAI(
-        model="gemini-flash-latest",
-        google_api_key=api_key,
+    return ChatNVIDIA(
+        model=model,
+        api_key=api_key,
         temperature=temperature,
-        max_output_tokens=max_tokens,
+        max_tokens=max_tokens,
         timeout=timeout,
     )
 
@@ -92,7 +89,7 @@ def test_llm_connection() -> bool:
 
 if __name__ == "__main__":
     # Quick test when run directly
-    print("Testing Gemini LLM connection...")
+    print("Testing NVIDIA NIM (Nemotron) LLM connection...")
 
     if test_llm_connection():
         print("✓ LLM connection successful!")

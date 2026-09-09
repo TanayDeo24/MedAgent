@@ -352,7 +352,7 @@ Tool Selection & Execution
 ### Agent Framework (Day 2+)
 - **langchain**: LLM framework
 - **langgraph**: Agent orchestration
-- **google-generativeai**: Gemini API
+- **langchain-nvidia-ai-endpoints**: NVIDIA NIM (Nemotron) API
 
 ### Testing
 - **pytest**: Test framework

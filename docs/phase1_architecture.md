@@ -6,7 +6,7 @@ Phase 1 establishes the foundational infrastructure for MedAgent's autonomous re
 
 ## What Phase 1 Accomplishes
 
-✅ **LLM Integration**: Connect to Google Gemini 1.5 Flash (free tier)
+✅ **LLM Integration**: Connect to NVIDIA NIM (Nemotron)
 ✅ **State Management**: Define complete agent state structure
 ✅ **Graph Infrastructure**: Build LangGraph skeleton
 ✅ **Basic Flow**: Single-node placeholder that validates end-to-end execution
@@ -157,15 +157,15 @@ Conditional edge at verification:
 
 ### 1. config/llm_config.py
 
-**Purpose**: Initialize Google Gemini LLM
+**Purpose**: Initialize NVIDIA NIM (Nemotron) LLM
 
 **Key Function**: `get_llm(temperature, max_tokens, timeout)`
 
 **Features**:
 - Loads API key from environment
 - Clear error if key missing
-- Returns configured ChatGoogleGenerativeAI
-- Free tier: 15 req/min, 1500 req/day, 1M token context
+- Returns configured ChatNVIDIA
+- Model: nvidia/nemotron-3-super-120b-a12b
 
 **Usage**:
 ```python
@@ -306,12 +306,12 @@ Testing: Agent Foundation Setup
 ======================================================================
 TEST: 1. LLM Connection Test
 ======================================================================
-Attempting to connect to Gemini API...
+Attempting to connect to NVIDIA NIM API...
 Sending test prompt...
-Response: Hello from Gemini!
+Response: Hello from Nemotron!
 
 ✓ PASS
-  LLM responded: Hello from Gemini!
+  LLM responded: Hello from Nemotron!
 
 ======================================================================
 TEST: 2. Agent Initialization Test
@@ -375,14 +375,14 @@ Next steps:
 
 ## Troubleshooting
 
-### "GOOGLE_API_KEY not found"
+### "NVIDIA_API_KEY not found"
 
 **Problem**: API key not in environment
 
 **Solution**:
 1. Check `.env` file exists in project root
-2. Ensure line: `GOOGLE_API_KEY=your_actual_key`
-3. Get key from: https://makersuite.google.com/app/apikey
+2. Ensure line: `NVIDIA_API_KEY=your_actual_key`
+3. Get key from: https://build.nvidia.com/
 4. Restart terminal/reload environment
 
 ### "Import Error: No module named 'langgraph'"
@@ -430,7 +430,7 @@ Will add:
 Phase 1 is complete when:
 
 ✅ All 4 tests pass in `test_phase1.py`
-✅ Can initialize Gemini LLM
+✅ Can initialize NVIDIA NIM (Nemotron) LLM
 ✅ AgentState structure defined
 ✅ LangGraph builds and compiles
 ✅ Can run `agent.run()` without crashes

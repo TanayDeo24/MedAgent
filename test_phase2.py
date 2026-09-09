@@ -597,7 +597,7 @@ def main():
         print("=" * 70)
         print("\nDebug steps:")
         print("  1. Check error messages above")
-        print("  2. Verify .env file has GOOGLE_API_KEY")
+        print("  2. Verify .env file has NVIDIA_API_KEY")
         print("  3. Check API connectivity (run test_tools.py)")
         print("  4. Review logs/medagent.log for details")
         print("  5. Ensure LLM is returning valid JSON")

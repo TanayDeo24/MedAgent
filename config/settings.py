@@ -85,10 +85,10 @@ class Settings(BaseSettings):
         description="Enable in-memory caching"
     )
 
-    # Google Gemini (for Day 2+)
-    GOOGLE_API_KEY: Optional[str] = Field(
+    # NVIDIA NIM (for Day 2+)
+    NVIDIA_API_KEY: Optional[str] = Field(
         default=None,
-        description="Google Gemini API key"
+        description="NVIDIA NIM API key"
     )
 
     # PubMed Specific

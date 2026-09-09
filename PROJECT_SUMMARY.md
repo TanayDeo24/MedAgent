@@ -169,7 +169,7 @@ for compound in result.data:
 ## What's Next?
 
 ### Day 2: Agent Orchestration
-- [ ] Integrate Google Gemini 1.5 Flash (free tier)
+- [ ] Integrate NVIDIA NIM (Nemotron)
 - [ ] Build LangGraph agent workflow
 - [ ] Multi-step research capabilities
 - [ ] Query planning and decomposition
@@ -194,7 +194,7 @@ All dependencies are **FREE** (no paid APIs):
 ### Agent Framework (Day 2+)
 - langchain: LLM framework
 - langgraph: Agent orchestration
-- google-generativeai: Gemini API (free tier)
+- langchain-nvidia-ai-endpoints: NVIDIA NIM (Nemotron) API
 
 ### Development
 - pytest: Testing framework

@@ -678,11 +678,10 @@ Approximate tokens per run:
 **Total for 1 iteration**: ~10,000-20,000 tokens
 **Total for 3 iterations**: ~30,000-60,000 tokens
 
-Using Gemini 1.5 Flash (FREE tier):
-- 15 requests/minute limit
-- 1,500 requests/day limit
-- 1M token context window
-- Within limits for all test queries
+Using NVIDIA NIM (nvidia/nemotron-3-super-120b-a12b):
+- Rate/context limits are account- and endpoint-specific; check your NVIDIA NIM
+  plan for current limits
+- Within limits for all test queries under typical NIM quotas
 
 ## Key Differences from Phase 1
 

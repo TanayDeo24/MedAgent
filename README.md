@@ -86,7 +86,7 @@ pip install -r requirements.txt
 cp .env.example .env
 
 # Edit .env and add your API keys (optional for Day 1)
-# Google Gemini API key will be needed for Day 2
+# NVIDIA NIM API key will be needed for Day 2
 ```
 
 ## 📚 Quick Start
@@ -339,7 +339,7 @@ mypy tools/ utils/
 - [x] Usage examples
 
 ### 📅 Day 2: Agent Orchestration
-- [ ] Integrate Google Gemini 1.5 Flash
+- [ ] Integrate NVIDIA NIM (Nemotron)
 - [ ] Build LangGraph agent workflow
 - [ ] Multi-step research capabilities
 - [ ] Query planning and decomposition
@@ -400,7 +400,7 @@ For questions or issues:
 - **PubMed/NCBI** - For providing free access to biomedical literature
 - **ClinicalTrials.gov** - For clinical trial data
 - **ChEMBL/EBI** - For chemical and drug information
-- **Google** - For Gemini API (Day 2+)
+- **NVIDIA** - For NIM API / Nemotron models (Day 2+)
 - **LangChain/LangGraph** - For agent orchestration framework
 
 ---

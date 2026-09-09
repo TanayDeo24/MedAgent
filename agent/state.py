@@ -163,7 +163,7 @@ class AgentState(TypedDict):
     """Running count of LLM tokens consumed.
 
     Useful for:
-        - Cost tracking (though Gemini is free)
+        - Cost tracking (NVIDIA NIM usage is metered per API key)
         - Performance monitoring
         - Debugging excessive LLM calls
     """
