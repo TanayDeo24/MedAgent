@@ -837,8 +837,8 @@ def report_generation_node(state: AgentState) -> AgentState:
                 elif tool_name == "chembl":
                     citations.append({
                         "source": "ChEMBL",
-                        "id": result.get("molecule_chembl_id", "N/A"),
-                        "name": result.get("pref_name", "N/A"),
+                        "id": result.get("chembl_id", "N/A"),
+                        "name": result.get("name") or result.get("drug_name") or "N/A",
                         "max_phase": result.get("max_phase", "N/A")
                     })
 
