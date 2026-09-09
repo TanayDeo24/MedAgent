@@ -1,0 +1,2861 @@
+{
+  "timestamp": "2026-09-09T19:38:11.181139",
+  "agent_config": {
+    "max_iterations": 2,
+    "temperature": 0.3
+  },
+  "total_tests": 60,
+  "workflows_run": 60,
+  "successful_tests": 11,
+  "timed_out_tests": 0,
+  "reconstructed_tests": 31,
+  "overall_success_rate": 0.18333333333333332,
+  "avg_tool_precision": 0.7680555555555556,
+  "avg_redundancy_rate": 0.1825,
+  "self_correction_rate": 0.9166666666666666,
+  "avg_citation_coverage": 0.6836054421768708,
+  "avg_confidence": 0.22466666666666668,
+  "avg_latency": 209.41369413932165,
+  "avg_iterations": 1.9166666666666667,
+  "composite_score": 0.44569421894070177,
+  "hallucination_rate": 0.42857142857142855,
+  "hallucination_rate_note": "LLM-judge methodology (separate call, no shared agent context) - measures internal grounding against this run's own tool_results, NOT verified correctness against reality. See evaluation/hallucination_judge.py and RESULTS.md for full methodology and its limits before treating this as a precise number.",
+  "total_claims_judged": 63,
+  "hallucinated_claims": 27,
+  "hallucination_judge_failures": 23,
+  "hallucination_judge_missing": 31,
+  "total_tokens_used_agent_pipeline": 1540990,
+  "total_tokens_used_hallucination_judge": 42384,
+  "total_tokens_used_combined": 1583374,
+  "total_llm_calls": 356,
+  "by_difficulty": {
+    "easy": {
+      "total": 18,
+      "successful": 0,
+      "success_rate": 0.0
+    },
+    "medium": {
+      "total": 24,
+      "successful": 6,
+      "success_rate": 0.25
+    },
+    "hard": {
+      "total": 12,
+      "successful": 3,
+      "success_rate": 0.25
+    },
+    "ambiguous": {
+      "total": 6,
+      "successful": 2,
+      "success_rate": 0.3333333333333333
+    }
+  },
+  "tool_usage": {
+    "chembl": 37,
+    "drugbank": 4,
+    "fda_labels": 2,
+    "pubchem": 3,
+    "clinical_trials": 42,
+    "pubmed": 43,
+    "literature": 1,
+    "kegg": 1,
+    "europe_pmc": 1,
+    "fda": 1,
+    "cochrane": 1,
+    "clinicaltrials.gov": 1
+  },
+  "failures": [
+    {
+      "test_case_id": 1,
+      "query": "What are FDA-approved EGFR inhibitors?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=EGFR&limit=5",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 2,
+      "query": "What is pembrolizumab used for?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 3,
+      "query": "Find BTK inhibitors",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30); chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)",
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 4,
+      "query": "Find BTK inhibitors in Phase 2 or 3 clinical trials for autoimmune diseases",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=BTK&limit=5",
+      "confidence": 0,
+      "results_count": 37
+    },
+    {
+      "test_case_id": 5,
+      "query": "What are the clinical trials for erlotinib in non-small cell lung cancer?",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 6,
+      "query": "Which kinase inhibitors are approved for melanoma?",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=melanoma&limit=20; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dmelanoma&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 7,
+      "query": "Find PD-1/PD-L1 inhibitors with completed Phase 3 trials",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcancer&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+PD-1%2FPD-L1+inhibitors+with+completed+Phase+3+trials&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 8,
+      "query": "Which protein kinase inhibitors failed in clinical trials due to cardiotoxicity?",
+      "difficulty": "hard",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/molecule.json?target_chembl_id=CHEMBL241&limit=20; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=protein+kinase&limit=5",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 9,
+      "query": "Compare the efficacy of first-generation vs second-generation EGFR TKIs in EGFR-mutant NSCLC",
+      "difficulty": "hard",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 6
+    },
+    {
+      "test_case_id": 10,
+      "query": "Find new cancer drugs",
+      "difficulty": "ambiguous",
+      "status": "completed_reconstructed",
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20",
+      "confidence": 0,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 11,
+      "query": "What is the mechanism of action of metformin in type 2 diabetes?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 12,
+      "query": "What is known about the pathophysiology of long COVID?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 13,
+      "query": "What clinical trials are currently recruiting for Alzheimer's disease?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 14,
+      "query": "Find completed Phase 3 trials for rheumatoid arthritis biologics",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 15,
+      "query": "Find JAK inhibitors",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 42
+    },
+    {
+      "test_case_id": 16,
+      "query": "What compounds target the androgen receptor?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 17,
+      "query": "List approved HMG-CoA reductase inhibitors (statins)",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 18,
+      "query": "Find small molecule inhibitors of BRAF",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 19,
+      "query": "Find approved ALK inhibitors",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+approved+ALK+inhibitors&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 20,
+      "query": "Find VEGF inhibitors approved for macular degeneration",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 21,
+      "query": "Find approved TNF-alpha inhibitors",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 22,
+      "query": "What is ibrutinib used for?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 23,
+      "query": "What are the known resistance mechanisms to imatinib in chronic myeloid leukemia?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 30
+    },
+    {
+      "test_case_id": 24,
+      "query": "Review the role of the gut microbiome in inflammatory bowel disease treatment",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 60
+    },
+    {
+      "test_case_id": 25,
+      "query": "What is the status of trials for CAR-T cell therapy in multiple myeloma?",
+      "difficulty": "easy",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 26,
+      "query": "What PARP inhibitors are used for BRCA-mutant ovarian cancer?",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 24
+    },
+    {
+      "test_case_id": 27,
+      "query": "Find SGLT2 inhibitors and their trial status for heart failure",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 28,
+      "query": "What is the evidence for metformin in cancer prevention?",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 29,
+      "query": "What GLP-1 receptor agonists are approved for obesity?",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 60
+    },
+    {
+      "test_case_id": 30,
+      "query": "Find trials of anti-CD20 antibodies for multiple sclerosis",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 31,
+      "query": "What are the cardiovascular risks associated with COX-2 inhibitors?",
+      "difficulty": "medium",
+      "status": "completed_reconstructed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 41
+    },
+    {
+      "test_case_id": 32,
+      "query": "Which mTOR inhibitors are approved for renal cell carcinoma and what trials support their use?",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.3,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 35,
+      "query": "Find HER2-targeted therapies for breast cancer and their clinical development status",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.6,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 37,
+      "query": "Find approved treatments for cystic fibrosis targeting CFTR",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.3,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 38,
+      "query": "What antibody-drug conjugates are approved for breast cancer and what trials led to approval?",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 40,
+      "query": "What is the trial landscape for gene therapies in hemophilia?",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": "Synthesis failed: LLM call did not return within 90s (attempt 3/3)",
+      "confidence": 0.3,
+      "results_count": 50
+    },
+    {
+      "test_case_id": 42,
+      "query": "What SSRIs are studied for treatment-resistant depression in recent trials?",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.6,
+      "results_count": 22
+    },
+    {
+      "test_case_id": 43,
+      "query": "Find approved treatments for chronic myeloid leukemia and compare their targets",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": "Synthesis failed: synthesis_node failed to return valid JSON: Expecting ':' delimiter: line 43 column 24 (char 1980)",
+      "confidence": 0.2,
+      "results_count": 50
+    },
+    {
+      "test_case_id": 44,
+      "query": "What is the evidence for statins in reducing all-cause mortality?",
+      "difficulty": "medium",
+      "status": "completed",
+      "error": "Verification failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 46,
+      "query": "Why did several BACE inhibitors fail in Alzheimer's clinical trials?",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": "Report generation failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "confidence": 0.6,
+      "results_count": 8
+    },
+    {
+      "test_case_id": 47,
+      "query": "Compare the safety profiles of first-generation vs second-generation antihistamines",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": "Synthesis failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "confidence": 0.45,
+      "results_count": 7
+    },
+    {
+      "test_case_id": 48,
+      "query": "What explains variable response to checkpoint inhibitor therapy across tumor types?",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.1,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 51,
+      "query": "Compare the mechanisms and clinical outcomes of CAR-T therapies targeting CD19 vs BCMA",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.5,
+      "results_count": 30
+    },
+    {
+      "test_case_id": 52,
+      "query": "Find kinase inhibitors originally developed for cancer that are now being tested for autoimmune disease",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.2,
+      "results_count": 70
+    },
+    {
+      "test_case_id": 54,
+      "query": "What is the comparative efficacy of first-line vs second-line therapies for metastatic colorectal cancer with KRAS mutations?",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.4,
+      "results_count": 21
+    },
+    {
+      "test_case_id": 55,
+      "query": "Which small-molecule kinase inhibitors have had black-box warnings added after approval, and why?",
+      "difficulty": "hard",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.1,
+      "results_count": 50
+    },
+    {
+      "test_case_id": 56,
+      "query": "Tell me about diabetes drugs",
+      "difficulty": "ambiguous",
+      "status": "completed",
+      "error": "Report generation failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "confidence": 0.6,
+      "results_count": 60
+    },
+    {
+      "test_case_id": 59,
+      "query": "Any updates on Alzheimer's treatment?",
+      "difficulty": "ambiguous",
+      "status": "completed",
+      "error": "Synthesis failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}; Verification failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+      "confidence": 0.95,
+      "results_count": 40
+    },
+    {
+      "test_case_id": 60,
+      "query": "What should I know about biologics?",
+      "difficulty": "ambiguous",
+      "status": "completed",
+      "error": "clinical_trials execution failed: [502] Bad Gateway\nUpstream request failed.; Synthesis failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+      "confidence": 0.4,
+      "results_count": 20
+    }
+  ],
+  "detailed_results": [
+    {
+      "test_case_id": 1,
+      "query": "What are FDA-approved EGFR inhibitors?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=EGFR&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "drugbank",
+        "fda_labels",
+        "pubchem"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 183.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=EGFR&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 2,
+      "query": "What is pembrolizumab used for?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 820.0,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 3,
+      "query": "Find BTK inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)",
+          "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.4,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 20,
+      "latency_seconds": 314.7,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30); chembl execution failed: ReadTimeout: HTTPSConnectionPool(host='www.ebi.ac.uk', port=443): Read timed out. (read timeout=30)",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 4,
+      "query": "Find BTK inhibitors in Phase 2 or 3 clinical trials for autoimmune diseases",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=BTK&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "literature"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.4,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 37,
+      "latency_seconds": 662.9,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=BTK&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 5,
+      "query": "What are the clinical trials for erlotinib in non-small cell lung cancer?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 402.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 6,
+      "query": "Which kinase inhibitors are approved for melanoma?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 1,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=melanoma&limit=20",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dmelanoma&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 128.5,
+      "iterations": 1,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=melanoma&limit=20; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dmelanoma&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 7,
+      "query": "Find PD-1/PD-L1 inhibitors with completed Phase 3 trials",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcancer&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+PD-1%2FPD-L1+inhibitors+with+completed+Phase+3+trials&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 290.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcancer&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+PD-1%2FPD-L1+inhibitors+with+completed+Phase+3+trials&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=PD-1&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 8,
+      "query": "Which protein kinase inhibitors failed in clinical trials due to cardiotoxicity?",
+      "difficulty": "hard",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/molecule.json?target_chembl_id=CHEMBL241&limit=20",
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=protein+kinase&limit=5"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "pubmed"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 269.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/molecule.json?target_chembl_id=CHEMBL241&limit=20; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=protein+kinase&limit=5",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 9,
+      "query": "Compare the efficacy of first-generation vs second-generation EGFR TKIs in EGFR-mutant NSCLC",
+      "difficulty": "hard",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 6,
+      "latency_seconds": 101.2,
+      "iterations": 1,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 10,
+      "query": "Find new cancer drugs",
+      "difficulty": "ambiguous",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20",
+          "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 311.7,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20; chembl execution failed: API returned an error: 500 Server Error: Internal Server Error for url: https://www.ebi.ac.uk/chembl/api/data/drug_indication.json?mesh_heading__icontains=cancer&limit=20",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 11,
+      "query": "What is the mechanism of action of metformin in type 2 diabetes?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "drugbank",
+        "kegg",
+        "pubmed"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 97.6,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 12,
+      "query": "What is known about the pathophysiology of long COVID?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 20,
+      "latency_seconds": 91.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 13,
+      "query": "What clinical trials are currently recruiting for Alzheimer's disease?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 164.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 14,
+      "query": "Find completed Phase 3 trials for rheumatoid arthritis biologics",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100"
+        ]
+      },
+      "tools_used": [
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 104.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100; clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis&filter.overallStatus=COMPLETED&filter.phase=PHASE3&format=json&pageSize=100",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 15,
+      "query": "Find JAK inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 42,
+      "citation_coverage": 1.0,
+      "results_count": 42,
+      "latency_seconds": 264.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 16,
+      "query": "What compounds target the androgen receptor?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 291.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 17,
+      "query": "List approved HMG-CoA reductase inhibitors (statins)",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 308.5,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 18,
+      "query": "Find small molecule inhibitors of BRAF",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "europe_pmc",
+        "pubchem"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 20,
+      "latency_seconds": 131.9,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 19,
+      "query": "Find approved ALK inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": [
+          "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+approved+ALK+inhibitors&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100"
+        ]
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 236.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": "clinical_trials execution failed: API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DFind+approved+ALK+inhibitors&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 20,
+      "query": "Find VEGF inhibitors approved for macular degeneration",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 188.5,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 21,
+      "query": "Find approved TNF-alpha inhibitors",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "drugbank",
+        "fda",
+        "pubchem"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 140.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 22,
+      "query": "What is ibrutinib used for?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 165.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 23,
+      "query": "What are the known resistance mechanisms to imatinib in chronic myeloid leukemia?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 0.6666666666666666,
+      "results_count": 30,
+      "latency_seconds": 205.0,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 24,
+      "query": "Review the role of the gut microbiome in inflammatory bowel disease treatment",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.2,
+      "confidence_score": null,
+      "citation_count": 60,
+      "citation_coverage": 1.0,
+      "results_count": 60,
+      "latency_seconds": 333.5,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 25,
+      "query": "What is the status of trials for CAR-T cell therapy in multiple myeloma?",
+      "difficulty": "easy",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 214.2,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 26,
+      "query": "What PARP inhibitors are used for BRCA-mutant ovarian cancer?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 24,
+      "citation_coverage": 1.0,
+      "results_count": 24,
+      "latency_seconds": 165.1,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 27,
+      "query": "Find SGLT2 inhibitors and their trial status for heart failure",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 226.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 28,
+      "query": "What is the evidence for metformin in cancer prevention?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 152.8,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 29,
+      "query": "What GLP-1 receptor agonists are approved for obesity?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.0,
+      "confidence_score": null,
+      "citation_count": 60,
+      "citation_coverage": 1.0,
+      "results_count": 60,
+      "latency_seconds": 225.6,
+      "iterations": 1,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 30,
+      "query": "Find trials of anti-CD20 antibodies for multiple sclerosis",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 225.3,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 31,
+      "query": "What are the cardiovascular risks associated with COX-2 inhibitors?",
+      "difficulty": "medium",
+      "task_completed": null,
+      "state": {
+        "confidence_score": null,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl",
+        "clinical_trials",
+        "pubmed"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.25,
+      "confidence_score": null,
+      "citation_count": 41,
+      "citation_coverage": 1.0,
+      "results_count": 41,
+      "latency_seconds": null,
+      "iterations": 2,
+      "reasoning_trace": [],
+      "error": null,
+      "tokens_used": null,
+      "llm_calls": null,
+      "hallucination_judge": null,
+      "reconstructed_from_logs": true,
+      "reconstruction_note": "Salvaged after evaluation_20260909 batch hung on case 31's hallucination-judge call (see EVAL_HANG_FIX_COMPLETE.md). confidence_score, task_completed, hallucination_judge, tokens_used, and llm_calls were never captured by the structured logger for the killed process and could not be honestly recovered - left null rather than guessed. agent_run_complete=True (whether this case's own pipeline finished, independent of whether the post-hoc hallucination judge call for it ever returned).",
+      "status": "completed_reconstructed"
+    },
+    {
+      "test_case_id": 32,
+      "query": "Which mTOR inhibitors are approved for renal cell carcinoma and what trials support their use?",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.3,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": 0.3,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 162.50998091697693,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['mTOR']\n  - Diseases: ['renal cell carcinoma']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify mTOR inhibitors that have reached approval (max phase 4) using ChEMBL, then retrieve clinical trial evidence for their use in renal cell carcinoma from ClinicalTrials.gov.\n  - Tools: chembl, clinical_trials\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'mTOR'",
+        "\u2713 clinical_trials: Found 20 results for 'renal cell carcinoma'",
+        "Synthesis Complete:\n  - Key findings: 5\n  - Cross-references: 1\n  - Gaps identified: 4\n  - Confidence: 0.70\n\nSummary: The tool records show that temsirolimus and everolimus have been studied in multiple renal cell carcinoma trials and are described as FDA-approved for RCC in one trial's summary, while sirolimus and nanoparticle albumin-bound rapamycin have also been investigated in smaller studies. However, the ChEMBL data lacks mechanistic information, preventing direct confirmation of mTOR inhibition from the compound database alone.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.50\n  - Coverage: 0.60\n  - Next: Retrieving specific trial records will provide NCT numbers, phases, results, and approval evidence. Querying ChEMBL for target activity will confirm mTOR inhibition mechanistically, strengthening evidence quality and completeness.",
+        "\u2713 clinical_trials: Found 20 results for 'renal cell carcinoma'",
+        "\u2713 chembl: Found 20 results for 'mTOR'",
+        "Synthesis Complete:\n  - Key findings: 3\n  - Cross-references: 1\n  - Gaps identified: 2\n  - Confidence: 0.40\n\nSummary: The tool results indicate that mTOR inhibitors have been used in prior treatment regimens for renal cell carcinoma, as referenced in a clinical trial's eligibility criteria, but the ChEMBL data lacks the compound details needed to name these inhibitors, and no trial directly evaluating an mTOR inhibitor for RCC is present.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.30\n  - Coverage: 0.30\n  - Reason: Maximum iterations reached (2 of 2)",
+        "\u2713 Report Generated: 5082 characters, 40 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 50352,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 33,
+      "query": "Compare efficacy of anti-TNF biologics for psoriatic arthritis",
+      "difficulty": "medium",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.2,
+      "confidence_score": 0.6,
+      "citation_count": 60,
+      "citation_coverage": 0.8571428571428571,
+      "results_count": 70,
+      "latency_seconds": 159.8395459651947,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['TNF']\n  - Diseases: ['psoriatic arthritis']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify clinical trials evaluating anti-TNF biologics in psoriatic arthritis to gather efficacy data, then supplement with published literature for comparative analyses and meta\u2011evidence, and finally retrieve compound\u2011level details from ChEMBL to confirm target engagement and development status.\n  - Tools: clinical_trials, pubmed, chembl\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'psoriatic arthritis'",
+        "\u2713 pubmed: Found 0 results for '(\"Psoriatic Arthritis\"[Mesh] AND (\"Anti-TNF Agents\"[Mesh] OR adalimumab OR etanercept OR infliximab OR golimumab OR certolizumab) AND (efficacy OR effectiveness) AND (comparative OR head-to-head))'",
+        "\u2713 chembl: Found 20 results for 'TNF'",
+        "Synthesis Complete:\n  - Key findings: 4\n  - Cross-references: 2\n  - Gaps identified: 5\n  - Confidence: 0.90\n\nSummary: The provided sources show that anti\u2011TNF biologics such as adalimumab, certolizumab pegol, and golimumab have been evaluated in clinical trials, with adalimumab and certolizumab pegol trials including psoriatic arthritis patients, but the summaries focus on safety, tolerability, quality of life, or pharmacokinetics rather than direct efficacy measures. ChEMBL data consist solely of small molecules and do not inform on these biologics. Consequently, direct efficacy comparisons of anti\u2011TNF agents for psoriatic arthritis cannot be derived from the current tool results.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.30\n  - Coverage: 0.20\n  - Next: These searches will retrieve clinical trial results reporting efficacy endpoints and comparative analyses (e.g., head\u2011to\u2011head or network meta\u2011analyses) needed to evaluate and compare the efficacy of anti\u2011TNF biologics for psoriatic arthritis.",
+        "\u2713 clinical_trials: Found 20 results for 'psoriatic arthritis'",
+        "\u2713 pubmed: Found 30 results for '(\"Psoriatic Arthritis\"[Mesh] OR \"psoriatic arthritis\") AND ((\"Anti-TNF Agents\"[Mesh] OR \"TNF inhibitors\" OR adalimumab OR etanercept OR infliximab OR golimumab OR \"certolizumab pegol\") AND (efficacy OR comparative effectiveness OR head-to-head OR ACR[tiab] OR PASI[tiab]))'",
+        "Synthesis Complete:\n  - Key findings: 5\n  - Cross-references: 2\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: The provided data demonstrates that anti-TNF biologics, particularly adalimumab, have established efficacy for psoriatic arthritis with specific response rates reported in clinical trials. Multiple anti-TNF agents are approved for PsA and supported by systematic reviews informing treatment guidelines, though direct comparative efficacy data between different anti-TNF agents is limited in the available results.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.50\n  - Reason: Maximum iterations reached (2 of 2); no further research possible.",
+        "\u2713 Report Generated: 6976 characters, 60 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 104619,
+      "llm_calls": 13,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 34,
+      "query": "What are the approved treatments for chronic hepatitis C and their trial history?",
+      "difficulty": "medium",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.62,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.62,
+      "citation_count": 40,
+      "citation_coverage": 0.8163265306122449,
+      "results_count": 49,
+      "latency_seconds": 164.53474473953247,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['chronic hepatitis C']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: We will first search ClinicalTrials.gov to identify clinical trials evaluating treatments for chronic hepatitis C, focusing on completed and approved therapies, then search PubMed for review articles and key studies detailing the approved regimens and their trial history.\n  - Tools: clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 50 results for 'chronic hepatitis C'",
+        "\u2713 pubmed: Found 30 results for '(\"Hepatitis C, Chronic\"[MeSH] AND (\"direct-acting antivirals\"[MeSH] OR sofosbuvir[MeSH] OR ledipasvir[MeSH] OR velpatasvir[MeSH] OR glecaprevir[MeSH] OR pibrentasvir[MeSH]) AND (\"clinical trial\"[Publication Type] OR \"trial history\"[Title/Abstract]))'",
+        "Synthesis Complete:\n  - Key findings: 8\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: The tool results reveal a progression from interferon\u2011based therapy (peginterferon alfa-2b + ribavirin) to interferon\u2011free direct\u2011acting antiviral regimens such as sofosbuvir/ledipasvir, sofosbuvir/velpatasvir, sofosbuvir/daclatasvir, elbasvir/grazoprevir, and triple combinations. These regimens have been evaluated in phase 2/3 clinical trials and supported by real\u2011world studies across diverse populations, including children, patients with cirrhosis, and marginalized groups.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Next: These queries will retrieve detailed trial records, review articles, and regulatory documents to fill the gaps in approved regimen lists, approval timelines, pivotal trial data, and real-world outcomes, thereby improving query coverage, completeness, and confidence.",
+        "\u2713 clinical_trials: Found 20 results for 'chronic hepatitis C'",
+        "\u2713 pubmed: Found 29 results for '\"chronic hepatitis C\"[tiab] AND approved[tiab] AND treatment[tiab] AND (\"clinical trial\"[pt] OR trial[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 9\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: The approved treatments for chronic hepatitis C have evolved from interferon\u2011based regimens (peginterferon alfa\u20112b + ribavirin) to interferon\u2011free direct\u2011acting antiviral combinations such as sofosbuvir/velpatasvir, ledipasvir/sofosbuvir, glecaprevir/pibrentasvir, sofosbuvir/velpatasvir/voxilaprevir, elbasvir/grazoprevir, and ravidasvir plus sofosbuvir. Clinical trials and real\u2011world studies demonstrate high sustained virologic response rates across genotypes and special populations, though gaps remain in long\u2011term safety, resistance data, and representation of certain patient groups.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.62\n  - Coverage: 0.86\n  - Reason: Maximum iterations reached (2 of 2); further refinement would require additional cycles which are not allowed.",
+        "\u2713 Report Generated: 8113 characters, 40 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 93707,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 35,
+      "query": "Find HER2-targeted therapies for breast cancer and their clinical development status",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": 0.6,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 157.025869846344,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['HER2']\n  - Diseases: ['breast cancer']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify HER2-targeted compounds using ChEMBL to obtain their development phases and chemical properties, then query ClinicalTrials.gov for breast cancer trials involving these compounds to determine their current clinical development status.\n  - Tools: chembl, clinical_trials\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'HER2'",
+        "\u2713 clinical_trials: Found 20 results for 'breast cancer'",
+        "Synthesis Complete:\n  - Key findings: 4\n  - Cross-references: 2\n  - Gaps identified: 4\n  - Confidence: 0.80\n\nSummary: Clinical trial results reveal several HER2-targeted therapies\u2014trastuzumab deruxtecan, trastuzumab, and the NeuVax vaccine\u2014under investigation across HER2-low, HER2-positive, and low/intermediate HER2 breast cancer populations. In contrast, the ChEMBL dataset provides only anonymous small molecules with unknown development phases and no HER2-related mechanisms, indicating a gap in publicly available compound data for HER2-targeted agents.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.50\n  - Coverage: 0.50\n  - Next: Additional clinical_trials searches will capture a full spectrum of HER2-directed agents and their trial phases. Refined ChEMBL queries focusing on HER2 as a target will yield annotated small molecules with known mechanisms, addressing the current gap in compound data.",
+        "\u2713 clinical_trials: Found 20 results for 'breast cancer HER2'",
+        "\u2713 chembl: Found 20 results for 'HER2'",
+        "Synthesis Complete:\n  - Key findings: 4\n  - Cross-references: 1\n  - Gaps identified: 5\n  - Confidence: 0.80\n\nSummary: The clinical trial data reveal several HER2-targeted therapies (trastuzumab, trastuzumab deruxtecan, NeuVax vaccine) under investigation or completed for HER2-positive, HER2-low, and intermediate HER2 breast cancer. In contrast, the ChEMBL search returned only unspecified small molecules with unknown development phases, providing no actionable HER2-targeted leads. This suggests a current emphasis on antibody-based HER2 therapies rather than small molecule inhibitors in the retrieved data.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Reason: No iterations remaining (maximum of 2 iterations reached).",
+        "\u2713 Report Generated: 6033 characters, 40 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 54271,
+      "llm_calls": 13,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 36,
+      "query": "What mAChR agonists are studied for Alzheimer's disease?",
+      "difficulty": "medium",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.65,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": 0.65,
+      "citation_count": 35,
+      "citation_coverage": 1.0,
+      "results_count": 35,
+      "latency_seconds": 183.83665895462036,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['mAChR']\n  - Diseases: [\"Alzheimer's disease\"]\n  - Type: drug_target_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify mAChR agonist compounds from ChEMBL, then retrieve relevant literature on their use in Alzheimer's disease from PubMed, and finally check for any clinical trials evaluating these agonists for Alzheimer's disease.\n  - Tools: chembl, pubmed, clinical_trials\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'mAChR'",
+        "\u2713 pubmed: Found 7 results for '(\"muscarinic acetylcholine receptor agonists\"[MeSH Terms] OR \"mAChR agonists\"[Title/Abstract]) AND (\"Alzheimer disease\"[MeSH Terms] OR \"Alzheimer's disease\"[Title/Abstract])'",
+        "\u2713 clinical_trials: Found 0 results for 'Alzheimer's disease'",
+        "Synthesis Complete:\n  - Key findings: 4\n  - Cross-references: 2\n  - Gaps identified: 4\n  - Confidence: 0.80\n\nSummary: The literature identifies xanomeline and TZ4M as mAChR agonists investigated for Alzheimer's disease, demonstrating procognitive benefits, while noting clinical challenges due to side effects. ChEMBL provides a list of small molecules with unknown activity, indicating a gap in annotated agonist data that hinders cross-referencing.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Next: Additional PubMed searches will capture a broader range of agonists and mechanistic studies. Clinical trials search will provide efficacy, safety, and trial outcome data. A refined ChEMBL query with activity filters will yield annotated agonist molecules, enabling better cross\u2011reference and structure\u2011activity insights.",
+        "\u2713 pubmed: Found 15 results for '(\"Muscarinic Agonists\"[MeSH] OR \"mAChR agonists\") AND \"Alzheimer Disease\"[MeSH]'",
+        "\u2713 clinical_trials: Found 0 results for 'Alzheimer's disease'",
+        "\u2713 chembl: Found 20 results for 'mAChR'",
+        "Synthesis Complete:\n  - Key findings: 9\n  - Cross-references: 1\n  - Gaps identified: 4\n  - Confidence: 0.70\n\nSummary: The literature describes several mAChR agonists\u2014orthosteric (e.g., TZ4M, xanomeline), allosteric modulators (e.g., VU0467319, VU0486846), and subtype\u2011selective activators (e.g., PT-3763)\u2014that have shown pro\u2011cognitive effects in preclinical models of Alzheimer's disease. However, cholinergic side effects have limited the clinical utility of non\u2011selective orthosteric agonists, driving research toward more selective modulators and agonist/antagonist combinations. ChEMBL provides physicochemical data for numerous small molecules, but lacks the named identifiers and mechanistic annotations needed to directly connect these compounds to the agonists highlighted in the publications.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.65\n  - Coverage: 0.80\n  - Reason: No iterations remaining (max iterations reached).",
+        "\u2713 Report Generated: 8457 characters, 35 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 60619,
+      "llm_calls": 16,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 37,
+      "query": "Find approved treatments for cystic fibrosis targeting CFTR",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.3,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.5,
+      "confidence_score": 0.3,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 81.68919920921326,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['CFTR']\n  - Diseases: ['cystic fibrosis']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify approved compounds that target CFTR using ChEMBL, then verify their clinical status in cystic fibrosis via ClinicalTrials.gov to confirm approved treatments.\n  - Tools: chembl, clinical_trials\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'CFTR'",
+        "\u2717 clinical_trials: Failed - API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcystic+fibrosis&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+        "Synthesis Complete:\n  - Key findings: 1\n  - Cross-references: 0\n  - Gaps identified: 4\n  - Confidence: 0.35\n\nSummary: The ChEMBL dataset provides a set of small molecules with physicochemical properties but lacks essential identifying and functional data, preventing any determination of approved CFTR-targeting therapies for cystic fibrosis.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.30\n  - Coverage: 0.20\n  - Next: Querying clinical_trials will reveal any completed or approved therapeutic trials, while a refined ChEMBL search with filters for approved drugs and target CFTR can yield known therapeutic molecules with regulatory status. Together these sources should provide the needed evidence to answer the original query.",
+        "\u2717 clinical_trials: Failed - API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dcystic+fibrosis&filter.overallStatus=COMPLETED&filter.phase=PHASE4&format=json&pageSize=100",
+        "\u2713 chembl: Found 20 results for 'CFTR'",
+        "Synthesis Complete:\n  - Key findings: 2\n  - Cross-references: 0\n  - Gaps identified: 5\n  - Confidence: 0.40\n\nSummary: The ChEMBL query returned ten small molecule entries, but none include compound names, mechanisms of action, or development phase information. Consequently, the data does not reveal any approved CFTR\u2011targeting treatments, highlighting significant gaps in the available data.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.30\n  - Coverage: 0.20\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 3565 characters, 20 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 25024,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 22,
+        "hallucinated_claims": 3,
+        "judge_tokens_used": 9804,
+        "judge_failed": false
+      }
+    },
+    {
+      "test_case_id": 38,
+      "query": "What antibody-drug conjugates are approved for breast cancer and what trials led to approval?",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.0,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.16666666666666666,
+      "confidence_score": 0.0,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 117.7782621383667,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['breast cancer']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify approved antibody-drug conjugates for breast cancer and the pivotal trials that supported their approval by searching clinical trial registries, then retrieve detailed compound information from ChEMBL, and finally gather supporting literature from PubMed if needed.\n  - Tools: clinical_trials, chembl, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'breast cancer'",
+        "\u2713 chembl: Found 0 results for 'breast cancer'",
+        "\u2713 pubmed: Found 0 results for '\"antibody-drug conjugate\"[MeSH Terms] AND breast neoplasm[MeSH Terms] AND (approved[Title/Abstract] OR approval[Title/Abstract]) AND (clinical trial[Publication Type] OR pivotal trial[Title/Abstract])'",
+        "Synthesis Complete:\n  - Key findings: 1\n  - Cross-references: 0\n  - Gaps identified: 2\n  - Confidence: 0.95\n\nSummary: The supplied clinical trial dataset contains no studies on antibody-drug conjugates for breast cancer. Therefore, it is impossible to identify approved ADCs or the trials that led to their approval from this information.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Next: Searching PubMed will retrieve review articles and primary literature on approved breast cancer ADCs and their pivotal trials. ClinicalTrials.gov will provide trial identifiers (NCT numbers) and detailed trial information. ChEMBL will supply validated drug-target and approval data for the ADCs. Together, these sources will fill the identified gaps and enable a complete answer.",
+        "\u2713 pubmed: Found 0 results for '\"Antibody-Drug Conjugates\"[MeSH] AND \"Breast Neoplasms\"[MeSH] AND (approved OR approval) AND \"clinical trial\"[Publication Type]'",
+        "\u2717 clinical_trials: Failed - API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dbreast+cancer+AND+AREA%5BInterventionSearch%5Dantibody-drug+conjugate&filter.phase=PHASE3&format=json&pageSize=100",
+        "\u2713 chembl: Found 0 results for 'breast cancer'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: The tool results contained no data, preventing synthesis of any facts about antibody-drug conjugates for breast cancer.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.00\n  - Coverage: 0.10\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 2366 characters, 0 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 28657,
+      "llm_calls": 15,
+      "hallucination_judge": {
+        "total_claims": 9,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 3763,
+        "judge_failed": false
+      }
+    },
+    {
+      "test_case_id": 39,
+      "query": "Find bispecific antibodies in clinical trials for hematologic malignancies",
+      "difficulty": "medium",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.5,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": 0.5,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 361.99290704727173,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['hematologic malignancies']\n  - Type: clinical_trial_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First search ClinicalTrials.gov for bispecific antibody trials in hematologic malignancies to identify active and completed studies, then supplement with PubMed for mechanistic and background literature, and finally query ChEMBL for detailed compound information on the bispecific antibodies.\n  - Tools: clinical_trials, pubmed, chembl\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'hematologic malignancies'",
+        "\u2713 pubmed: Found 0 results for '(\"bispecific antibodies\"[MeSH Terms] OR \"bispecific antibody\"[Title/Abstract]) AND (\"hematologic neoplasms\"[MeSH Terms] OR \"hematologic malignancy\"[Title/Abstract]) AND \"clinical trial\"[Publication Type]'",
+        "\u2713 chembl: Found 0 results for 'hematologic malignancies'",
+        "Synthesis Complete:\n  - Key findings: 10\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.95\n\nSummary: The clinical trial landscape shows active investigation of bispecific antibodies\u2014particularly those targeting BCMA/CD3, CD19/CD3, and CD20/CD3\u2014for hematologic malignancies such as multiple myeloma, acute lymphoblastic leukemia, Waldenstrom macroglobulinemia, and plasma cell leukemia. Most studies are early-phase (Phase I/II) or real-world evaluations, with several combination regimens underway, while completed studies provide initial evidence of activity and safety.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.40\n  - Coverage: 0.60\n  - Next: Searching PubMed will provide peer-reviewed studies and detailed trial results; refining clinical_trials queries will yield specific antibody names, NCT numbers, phases, sponsors, and outcomes; querying ChEMBL will supply molecular and target information for the antibodies to complement clinical data.",
+        "\u2713 pubmed: Found 0 results for '\"bispecific antibodies\"[tiab] AND \"hematologic malignancies\"[tiab] AND \"clinical trial\"[pt]'",
+        "\u2713 clinical_trials: Found 20 results for 'hematologic malignancies'",
+        "\u2713 chembl: Found 0 results for 'hematologic malignancies'",
+        "Synthesis Complete:\n  - Key findings: 6\n  - Cross-references: 1\n  - Gaps identified: 5\n  - Confidence: 0.95\n\nSummary: The clinical trial landscape shows multiple bispecific antibodies\u2014particularly those targeting BCMA/CD3 or CD3/CD38\u2014being investigated in hematologic malignancies, with a strong focus on multiple myeloma. Teclistamab is the most frequently studied agent, appearing in monotherapy, combination, and real\u2011world studies across different phases. While many trials are active or recently completed, key efficacy and safety outcomes are not captured in the supplied data, highlighting a need for further reporting.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.50\n  - Coverage: 0.60\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 13648 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 59399,
+      "llm_calls": 16,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 40,
+      "query": "What is the trial landscape for gene therapies in hemophilia?",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.3,
+        "current_step": 2,
+        "errors": [
+          "Synthesis failed: LLM call did not return within 90s (attempt 3/3)"
+        ]
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.25,
+      "confidence_score": 0.3,
+      "citation_count": 20,
+      "citation_coverage": 0.4,
+      "results_count": 50,
+      "latency_seconds": 442.5897560119629,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['hemophilia']\n  - Type: clinical_trial_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First search ClinicalTrials.gov to map the current trial landscape of gene therapies for hemophilia, then supplement with PubMed to gather relevant scientific literature and review articles that provide context on mechanisms and outcomes.\n  - Tools: clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 50 results for 'hemophilia'",
+        "\u2713 pubmed: Found 20 results for '(\"gene therapy\"[MeSH Terms] OR \"gene therapy\"[tiab]) AND (\"hemophilia\"[MeSH Terms] OR \"hemophilia A\"[tiab] OR \"hemophilia B\"[tiab]) AND (\"clinical trial\"[Publication Type] OR \"trial\"[tiab])'",
+        "\u26a0 Synthesis error: LLM call did not return within 90s (attempt 3/3)",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.30\n  - Coverage: 0.20\n  - Next: Targeted queries will retrieve detailed trial records (including phase, status, sponsor, location) and recent scholarly reviews, enabling a comprehensive synthesis of the trial landscape, identification of trends, and assessment of evidence quality.",
+        "\u2713 clinical_trials: Found 50 results for 'hemophilia'",
+        "\u2713 pubmed: Found 0 results for '(\"gene therapy\"[MeSH] OR \"gene transfer\"[MeSH]) AND (\"hemophilia A\"[MeSH] OR \"hemophilia B\"[MeSH]) AND (\"clinical trial\"[pt] OR \"clinical study\"[pt])'",
+        "Synthesis Complete:\n  - Key findings: 8\n  - Cross-references: 3\n  - Gaps identified: 6\n  - Confidence: 0.95\n\nSummary: The clinical trial landscape for hemophilia gene therapies includes a variety of AAV\u2011mediated liver\u2011directed approaches for both hemophilia A and B, a lentiviral hematopoietic stem cell strategy for hemophilia A, and extensive observational follow\u2011up for an approved factor IX gene therapy. Baseline standard\u2011of\u2011care studies and screening protocols support trial conduct, while early\u2011phase studies remain small in size. Major sponsors range from large pharmaceutical companies to academic institutions, with trial sites concentrated primarily in the United States.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.30\n  - Coverage: 0.60\n  - Reason: Maximum iterations reached (2); no further research can be conducted.",
+        "\u2713 Report Generated: 13705 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": "Synthesis failed: LLM call did not return within 90s (attempt 3/3)",
+      "tokens_used": 54988,
+      "llm_calls": 14,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 41,
+      "query": "Find approved treatments for pulmonary arterial hypertension and their targets",
+      "difficulty": "medium",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.65,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "chembl"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.25,
+      "confidence_score": 0.65,
+      "citation_count": 30,
+      "citation_coverage": 1.0,
+      "results_count": 30,
+      "latency_seconds": 203.73541402816772,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['pulmonary arterial hypertension']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First query ChEMBL for compounds approved for pulmonary arterial hypertension (max phase = 4) and retrieve their protein targets. Then, if needed, supplement with PubMed to gather mechanistic literature on the drug-target interactions.\n  - Tools: chembl, pubmed\n  - Complexity: moderate",
+        "\u2713 chembl: Found 10 results for 'pulmonary arterial hypertension'",
+        "\u2713 pubmed: Found 13 results for '\"Pulmonary Arterial Hypertension\"[MeSH] AND approved[Title/Abstract] AND (drug target[Title/Abstract] OR mechanism[Title/Abstract])'",
+        "Synthesis Complete:\n  - Key findings: 10\n  - Cross-references: 9\n  - Gaps identified: 6\n  - Confidence: 0.90\n\nSummary: Approved treatments for pulmonary arterial hypertension primarily target the NO, endothelin, and prostacyclin pathways, as evidenced by chembl entries for drugs like sildenafil, bosentan, and treprostinil. Recent literature expands the therapeutic landscape with activin/BMP inhibition (sotatercept) and sGC stimulation (riociguat), while also highlighting novel targets such as ARF6/HIF-2\u03b1, SIRT3, and neutrophil elastase, and exploring formulation improvements like PEG-treprostinil conjugates.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.65\n  - Coverage: 0.70\n  - Next: A targeted ChEMBL query will retrieve all drugs annotated with the PAH indication and their confirmed protein targets, ensuring completeness of the approved drug list. A PubMed search for recent review articles will provide up-to-date summaries of approved therapies, including newer agents and formulation advances, filling the gaps in detail and context.",
+        "\u2713 chembl: Found 10 results for 'pulmonary arterial hypertension'",
+        "\u2713 pubmed: Found 20 results for '\"pulmonary arterial hypertension\" AND (approved OR FDA) AND (\"mechanism of action\" OR target)'",
+        "Synthesis Complete:\n  - Key findings: 14\n  - Cross-references: 7\n  - Gaps identified: 6\n  - Confidence: 0.90\n\nSummary: The chembl database lists multiple approved PAH drugs spanning prostacyclin analogs/agonists, endothelin receptor antagonists, and PDE5 inhibitors, which align with pubmed-described classes of NO-cGMP enhancers, prostacyclin pathway agonists, and endothelin antagonists. Pubmed further notes approved agents such as riociguat and sotatercept, and emerging therapies like seralutinib, indicating additional targets and mechanisms not fully captured in the chembl subset.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.65\n  - Coverage: 0.70\n  - Reason: Maximum iterations reached; no further tool calls permitted.",
+        "\u2713 Report Generated: 8357 characters, 30 citations, 9 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 73842,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 42,
+      "query": "What SSRIs are studied for treatment-resistant depression in recent trials?",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.6,
+      "citation_count": 22,
+      "citation_coverage": 1.0,
+      "results_count": 22,
+      "latency_seconds": 204.0227620601654,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['treatment-resistant depression']\n  - Type: clinical_trial_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First search ClinicalTrials.gov for recent trials of SSRIs in treatment-resistant depression to identify which specific SSRIs are being investigated. Then supplement with a PubMed search for recent literature and reviews on SSRIs for treatment-resistant depression to capture additional context and findings.\n  - Tools: clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'treatment-resistant depression'",
+        "\u2713 pubmed: Found 8 results for '(\"Selective Serotonin Reuptake Inhibitors\"[MeSH] OR fluoxetine OR sertraline OR paroxetine OR citalopram OR escitalopram OR fluvoxamine) AND (\"Depressive Disorder, Treatment-Resistant\"[MeSH] OR \"treatment-resistant depression\") AND (\"clinical trial\"[pt] OR \"randomized controlled trial\"[pt])'",
+        "Synthesis Complete:\n  - Key findings: 4\n  - Cross-references: 2\n  - Gaps identified: 3\n  - Confidence: 0.90\n\nSummary: Recent research on SSRIs for treatment-resistant depression shows they are commonly used as baseline or concomitant therapy in trials investigating novel interventions (e.g., esketamine, psilocybin, psychotherapy augmentations) rather than being studied as primary monotherapy. Specific SSRIs such as escitalopram and sertraline appear frequently across both clinical trial interventions and PubMed studies, indicating their established role in TRD treatment regimens.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Next: Targeted searches will capture a fuller list of SSRIs appearing in recent TRD trials, retrieve specific trial records for detailed data, and locate recent syntheses that summarize outcomes, thereby addressing the identified gaps and improving completeness and confidence.",
+        "\u2713 clinical_trials: Found 18 results for 'treatment-resistant depression'",
+        "\u2713 pubmed: Found 4 results for '(\"selective serotonin reuptake inhibitors\"[MeSH] OR SSRI[tiab]) AND (\"treatment-resistant depression\"[MeSH] OR \"treatment resistant depression\"[tiab]) AND (\"clinical trial\"[pt] OR \"randomized controlled trial\"[pt])'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: Recent clinical trials for treatment-resistant depression consistently use SSRIs as background therapy when investigating novel augmentations such as ziprasidone, esketamine, quetiapine, or lithium, with escitalopram being the only specifically named SSRI. Studies comparing SSRI dose optimization to alternative second-line strategies show modest benefits, reinforcing the role of SSRIs as a foundational but often insufficient treatment that necessitates augmentation.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.50\n  - Reason: No iterations remaining (maximum of 2 iterations reached)",
+        "\u2713 Report Generated: 7243 characters, 22 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 63612,
+      "llm_calls": 13,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 43,
+      "query": "Find approved treatments for chronic myeloid leukemia and compare their targets",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.2,
+        "current_step": 2,
+        "errors": [
+          "Synthesis failed: synthesis_node failed to return valid JSON: Expecting ':' delimiter: line 43 column 24 (char 1980)"
+        ]
+      },
+      "tools_used": [
+        "drugbank",
+        "clinical_trials",
+        "chembl",
+        "fda_labels"
+      ],
+      "tool_precision": 0.25,
+      "redundancy_rate": 0.2,
+      "confidence_score": 0.2,
+      "citation_count": 20,
+      "citation_coverage": 0.4,
+      "results_count": 50,
+      "latency_seconds": 153.29359698295593,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['chronic myeloid leukemia']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First retrieve approved treatments for chronic myeloid leukemia from clinical trial data, then obtain their molecular targets from ChEMBL to enable comparison.\n  - Tools: clinical_trials, chembl\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 50 results for 'chronic myeloid leukemia'",
+        "\u2713 chembl: Found 0 results for 'chronic myeloid leukemia'",
+        "\u26a0 Synthesis error: synthesis_node failed to return valid JSON: Expecting ':' delimiter: line 43 column 24 (char 1980)",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.30\n  - Coverage: 0.20\n  - Next: Querying drug approval databases (DrugBank, FDA labels) will provide the list of approved CML treatments. Follow\u2011up ChEMBL queries will retrieve their protein targets and activity data, enabling a target comparison.",
+        "\u2717 drugbank: Invalid tool name (hallucinated - not a real tool)",
+        "\u2717 fda_labels: Invalid tool name (hallucinated - not a real tool)",
+        "\u2713 chembl: Found 0 results for 'chronic myeloid leukemia'",
+        "Synthesis Complete:\n  - Key findings: 11\n  - Cross-references: 3\n  - Gaps identified: 4\n  - Confidence: 0.90\n\nSummary: The clinical trial records show multiple agents\u2014including tyrosine kinase inhibitors (dasatinib, bosutinib, imatinib, nilotinib), immunosuppressants, investigational molecules (ELVN-001, KPT-330, Hu8F4, MK2206), and pentostatin\u2014being studied in chronic myeloid leukemia, but they do not disclose the drugs' targets or regulatory approval status.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.20\n  - Coverage: 0.20\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 9683 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": "Synthesis failed: synthesis_node failed to return valid JSON: Expecting ':' delimiter: line 43 column 24 (char 1980)",
+      "tokens_used": 64084,
+      "llm_calls": 11,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 44,
+      "query": "What is the evidence for statins in reducing all-cause mortality?",
+      "difficulty": "medium",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.0,
+        "current_step": 2,
+        "errors": [
+          "Verification failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+        ]
+      },
+      "tools_used": [
+        "pubmed",
+        "cochrane"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.0,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 37.99899101257324,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: []\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Conduct a focused literature search in PubMed to gather systematic reviews, meta-analyses, and clinical trial evidence regarding statins and all-cause mortality.\n  - Tools: pubmed\n  - Complexity: simple",
+        "\u2713 pubmed: Found 0 results for '\"Statins\"[MeSH] AND (\"Mortality\"[MeSH] OR \"all-cause mortality\"[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: The tool results contain no information, so no evidence can be synthesized regarding statins' effect on all-cause mortality.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Next: A broader search using terms for systematic reviews and meta-analyses will likely capture high-level evidence. Including Cochrane will provide access to high-quality syntheses. This should yield the needed evidence to assess statins' impact on all-cause mortality.",
+        "\u2713 pubmed: Found 0 results for '\"Statins\"[MeSH] AND (\"Mortality\"[MeSH] OR \"all-cause mortality\"[Title/Abstract])'",
+        "\u2717 cochrane: Invalid tool name (hallucinated - not a real tool)",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: The tool results were empty, so no evidence regarding statins' effect on all-cause mortality could be extracted or synthesized.",
+        "\u26a0 Verification error: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+        "\u2713 Report Generated: 1222 characters, 0 citations, 0 compounds in table"
+      ],
+      "error": "Verification failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "tokens_used": 10373,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 9,
+        "hallucinated_claims": 3,
+        "judge_tokens_used": 3628,
+        "judge_failed": false
+      }
+    },
+    {
+      "test_case_id": 45,
+      "query": "What trials support use of semaglutide for cardiovascular risk reduction?",
+      "difficulty": "medium",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.65,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": 0.65,
+      "citation_count": 22,
+      "citation_coverage": 1.0,
+      "results_count": 22,
+      "latency_seconds": 164.98286080360413,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['cardiovascular risk reduction']\n  - Type: clinical_trial_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Search clinical trial registries for semaglutide studies focused on cardiovascular outcomes, then supplement with PubMed literature to capture published results and additional details.\n  - Tools: clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 2 results for 'cardiovascular risk reduction'",
+        "\u2713 pubmed: Found 20 results for '\"Semaglutide\"[MeSH] AND (\"Cardiovascular Diseases\"[MeSH] OR \"Myocardial Infarction\"[MeSH] OR \"Stroke\"[MeSH]) AND \"Clinical Trial\"[pt]'",
+        "Synthesis Complete:\n  - Key findings: 5\n  - Cross-references: 4\n  - Gaps identified: 5\n  - Confidence: 0.90\n\nSummary: Semaglutide consistently reduces major adverse cardiovascular events across diverse populations including type 2 diabetes, chronic kidney disease, overweight/obesity, and heart failure with preserved ejection fraction, as demonstrated by multiple large randomized trials. Ongoing studies are evaluating its use in HIV patients and broader cerebrovascular risk, while current evidence indicates its benefit is independent of SGLT2 inhibitor use.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Next: These targeted searches will retrieve the specific trial names, designs, primary outcomes, and quantitative efficacy data needed to fully answer which trials support semaglutide for cardiovascular risk reduction.",
+        "\u2713 clinical_trials: Found 2 results for 'cardiovascular risk reduction'",
+        "\u2713 pubmed: Found 20 results for '\"Semaglutide\"[MeSH] AND (\"cardiovascular diseases\"[MeSH] OR \"cardiovascular risk\"[MeSH]) AND \"clinical trial\"[Publication Type]'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.92\n\nSummary: Multiple large randomized trials show that semaglutide\u2014both subcutaneous and oral\u2014reduces major adverse cardiovascular events in patients with type 2 diabetes, chronic kidney disease, overweight/obesity without diabetes, and heart failure with preserved ejection fraction. Ongoing trials are evaluating its HIV\u2011specific cardiovascular effects and comparing it with metformin in diabetes. Gaps remain in long\u2011term data, head\u2011to\u2011head comparisons, and evidence in certain subgroups such as HIV and HFrEF.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.65\n  - Coverage: 0.85\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 8803 characters, 22 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 77803,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 46,
+      "query": "Why did several BACE inhibitors fail in Alzheimer's clinical trials?",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": [
+          "Report generation failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+        ]
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.6,
+      "citation_count": 8,
+      "citation_coverage": 1.0,
+      "results_count": 8,
+      "latency_seconds": 177.5531542301178,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['BACE']\n  - Diseases: [\"Alzheimer's\"]\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Search PubMed for literature discussing the reasons behind clinical trial failures of BACE inhibitors in Alzheimer's disease, focusing on efficacy, safety, and mechanistic insights.\n  - Tools: pubmed\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 6 results for '(\"BACE inhibitor\" OR \"beta-secretase inhibitor\") AND Alzheimer* AND (\"clinical trial\" OR \"treatment failure\") AND (efficacy OR safety OR adverse effects)'",
+        "Synthesis Complete:\n  - Key findings: 5\n  - Cross-references: 2\n  - Gaps identified: 4\n  - Confidence: 0.88\n\nSummary: Several BACE inhibitors, notably verubecestat and atabecestat, failed in Alzheimer's clinical trials due to lack of cognitive or functional benefit and the emergence of adverse events such as falls, suicidal ideation, weight loss, hepatic toxicity, and neuropsychiatric symptoms. Mechanistic data show that chronic BACE inhibition did not alter BACE1 cerebrospinal fluid levels despite correlations with downstream Alzheimer's markers, suggesting insufficient target engagement or compensatory biology. These findings point to a combination of efficacy shortfalls and safety liabilities as key reasons for the clinical failures of this drug class.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.40\n  - Coverage: 0.75\n  - Next: These queries will retrieve detailed primary literature and review articles that provide specific efficacy endpoints, adverse event profiles, trial designs, and mechanistic data needed to substantiate the reasons for clinical failure and fill the identified gaps.",
+        "\u2713 pubmed: Found 8 results for '(\"beta-Secretase\"[MeSH] OR BACE[tiab] OR \"beta-secretase inhibitor\"[tiab]) AND (\"Alzheimer Disease\"[MeSH] OR Alzheimer*[tiab]) AND (\"clinical trial\"[pt] OR \"clinical trial\"[tiab]) AND (failure[tiab] OR \"lack of efficacy\"[tiab] OR safety[tiab] OR adverse effects[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 6\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.92\n\nSummary: BACE inhibitors consistently demonstrate amyloid\u2011\u03b2 lowering in humans, yet clinical trials in symptomatic Alzheimer\u2019s disease have shown lack of efficacy and notable adverse effects, while prevention\u2011focused agents like CNP520 are still under investigation. The data suggest that achieving a suitable balance between target engagement, selectivity, and safety is critical, and that mechanistic understanding of off\u2011target effects and patient selection remains incomplete.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.80\n  - Reason: No iterations remaining",
+        "\u26a0 Report generation error: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+      ],
+      "error": "Report generation failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "tokens_used": 27186,
+      "llm_calls": 11,
+      "hallucination_judge": {
+        "total_claims": 1,
+        "hallucinated_claims": 1,
+        "judge_tokens_used": 4789,
+        "judge_failed": false
+      }
+    },
+    {
+      "test_case_id": 47,
+      "query": "Compare the safety profiles of first-generation vs second-generation antihistamines",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.45,
+        "current_step": 2,
+        "errors": [
+          "Synthesis failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+        ]
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.45,
+      "citation_count": 7,
+      "citation_coverage": 1.0,
+      "results_count": 7,
+      "latency_seconds": 76.55026197433472,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: []\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Conduct a focused literature review using PubMed to gather comparative safety data, adverse effect profiles, and clinical study findings for first- versus second-generation antihistamines.\n  - Tools: pubmed\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 1 results for '(\"first generation antihistamines\"[tiab] OR \"first-generation antihistamines\"[tiab]) AND (\"second generation antihistamines\"[tiab] OR \"second-generation antihistamines\"[tiab]) AND (safety[tiab] OR \"adverse effects\"[MeSH]) AND (comparison[tiab] OR comparative[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 3\n  - Cross-references: 0\n  - Gaps identified: 4\n  - Confidence: 0.50\n\nSummary: The reviewed literature indicates that first-generation antihistamines are linked to sedation, whereas second-generation antihistamines generally produce less sedation but differ in efficacy and safety. Bilastine, a newer second-generation agent, is highlighted for its minimal sedation and rapid onset, though detailed comparative safety data are lacking.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.50\n  - Coverage: 0.50\n  - Next: Additional PubMed searches targeting specific safety domains will provide more comprehensive comparative data, improving query coverage, evidence quality, and completeness.",
+        "\u2713 pubmed: Found 7 results for '(\"first generation antihistamines\"[MeSH Terms] OR \"first-generation antihistamines\"[Title/Abstract]) AND (\"second generation antihistamines\"[MeSH Terms] OR \"second-generation antihistamines\"[Title/Abstract]) AND (safety[Title/Abstract] OR adverse effects[MeSH Terms] OR side effects[MeSH Terms])'",
+        "\u26a0 Synthesis error: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.45\n  - Coverage: 0.55\n  - Reason: No iterations remaining (max iterations reached)",
+        "\u2713 Report Generated: 9887 characters, 7 citations, 0 compounds in table"
+      ],
+      "error": "Synthesis failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "tokens_used": 22017,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 48,
+      "query": "What explains variable response to checkpoint inhibitor therapy across tumor types?",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.1,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.1,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 62.66448092460632,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['tumor types']\n  - Type: literature_review\n  - Confidence: 0.9",
+        "Research Plan Created:\n  - Strategy: Conduct a focused literature review to identify biological, immunological, and tumor-intrinsic factors that contribute to heterogeneous responses to checkpoint inhibitor therapy across different cancer types.\n  - Tools: pubmed\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 0 results for '(\"immune checkpoint inhibitors\"[MeSH] OR \"PD-1 inhibitors\"[MeSH] OR \"PD-L1 inhibitors\"[MeSH]) AND (\"neoplasms\"[MeSH]) AND (\"response biomarkers\"[MeSH] OR \"tumor mutational burden\"[MeSH] OR \"PD-L1 expression\"[MeSH]) AND (\"heterogeneity\"[MeSH] OR \"variable response\"[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: No tool results were provided, so no synthesis can be performed.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Next: Searching PubMed for recent reviews and primary studies will provide the necessary evidence to explain variability in checkpoint inhibitor efficacy across different tumor types, addressing the identified gaps.",
+        "\u2713 pubmed: Found 0 results for '(\"checkpoint inhibitor therapy\"[MeSH] OR \"PD-1 inhibitors\"[MeSH] OR \"PD-L1 inhibitors\"[MeSH] OR \"CTLA-4 inhibitors\"[MeSH]) AND (neoplasms[MeSH] OR cancer[MeSH]) AND (treatment response[MeSH] OR response variability[MeSH] OR differential response[MeSH])'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: No tool results were available to synthesize; therefore no findings can be reported.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Reason: Maximum iterations (2) reached without obtaining any evidence; further research cannot be performed within the allowed iteration limit.",
+        "\u2713 Report Generated: 1817 characters, 0 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 12762,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 49,
+      "query": "Assess the evidence for repurposing metformin as an anti-aging intervention",
+      "difficulty": "hard",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinicaltrials.gov"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.6,
+      "citation_count": 20,
+      "citation_coverage": 0.6666666666666666,
+      "results_count": 30,
+      "latency_seconds": 118.53410696983337,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['anti-aging']\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Conduct a focused literature review using PubMed to gather and synthesize preclinical, clinical, and epidemiological evidence on metformin's potential anti-aging effects.\n  - Tools: pubmed\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 30 results for '(\"Metformin\"[Mesh] OR metformin) AND (\"Aging\"[Mesh] OR aging OR anti-aging OR longevity) AND (\"Drug Repurposing\"[Mesh] OR repurposing)'",
+        "Synthesis Complete:\n  - Key findings: 9\n  - Cross-references: 4\n  - Gaps identified: 6\n  - Confidence: 0.90\n\nSummary: Metformin is extensively studied for anti-aging properties, with clinical trials (MILES, TAME) designed to test its impact on lifespan and healthspan. Preclinical data show metformin modulates key ageing pathways (mTOR, AMPK, NF-kB, SASP) and improves outcomes in models of neurodegeneration, photoaging, and vascular disease, while observational studies associate its use with reduced risks such as aneurysmal subarachnoid hemorrhage. However, translation to humans is hindered by biomarker gaps, dosage uncertainty, and the need to disentangle glucose-dependent from independent mechanisms.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.50\n  - Coverage: 0.68\n  - Next: These queries will retrieve detailed trial outcomes, effect sizes, safety data, biomarker studies, and recent systematic reviews, directly addressing the gaps in long-term human evidence, dosing/biomarker clarity, mechanism separation, and safety profiles needed to robustly assess metformin's anti-aging potential.",
+        "\u2713 pubmed: Found 30 results for '\"Metformin\"[MeSH Terms] AND (\"Aging\"[MeSH Terms] OR \"Longevity\"[MeSH Terms] OR \"Healthspan\"[MeSH Terms])'",
+        "\u2717 clinicaltrials.gov: Invalid tool name (hallucinated - not a real tool)",
+        "Synthesis Complete:\n  - Key findings: 5\n  - Cross-references: 3\n  - Gaps identified: 4\n  - Confidence: 0.85\n\nSummary: Metformin demonstrates geroprotective effects in preclinical models, targeting multiple aging hallmarks and showing brain-specific benefits in primates, and is being evaluated in human clinical trials for anti-aging. However, evidence for extending human lifespan remains inconclusive, and key gaps in long-term data, sex-specific effects, and mechanistic clarity persist.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.85\n  - Reason: Maximum iterations reached (2)",
+        "\u2713 Report Generated: 5630 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 53442,
+      "llm_calls": 11,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 50,
+      "query": "Why do some EGFR-mutant lung cancers develop resistance to osimertinib?",
+      "difficulty": "hard",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.68,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.68,
+      "citation_count": 9,
+      "citation_coverage": 1.0,
+      "results_count": 9,
+      "latency_seconds": 101.6248037815094,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['EGFR']\n  - Diseases: ['lung cancer']\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Conduct a literature review to identify and summarize the known mechanisms of resistance to osimertinib in EGFR-mutant lung cancer.\n  - Tools: pubmed\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 0 results for '(\"EGFR\"[MeSH] OR \"epidermal growth factor receptor\") AND (\"lung neoplasms\"[MeSH]) AND (\"osimertinib\"[MeSH]) AND (\"drug resistance\"[MeSH])'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: No tool results were available to synthesize findings about EGFR-mutant lung cancer resistance to osimertinib.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Next: Targeted PubMed searches will retrieve recent primary and review articles detailing known resistance mechanisms, providing the evidence needed to answer the original query and assess coverage, quality, and completeness.",
+        "\u2713 pubmed: Found 9 results for '(\"EGFR mutation\"[MeSH] OR \"EGFR-mutant\"[tiab]) AND (\"non-small cell lung carcinoma\"[MeSH] OR \"lung cancer\"[tiab]) AND (\"osimertinib\"[MeSH] OR \"AZD9291\"[tiab]) AND (\"drug resistance\"[MeSH] OR \"resistance\"[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 12\n  - Cross-references: 4\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: The literature identifies several interconnected mechanisms of acquired resistance to osimertinib in EGFR\u2011mutant NSCLC, including telomerase/hTERT dysregulation, PAK\u2011mediated signaling (PAK2/\u03b2\u2011catenin and PAK1 via S1PR3), MET amplification, aberrant miRNA expression, and altered regulation of c\u2011Myc, MEK5/ERK5, and SREBP1 pathways, many of which converge on impaired apoptosis (Bim). Preclinical evidence suggests that targeting these nodes can restore sensitivity, but clinical validation and comparative effectiveness studies are lacking.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.68\n  - Coverage: 0.85\n  - Reason: Maximum iterations reached (2); no further tool calls permitted.",
+        "\u2713 Report Generated: 8137 characters, 9 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 34690,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 51,
+      "query": "Compare the mechanisms and clinical outcomes of CAR-T therapies targeting CD19 vs BCMA",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.5,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.5,
+      "citation_count": 20,
+      "citation_coverage": 0.6666666666666666,
+      "results_count": 30,
+      "latency_seconds": 180.53230500221252,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['CD19', 'BCMA']\n  - Diseases: []\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First retrieve mechanistic literature on CAR-T constructs targeting CD19 and BCMA via PubMed, then gather clinical trial data on efficacy, safety, and outcomes from ClinicalTrials.gov to enable a direct comparison.\n  - Tools: pubmed, clinical_trials\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 30 results for '(\"CAR T-cell\" OR CAR-T) AND (CD19 OR BCMA) AND (mechanism OR \"clinical outcome\")'",
+        "\u2713 clinical_trials: Found 30 results for 'B-ALL OR diffuse large B-cell lymphoma OR multiple myeloma'",
+        "Synthesis Complete:\n  - Key findings: 10\n  - Cross-references: 3\n  - Gaps identified: 4\n  - Confidence: 0.75\n\nSummary: The literature establishes CD19 CAR-T mechanisms (antigen affinity-driven function) and robust clinical outcomes in B-cell lymphomas, with well-characterized resistance pathways. BCMA CAR-T is approved for multiple myeloma with emerging earlier use, and strategies to overcome resistance are outlined, but mechanistic depth is less detailed in the provided sources. Clinical trial evidence exists for CD19 CAR-T but not for BCMA CAR-T in the dataset.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.50\n  - Coverage: 0.55\n  - Next: These searches will retrieve mechanistic studies, clinical trial reports, and comparative analyses to fill the gaps and enable a thorough comparison.",
+        "\u2713 pubmed: Found 30 results for '(\"CAR T-cell\"[Title/Abstract] OR \"chimeric antigen receptor T cell\"[Title/Abstract]) AND (CD19[Title/Abstract] OR BCMA[Title/Abstract]) AND (mechanism[Title/Abstract] OR \"clinical outcome\"[Title/Abstract])'",
+        "\u2713 clinical_trials: Found 0 results for 'Compare the mechanisms and clinical outcomes of CAR-T therapies targeting CD19 vs BCMA'",
+        "Synthesis Complete:\n  - Key findings: 8\n  - Cross-references: 2\n  - Gaps identified: 4\n  - Confidence: 0.85\n\nSummary: CD19 CAR-T is established in B-cell malignancies with known relapse via antigen loss and toxicity such as prolonged cytopenia, while BCMA CAR-T in multiple myeloma faces antigen downregulation addressed by proteasome inhibition or cytokine-enhancing designs. Both targets benefit from engineering strategies to improve CAR-T persistence and function, but comparative clinical outcomes and long-term safety remain understudied.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.50\n  - Coverage: 0.50\n  - Reason: Maximum iterations reached (2)",
+        "\u2713 Report Generated: 9909 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 76245,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 52,
+      "query": "Find kinase inhibitors originally developed for cancer that are now being tested for autoimmune disease",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.2,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.16666666666666666,
+      "confidence_score": 0.2,
+      "citation_count": 40,
+      "citation_coverage": 0.5714285714285714,
+      "results_count": 70,
+      "latency_seconds": 168.04671120643616,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['cancer', 'autoimmune disease']\n  - Type: clinical_trial_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify kinase inhibitor compounds using ChEMBL, then find autoimmune disease clinical trials testing those compounds via ClinicalTrials.gov, and finally confirm their original cancer development through literature searches in PubMed.\n  - Tools: chembl, clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 chembl: Found 50 results for 'protein kinase'",
+        "\u2713 clinical_trials: Found 20 results for 'autoimmune disease'",
+        "\u2713 pubmed: Found 0 results for '(\"kinase inhibitor*\"[Title/Abstract] OR \"protein kinase inhibitor*\"[Title/Abstract]) AND (\"cancer\"[MeSH] OR \"neoplasm*\"[MeSH]) AND (\"autoimmune disease*\"[MeSH] OR \"autoimmunity\"[MeSH]) AND \"clinical trial\"[Publication Type]'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 2\n  - Gaps identified: 5\n  - Confidence: 0.75\n\nSummary: Clinical trial data reveal several kinase inhibitors originally developed for oncology (BTK, JAK, Syk, Tyk2) are being tested or have been tested in autoimmune diseases such as NMOSD, RA, ITP, and SLE. ChEMBL data provides a set of small molecules but lacks annotation to connect them to these therapeutic areas.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.55\n  - Coverage: 0.65\n  - Next: Additional PubMed searches will provide peer-reviewed evidence and mechanistic insights. Targeted clinical_trials queries will yield detailed trial information for specific inhibitors and diseases. Enriching ChEMBL results with disease annotation (via literature or ontology mapping) will connect small molecules to therapeutic areas, addressing the annotation gap.",
+        "\u2713 pubmed: Found 0 results for '\"Protein Kinase Inhibitors\"[MeSH] AND \"Neoplasms\"[MeSH] AND \"Autoimmune Diseases\"[MeSH] AND \"Drug Repositioning\"[MeSH]'",
+        "\u2713 clinical_trials: Found 20 results for 'autoimmune disease'",
+        "\u2713 chembl: Found 50 results for 'protein kinase'",
+        "Synthesis Complete:\n  - Key findings: 3\n  - Cross-references: 0\n  - Gaps identified: 4\n  - Confidence: 0.20\n\nSummary: The tool results do not provide evidence of kinase inhibitors originally developed for cancer being tested for autoimmune disease. ChEMBL records lack essential identifying details, and the clinical trials listed involve non-kinase inhibitor agents such as statins and monoclonal antibodies.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.20\n  - Coverage: 0.20\n  - Reason: Maximum iterations reached (2) without sufficient findings; no further tool calls possible.",
+        "\u2713 Report Generated: 4976 characters, 40 citations, 2 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 58558,
+      "llm_calls": 14,
+      "hallucination_judge": {
+        "total_claims": 20,
+        "hallucinated_claims": 18,
+        "judge_tokens_used": 13674,
+        "judge_failed": false
+      }
+    },
+    {
+      "test_case_id": 53,
+      "query": "Find complement inhibitors approved for paroxysmal nocturnal hemoglobinuria and compare their clinical trial evidence",
+      "difficulty": "hard",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.55,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.55,
+      "citation_count": 40,
+      "citation_coverage": 0.5714285714285714,
+      "results_count": 70,
+      "latency_seconds": 220.21935486793518,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['complement']\n  - Diseases: ['paroxysmal nocturnal hemoglobinuria']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify approved complement inhibitors for PNH using ChEMBL, then retrieve detailed clinical trial information for those agents from ClinicalTrials.gov, and finally gather comparative efficacy evidence from the scientific literature via PubMed.\n  - Tools: chembl, clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 chembl: Found 0 results for 'paroxysmal nocturnal hemoglobinuria'",
+        "\u2713 clinical_trials: Found 20 results for 'paroxysmal nocturnal hemoglobinuria'",
+        "\u2713 pubmed: Found 0 results for '(eculizumab[MeSH Terms] OR ravulizumab[MeSH Terms] OR pegcetacoplan[MeSH Terms]) AND (\"Paroxysmal Nocturnal Hemoglobinuria\"[MeSH] OR PNH) AND (\"Complement Inhibitors\"[MeSH] OR complement inhibitor) AND (\"Clinical Trials as Topic\"[MeSH] OR clinical trial)'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.90\n\nSummary: The clinical trial data reveal approved complement inhibitors eculizumab and ravulizumab with early-phase evidence, a biosimilar (Elizaria) demonstrating comparability in a Phase 3 trial, and several investigational agents (crovalimab, HSK39297, LP-005, TUL321, HRS-5965) progressing through Phase 1-3 studies. While comparative trials against eculizumab exist for crovalimab and Elizaria, there are notable gaps in head-to-head long-term data, real-world evidence, and direct comparisons among approved and novel therapies.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.58\n  - Coverage: 0.68\n  - Next: Targeted clinical_trials searches will retrieve detailed trial results, including primary and secondary endpoints, safety profiles, and any head-to-head comparisons. PubMed searches will provide peer-reviewed publications, real-world evidence studies, and comparative effectiveness research that are necessary to fill the identified gaps and increase confidence in the evidence base.",
+        "\u2713 clinical_trials: Found 50 results for 'paroxysmal nocturnal hemoglobinuria'",
+        "\u2713 pubmed: Found 20 results for '(\"Complement Inhibitors\"[MeSH] OR eculizumab OR ravulizumab OR pegcetacoplan) AND (\"Paroxysmal Hemoglobinuria\"[MeSH] OR \"paroxysmal nocturnal hemoglobinuria\") AND (\"Clinical Trials as Topic\"[MeSH] OR \"comparative effectiveness\" OR \"head-to-head\" OR \"meta-analysis\" OR \"systematic review\")'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 4\n  - Gaps identified: 4\n  - Confidence: 0.85\n\nSummary: The tool results show that several complement inhibitors (eculizumab, ravulizumab, pegcetacoplan, crovalimab, iptacopan, danicopan) have been investigated for PNH across early to late-phase clinical trials, with PubMed syntheses providing comparative efficacy, safety, and economic data. However, direct comparative trials and long-term outcomes remain limited.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.55\n  - Coverage: 0.65\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 8734 characters, 40 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 107873,
+      "llm_calls": 14,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 54,
+      "query": "What is the comparative efficacy of first-line vs second-line therapies for metastatic colorectal cancer with KRAS mutations?",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.4,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.25,
+      "confidence_score": 0.4,
+      "citation_count": 21,
+      "citation_coverage": 1.0,
+      "results_count": 21,
+      "latency_seconds": 266.0650489330292,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['KRAS']\n  - Diseases: ['metastatic colorectal cancer']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First, search clinical trials to identify studies comparing first-line and second-line therapies in metastatic colorectal cancer with KRAS mutations, then search PubMed for systematic reviews, meta-analyses, and comparative effectiveness studies that synthesize efficacy data.\n  - Tools: clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'metastatic colorectal cancer'",
+        "\u2713 pubmed: Found 2 results for '(\"colorectal neoplasms\"[MeSH] AND metastatic[tiab] AND KRAS[tiab]) AND ((\"first-line therapy\"[tiab] OR \"second-line therapy\"[tiab]) AND (\"comparative effectiveness\"[tiab] OR \"comparative efficacy\"[tiab]))'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 2\n  - Gaps identified: 4\n  - Confidence: 0.60\n\nSummary: The available evidence shows that EGFR and VEGF inhibitors have comparable efficacy in KRAS wild-type mCRC, with no significant differences in PFS or OS. Data specific to KRAS mutant mCRC are limited; clinical trials explore later-line agents such as regorafenib and panitumumab combinations in RAS/BRAF mutant populations, but direct first-line versus second-line comparative efficacy studies are absent.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.40\n  - Coverage: 0.30\n  - Next: These searches aim to identify clinical trials, observational studies, or meta-analyses that directly compare first-line and second-line treatment outcomes in KRAS mutant mCRC, thereby providing the comparative efficacy evidence needed to answer the original query.",
+        "\u2713 clinical_trials: Found 20 results for 'metastatic colorectal cancer'",
+        "\u2713 pubmed: Found 1 results for '(\"metastatic colorectal cancer\"[tiab] OR mCRC[tiab]) AND KRAS[tiab] AND ((\"first-line\"[tiab] OR \"second-line\"[tiab]) AND (\"therapy\"[tiab] OR \"treatment\"[tiab])) AND (\"comparative efficacy\"[tiab] OR \"comparative effectiveness\"[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 4\n  - Cross-references: 3\n  - Gaps identified: 4\n  - Confidence: 0.60\n\nSummary: The available evidence indicates that EGFR inhibitors (cetuximab, panitumumab) show benefit in first-line therapy only for wild-type KRAS mCRC, while second-line options such as regorafenib have been studied in RAS/BRAF mutant (including KRAS) mCRC. Early-phase trials are exploring KRAS G12D\u2011directed agents. However, there is a notable absence of direct comparative effectiveness data comparing first-line versus second-line therapies specifically in KRAS mutant metastatic colorectal cancer.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.40\n  - Coverage: 0.30\n  - Reason: Maximum iterations reached (2 of 2)",
+        "\u2713 Report Generated: 6624 characters, 21 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 54405,
+      "llm_calls": 14,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 55,
+      "query": "Which small-molecule kinase inhibitors have had black-box warnings added after approval, and why?",
+      "difficulty": "hard",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.1,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "chembl"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.1,
+      "citation_count": 20,
+      "citation_coverage": 0.4,
+      "results_count": 50,
+      "latency_seconds": 232.32350063323975,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: []\n  - Type: compound_information\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First identify approved small-molecule kinase inhibitors using ChEMBL, then search the biomedical literature for reports of FDA black-box warnings added post-approval and the underlying safety reasons.\n  - Tools: chembl, pubmed\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'protein kinase'",
+        "\u2713 pubmed: Found 0 results for '(\"Protein Kinase Inhibitors\"[MeSH] OR \"small molecule kinase inhibitor*\") AND (\"Black Box Warning\"[MeSH] OR \"boxed warning\") AND (\"post-marketing\"[MeSH] OR \"post-approval\") AND (\"drug labeling\"[MeSH] OR FDA)'",
+        "Synthesis Complete:\n  - Key findings: 2\n  - Cross-references: 0\n  - Gaps identified: 5\n  - Confidence: 0.20\n\nSummary: The tool results provide only basic physicochemical descriptors for a set of small molecules lacking names and mechanism-of-action annotations. They do not contain any data on kinase inhibition, regulatory warnings, or the reasons for such warnings, leaving the original query unanswered.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Next: Searching PubMed will capture literature and regulatory announcements describing black-box warnings for kinase inhibitors and their reasons. Querying ChEMBL with a focus on kinase inhibitors will provide molecular names and mechanism-of-action data that can be cross-referenced with warning information to answer the original question.",
+        "\u2713 pubmed: Found 0 results for '(\"small molecule kinase inhibitor\"[tiab] OR \"protein kinase inhibitor\"[MeSH]) AND (\"black box warning\"[tiab] OR \"boxed warning\"[MeSH]) AND (\"FDA\"[tiab] OR \"Food and Drug Administration\"[MeSH]) AND (\"post-approval\"[tiab] OR \"post-marketing\"[MeSH])'",
+        "\u2713 chembl: Found 50 results for 'protein kinase'",
+        "Synthesis Complete:\n  - Key findings: 2\n  - Cross-references: 0\n  - Gaps identified: 5\n  - Confidence: 0.20\n\nSummary: The ChEMBL tool provided a list of small molecule compounds with basic physicochemical properties but lacked any data on kinase inhibition, black-box warnings, or post-approval safety alerts. Consequently, no compounds with post-approval black-box warnings could be identified from the available results. Significant gaps remain in safety and target information needed to answer the original query.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 3705 characters, 20 citations, 2 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 29747,
+      "llm_calls": 12,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 56,
+      "query": "Tell me about diabetes drugs",
+      "difficulty": "ambiguous",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": [
+          "Report generation failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+        ]
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.3333333333333333,
+      "confidence_score": 0.6,
+      "citation_count": 60,
+      "citation_coverage": 1.0,
+      "results_count": 60,
+      "latency_seconds": 155.5710949897766,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['diabetes']\n  - Type: disease_treatment_search\n  - Confidence: 0.9",
+        "Research Plan Created:\n  - Strategy: First identify diabetes drug treatments via clinical trial data, then gather scientific literature on those drugs, and finally retrieve detailed compound information from ChEMBL to cover efficacy, mechanism, and chemical properties.\n  - Tools: clinical_trials, pubmed, chembl\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'diabetes'",
+        "\u2713 pubmed: Found 20 results for '\"Diabetes Mellitus\"[MeSH] AND \"Drug Therapy\"[MeSH]'",
+        "\u2713 chembl: Found 20 results for 'diabetes'",
+        "Synthesis Complete:\n  - Key findings: 10\n  - Cross-references: 5\n  - Gaps identified: 7\n  - Confidence: 0.85\n\nSummary: The integrated data reveal a landscape of diabetes therapies spanning insulin analogs, GLP\u20111 receptor agonists, metformin, statins, thiazolidinediones, and emerging agents such as oral small\u2011molecule GLP\u20111RAs, finerenone, and faricimab. ChEMBL provides annotated drug\u2011indication pairs, while clinical trials and PubMed articles offer empirical evidence on efficacy, safety, and mechanistic insights. Cross\u2011references show consistency between drug classifications and trial interventions, yet notable gaps exist in trial coverage for many approved drugs and in long\u2011term outcome data for novel therapies.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Next: Targeted clinical trial searches will retrieve long-term outcome studies for emerging agents; PubMed queries will locate real-world evidence and subgroup analyses; ChEMBL queries will provide detailed molecular interaction and ADME data to fill pharmacokinetic gaps.",
+        "\u2713 clinical_trials: Found 20 results for 'diabetes'",
+        "\u2713 pubmed: Found 20 results for '\"diabetes mellitus\"[MeSH] AND \"drug therapy\"[MeSH]'",
+        "\u2713 chembl: Found 20 results for 'diabetes'",
+        "Synthesis Complete:\n  - Key findings: 8\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: The integrated data show that established diabetes therapies such as metformin, insulin detemir, and GLP-1 receptor agonists are well-characterized and widely used, while emerging oral GLP-1 RAs demonstrate promising glycemic efficacy in metformin-treated patients. Lipid-modifying agents exhibit varied effects on diabetes risk, and novel therapies like finerenone, faricimab, and biosimilar aflibercept show benefits in diabetic complications. However, gaps remain in long-term safety, real-world effectiveness, and head-to-head comparisons for newer agents.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.60\n  - Reason: Maximum iterations reached (2)",
+        "\u26a0 Report generation error: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+      ],
+      "error": "Report generation failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "tokens_used": 57684,
+      "llm_calls": 14,
+      "hallucination_judge": {
+        "total_claims": 2,
+        "hallucinated_claims": 2,
+        "judge_tokens_used": 6726,
+        "judge_failed": false
+      }
+    },
+    {
+      "test_case_id": 57,
+      "query": "What's new in oncology?",
+      "difficulty": "ambiguous",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 2,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.6,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 172.1638159751892,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: []\n  - Type: literature_review\n  - Confidence: 0.9",
+        "Research Plan Created:\n  - Strategy: Perform a literature review using PubMed to identify recent advances and new developments in oncology.\n  - Tools: pubmed\n  - Complexity: simple",
+        "\u2713 pubmed: Found 20 results for 'oncology[MeSH] AND (new OR recent OR advances)'",
+        "Synthesis Complete:\n  - Key findings: 10\n  - Cross-references: 4\n  - Gaps identified: 8\n  - Confidence: 0.90\n\nSummary: Recent literature reveals rapid progress in immunotherapy, targeted agents (including bispecific antibodies and ADCs), mRNA vaccines, and novel cellular therapies across diverse cancers, while highlighting persistent challenges related to delivery, resistance, manufacturing complexity, and biomarker\u2011restricted efficacy.",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.65\n  - Coverage: 0.68\n  - Next: Targeted PubMed searches for recent regulatory approvals, detailed clinical trial results, and specific therapeutic modalities will fill the identified gaps, providing concrete examples, efficacy/safety data, and updates on manufacturing and delivery that are needed for a comprehensive answer to 'What's new in oncology?'.",
+        "\u2713 pubmed: Found 20 results for 'oncology AND (advances OR breakthroughs OR emerging OR new)'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 3\n  - Gaps identified: 6\n  - Confidence: 0.85\n\nSummary: Recent literature highlights rapid progress in immune\u2011based oncology, including mRNA vaccines, checkpoint inhibitors, CAR\u2011T therapy and spatial profiling of the tumor microenvironment, alongside advances in precision screening for cervical cancer and emerging targets in NSCLC. While these innovations show promise, challenges remain in delivery, biomarker standardization, combination therapy optimization and translating stromal targets like CAFs into clinical practice.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.60\n  - Coverage: 0.75\n  - Reason: Maximum iterations reached (2/2); no further tool calls allowed.",
+        "\u2713 Report Generated: 10217 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 50438,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 58,
+      "query": "Find good drugs for pain",
+      "difficulty": "ambiguous",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.78,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 0.6666666666666666,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.78,
+      "citation_count": 60,
+      "citation_coverage": 1.0,
+      "results_count": 60,
+      "latency_seconds": 312.50288009643555,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['pain']\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Start by searching clinical trials for pain to identify drugs under investigation or approved, then explore PubMed for mechanistic and efficacy literature, and finally query ChEMBL for detailed chemical and bioactivity profiles of promising candidates.\n  - Tools: clinical_trials, pubmed, chembl\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'pain'",
+        "\u2713 pubmed: Found 20 results for '\"pain\"[MeSH] AND \"analgesics\"[MeSH]'",
+        "\u2713 chembl: Found 20 results for 'pain'",
+        "Synthesis Complete:\n  - Key findings: 10\n  - Cross-references: 3\n  - Gaps identified: 4\n  - Confidence: 0.85\n\nSummary: The tools show established analgesics (acetaminophen, NSAIDs, local anesthetics, opioids) with strong clinical trial and regulatory evidence, while recent literature highlights emerging non-opioid mechanisms (NaV1.8 inhibitors, opioid allosteric modulators, glial targets, metformin) that require further clinical validation.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.78\n  - Coverage: 0.86\n  - Reason: Query coverage >= 0.8 and confidence >= 0.7, satisfying stop criteria; sufficient information provided for the original query.",
+        "\u2713 Report Generated: 9885 characters, 60 citations, 19 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 61435,
+      "llm_calls": 11,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 59,
+      "query": "Any updates on Alzheimer's treatment?",
+      "difficulty": "ambiguous",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.95,
+        "current_step": 1,
+        "errors": [
+          "Synthesis failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+          "Verification failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}"
+        ]
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.95,
+      "citation_count": 40,
+      "citation_coverage": 1.0,
+      "results_count": 40,
+      "latency_seconds": 175.3734152317047,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: [\"Alzheimer's\"]\n  - Type: disease_treatment_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First search for recent and ongoing clinical trials to identify current therapeutic approaches for Alzheimer's, then supplement with PubMed literature to capture the latest mechanistic insights and treatment updates.\n  - Tools: clinical_trials, pubmed\n  - Complexity: moderate",
+        "\u2713 clinical_trials: Found 20 results for 'Alzheimer's'",
+        "\u2713 pubmed: Found 20 results for '\"Alzheimer Disease\"[MeSH] AND (treatment[MeSH] OR therapy[MeSH])'",
+        "\u26a0 Synthesis error: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+        "\u26a0 Verification error: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+        "\u2713 Report Generated: 11542 characters, 40 citations, 0 compounds in table"
+      ],
+      "error": "Synthesis failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}; Verification failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+      "tokens_used": 36693,
+      "llm_calls": 11,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 60,
+      "query": "What should I know about biologics?",
+      "difficulty": "ambiguous",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.4,
+        "current_step": 2,
+        "errors": [
+          "clinical_trials execution failed: [502] Bad Gateway\nUpstream request failed.",
+          "Synthesis failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}"
+        ]
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.4,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 132.76616382598877,
+      "iterations": 2,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: []\n  - Type: general_research\n  - Confidence: 0.9",
+        "Research Plan Created:\n  - Strategy: First gather foundational knowledge about biologics from the scientific literature, then explore their clinical translation by examining ongoing and completed clinical trials.\n  - Tools: pubmed, clinical_trials\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 20 results for 'biologics[MeSH Terms]'",
+        "\u2717 clinical_trials: Error - [502] Bad Gateway\nUpstream request failed.",
+        "\u26a0 Synthesis error: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+        "\u27f3 Self-Reflection: Need more research\n  - Confidence: 0.25\n  - Coverage: 0.20\n  - Next: Targeted PubMed searches will retrieve specific review articles and key references that can be synthesized to address the user's question comprehensively, filling the identified gaps in definition, mechanisms, applications, safety, and regulatory aspects.",
+        "\u2713 pubmed: Found 20 results for '(\"biologics\"[MeSH Terms] OR \"biological products\"[MeSH Terms] OR \"monoclonal antibodies\"[MeSH Terms] OR \"fusion proteins\"[MeSH Terms] OR \"vaccines\"[MeSH Terms]) AND (review[pt] OR overview[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 13\n  - Cross-references: 3\n  - Gaps identified: 5\n  - Confidence: 0.85\n\nSummary: The PubMed results primarily focus on mRNA vaccine technology, describing its advantages, delivery challenges, and encouraging preclinical and clinical results in infectious diseases and oncology. They also cover public health aspects of vaccination, including hesitancy, disease-specific vaccines (measles, malaria, meningococcus), and the need for better immunological understanding. There is a notable lack of information on other classes of biologics beyond vaccines.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.40\n  - Coverage: 0.30\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 7245 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": "clinical_trials execution failed: [502] Bad Gateway\nUpstream request failed.; Synthesis failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+      "tokens_used": 36465,
+      "llm_calls": 11,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    }
+  ]
+}
