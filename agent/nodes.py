@@ -34,6 +34,22 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 logger = get_logger(__name__)
 
 
+def _accumulate_tokens(state: AgentState, response: Any) -> None:
+    """Add one LLM response's token usage to the running per-run total.
+
+    ChatNVIDIA responses carry usage in the standard LangChain
+    `usage_metadata` dict (input_tokens/output_tokens/total_tokens).
+    total_tokens_used is declared on AgentState but was never populated by
+    any node until now, making it a permanently-dead field. Checking
+    isinstance(usage, dict) (rather than just truthiness) also makes this
+    safely a no-op against mocked LLM responses in tests that don't set a
+    real usage_metadata, instead of corrupting the running total.
+    """
+    usage = getattr(response, "usage_metadata", None)
+    if isinstance(usage, dict) and usage.get("total_tokens"):
+        state["total_tokens_used"] = state.get("total_tokens_used", 0) + usage["total_tokens"]
+
+
 def _parse_llm_json(llm_response: str, node_name: str) -> Dict[str, Any]:
     """Parse JSON from LLM response, handling markdown code blocks.
 
@@ -300,6 +316,7 @@ def query_analysis_node(state: AgentState) -> AgentState:
 
         # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
+        _accumulate_tokens(state, response)
         analysis = _parse_llm_json(response.content, "query_analysis_node")
 
         # Store analysis in research_plan (will be used by planning node)
@@ -396,6 +413,7 @@ def planning_node(state: AgentState) -> AgentState:
 
         # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
+        _accumulate_tokens(state, response)
         plan = _parse_llm_json(response.content, "planning_node")
 
         # Extract tools to call (sorted by priority)
@@ -492,6 +510,7 @@ def tool_execution_node(state: AgentState) -> AgentState:
             )
 
             response = llm.invoke([HumanMessage(content=prompt)])
+            _accumulate_tokens(state, response)
             tool_params = _parse_llm_json(response.content, f"tool_query_gen_{tool_name}")
 
             params = tool_params.get("parameters", {})
@@ -639,6 +658,7 @@ def synthesis_node(state: AgentState) -> AgentState:
 
         # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
+        _accumulate_tokens(state, response)
         synthesis = _parse_llm_json(response.content, "synthesis_node")
 
         # Extract key info
@@ -736,6 +756,7 @@ def verification_node(state: AgentState) -> AgentState:
 
         # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
+        _accumulate_tokens(state, response)
         verification = _parse_llm_json(response.content, "verification_node")
 
         # Extract decision
@@ -866,6 +887,7 @@ def report_generation_node(state: AgentState) -> AgentState:
 
         # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
+        _accumulate_tokens(state, response)
         report = response.content.strip()
 
         # Remove markdown code blocks if LLM wrapped it
