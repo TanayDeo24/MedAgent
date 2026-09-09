@@ -14,7 +14,7 @@ All nodes use the LLM to make autonomous decisions and return structured outputs
 """
 
 import json
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 from agent.state import AgentState
 from agent.prompts import (
     QUERY_ANALYSIS_PROMPT,
@@ -140,6 +140,121 @@ def _backfill_chembl_names(
             stats["still_missing"] += 1
 
     return stats
+
+
+def _chembl_phase_label(max_phase: Any) -> str:
+    """Map a ChEMBL max_phase value to a human-readable label.
+
+    Mirrors ChEMBLTool._parse_molecule's phase_map (that map is private to
+    the tool class and only applied to target-search entries, but the same
+    max_phase -> label convention is ChEMBL's own, so it's reused here for
+    any entry that doesn't already carry a development_phase string).
+    """
+    try:
+        phase_num = int(float(max_phase))
+    except (TypeError, ValueError):
+        return "Unknown"
+
+    return {
+        0: "Preclinical",
+        1: "Phase 1",
+        2: "Phase 2",
+        3: "Phase 3",
+        4: "Approved",
+    }.get(phase_num, "Unknown")
+
+
+def _build_chembl_compound_table(tool_results: Dict[str, Any]) -> Tuple[str, int]:
+    """Deterministically build the ChEMBL compound table as markdown.
+
+    This exists so the set of compounds that appear in the final report is
+    decided by real tool data, not by the report-writing LLM's own
+    (unverifiable) selection - the LLM's job is narrative discussion of
+    these compounds, not deciding which ones exist. Built from whatever is
+    currently in tool_results["chembl"] (post-backfill, see
+    _backfill_chembl_names), deduplicated by chembl_id since the ChEMBL
+    drug_indication endpoint returns one row per matched indication/EFO
+    term, so the same compound can appear multiple times for a single
+    disease query (e.g. once for "melanoma", once for "metastatic
+    melanoma").
+
+    Args:
+        tool_results: state["tool_results"] - expects "chembl" (list of
+            parsed molecule/indication dicts) and optionally
+            "clinical_trials" (list of parsed trial dicts) to cross-
+            reference a matching NCT ID by intervention name.
+
+    Returns:
+        (markdown_table_or_placeholder_text, number_of_rows)
+    """
+    chembl_entries = tool_results.get("chembl") or []
+    clinical_trials = tool_results.get("clinical_trials") or []
+
+    seen_ids = set()
+    rows = []
+    for entry in chembl_entries:
+        chembl_id = entry.get("chembl_id")
+        if not chembl_id or chembl_id in seen_ids:
+            continue
+
+        # Target-search entries use "name"; indication-search entries use
+        # "drug_name" (see ChEMBLTool._parse_molecule vs
+        # _parse_drug_indication) - only one of the two will ever be set.
+        name = entry.get("name") or entry.get("drug_name")
+        if not name:
+            continue
+
+        seen_ids.add(chembl_id)
+
+        max_phase = entry.get("max_phase")
+        phase_label = entry.get("development_phase") or _chembl_phase_label(max_phase)
+
+        # Look for a same-run ClinicalTrials.gov trial whose intervention
+        # list mentions this compound by name (simple case-insensitive
+        # substring match - there's no direct chembl_id/trial linkage in
+        # the data, so this is the best available cross-reference).
+        matched_nct = None
+        name_lower = name.lower()
+        for trial in clinical_trials:
+            for intervention in (trial.get("interventions") or []):
+                intervention_name = (intervention.get("name") or "").lower()
+                if intervention_name and (
+                    name_lower in intervention_name or intervention_name in name_lower
+                ):
+                    matched_nct = trial.get("nct_id")
+                    break
+            if matched_nct:
+                break
+
+        # ChEMBL preferred names are conventionally ALL CAPS; title-case
+        # them for a readable report without altering the underlying data.
+        display_name = name.title() if name.isupper() else name
+
+        rows.append({
+            "name": display_name,
+            "chembl_id": chembl_id,
+            "max_phase": max_phase if max_phase not in (None, "") else "N/A",
+            "phase_label": phase_label,
+            "nct_id": matched_nct or "—",
+        })
+
+    if not rows:
+        return (
+            "_No named ChEMBL compounds were identified in this run's retrieved results._",
+            0
+        )
+
+    lines = [
+        "| Compound | ChEMBL ID | Max Phase | Status | Matched Trial |",
+        "|----------|-----------|-----------|--------|---------------|",
+    ]
+    for row in rows:
+        lines.append(
+            f"| {row['name']} | {row['chembl_id']} | {row['max_phase']} | "
+            f"{row['phase_label']} | {row['nct_id']} |"
+        )
+
+    return "\n".join(lines), len(rows)
 
 
 # =============================================================================
@@ -729,6 +844,11 @@ def report_generation_node(state: AgentState) -> AgentState:
 
         state["citations"] = citations
 
+        # Build the compound table deterministically from tool data - which
+        # compounds exist in the report is not the LLM's decision to make
+        # (see _build_chembl_compound_table's docstring for why).
+        compound_table_markdown, compound_count = _build_chembl_compound_table(tool_results)
+
         # Get LLM
         # Raised max_tokens for the same reason as synthesis_node — a full
         # markdown report (executive summary, tables, citations) is the
@@ -740,7 +860,8 @@ def report_generation_node(state: AgentState) -> AgentState:
             query=query,
             findings=json.dumps(synthesis, indent=2, default=str),
             tool_results=json.dumps(tool_results, indent=2, default=str),
-            citations=json.dumps(citations, indent=2, default=str)
+            citations=json.dumps(citations, indent=2, default=str),
+            compound_table=compound_table_markdown
         )
 
         # Call LLM (using HumanMessage for consistent prompt formatting)
@@ -753,15 +874,35 @@ def report_generation_node(state: AgentState) -> AgentState:
             report = "\n".join(lines[1:-1]) if len(lines) > 2 else report
             report = report.replace("```markdown", "").replace("```", "").strip()
 
+        # Insert the deterministic compound table at the LLM's placeholder.
+        # If the LLM didn't include the placeholder (it's instructed to,
+        # but LLM output isn't guaranteed), fall back to inserting our own
+        # "## Notable Compounds/Drugs" section rather than silently losing
+        # the table - the whole point of this change is that the table's
+        # presence doesn't depend on the LLM cooperating.
+        if "<<COMPOUND_TABLE>>" in report:
+            report = report.replace("<<COMPOUND_TABLE>>", compound_table_markdown)
+        else:
+            section = f"## Notable Compounds/Drugs\n\n{compound_table_markdown}\n\n"
+            insertion_point = report.find("## Knowledge Gaps")
+            if insertion_point != -1:
+                report = report[:insertion_point] + section + report[insertion_point:]
+            else:
+                report = report.rstrip() + "\n\n" + section
+
         # Store report
         state["final_report"] = report
 
         # Log completion
         state["intermediate_thoughts"].append(
-            f"✓ Report Generated: {len(report)} characters, {len(citations)} citations"
+            f"✓ Report Generated: {len(report)} characters, {len(citations)} citations, "
+            f"{compound_count} compounds in table"
         )
 
-        logger.info(f"[REPORT] Generated report with {len(citations)} citations")
+        logger.info(
+            f"[REPORT] Generated report with {len(citations)} citations, "
+            f"{compound_count} compounds in table"
+        )
 
     except Exception as e:
         logger.error(f"[REPORT] Failed: {e}", exc_info=True)

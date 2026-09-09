@@ -347,6 +347,9 @@ ALL TOOL RESULTS:
 CITATIONS:
 {citations}
 
+PRE-BUILT COMPOUND TABLE (already generated from real ChEMBL data — see instructions below):
+{compound_table}
+
 Generate a professional research report in markdown format.
 
 **REPORT STRUCTURE:**
@@ -376,9 +379,7 @@ Cross-reference findings from multiple sources.
 
 ## Notable Compounds/Drugs (if applicable)
 
-| Compound | Target | Status | Source |
-|----------|--------|--------|--------|
-| Name     | Target | Phase  | Tool   |
+<<COMPOUND_TABLE>>
 
 ## Clinical Evidence (if applicable)
 
@@ -407,6 +408,17 @@ Cross-reference findings from multiple sources.
 4. **Use professional scientific language**: Clear, precise, objective
 5. **Structure for readability**: Use headers, bullets, tables where appropriate
 6. **Include specific details**: Drug names, trial IDs, publication info when available
+7. **Do NOT build your own compound table**: The "Notable Compounds/Drugs" section's
+   table is generated deterministically from real tool data, not by you - which
+   compounds appear there is already decided. Your job in that section is exactly one
+   thing: write the literal placeholder text `<<COMPOUND_TABLE>>` on its own line
+   immediately under the "## Notable Compounds/Drugs" heading, with nothing else in
+   that section - no header row, no compound rows, no substitute table of your own.
+   The PRE-BUILT COMPOUND TABLE shown above is the actual data that placeholder will
+   be replaced with; you may (and should) discuss, prioritize, and cross-reference
+   those same compounds by name in your Key Findings and Detailed Analysis prose
+   (e.g. noting which have the strongest evidence) - that narrative judgment is yours
+   to make. You just don't get to decide which compounds exist in the table itself.
 
 **TONE**: Professional, objective, scientific. Like a research analyst's report.
 
