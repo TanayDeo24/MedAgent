@@ -202,6 +202,11 @@ class PubMedTool(BaseTool):
         Returns:
             List of dictionaries with paper details
         """
+        if isinstance(raw_data, list):
+            # search_pubmed() returns [] directly (no XML fetched) when the
+            # PMID search found zero results — nothing to parse.
+            return raw_data
+
         try:
             root = ET.fromstring(raw_data)
             articles = root.findall(".//PubmedArticle")
@@ -264,6 +269,10 @@ class PubMedTool(BaseTool):
             pmids = self._search_ids(query, max_results, date_from, date_to)
 
             if not pmids:
+                # Empty PMID list means "no results" — return it as-is and
+                # short-circuit before _fetch_details/parse_results, which
+                # expect XML text, not a list. parse_results() below also
+                # guards against this directly.
                 return []
 
             # Fetch details for all PMIDs

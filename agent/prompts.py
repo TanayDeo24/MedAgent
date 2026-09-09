@@ -138,19 +138,25 @@ Generate the optimal search parameters for this tool.
 
 **TOOL-SPECIFIC GUIDELINES:**
 
-**For PubMed:**
+These parameter names must match the ACTUAL tool method signatures exactly. Do not
+invent parameter names — the values below are the only ones the underlying tools accept.
+
+**For PubMed** (calls `search_pubmed(query, max_results, years_back)`):
 - query: Scientific search terms (use MeSH terms when possible)
 - max_results: 10-50 (default 20)
 - years_back: How many years to search (default 2-5 for recent research, 10+ for comprehensive)
 
-**For ClinicalTrials:**
-- query: Disease or intervention name
+**For ClinicalTrials** (calls `search_trials(condition, intervention, status, phase, max_results)`):
+- condition: Disease or condition name (e.g., "lung cancer") — use this for the primary search term
+- intervention: Drug/treatment name (e.g., "pembrolizumab"), or null if not applicable
+- status: One of "RECRUITING", "COMPLETED", "ACTIVE_NOT_RECRUITING", "TERMINATED", or null for any status
+- phase: One of "PHASE1", "PHASE2", "PHASE3", "PHASE4", or null for any phase
 - max_results: 10-50 (default 20)
-- status: "recruiting", "completed", "all", or null (default null)
+- Do NOT output a "query" parameter for this tool — there is no such parameter. Use "condition" and/or "intervention" instead.
 
-**For ChEMBL:**
-- query: Drug name, target name, or disease name
-- query_type: "compound", "target", or "disease"
+**For ChEMBL** (calls EITHER `search_by_target(target_name, max_results)` OR `search_by_indication(disease, max_results)` — there is no generic "search_compounds" method):
+- query_type: "target" or "indication" — choose "target" when the query is about a protein/gene/pathway, "indication" when it's about a disease
+- query: the target name (e.g., "EGFR") if query_type is "target", or the disease name (e.g., "lung cancer") if query_type is "indication"
 - max_results: 10-50 (default 20)
 
 **SEARCH QUERY OPTIMIZATION:**
@@ -165,14 +171,19 @@ Return the tool parameters as valid JSON with this exact structure:
 {{
   "tool": "tool_name",
   "parameters": {{
-    "query": "optimized search query",
+    "query": "optimized search query (PubMed, ChEMBL)",
+    "condition": "disease or condition name (ClinicalTrials only)",
+    "intervention": "drug/treatment name or null (ClinicalTrials only)",
+    "status": "trial status or null (ClinicalTrials only)",
+    "phase": "trial phase or null (ClinicalTrials only)",
+    "query_type": "target or indication (ChEMBL only)",
     "max_results": 20,
-    "other_params": "as needed per tool"
+    "years_back": 5
   }},
   "search_rationale": "Why these parameters will find relevant results"
 }}
 
-Return ONLY the JSON, no additional text or explanation."""
+Only include the fields relevant to the specific tool named above. Return ONLY the JSON, no additional text or explanation."""
 
 
 # =============================================================================

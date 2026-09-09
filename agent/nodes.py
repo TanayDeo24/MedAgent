@@ -103,7 +103,7 @@ def query_analysis_node(state: AgentState) -> AgentState:
         # Create prompt
         prompt = QUERY_ANALYSIS_PROMPT.format(query=query)
 
-        # Call LLM (Gemini doesn't support SystemMessage, use HumanMessage)
+        # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
         analysis = _parse_llm_json(response.content, "query_analysis_node")
 
@@ -199,7 +199,7 @@ def planning_node(state: AgentState) -> AgentState:
             available_tools=available_tools
         )
 
-        # Call LLM (Gemini doesn't support SystemMessage, use HumanMessage)
+        # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
         plan = _parse_llm_json(response.content, "planning_node")
 
@@ -300,7 +300,7 @@ def tool_execution_node(state: AgentState) -> AgentState:
             tool_params = _parse_llm_json(response.content, f"tool_query_gen_{tool_name}")
 
             params = tool_params.get("parameters", {})
-            search_query = params.get("query", query)
+            search_query = params.get("query") or params.get("condition") or query
 
             logger.info(f"[TOOL EXECUTION] {tool_name} query: {search_query}")
 
@@ -314,17 +314,29 @@ def tool_execution_node(state: AgentState) -> AgentState:
                     years_back=params.get("years_back", 5)
                 )
             elif tool_name == "clinical_trials":
+                # ClinicalTrialsTool.search_trials() has no "query" parameter —
+                # it takes "condition" / "intervention" separately.
                 result = tool.search_trials(
-                    query=search_query,
-                    max_results=params.get("max_results", 20),
-                    status=params.get("status")
-                )
-            elif tool_name == "chembl":
-                result = tool.search_compounds(
-                    query=search_query,
-                    query_type=params.get("query_type", "target"),
+                    condition=params.get("condition") or search_query,
+                    intervention=params.get("intervention"),
+                    status=params.get("status"),
+                    phase=params.get("phase"),
                     max_results=params.get("max_results", 20)
                 )
+            elif tool_name == "chembl":
+                # ChEMBLTool has no "search_compounds" method — dispatch to the
+                # real method based on the LLM-selected query_type.
+                query_type = params.get("query_type", "target")
+                if query_type == "indication":
+                    result = tool.search_by_indication(
+                        disease=search_query,
+                        max_results=params.get("max_results", 20)
+                    )
+                else:
+                    result = tool.search_by_target(
+                        target_name=search_query,
+                        max_results=params.get("max_results", 20)
+                    )
 
             # Store results
             state["tool_results"][tool_name] = result.data if result.success else None
@@ -395,7 +407,12 @@ def synthesis_node(state: AgentState) -> AgentState:
 
     try:
         # Get LLM
-        llm = get_llm(temperature=0.2)  # Low temperature for factual synthesis
+        # max_tokens is raised well above the get_llm() default here: with
+        # NVIDIA NIM's nemotron-3-super-120b-a12b, the default 2048-token
+        # budget was observed to truncate this node's JSON output mid-string
+        # (it was never an issue against the previous Gemini model), which
+        # made _parse_llm_json() fail on almost every real run.
+        llm = get_llm(temperature=0.2, max_tokens=8192)  # Low temperature for factual synthesis
 
         # Format tool results for LLM
         formatted_results = {}
@@ -410,7 +427,7 @@ def synthesis_node(state: AgentState) -> AgentState:
             tool_results=json.dumps(formatted_results, indent=2, default=str)
         )
 
-        # Call LLM (Gemini doesn't support SystemMessage, use HumanMessage)
+        # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
         synthesis = _parse_llm_json(response.content, "synthesis_node")
 
@@ -507,7 +524,7 @@ def verification_node(state: AgentState) -> AgentState:
             max_iterations=max_iterations
         )
 
-        # Call LLM (Gemini doesn't support SystemMessage, use HumanMessage)
+        # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
         verification = _parse_llm_json(response.content, "verification_node")
 
@@ -618,7 +635,10 @@ def report_generation_node(state: AgentState) -> AgentState:
         state["citations"] = citations
 
         # Get LLM
-        llm = get_llm(temperature=0.4)  # Moderate temperature for natural writing
+        # Raised max_tokens for the same reason as synthesis_node — a full
+        # markdown report (executive summary, tables, citations) is the
+        # largest output any node produces and risks truncation at 2048.
+        llm = get_llm(temperature=0.4, max_tokens=8192)  # Moderate temperature for natural writing
 
         # Create prompt
         prompt = REPORT_GENERATION_PROMPT.format(
@@ -628,7 +648,7 @@ def report_generation_node(state: AgentState) -> AgentState:
             citations=json.dumps(citations, indent=2, default=str)
         )
 
-        # Call LLM (Gemini doesn't support SystemMessage, use HumanMessage)
+        # Call LLM (using HumanMessage for consistent prompt formatting)
         response = llm.invoke([HumanMessage(content=prompt)])
         report = response.content.strip()
 

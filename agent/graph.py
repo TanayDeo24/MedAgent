@@ -216,8 +216,19 @@ class MedAgent:
         )
 
         # Run the graph
+        # LangGraph's recursion_limit counts every node visit, not research
+        # iterations: each loop of the self-reflection cycle (tool_execution
+        # -> synthesis -> verification) is 3 node visits, plus 2 for the
+        # initial query_analysis/planning pass. The library default of 25
+        # is exhausted by ~7-8 iterations, well under max_iterations'
+        # intended ceiling, so size it explicitly from max_iterations
+        # (with headroom) instead of relying on the default.
+        recursion_limit = (self.max_iterations * 3) + 10
         try:
-            final_state = self.graph.invoke(initial_state)
+            final_state = self.graph.invoke(
+                initial_state,
+                config={"recursion_limit": recursion_limit}
+            )
 
             logger.info(
                 f"Agent run complete. Steps: {final_state['current_step']}, "
