@@ -62,6 +62,98 @@ def _parse_llm_json(llm_response: str, node_name: str) -> Dict[str, Any]:
         raise ValueError(f"{node_name} failed to return valid JSON: {e}")
 
 
+# Maximum number of ChEMBL get_drug_info() lookups to make per tool call when
+# backfilling missing compound names (see _backfill_chembl_names below).
+# Capped rather than unbounded because:
+#   - Report tables and citations in report_generation_node only ever surface
+#     a handful of compounds anyway, so backfilling low-ranked hits buys
+#     little.
+#   - Each backfill is a separate rate-limited ChEMBL API call (observed
+#     150ms-8s in practice), so an uncapped backfill over a 20-50 result
+#     search could add tens of seconds of latency to a single node for
+#     marginal benefit.
+# 5 covers the compounds most likely to actually appear in the final report
+# while keeping worst-case added latency bounded to a handful of extra calls.
+CHEMBL_BACKFILL_MAX = 5
+
+
+def _backfill_chembl_names(
+    chembl_tool: ChEMBLTool,
+    entries: List[Dict[str, Any]],
+    query_type: str
+) -> Dict[str, Any]:
+    """Backfill missing ChEMBL compound names using get_drug_info().
+
+    search_by_target()/search_by_indication() frequently return entries with
+    no compound name (ChEMBL's own data gap, not a parsing bug): "target"
+    query results have `name: None`, "indication" query results have
+    `drug_name: ""`. get_drug_info(chembl_id) fetches the full molecule
+    record for a specific ID, which sometimes has a name even when the
+    search result didn't. This mutates `entries` in place (filling in real
+    data where get_drug_info has it) and never invents a placeholder for
+    compounds ChEMBL genuinely has no name for.
+
+    Args:
+        chembl_tool: The ChEMBLTool instance to call get_drug_info() on
+        entries: Parsed result list from search_by_target/search_by_indication
+        query_type: "target" (entries use "name") or "indication"
+            (entries use "drug_name") - determines which field is checked
+            and how the backfilled name is written back
+
+    Returns:
+        Stats dict: {"missing_before": int, "attempted": int,
+        "backfilled": int, "still_missing": int}
+    """
+    name_field = "drug_name" if query_type == "indication" else "name"
+
+    missing = [
+        entry for entry in entries
+        if not entry.get(name_field) and entry.get("chembl_id")
+    ]
+    stats = {
+        "missing_before": len(missing),
+        "attempted": 0,
+        "backfilled": 0,
+        "still_missing": 0,
+    }
+
+    for entry in missing[:CHEMBL_BACKFILL_MAX]:
+        stats["attempted"] += 1
+        try:
+            detail = chembl_tool.get_drug_info(entry["chembl_id"])
+        except Exception as e:
+            logger.warning(f"[TOOL EXECUTION] ChEMBL backfill failed for {entry['chembl_id']}: {e}")
+            stats["still_missing"] += 1
+            continue
+
+        if not detail.success or not detail.data:
+            stats["still_missing"] += 1
+            continue
+
+        backfilled_name = detail.data.get("name")
+        if backfilled_name and backfilled_name != "No name":
+            entry[name_field] = backfilled_name
+            # Bonus fields worth carrying over when the original result was
+            # missing them too - only overwrite genuine placeholders, never
+            # data the search result already had.
+            if entry.get("mechanism_of_action") in (None, "", "Not available") \
+                    and detail.data.get("mechanism_of_action") not in (None, "", "Not available"):
+                entry["mechanism_of_action"] = detail.data["mechanism_of_action"]
+            if entry.get("development_phase") in (None, "", "Unknown") \
+                    and detail.data.get("development_phase") not in (None, "", "Unknown"):
+                entry["development_phase"] = detail.data["development_phase"]
+            stats["backfilled"] += 1
+        else:
+            # get_drug_info itself has no usable name for this compound -
+            # leave the entry as-is rather than inventing a placeholder.
+            stats["still_missing"] += 1
+
+    # Entries past the cap were never attempted, so they're still missing too.
+    stats["still_missing"] += max(0, stats["missing_before"] - stats["attempted"])
+
+    return stats
+
+
 # =============================================================================
 # NODE 1: QUERY ANALYSIS
 # =============================================================================
@@ -337,6 +429,21 @@ def tool_execution_node(state: AgentState) -> AgentState:
                         target_name=search_query,
                         max_results=params.get("max_results", 20)
                     )
+
+                # ChEMBL search results frequently come back with a null/
+                # empty compound name (a real ChEMBL data gap). Backfill the
+                # top few via get_drug_info(), which sometimes has a name
+                # even when the search result didn't.
+                if result.success and result.data:
+                    backfill_stats = _backfill_chembl_names(tool, result.data, query_type)
+                    if backfill_stats["missing_before"] > 0:
+                        logger.info(
+                            f"[TOOL EXECUTION] ChEMBL name backfill: "
+                            f"{backfill_stats['missing_before']} missing, "
+                            f"{backfill_stats['attempted']} attempted, "
+                            f"{backfill_stats['backfilled']} backfilled, "
+                            f"{backfill_stats['still_missing']} still missing"
+                        )
 
             # Store results
             state["tool_results"][tool_name] = result.data if result.success else None
