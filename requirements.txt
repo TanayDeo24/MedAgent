@@ -17,5 +17,6 @@ tabulate==0.9.0
 # RAG / retrieval layer (Phase 3)
 sentence-transformers==6.0.1
 faiss-cpu==1.15.0
+rank_bm25==0.2.2
 numpy<2  # pinned: sentence-transformers pulls scipy/scikit-learn that need
          # a numpy<2-compatible build to stay ABI-compatible with pandas 2.1.4

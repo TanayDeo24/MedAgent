@@ -13,6 +13,7 @@ only pay the load cost once.
 """
 
 import json
+import pickle
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
@@ -21,10 +22,13 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
+from retrieval.build_bm25 import tokenize as bm25_tokenize
+
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 INDEX_PATH = DATA_DIR / "index" / "faiss.index"
 CHUNKS_PATH = DATA_DIR / "index" / "chunks.jsonl"
 META_PATH = DATA_DIR / "index" / "index_meta.json"
+BM25_PATH = DATA_DIR / "index" / "bm25.pkl"
 
 
 @dataclass
@@ -53,6 +57,7 @@ class Retriever:
         index_path: Path = INDEX_PATH,
         chunks_path: Path = CHUNKS_PATH,
         meta_path: Path = META_PATH,
+        bm25_path: Path = BM25_PATH,
     ):
         if not index_path.exists() or not chunks_path.exists():
             raise FileNotFoundError(
@@ -88,6 +93,33 @@ class Retriever:
         self.chunk_ids = [
             f"{c['pmid']}_{c['chunk_index']}" for c in self.chunks
         ]
+
+        # BM25 is loaded lazily (on first _bm25_search call), not here --
+        # keeps Retriever() constructible (for retrieve_dense-only use, e.g.
+        # the eval-set builder) even before a BM25 index has been built, and
+        # avoids paying its load cost for callers who never use it.
+        self._bm25_path = bm25_path
+        self._bm25 = None
+
+    def _load_bm25(self):
+        if self._bm25 is None:
+            if not self._bm25_path.exists():
+                raise FileNotFoundError(
+                    f"BM25 index not found at {self._bm25_path}. "
+                    "Run `python -m retrieval.build_bm25` first."
+                )
+            with open(self._bm25_path, "rb") as f:
+                self._bm25 = pickle.load(f)
+        return self._bm25
+
+    def _bm25_search(self, query: str, n: int) -> List[tuple]:
+        """Sparse BM25 search over the same chunk order as the FAISS index.
+        Returns [(row_idx, bm25_score), ...], ranked descending, len <= n."""
+        bm25 = self._load_bm25()
+        scores = bm25.get_scores(bm25_tokenize(query))
+        n = min(n, len(scores))
+        top_idx = np.argsort(scores)[::-1][:n]
+        return [(int(idx), float(scores[idx])) for idx in top_idx if scores[idx] > 0]
 
     def _doc_from_row(self, row_idx: int, score: float) -> Document:
         chunk = self.chunks[row_idx]
