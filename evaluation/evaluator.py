@@ -10,6 +10,7 @@ This module provides the main evaluation framework that:
 import json
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import List, Dict, Optional
 from pathlib import Path
@@ -18,7 +19,12 @@ from evaluation.test_cases import TEST_CASES, get_test_subset
 from evaluation.metrics import AgentMetrics
 from evaluation.hallucination_judge import judge_report_hallucinations
 from agent.graph import MedAgent
-from config.llm_config import get_llm_call_count, reset_llm_call_count
+from config.llm_config import (
+    get_llm_call_count,
+    reset_llm_call_count,
+    get_thread_llm_call_count,
+    reset_thread_llm_call_count,
+)
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -93,6 +99,16 @@ class AgentEvaluator:
         self.agent = agent
         self.results = []
         self.metrics_calculator = AgentMetrics()
+        # Guards every write to an incremental results file. Each write opens
+        # its own file handle in append mode rather than keeping one open, so
+        # POSIX's O_APPEND does give a per-syscall atomicity guarantee for
+        # small writes on most filesystems - but that guarantee has platform/
+        # filesystem caveats (e.g. some network filesystems, or writes larger
+        # than the OS's atomic-write threshold), and a large state dict
+        # serialized to JSON can be tens of KB. An explicit lock removes any
+        # dependency on those caveats: only one thread's write() call can be
+        # in flight at a time, full stop, regardless of OS or filesystem.
+        self._incremental_write_lock = threading.Lock()
 
     def _incremental_path(self, run_id: str) -> Path:
         results_dir = Path("experiments/results")
@@ -133,12 +149,19 @@ class AgentEvaluator:
         the end. Uses a slimmed copy (full final_report/tool_results text
         stripped from the stored state) to keep the file from growing
         unbounded across a 60+ case run - the full state is only ever
-        needed in-memory, for this same process's own aggregate metrics."""
+        needed in-memory, for this same process's own aggregate metrics.
+
+        Thread-safe: the whole read-serialize-write is done under
+        _incremental_write_lock so concurrent case-level execution (Phase 3)
+        can never interleave two cases' writes into one corrupted line.
+        """
         path = self._incremental_path(run_id)
         slim = dict(result)
         slim["state"] = self._slim_state(result.get("state", {}))
-        with open(path, "a") as f:
-            f.write(json.dumps(slim, default=str) + "\n")
+        line = json.dumps(slim, default=str) + "\n"
+        with self._incremental_write_lock:
+            with open(path, "a") as f:
+                f.write(line)
 
     @staticmethod
     def _slim_state(state: Dict) -> Dict:
@@ -154,7 +177,8 @@ class AgentEvaluator:
         self,
         test_cases: List[Dict] = None,
         verbose: bool = True,
-        run_id: str = "default"
+        run_id: str = "default",
+        concurrency: int = 1
     ) -> Dict:
         """Run full evaluation on test cases, with incremental persistence
         and resume support.
@@ -168,6 +192,16 @@ class AgentEvaluator:
                 interruption resumes from the first test case not already
                 present in that file, instead of starting over. Use a new
                 run_id to start a genuinely fresh batch.
+            concurrency: Number of test cases to run at once. 1 (default)
+                preserves the original strictly-sequential behavior. >1 runs
+                multiple cases' full 6-node pipelines concurrently in
+                separate threads, all sharing the same global 35 RPM rate
+                limiter and the same hard-timeout-with-fresh-client-retry
+                mechanism (config/llm_config.py) - concurrency parallelizes
+                *cases*, not individual LLM calls within one case, which
+                still run their own node sequence in order. See
+                PHASE3_CONCURRENCY_VALIDATION.md for the worker-count
+                rationale and validation results.
 
         Returns:
             Evaluation report dictionary
@@ -188,6 +222,8 @@ class AgentEvaluator:
         if verbose:
             print(f"\n{'='*70}")
             print(f"RUNNING AGENT EVALUATION ({len(test_cases)} test cases)")
+            if concurrency > 1:
+                print(f"CONCURRENCY: {concurrency} test cases in flight at once")
             if completed_ids:
                 print(
                     f"RESUMING run_id={run_id!r}: {len(completed_ids)} cases "
@@ -204,45 +240,38 @@ class AgentEvaluator:
         # llm_calls from when it was originally computed.
         reset_llm_call_count()
 
-        for i, test_case in enumerate(remaining, len(completed_ids) + 1):
-            if verbose:
-                print(f"[{i}/{len(test_cases)}] Testing: {test_case['query'][:60]}...")
-
-            try:
-                # Run agent on this test case, capped at
-                # CASE_WALL_CLOCK_TIMEOUT_SECONDS so one pathological case
-                # (e.g. every LLM call in it exhausting all its own
-                # timeout/retries) can't stall the whole batch the way the
-                # original hang did.
-                result = self._evaluate_single_case(test_case, verbose=verbose)
+        if concurrency <= 1:
+            for i, test_case in enumerate(remaining, len(completed_ids) + 1):
+                if verbose:
+                    print(f"[{i}/{len(test_cases)}] Testing: {test_case['query'][:60]}...")
+                result = self._run_and_record_case(test_case, run_id, agent=self.agent)
                 self.results.append(result)
-                self._append_incremental_result(run_id, result)
-
-                # Print status
                 if verbose:
-                    status = {"completed": "✓", "timeout": "⏱", "failed": "✗"}.get(
-                        result.get("status"), "✓" if result["task_completed"] else "✗"
-                    )
-                    latency = result["latency_seconds"] or 0
-                    print(f"    {status} {result.get('status', 'completed')} in {latency:.1f}s")
+                    self._print_case_status(result)
+        else:
+            self._run_concurrent(remaining, run_id, verbose, concurrency, total=len(test_cases), offset=len(completed_ids))
 
-            except Exception as e:
-                if verbose:
-                    print(f"    ✗ Error: {str(e)[:50]}")
-
-                # Store error result
-                error_result = {
-                    "test_case_id": test_case["id"],
-                    "query": test_case["query"],
-                    "difficulty": test_case["difficulty"],
-                    "task_completed": False,
-                    "status": "failed",
-                    "error": str(e),
-                    "latency_seconds": 0,
-                    "state": {}
-                }
-                self.results.append(error_result)
-                self._append_incremental_result(run_id, error_result)
+        # Cross-check: the global call counter (incremented under a real
+        # lock on every invoke(), so accurate in total regardless of
+        # concurrency) should match the sum of each freshly-run case's own
+        # thread-local-derived count. A mismatch would mean the per-case
+        # attribution mechanism (see _evaluate_single_case) is broken - this
+        # is exactly the kind of concurrency bug that "probably fine" can
+        # hide, so it's checked automatically on every run, not just during
+        # manual validation.
+        fresh_calls_sum = sum(
+            r.get("llm_calls") or 0 for r in self.results if r.get("status") == "completed"
+        )
+        global_calls = get_llm_call_count()
+        if fresh_calls_sum != global_calls:
+            logger.warning(
+                f"[EVALUATOR] LLM call count mismatch: sum of per-case counts "
+                f"({fresh_calls_sum}) != global counter ({global_calls}). "
+                f"Per-case llm_calls figures may be unreliable for this run."
+            )
+        elif verbose and remaining:
+            print(f"\n(LLM call count cross-check passed: {global_calls} calls, "
+                  f"per-case sum matches exactly)")
 
         # Generate report
         report = self._generate_evaluation_report()
@@ -256,7 +285,92 @@ class AgentEvaluator:
 
         return report
 
-    def _build_timeout_result(self, test_case: Dict, latency: float, llm_calls: int) -> Dict:
+    def _print_case_status(self, result: Dict) -> None:
+        status = {"completed": "✓", "timeout": "⏱", "failed": "✗"}.get(
+            result.get("status"), "✓" if result["task_completed"] else "✗"
+        )
+        latency = result["latency_seconds"] or 0
+        label = f"[{result['test_case_id']}] " if result.get("test_case_id") is not None else ""
+        print(f"    {status} {label}{result.get('status', 'completed')} in {latency:.1f}s")
+
+    def _run_and_record_case(self, test_case: Dict, run_id: str, agent: MedAgent) -> Dict:
+        """Run one test case end-to-end and persist its result immediately.
+
+        Shared by both the sequential and concurrent execution paths so
+        incremental persistence, error handling, and result shape are
+        identical regardless of how the case was scheduled.
+        """
+        try:
+            result = self._evaluate_single_case(test_case, agent=agent)
+        except Exception as e:
+            result = {
+                "test_case_id": test_case["id"],
+                "query": test_case["query"],
+                "difficulty": test_case["difficulty"],
+                "task_completed": False,
+                "status": "failed",
+                "error": str(e),
+                "latency_seconds": 0,
+                "state": {}
+            }
+        self._append_incremental_result(run_id, result)
+        return result
+
+    def _run_concurrent(
+        self,
+        remaining: List[Dict],
+        run_id: str,
+        verbose: bool,
+        concurrency: int,
+        total: int,
+        offset: int
+    ) -> None:
+        """Run `remaining` test cases concurrently, `concurrency` at a time.
+
+        Each submitted case gets its OWN freshly-constructed MedAgent
+        instance rather than sharing self.agent across threads - this isn't
+        because self.agent was shown to be unsafe (a compiled LangGraph
+        StateGraph's .invoke() operates purely on the state dict passed to
+        it, with create_initial_state() building a fresh one per call, and
+        no node mutates agent-instance attributes), but constructing a
+        MedAgent is cheap (no network calls, just graph compilation) and
+        removes any need to reason about it further - a genuinely-safe
+        default rather than a probably-fine one.
+
+        Using ThreadPoolExecutor here (unlike config/llm_config.py's and
+        this module's own single-call timeout wrappers, which deliberately
+        use a raw daemon thread instead) is safe specifically because every
+        submitted task is already internally bounded by
+        _evaluate_single_case's CASE_WALL_CLOCK_TIMEOUT_SECONDS cap - a
+        submitted task can never run longer than ~20 minutes plus judge
+        time, so ThreadPoolExecutor's worker threads are always guaranteed
+        to return and its atexit thread-join can never hang the way it
+        could for a call with no such ceiling.
+        """
+        completed_count = offset
+        with ThreadPoolExecutor(max_workers=concurrency) as executor:
+            futures = {
+                executor.submit(self._run_and_record_case, tc, run_id, MedAgent(
+                    max_iterations=self.agent.max_iterations,
+                    temperature=self.agent.temperature
+                )): tc
+                for tc in remaining
+            }
+            if verbose:
+                queued = ", ".join(str(tc["id"]) for tc in remaining)
+                print(f"Queued {len(remaining)} cases across {concurrency} workers: [{queued}]\n")
+
+            for future in as_completed(futures):
+                test_case = futures[future]
+                result = future.result()
+                self.results.append(result)
+                completed_count += 1
+                if verbose:
+                    print(f"[{completed_count}/{total}] Finished case {test_case['id']}: "
+                          f"{test_case['query'][:50]}...")
+                    self._print_case_status(result)
+
+    def _build_timeout_result(self, test_case: Dict, latency: float, llm_calls: Optional[int]) -> Dict:
         """Result shape for a case that exceeded CASE_WALL_CLOCK_TIMEOUT_SECONDS.
 
         Marked with status="timeout" (not silently dropped, not crashing the
@@ -286,24 +400,40 @@ class AgentEvaluator:
             "hallucination_judge": None,
         }
 
-    def _evaluate_single_case(self, test_case: Dict, verbose: bool = False) -> Dict:
+    def _evaluate_single_case(self, test_case: Dict, verbose: bool = False, agent: Optional[MedAgent] = None) -> Dict:
         """Evaluate agent on a single test case.
 
         Args:
             test_case: Test case dictionary
             verbose: Print details
+            agent: MedAgent instance to run this case on. Defaults to
+                self.agent (sequential path); the concurrent path
+                (_run_concurrent) passes a fresh per-case instance instead.
 
         Returns:
             Evaluation result dictionary
         """
+        agent = agent or self.agent
         start_time = time.time()
-        llm_calls_before = get_llm_call_count()
 
         # Run agent, capped at CASE_WALL_CLOCK_TIMEOUT_SECONDS - see that
         # constant's docstring for why this exists on top of
-        # config/llm_config.py's own per-call hard timeout.
-        completed, state = _run_with_wall_clock_cap(
-            lambda: self.agent.run(test_case["query"]),
+        # config/llm_config.py's own per-call hard timeout. agent.run()
+        # actually executes on a DIFFERENT (inner) daemon thread than this
+        # one - see _run_with_wall_clock_cap - so a naive thread-local LLM
+        # call count read from THIS thread would always see 0. Instead,
+        # _run_agent_and_count_calls resets and reads the thread-local
+        # counter from *inside* that inner thread's own execution and
+        # returns it alongside the state, which correctly isolates this
+        # case's count even when other cases are running concurrently in
+        # other threads (Phase 3 concurrency).
+        def _run_agent_and_count_calls():
+            reset_thread_llm_call_count()
+            result_state = agent.run(test_case["query"])
+            return result_state, get_thread_llm_call_count()
+
+        completed, wrapped_result = _run_with_wall_clock_cap(
+            _run_agent_and_count_calls,
             CASE_WALL_CLOCK_TIMEOUT_SECONDS
         )
         if not completed:
@@ -313,9 +443,13 @@ class AgentEvaluator:
                 f"{CASE_WALL_CLOCK_TIMEOUT_SECONDS}s wall-clock cap - marking "
                 f"as timeout and moving on"
             )
-            return self._build_timeout_result(
-                test_case, latency, get_llm_call_count() - llm_calls_before
-            )
+            # The abandoned inner thread's call count can't be retrieved -
+            # it may still be running, and joining it further defeats the
+            # whole point of the cap. Genuinely unknown, so None (not a
+            # guessed 0), consistent with how every other genuinely-
+            # unmeasurable field in this evaluator is handled.
+            return self._build_timeout_result(test_case, latency, llm_calls=None)
+        state, agent_llm_calls = wrapped_result
 
         end_time = time.time()
         latency = end_time - start_time
@@ -326,14 +460,16 @@ class AgentEvaluator:
         # LLM-judge hallucination check (see evaluation/hallucination_judge.py
         # for the full methodology and its rigor caveats). Run after the
         # agent's own pipeline has fully finished, as a separate LLM call
-        # with no shared context - not the agent grading its own work.
+        # with no shared context - not the agent grading its own work. Runs
+        # on THIS thread (not the inner daemon thread above), so its calls
+        # are counted separately via the same thread-local mechanism and
+        # added to the agent's own count below.
+        reset_thread_llm_call_count()
         hallucination_judge = judge_report_hallucinations(
             state.get("final_report", ""),
             state.get("tool_results", {})
         )
-        # Counted after the judge call so this includes it - get_llm_call_count()
-        # tracks every real invoke() globally, agent pipeline and judge alike.
-        llm_calls_this_case = get_llm_call_count() - llm_calls_before
+        llm_calls_this_case = agent_llm_calls + get_thread_llm_call_count()
 
         # Calculate metrics for this result
         tool_precision = AgentMetrics.tool_precision(
