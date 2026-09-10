@@ -39,7 +39,7 @@ EVAL_SET_PATH = Path(__file__).resolve().parent / "eval_set.json"
 K = 10
 
 
-def measure(mode: str, variant: str = None, expand: bool = False) -> dict:
+def measure(mode: str, variant: str = None, expand: bool = False, eval_set_path: Path = EVAL_SET_PATH) -> dict:
     retriever = get_retriever_for_variant(variant)
 
     if expand:
@@ -58,7 +58,7 @@ def measure(mode: str, variant: str = None, expand: bool = False) -> dict:
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
-    with open(EVAL_SET_PATH) as f:
+    with open(eval_set_path) as f:
         eval_set = json.load(f)
 
     # Warm up (load model/index/bm25/cross-encoder) outside per-query timing.
@@ -100,6 +100,7 @@ def measure(mode: str, variant: str = None, expand: bool = False) -> dict:
         "mode": mode,
         "variant": variant,
         "expand": expand,
+        "eval_set_path": str(eval_set_path),
         "k": K,
         "num_queries": len(per_query),
         "num_queries_scored": len(scored),
@@ -119,12 +120,13 @@ def main():
     parser.add_argument("--mode", choices=["dense", "hybrid"], required=True)
     parser.add_argument("--variant", default=None, help="Index variant tag under data/index/variants/, omit for production index")
     parser.add_argument("--expand", action="store_true", help="Apply query expansion (retrieval/query_expansion.py) before retrieving")
+    parser.add_argument("--eval-set", type=Path, default=EVAL_SET_PATH, help="Path to an eval_set.json-shaped file (e.g. eval_set_strict.json)")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
     label = f"mode={args.mode} variant={args.variant or 'production'} expand={args.expand}"
-    print(f"Measuring Recall@{K} ({label}) against {EVAL_SET_PATH} ...")
-    summary = measure(args.mode, variant=args.variant, expand=args.expand)
+    print(f"Measuring Recall@{K} ({label}) against {args.eval_set} ...")
+    summary = measure(args.mode, variant=args.variant, expand=args.expand, eval_set_path=args.eval_set)
 
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
