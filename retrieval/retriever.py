@@ -119,16 +119,29 @@ class Retriever:
         return self._cross_encoder
 
     def _rerank(self, query: str, candidates: List[tuple], k: int) -> List[tuple]:
-        """Cross-encoder rerank: scores (query, chunk_text) pairs directly
-        (not two independently-embedded vectors, unlike the dense/bilinear
-        FAISS search) -- slower per-pair but more accurate, which is exactly
-        why it runs last, over only the ~30 already-fused candidates rather
-        than the full corpus. Returns top-k [(row_idx, ce_score), ...].
+        """Cross-encoder rerank: scores (query, passage) pairs directly (not
+        two independently-embedded vectors, unlike the dense/bilinear FAISS
+        search) -- slower per-pair but more accurate, which is exactly why
+        it runs last, over only the ~30 already-fused candidates rather than
+        the full corpus. Returns top-k [(row_idx, ce_score), ...].
+
+        The passage text includes the title (same "Title: X\n\nchunk text"
+        framing used for dense embedding, see chunking.py's embed_text) --
+        without it, a mid-abstract chunk (chunk_index > 0) can read as an
+        off-topic fragment (e.g. a safety/tolerability paragraph) even when
+        its abstract's title makes it clearly relevant to the query, and the
+        cross-encoder was observed live demoting exactly such chunks when
+        scored on chunk_text alone. Passing title + text keeps what the
+        cross-encoder sees consistent with what the dense encoder already
+        saw when it originally surfaced the candidate.
         """
         if not candidates:
             return []
         cross_encoder = self._load_cross_encoder()
-        pairs = [(query, self.chunks[idx]["chunk_text"]) for idx, _ in candidates]
+        pairs = [
+            (query, f"Title: {self.chunks[idx]['title']}\n\n{self.chunks[idx]['chunk_text']}")
+            for idx, _ in candidates
+        ]
         scores = cross_encoder.predict(pairs)
         reranked = sorted(
             zip((idx for idx, _ in candidates), scores),
