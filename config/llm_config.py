@@ -48,6 +48,28 @@ LLM_CALL_TIMEOUT_SECONDS = 90
 # again just with extra steps first.
 LLM_CALL_MAX_ATTEMPTS = 3
 
+# langchain_nvidia_ai_endpoints raises transient provider errors (429 rate
+# limits, 503 overloaded) as a plain Exception with the status embedded in
+# the message text (see _common.py's _try_raise) - there's no dedicated
+# exception subclass or .status_code attribute to catch by type. Matched by
+# substring against both the numeric code and NVIDIA's own wording, since
+# real observed messages vary in exact shape (e.g. "[429] Too Many Requests"
+# vs "[###] {'code': 503, ...}"). These were observed live and repeatedly in
+# real evaluation runs (see PHASE3_CONCURRENCY_VALIDATION.md and
+# EVAL_HANG_FIX_COMPLETE.md) with no retry at this layer previously - only
+# timeouts were retried, so every 429/503 failed its call outright.
+_RETRYABLE_ERROR_MARKERS = (
+    "429", "503", "Too Many Requests", "Service Unavailable", "temporarily overloaded"
+)
+
+
+def _is_retryable_llm_error(exc: Exception) -> bool:
+    """True if `exc` looks like a transient provider error (429/503) worth
+    retrying with a fresh client, rather than a real, non-retryable failure
+    (e.g. a 400/401/404) that should propagate immediately as before."""
+    text = str(exc)
+    return any(marker in text for marker in _RETRYABLE_ERROR_MARKERS)
+
 
 class LLMCallTimeoutError(Exception):
     """Raised when an LLM call exceeds LLM_CALL_TIMEOUT_SECONDS on every
@@ -209,11 +231,27 @@ class _RateLimitedChatNVIDIA:
                     f"[LLM DISPATCH RESULT] thread={thread_id} t={time.time():.4f} "
                     f"error={type(e).__name__}: {str(e)[:100]}"
                 )
-                # A real error (e.g. a 503) that surfaced within the
-                # timeout - not what this fix targets, let it propagate
-                # exactly as before so existing per-node try/except handling
-                # is unaffected.
-                raise
+                if not _is_retryable_llm_error(e):
+                    # A real, non-retryable error (e.g. a 400/401/404) - let
+                    # it propagate immediately exactly as before, so existing
+                    # per-node try/except handling for anything outside the
+                    # 429/503 case is unaffected.
+                    raise
+                last_exc = e
+                logger.warning(
+                    f"[LLM RETRY] Call failed with a retryable provider error "
+                    f"(attempt {attempt + 1}/{LLM_CALL_MAX_ATTEMPTS}): {e} - "
+                    f"discarding client and retrying with a fresh connection"
+                )
+                # Same fresh-client-and-backoff pattern as the timeout path
+                # below, sharing the same attempt budget - a 429/503 no
+                # longer fails the call outright on the very first sight of
+                # it (previously the only retry that ever happened here was
+                # for a hang, never for a real transient provider error).
+                self._llm = ChatNVIDIA(**self._construct_kwargs)
+                if attempt < LLM_CALL_MAX_ATTEMPTS - 1:
+                    time.sleep(calculate_backoff(attempt))
+                continue
 
             if completed:
                 logger.info(f"[LLM DISPATCH RESULT] thread={thread_id} t={time.time():.4f} status=success")
