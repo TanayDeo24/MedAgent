@@ -239,6 +239,32 @@ class Retriever:
         fused = self._rrf_fuse([dense_hits, bm25_hits])[:n]
         return [self._doc_from_row(idx, score) for idx, score in fused]
 
+    def _dedup_rows_by_pmid(self, ranked: List[tuple], k: int) -> List[tuple]:
+        """Walk a ranked [(row_idx, score), ...] list and keep the first
+        (highest-ranked) chunk per PMID, stopping once k unique PMIDs are
+        collected. Returns <= k items.
+
+        Multiple chunks of the same abstract routinely rank near each other
+        (they're near-duplicate text), so an undeduplicated top-k
+        chronically wastes slots on the same PMID more than once -- observed
+        live at ~7-8 unique PMIDs per 10 chunks returned, both for dense and
+        hybrid. This directly hurts result diversity for a real caller (an
+        agent citing "10 sources" that are actually 2 abstracts chunked 5
+        ways each is not 10 sources) independent of any evaluation metric --
+        it's a correctness fix, not a metric-specific tweak.
+        """
+        seen_pmids = set()
+        out = []
+        for row_idx, score in ranked:
+            pmid = self.chunks[row_idx]["pmid"]
+            if pmid in seen_pmids:
+                continue
+            seen_pmids.add(pmid)
+            out.append((row_idx, score))
+            if len(out) >= k:
+                break
+        return out
+
     def retrieve_dense(self, query: str, k: int = 5) -> List[Document]:
         """Pure dense (FAISS cosine) retrieval -- the original, pre-hybrid
         retrieval path. Kept as a first-class method (not just folded into
@@ -246,30 +272,76 @@ class Retriever:
         baseline measurement and the eval-set candidate pool need: a fixed,
         unchanging reference point to compare any later retrieval changes
         against.
+
+        Fetches more than k candidates and deduplicates by PMID down to k
+        (see _dedup_rows_by_pmid) -- otherwise a top-k of raw chunk ranks
+        routinely returns multiple chunks of the same 1-2 abstracts instead
+        of k distinct sources.
         """
         if k <= 0:
             return []
-        return [self._doc_from_row(idx, score) for idx, score in self._dense_search(query, k)]
+        candidates = self._dense_search(query, max(k * 4, 40))
+        deduped = self._dedup_rows_by_pmid(candidates, k)
+        return [self._doc_from_row(idx, score) for idx, score in deduped]
 
     def retrieve(self, query: str, k: int = 5) -> List[Document]:
-        """Return the top-k most relevant chunks for `query`.
+        """Return the top-k most relevant chunks for `query`, one per PMID.
 
         Full hybrid pipeline: dense (FAISS) + sparse (BM25) candidates,
-        fused via RRF, then reranked by a cross-encoder scoring (query,
-        chunk) pairs directly -- the external interface is unchanged from
-        the pure-dense version (same signature, same Document shape); only
-        what happens inside changed.
+        fused via RRF, reranked by a cross-encoder scoring (query, chunk)
+        pairs directly, then deduplicated by PMID -- the external interface
+        is unchanged from the pure-dense version (same signature, same
+        Document shape); only what happens inside changed.
         """
         if k <= 0:
             return []
         dense_hits = self._dense_search(query, DENSE_TOP_N)
         bm25_hits = self._bm25_search(query, BM25_TOP_N)
         fused = self._rrf_fuse([dense_hits, bm25_hits])[:RRF_POOL_SIZE]
-        reranked = self._rerank(query, fused, k)
-        return [self._doc_from_row(idx, score) for idx, score in reranked]
+        # Rerank the full fused pool (not capped to k) so there's enough
+        # depth left to dedup by PMID down to k afterward.
+        reranked = self._rerank(query, fused, len(fused))
+        deduped = self._dedup_rows_by_pmid(reranked, k)
+        return [self._doc_from_row(idx, score) for idx, score in deduped]
+
+    def get_pooled_candidates(self, query: str, n: int = 30) -> List[Document]:
+        """Union of dense top-n, BM25 top-n, and full hybrid(RRF+rerank)
+        top-n candidates, deduplicated by chunk_id.
+
+        Exists specifically to build a less-biased eval-set candidate pool:
+        labeling only dense's own top-N (as the first retrieval-quality pass
+        did) structurally caps every other method's measurable recall,
+        since nothing outside that pool can ever count as a hit. Pooling
+        from all three methods gives each one a fair chance to get credit
+        for what it actually finds -- the standard TREC-style fix for
+        single-system pooling bias, applied here across 3 systems instead
+        of exhaustively across every system, per the "one call per query"
+        labeling budget.
+
+        Note the hybrid list is, by construction, a subset of the union of
+        the dense and BM25 lists here (RRF fusion and reranking only ever
+        reorder/trim dense_hits + bm25_hits, they never introduce new
+        candidates) -- so in practice this pool equals dense-top-n union
+        bm25-top-n. It's still computed as a 3-way union rather than
+        special-cased to 2, so this stays correct if DENSE_TOP_N/BM25_TOP_N/
+        RRF_POOL_SIZE are ever tuned independently of each other.
+        """
+        dense_docs = self.retrieve_dense(query, k=n)
+        bm25_hits = self._bm25_search(query, n)
+        bm25_docs = [self._doc_from_row(idx, score) for idx, score in bm25_hits]
+        hybrid_docs = self.retrieve(query, k=n)
+
+        pooled = {}
+        for doc in dense_docs + bm25_docs + hybrid_docs:
+            if doc.chunk_id not in pooled:
+                pooled[doc.chunk_id] = doc
+        return list(pooled.values())
 
 
 _retriever: Optional[Retriever] = None
+_variant_retrievers: dict = {}
+
+VARIANTS_DIR = DATA_DIR / "index" / "variants"
 
 
 def _get_retriever() -> Retriever:
@@ -277,6 +349,27 @@ def _get_retriever() -> Retriever:
     if _retriever is None:
         _retriever = Retriever()
     return _retriever
+
+
+def get_retriever_for_variant(tag: Optional[str] = None) -> Retriever:
+    """Get a (cached) Retriever for a named index variant under
+    data/index/variants/<tag>/, or the production Retriever if tag is None.
+
+    Lets the embedding-model and chunk-size experiments load an alternate
+    FAISS/BM25/chunks build without disturbing the production singleton
+    returned by retrieve()/retrieve_dense() at module scope.
+    """
+    if tag is None:
+        return _get_retriever()
+    if tag not in _variant_retrievers:
+        variant_dir = VARIANTS_DIR / tag
+        _variant_retrievers[tag] = Retriever(
+            index_path=variant_dir / "faiss.index",
+            chunks_path=variant_dir / "chunks.jsonl",
+            meta_path=variant_dir / "index_meta.json",
+            bm25_path=variant_dir / "bm25.pkl",
+        )
+    return _variant_retrievers[tag]
 
 
 def retrieve(query: str, k: int = 5) -> List[Document]:
