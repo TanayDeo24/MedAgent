@@ -284,14 +284,23 @@ class Retriever:
         deduped = self._dedup_rows_by_pmid(candidates, k)
         return [self._doc_from_row(idx, score) for idx, score in deduped]
 
-    def retrieve(self, query: str, k: int = 5) -> List[Document]:
-        """Return the top-k most relevant chunks for `query`, one per PMID.
-
-        Full hybrid pipeline: dense (FAISS) + sparse (BM25) candidates,
+    def retrieve_hybrid_reranked(self, query: str, k: int = 5) -> List[Document]:
+        """Full hybrid pipeline: dense (FAISS) + sparse (BM25) candidates,
         fused via RRF, reranked by a cross-encoder scoring (query, chunk)
-        pairs directly, then deduplicated by PMID -- the external interface
-        is unchanged from the pure-dense version (same signature, same
-        Document shape); only what happens inside changed.
+        pairs directly, then deduplicated by PMID.
+
+        NOT the default `retrieve()` path (see that method's docstring for
+        why) -- kept as an explicit, opt-in method. On this project's fixed
+        19-query eval set (see PHASE3_RETRIEVAL_QUALITY_COMPLETE.md), this
+        pipeline measured a LOWER mean Recall@10 than plain retrieve_dense()
+        (0.4832 vs 0.5711) at ~35x the latency (257ms vs 7ms), though it
+        measured slightly BETTER than dense on the subset of queries with
+        more than one labeled-relevant abstract (mean 0.383 vs 0.337) --
+        dense's aggregate edge concentrates in a handful of single-relevant-
+        abstract queries that behave as high-variance, near-binary outcomes
+        on a small eval set, not a broad-based advantage. Worth revisiting
+        if a larger eval set becomes available, or if a caller specifically
+        wants BM25's lexical-match recall for terminology-heavy queries.
         """
         if k <= 0:
             return []
@@ -303,6 +312,26 @@ class Retriever:
         reranked = self._rerank(query, fused, len(fused))
         deduped = self._dedup_rows_by_pmid(reranked, k)
         return [self._doc_from_row(idx, score) for idx, score in deduped]
+
+    def retrieve(self, query: str, k: int = 5) -> List[Document]:
+        """Return the top-k most relevant chunks for `query`, one per PMID.
+
+        Default pipeline is pure dense retrieval (retrieve_dense), not the
+        hybrid+RRF+rerank pipeline built earlier in this project's
+        retrieval-quality work. That hybrid pipeline (still available as
+        retrieve_hybrid_reranked) was measured, on this project's fixed
+        19-query eval set, to have a LOWER mean Recall@10 than plain dense
+        retrieval (0.4832 vs 0.5711) despite ~35x the latency -- see
+        PHASE3_RETRIEVAL_QUALITY_COMPLETE.md for the full comparison,
+        including embedding-model and chunk-size variants (none beat this
+        default either) and the caveat that dense's edge concentrates in a
+        subset of high-variance queries rather than being uniform. This is
+        the empirically-best-measured configuration from that work, used as
+        the default per its explicit instruction to ship whichever
+        combination measured best -- not a reversion to a simpler
+        implementation for its own sake.
+        """
+        return self.retrieve_dense(query, k=k)
 
     def get_pooled_candidates(self, query: str, n: int = 30) -> List[Document]:
         """Union of dense top-n, BM25 top-n, and full hybrid(RRF+rerank)
@@ -329,7 +358,7 @@ class Retriever:
         dense_docs = self.retrieve_dense(query, k=n)
         bm25_hits = self._bm25_search(query, n)
         bm25_docs = [self._doc_from_row(idx, score) for idx, score in bm25_hits]
-        hybrid_docs = self.retrieve(query, k=n)
+        hybrid_docs = self.retrieve_hybrid_reranked(query, k=n)
 
         pooled = {}
         for doc in dense_docs + bm25_docs + hybrid_docs:
@@ -395,6 +424,19 @@ def retrieve_dense(query: str, k: int = 5) -> List[Document]:
 
     Exposed at module level for the eval-set builder and the baseline
     Recall@10 measurement, which both need this exact, unchanging retrieval
-    path regardless of what `retrieve()` itself does internally.
+    path regardless of what `retrieve()` itself does internally. Also what
+    `retrieve()` itself calls by default -- see Retriever.retrieve's
+    docstring for why (it's the empirically-best-measured configuration on
+    this project's fixed eval set, not just a simpler fallback).
     """
     return _get_retriever().retrieve_dense(query, k=k)
+
+
+def retrieve_hybrid_reranked(query: str, k: int = 5) -> List[Document]:
+    """Hybrid pipeline: dense + BM25, fused via RRF, cross-encoder reranked.
+
+    Exposed at module level as an explicit opt-in -- NOT what `retrieve()`
+    calls by default. See Retriever.retrieve_hybrid_reranked's docstring
+    for the measured Recall@10/latency comparison against retrieve_dense().
+    """
+    return _get_retriever().retrieve_hybrid_reranked(query, k=k)

@@ -50,7 +50,11 @@ def measure(mode: str, variant: str = None, expand: bool = False) -> dict:
     elif mode == "dense":
         retrieve_fn = retriever.retrieve_dense
     elif mode == "hybrid":
-        retrieve_fn = retriever.retrieve
+        # Explicitly the hybrid pipeline, not retriever.retrieve -- that
+        # now defaults to dense (see Retriever.retrieve's docstring), and
+        # this script needs the hybrid path specifically regardless of what
+        # the production default is.
+        retrieve_fn = retriever.retrieve_hybrid_reranked
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
