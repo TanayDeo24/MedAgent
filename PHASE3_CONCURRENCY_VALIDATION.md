@@ -110,20 +110,17 @@ Two 8-case subsets (`TEST_CASES` ids `[1, 2, 11, 12, 13, 15, 16, 19]`,
 
 ### Important caveat that must be stated plainly, not smoothed over
 
-**This environment had heavy, ongoing external contention on the shared NVIDIA
-API key during both validation runs** - consistent with the parallel workstream
-this task itself mentioned running against the same repo concurrently. Evidence:
-the sequential run alone saw **52 real `429 Too Many Requests` responses** from
+**This environment had heavy 429 activity during both validation runs.** The
+sequential run alone saw **52 real `429 Too Many Requests` responses** from
 NVIDIA despite our own process measuring only **73 real LLM calls over 19.3
-minutes (≈3.8 calls/min - nowhere near the 35 limit)**. Our own rate limiting was
-not the cause of those 429s; something else sharing the same API key was
-consuming the account-wide quota independent of our conservative usage. The
-concurrent run saw even more (113), plausibly because 4 of our own workers plus
-that external load compounded further. **This means the raw wall-clock numbers
-below are not a clean, confound-free concurrency benchmark** - some of the
-difference reflects cases failing faster (fewer completed pipeline steps before
-hitting a 429) rather than pure parallelism efficiency. Reported honestly instead
-of presented as a clean number.
+minutes (≈3.8 calls/min - nowhere near the 35 limit)**. The concurrent run saw
+even more (113). Our own rate limiting was not the cause - see the dedicated
+root-cause investigation below, which does NOT confirm the "parallel workstream"
+explanation first assumed here and instead traces this to something else. **This
+means the raw wall-clock numbers below are not a clean, confound-free concurrency
+benchmark** - some of the difference reflects cases failing faster (fewer
+completed pipeline steps before hitting a 429) rather than pure parallelism
+efficiency. Reported honestly instead of presented as a clean number.
 
 | | Sequential | Concurrent (4 workers) |
 |---|---|---|
@@ -153,6 +150,89 @@ the external contention subsides would give a more trustworthy number; this
 validation pass ran during genuinely contended conditions and reports that as-is
 rather than waiting for quieter conditions or claiming a number this data doesn't
 actually support.
+
+## 3a. Root cause of the 429s — verified, not assumed
+
+The initial validation pass (above) attributed the 429s to "the parallel
+workstream" mentioned in the task that assigned it. **That assumption was checked
+and does not hold up**: the workstream in question is scoped to make zero
+`ChatNVIDIA` calls (confirmed via `git status` on that work), and `ps aux` /
+`lsof -i` checked at multiple points during this investigation found no other
+local process with an open connection to NVIDIA's endpoint. So a dedicated
+investigation was run instead of repeating that explanation.
+
+**Method**: added precise per-dispatch logging (`config/llm_config.py`:
+`[LLM DISPATCH]` / `[LLM DISPATCH RESULT]`, timestamped to 4 decimal places with
+thread id, logged at actual request-send time - not just on failure). Ran the
+same 8-case subset (ids `[1, 2, 11, 12, 13, 15, 16, 19]`) twice, back-to-back,
+close in time: sequential first (`run_id="investigate_429_seq"`), concurrent
+immediately after (`run_id="investigate_429_conc"`).
+
+**Result — the opposite of what "bursty clustering from concurrency" would
+predict:**
+
+| | Sequential (no concurrency) | Concurrent (4 workers), run immediately after |
+|---|---|---|
+| Real 429s | **5 events** (10 log lines) | **0** |
+| Real 90s LLM timeouts | 6 | 5 |
+| Real 503s (pre-existing, unrelated) | 0 | 2 |
+| Wall-clock | 1783.3s | 448.7s |
+| Own-process calls | 69 | 67 |
+| Min gap between any two dispatches | n/a (single thread, naturally serial) | **1.7143s** |
+
+The concurrent run - the one under suspicion - had **zero** 429s. The sequential
+run - fully single-threaded, one LLM call in flight at a time, obviously
+incapable of "bursty" behavior - had 5. That alone rules out concurrency-induced
+clustering as the explanation for these events.
+
+**Directly confirmed no clustering exists in the rate limiter's actual behavior**,
+not just inferred from the RPM average: across all 67 dispatches in the
+concurrent run - 4 worker threads pulling from the same shared token bucket -
+the **minimum gap between any two consecutive dispatches was 1.7143 seconds**,
+matching the theoretical steady-state spacing (60s / 35 = 1.7143s) to four
+decimal places. Zero dispatches occurred within 1.5s of another; zero within 1.0s;
+zero within 0.5s. The token bucket releases exactly one token at a time, at the
+intended interval, regardless of how many threads are waiting - there is no burst
+to find.
+
+**The most direct evidence against the token bucket (or any request-pattern
+explanation) as the cause**: in the sequential run, three of the five 429s
+occurred on a *single thread*, with dispatches **45+ seconds apart**
+(`t=1789003493.86` → next dispatch `t=1789003538.96`, a 45.1s gap; similar for the
+others) - nowhere close to the 1.71s minimum spacing, let alone a burst. A request
+made once every 45+ seconds, alone, on one thread, still got a 429.
+
+**Conclusion**: the 429s are not caused by this codebase's request pattern,
+concurrency implementation, or token-bucket behavior - all three were directly
+measured and ruled out. What's left, given the evidence:
+- **Not local-process contention** - checked and found none, at multiple points
+  across the investigation.
+- **Most consistent explanation: NVIDIA-side throttling on a timescale or rule
+  this token bucket doesn't model** (e.g. a shorter rolling window, or per-account
+  burst/quota accounting stricter or differently-shaped than a smooth 35-per-60s
+  average), **or genuine external account activity this machine has no visibility
+  into** (a remote/cloud process, a different session on another machine, or
+  another local application using the same key that wasn't running at the moments
+  checked). This investigation can rule out what it could directly observe (this
+  process's own pattern, other local processes at the times checked) but cannot
+  prove a negative about traffic this machine cannot see.
+- **No fix was implemented in the rate limiter**, because no defect was found in
+  it - inventing a fix (jitter, serialized acquisition, etc.) for a "bursty
+  release" problem that the timestamp data shows does not exist would be solving
+  the wrong problem and adding complexity with no evidence it helps.
+- **Worth flagging, found while checking this**: `_RateLimitedChatNVIDIA.invoke()`
+  only retries with backoff on a *timeout* (§ "Enforce a real hard timeout..." -
+  `LLM_CALL_MAX_ATTEMPTS`). A real exception that surfaces within the timeout
+  window - a 429 included - is caught and immediately re-raised, with zero
+  retry at this layer (`config/llm_config.py`, the `except Exception as e: raise`
+  branch). The only thing that currently keeps a 429 from failing the whole
+  batch is each node's own pre-existing try/except, which fails that one node's
+  step (and often that whole test case) rather than crashing the run. Given how
+  real and unpredictable these 429s turned out to be in this environment, adding
+  a retry specifically for 429 (distinct from the timeout-retry path) would be a
+  reasonable follow-up - but that's a new capability, not a fix for the bursty-
+  clustering hypothesis this investigation was scoped to check, so it wasn't
+  added here.
 
 ### Resume-safety under mid-concurrent-run interruption (the requirement that
 ### matters most for trustworthiness)
@@ -198,12 +278,24 @@ unique ids present, zero duplicates, zero missing**.
 
 ## What to know before using this for the real baseline-vs-RAG run
 
-- **The 429 contention observed here is environmental (a shared API key under
-  concurrent external load), not a defect in this concurrency implementation.**
-  If it persists when the real comparison run is scheduled, expect a nontrivial
-  failure rate from genuine account-level rate limiting regardless of how
+- **The 429s are confirmed NOT caused by this concurrency implementation** - not
+  bursty clustering (zero clustering measured, minimum inter-dispatch gap matched
+  theoretical spacing exactly), not this process's own request volume (3.8/min
+  measured when 429s occurred), and not another local process (checked and found
+  none). The concurrent run in the dedicated investigation (§3a) had *fewer* 429s
+  than the sequential one run right before it, which itself rules out "more
+  workers → more bursts" as an explanation.
+- **The actual source is unresolved** - most consistent with NVIDIA-side
+  throttling on a timescale this token bucket doesn't model, or external account
+  activity this machine has no visibility into. If it persists during the real
+  comparison run, expect a nontrivial failure rate from this regardless of how
   carefully this process's own usage is throttled - that's outside what any
-  in-process rate limiter can control.
+  in-process rate limiter can control, confirmed rather than assumed.
+- **A concrete, scoped-out follow-up worth doing before that run**: add a
+  retry-on-429 at the `_RateLimitedChatNVIDIA.invoke()` layer (currently only
+  timeouts get retried there - a 429 propagates immediately, see §3a). Given how
+  real and frequent these turned out to be, that would likely reduce the
+  per-case failure rate more than anything else discussed in this document.
 - Recommended worker count: **4**, per the reasoning in §2 - re-evaluate only if
   the tool-level (ChEMBL/PubMed/ClinicalTrials) APIs start showing their own
   rate-limit strain at this concurrency, which was not observed here.

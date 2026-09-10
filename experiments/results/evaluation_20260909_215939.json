@@ -1,0 +1,437 @@
+{
+  "timestamp": "2026-09-09T21:59:39.584556",
+  "agent_config": {
+    "max_iterations": 1,
+    "temperature": 0.3
+  },
+  "total_tests": 8,
+  "workflows_run": 8,
+  "successful_tests": 2,
+  "timed_out_tests": 0,
+  "reconstructed_tests": 0,
+  "overall_success_rate": 0.25,
+  "avg_tool_precision": 0.6666666666666666,
+  "avg_redundancy_rate": 0.0,
+  "self_correction_rate": 0.0,
+  "avg_citation_coverage": 0.7083333333333334,
+  "avg_confidence": 0.28125,
+  "avg_latency": 112.97873282432556,
+  "avg_iterations": 1.0,
+  "composite_score": 0.5205341253181298,
+  "hallucination_rate": 0.0,
+  "hallucination_rate_note": "LLM-judge methodology (separate call, no shared agent context) - measures internal grounding against this run's own tool_results, NOT verified correctness against reality. See evaluation/hallucination_judge.py and RESULTS.md for full methodology and its limits before treating this as a precise number.",
+  "total_claims_judged": 0,
+  "hallucinated_claims": 0,
+  "hallucination_judge_failures": 8,
+  "hallucination_judge_missing": 0,
+  "total_tokens_used_agent_pipeline": 171394,
+  "total_tokens_used_hallucination_judge": 0,
+  "total_tokens_used_combined": 171394,
+  "total_llm_calls": 67,
+  "by_difficulty": {
+    "easy": {
+      "total": 8,
+      "successful": 2,
+      "success_rate": 0.25
+    }
+  },
+  "tool_usage": {
+    "pubmed": 6,
+    "chembl": 6,
+    "clinical_trials": 2
+  },
+  "failures": [
+    {
+      "test_case_id": 11,
+      "query": "What is the mechanism of action of metformin in type 2 diabetes?",
+      "difficulty": "easy",
+      "status": "completed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 13,
+      "query": "What clinical trials are currently recruiting for Alzheimer's disease?",
+      "difficulty": "easy",
+      "status": "completed",
+      "error": "clinical_trials execution failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "confidence": 0,
+      "results_count": 0
+    },
+    {
+      "test_case_id": 2,
+      "query": "What is pembrolizumab used for?",
+      "difficulty": "easy",
+      "status": "completed",
+      "error": null,
+      "confidence": 0,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 1,
+      "query": "What are FDA-approved EGFR inhibitors?",
+      "difficulty": "easy",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.1,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 16,
+      "query": "What compounds target the androgen receptor?",
+      "difficulty": "easy",
+      "status": "completed",
+      "error": "Verification failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "confidence": 0.6,
+      "results_count": 20
+    },
+    {
+      "test_case_id": 19,
+      "query": "Find approved ALK inhibitors",
+      "difficulty": "easy",
+      "status": "completed",
+      "error": null,
+      "confidence": 0.2,
+      "results_count": 20
+    }
+  ],
+  "detailed_results": [
+    {
+      "test_case_id": 11,
+      "query": "What is the mechanism of action of metformin in type 2 diabetes?",
+      "difficulty": "easy",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.0,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "chembl"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.0,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 66.16910099983215,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['type 2 diabetes']\n  - Type: compound_information\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First retrieve metformin's known targets and bioactivity from ChEMBL, then search PubMed for detailed mechanistic studies explaining its action in type 2 diabetes.\n  - Tools: chembl, pubmed\n  - Complexity: moderate",
+        "\u2713 chembl: Found 0 results for 'metformin'",
+        "\u2713 pubmed: Found 0 results for '\"Metformin\"[MeSH] AND \"Mechanism of Action\"[MeSH] AND \"Diabetes Mellitus, Type 2\"[MeSH]'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: No tool results were available, so no findings about metformin's mechanism of action can be synthesized.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.00\n  - Coverage: 0.00\n  - Reason: Maximum iterations reached (1) without obtaining any evidence; cannot continue research.",
+        "\u2713 Report Generated: 1750 characters, 0 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 10203,
+      "llm_calls": 8,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 13,
+      "query": "What clinical trials are currently recruiting for Alzheimer's disease?",
+      "difficulty": "easy",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.0,
+        "current_step": 1,
+        "errors": [
+          "clinical_trials execution failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+        ]
+      },
+      "tools_used": [],
+      "tool_precision": 0.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.0,
+      "citation_count": 0,
+      "citation_coverage": 0.0,
+      "results_count": 0,
+      "latency_seconds": 59.40060901641846,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: [\"Alzheimer's disease\"]\n  - Type: clinical_trial_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Search ClinicalTrials.gov for Alzheimer's disease studies that are currently recruiting to provide an up-to-date list of active trials.\n  - Tools: clinical_trials\n  - Complexity: simple",
+        "\u2717 clinical_trials: Error - [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 1\n  - Confidence: 0.00\n\nSummary: No data was supplied from any tools, thus no findings can be synthesized.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.00\n  - Coverage: 0.00\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 1808 characters, 0 citations, 0 compounds in table"
+      ],
+      "error": "clinical_trials execution failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "tokens_used": 5585,
+      "llm_calls": 7,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 2,
+      "query": "What is pembrolizumab used for?",
+      "difficulty": "easy",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.0,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "clinical_trials",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.0,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 99.6607460975647,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: []\n  - Type: compound_information\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First retrieve pembrolizumab's approved indications and pharmacological details from ChEMBL, then examine clinical trials to see current investigational uses, and finally search PubMed for review literature summarizing its therapeutic applications.\n  - Tools: chembl, clinical_trials, pubmed\n  - Complexity: simple",
+        "\u2713 chembl: Found 20 results for 'PD-1'",
+        "\u2713 clinical_trials: Found 0 results for 'What is pembrolizumab used for?'",
+        "\u2713 pubmed: Found 0 results for '\"pembrolizumab\"[MeSH Terms] AND (therapeutic use[MeSH Terms] OR indication[MeSH Terms])'",
+        "Synthesis Complete:\n  - Key findings: 0\n  - Cross-references: 0\n  - Gaps identified: 2\n  - Confidence: 0.10\n\nSummary: The ChEMBL query returned a list of small molecule compounds with no names or mechanism data, and did not include pembrolizumab. Therefore, no information about pembrolizumab's uses is available from the provided sources.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.00\n  - Coverage: 0.00\n  - Reason: No iterations remaining",
+        "\u2713 Report Generated: 3122 characters, 20 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 18829,
+      "llm_calls": 9,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 12,
+      "query": "What is known about the pathophysiology of long COVID?",
+      "difficulty": "easy",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.65,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.65,
+      "citation_count": 20,
+      "citation_coverage": 0.6666666666666666,
+      "results_count": 30,
+      "latency_seconds": 162.7288658618927,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: []\n  - Diseases: ['long COVID']\n  - Type: literature_review\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Conduct a focused literature review using PubMed to gather current knowledge on the pathophysiological mechanisms underlying long COVID.\n  - Tools: pubmed\n  - Complexity: moderate",
+        "\u2713 pubmed: Found 30 results for '(\"long COVID\"[tiab] OR \"post-acute sequelae of SARS-CoV-2 infection\"[tiab]) AND (pathophysiology[tiab] OR mechanism*[tiab] OR immunology[tiab] OR virology[tiab] OR autonomic dysfunction[tiab] OR microclot[tiab] OR autoimmunity[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 8\n  - Cross-references: 4\n  - Gaps identified: 6\n  - Confidence: 0.90\n\nSummary: The literature converges on a multifactorial pathophysiology of long COVID involving viral persistence, immune dysregulation (including autoimmunity and herpesvirus reactivation), endothelial dysfunction/microclotting, dysbiosis, mitochondrial dysfunction, and neuroimmune interactions, leading to multisystem symptoms such as fatigue, cognitive impairment, and dyspnea. While mechanistic hypotheses are well articulated, significant gaps remain in biomarkers, proven therapies, and standardized research frameworks.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.65\n  - Coverage: 0.85\n  - Reason: No iterations remaining (max iterations reached)",
+        "\u2713 Report Generated: 10973 characters, 20 citations, 0 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 48579,
+      "llm_calls": 7,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 1,
+      "query": "What are FDA-approved EGFR inhibitors?",
+      "difficulty": "easy",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.1,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.1,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 116.44461488723755,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['EGFR']\n  - Diseases: []\n  - Type: drug_target_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Use ChEMBL to identify EGFR inhibitors with FDA approval (max phase 4), then optionally supplement with PubMed for mechanistic insights.\n  - Tools: chembl, pubmed\n  - Complexity: simple",
+        "\u2713 chembl: Found 20 results for 'EGFR'",
+        "\u2713 pubmed: Found 0 results for '(\"EGFR\"[MeSH Terms] OR \"epidermal growth factor receptor\"[MeSH Terms]) AND inhibitor AND (\"FDA approved\" OR approval)'",
+        "Synthesis Complete:\n  - Key findings: 7\n  - Cross-references: 0\n  - Gaps identified: 5\n  - Confidence: 0.20\n\nSummary: The chembl tool returned a list of 10 small molecule records with basic physicochemical properties but lacking names, mechanisms of action, development phase details, and any FDA approval or EGFR inhibition information. Consequently, the data do not allow identification of FDA-approved EGFR inhibitors.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.10\n  - Coverage: 0.10\n  - Reason: Maximum iterations reached (1 of 1) and insufficient data to answer the query; further research would require additional iterations which are not available.",
+        "\u2713 Report Generated: 3913 characters, 20 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 16391,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 15,
+      "query": "Find JAK inhibitors",
+      "difficulty": "easy",
+      "task_completed": true,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.7,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "tool_precision": 0.3333333333333333,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.7,
+      "citation_count": 42,
+      "citation_coverage": 1.0,
+      "results_count": 42,
+      "latency_seconds": 205.0456748008728,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['JAK']\n  - Diseases: []\n  - Type: drug_target_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Begin by identifying JAK inhibitor compounds in ChEMBL, then explore their biological mechanisms via PubMed literature, and finally check for any clinical trials involving these inhibitors on ClinicalTrials.gov.\n  - Tools: chembl, pubmed, clinical_trials\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'JAK'",
+        "\u2713 pubmed: Found 20 results for '\"Janus Kinase Inhibitors\"[MeSH] OR \"JAK inhibitors\"'",
+        "\u2713 clinical_trials: Found 2 results for 'Find JAK inhibitors'",
+        "Synthesis Complete:\n  - Key findings: 5\n  - Cross-references: 2\n  - Gaps identified: 3\n  - Confidence: 0.80\n\nSummary: The ChEMBL dataset provides numerous small molecule entries without annotated names or mechanisms, while PubMed literature extensively describes multiple named JAK inhibitors and their therapeutic applications across diseases such as alopecia areata, atopic dermatitis, vitiligo, rheumatoid arthritis, and antitumor responses. Clinical trial data confirm the investigation of ruxolitinib in myelofibrosis, linking PubMed-reported inhibitors to actual clinical studies.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.70\n  - Coverage: 0.90\n  - Reason: Maximum iterations reached (1); no further tool calls permitted.",
+        "\u2713 Report Generated: 7202 characters, 42 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 41662,
+      "llm_calls": 10,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 16,
+      "query": "What compounds target the androgen receptor?",
+      "difficulty": "easy",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.6,
+        "current_step": 1,
+        "errors": [
+          "Verification failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+        ]
+      },
+      "tools_used": [
+        "pubmed",
+        "chembl"
+      ],
+      "tool_precision": 0.5,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.6,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 73.06502485275269,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['androgen receptor']\n  - Diseases: []\n  - Type: drug_target_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: First retrieve known compounds that bind the androgen receptor from ChEMBL, then supplement with PubMed literature to understand their mechanisms and biological context.\n  - Tools: chembl, pubmed\n  - Complexity: moderate",
+        "\u2713 chembl: Found 20 results for 'androgen receptor'",
+        "\u2713 pubmed: Found 0 results for '\"Androgen Receptor\"[Mesh] AND (ligand[tiab] OR antagonist[tiab] OR agonist[tiab] OR inhibitor[tiab])'",
+        "Synthesis Complete:\n  - Key findings: 1\n  - Cross-references: 0\n  - Gaps identified: 5\n  - Confidence: 0.60\n\nSummary: The ChEMBL dataset provides a list of ten small molecule compounds identified in response to the query for androgen receptor targets, but lacks essential annotation such as compound names, mechanisms of action, clinical development status, and supporting literature. Consequently, while the compounds' physicochemical properties are documented, their relevance to the androgen receptor cannot be verified from the current results alone.",
+        "\u26a0 Verification error: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+        "\u2713 Report Generated: 4282 characters, 20 citations, 1 compounds in table"
+      ],
+      "error": "Verification failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}",
+      "tokens_used": 15272,
+      "llm_calls": 9,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    },
+    {
+      "test_case_id": 19,
+      "query": "Find approved ALK inhibitors",
+      "difficulty": "easy",
+      "task_completed": false,
+      "status": "completed",
+      "state": {
+        "confidence_score": 0.2,
+        "current_step": 1,
+        "errors": []
+      },
+      "tools_used": [
+        "chembl"
+      ],
+      "tool_precision": 1.0,
+      "redundancy_rate": 0.0,
+      "confidence_score": 0.2,
+      "citation_count": 20,
+      "citation_coverage": 1.0,
+      "results_count": 20,
+      "latency_seconds": 121.31522607803345,
+      "iterations": 1,
+      "reasoning_trace": [
+        "Query Analysis Complete:\n  - Targets: ['ALK']\n  - Diseases: []\n  - Type: drug_target_search\n  - Confidence: 0.95",
+        "Research Plan Created:\n  - Strategy: Query ChEMBL for compounds that target ALK and have a maximum development phase of 4 (approved) to identify approved ALK inhibitors.\n  - Tools: chembl\n  - Complexity: simple",
+        "\u2713 chembl: Found 20 results for 'ALK'",
+        "Synthesis Complete:\n  - Key findings: 3\n  - Cross-references: 0\n  - Gaps identified: 4\n  - Confidence: 0.30\n\nSummary: The ChEMBL result set contains numerous small molecules with basic physicochemical properties but lacks essential annotations such as compound names, mechanism of action, development phase, and target information. Consequently, no approved ALK inhibitors can be identified from the provided data.",
+        "\u2713 Self-Reflection: Ready to report\n  - Confidence: 0.20\n  - Coverage: 0.20\n  - Reason: No iterations remaining; cannot perform further searches to fill gaps.",
+        "\u2713 Report Generated: 3559 characters, 20 citations, 1 compounds in table"
+      ],
+      "error": null,
+      "tokens_used": 14873,
+      "llm_calls": 7,
+      "hallucination_judge": {
+        "total_claims": 0,
+        "hallucinated_claims": 0,
+        "judge_tokens_used": 0,
+        "judge_failed": true
+      }
+    }
+  ]
+}
