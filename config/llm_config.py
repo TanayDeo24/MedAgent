@@ -190,12 +190,25 @@ class _RateLimitedChatNVIDIA:
             with _llm_call_lock:
                 _llm_call_count += 1
             _thread_local.count = getattr(_thread_local, "count", 0) + 1
+            # Precise per-dispatch timestamp + thread id, logged at request
+            # time (not just on failure) - added to investigate whether
+            # concurrent workers can be released from the token bucket in a
+            # tight cluster rather than evenly spaced, which an aggregate
+            # calls/min figure alone can't reveal. See
+            # PHASE3_CONCURRENCY_VALIDATION.md for what this found.
+            dispatch_time = time.time()
+            thread_id = threading.get_ident()
+            logger.info(f"[LLM DISPATCH] thread={thread_id} t={dispatch_time:.4f}")
 
             try:
                 completed, result = _invoke_with_hard_timeout(
                     self._llm, args, kwargs, LLM_CALL_TIMEOUT_SECONDS
                 )
             except Exception as e:
+                logger.info(
+                    f"[LLM DISPATCH RESULT] thread={thread_id} t={time.time():.4f} "
+                    f"error={type(e).__name__}: {str(e)[:100]}"
+                )
                 # A real error (e.g. a 503) that surfaced within the
                 # timeout - not what this fix targets, let it propagate
                 # exactly as before so existing per-node try/except handling
@@ -203,6 +216,7 @@ class _RateLimitedChatNVIDIA:
                 raise
 
             if completed:
+                logger.info(f"[LLM DISPATCH RESULT] thread={thread_id} t={time.time():.4f} status=success")
                 return result
 
             last_exc = LLMCallTimeoutError(
