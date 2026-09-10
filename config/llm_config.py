@@ -102,6 +102,17 @@ def _invoke_with_hard_timeout(llm: ChatNVIDIA, args: tuple, kwargs: dict, timeou
 _llm_call_lock = threading.Lock()
 _llm_call_count = 0
 
+# Per-thread call counter, in addition to the global one above. Needed for
+# evaluation/evaluator.py's case-level concurrency (Phase 3): when multiple
+# test cases run in parallel threads, each one's own "how many LLM calls did
+# THIS case make" can no longer be computed as a before/after delta on the
+# single global counter, since other concurrently-running cases would be
+# incrementing it in between. threading.local() gives each thread (and, in
+# this codebase's usage, each concurrently-running test case) its own
+# isolated count with no locking needed - no other thread can ever see or
+# mutate another thread's local storage.
+_thread_local = threading.local()
+
 
 def get_llm_call_count() -> int:
     """Return the total number of rate-limited LLM invocations made in this
@@ -110,7 +121,10 @@ def get_llm_call_count() -> int:
     This is the single source of truth for "how many LLM calls did this run
     actually make" - every get_llm() caller's invoke() passes through
     _RateLimitedChatNVIDIA, so this counts every real call, not an estimate
-    reconstructed from node structure.
+    reconstructed from node structure. Under concurrent execution (multiple
+    threads calling invoke() at once) this global count is still accurate in
+    total, but a before/after delta on it is NOT a reliable per-task count -
+    use get_thread_llm_call_count() for that instead.
     """
     return _llm_call_count
 
@@ -124,6 +138,22 @@ def reset_llm_call_count() -> None:
     global _llm_call_count
     with _llm_call_lock:
         _llm_call_count = 0
+
+
+def get_thread_llm_call_count() -> int:
+    """Return the number of LLM invocations made by the CURRENT thread only,
+    since that thread's last reset_thread_llm_call_count() call.
+
+    Use this (not a delta on get_llm_call_count()) to measure a single
+    task's own LLM usage when multiple tasks may be running concurrently in
+    different threads.
+    """
+    return getattr(_thread_local, "count", 0)
+
+
+def reset_thread_llm_call_count() -> None:
+    """Reset the current thread's local LLM call counter to 0."""
+    _thread_local.count = 0
 
 
 class _RateLimitedChatNVIDIA:
@@ -159,6 +189,7 @@ class _RateLimitedChatNVIDIA:
             wait_for_rate_limit(NVIDIA_RATE_LIMIT_KEY, NVIDIA_RATE_LIMIT_RPM / 60.0, capacity=1.0)
             with _llm_call_lock:
                 _llm_call_count += 1
+            _thread_local.count = getattr(_thread_local, "count", 0) + 1
 
             try:
                 completed, result = _invoke_with_hard_timeout(
