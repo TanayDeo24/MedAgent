@@ -20,7 +20,7 @@ from typing import List, Optional
 
 import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import CrossEncoder, SentenceTransformer
 
 from retrieval.build_bm25 import tokenize as bm25_tokenize
 
@@ -35,6 +35,8 @@ DENSE_TOP_N = 30  # candidates pulled from FAISS before fusion
 BM25_TOP_N = 30  # candidates pulled from BM25 before fusion
 RRF_K = 60  # standard RRF constant (see _rrf_fuse)
 RRF_POOL_SIZE = 30  # fused candidates kept for reranking
+
+CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
 
 @dataclass
@@ -106,6 +108,34 @@ class Retriever:
         # avoids paying its load cost for callers who never use it.
         self._bm25_path = bm25_path
         self._bm25 = None
+
+        # Cross-encoder is also loaded lazily -- same rationale as BM25:
+        # retrieve_dense/retrieve_hybrid callers shouldn't pay for it.
+        self._cross_encoder = None
+
+    def _load_cross_encoder(self) -> CrossEncoder:
+        if self._cross_encoder is None:
+            self._cross_encoder = CrossEncoder(CROSS_ENCODER_MODEL)
+        return self._cross_encoder
+
+    def _rerank(self, query: str, candidates: List[tuple], k: int) -> List[tuple]:
+        """Cross-encoder rerank: scores (query, chunk_text) pairs directly
+        (not two independently-embedded vectors, unlike the dense/bilinear
+        FAISS search) -- slower per-pair but more accurate, which is exactly
+        why it runs last, over only the ~30 already-fused candidates rather
+        than the full corpus. Returns top-k [(row_idx, ce_score), ...].
+        """
+        if not candidates:
+            return []
+        cross_encoder = self._load_cross_encoder()
+        pairs = [(query, self.chunks[idx]["chunk_text"]) for idx, _ in candidates]
+        scores = cross_encoder.predict(pairs)
+        reranked = sorted(
+            zip((idx for idx, _ in candidates), scores),
+            key=lambda pair: pair[1],
+            reverse=True,
+        )
+        return [(int(idx), float(score)) for idx, score in reranked[:k]]
 
     def _load_bm25(self):
         if self._bm25 is None:
@@ -209,8 +239,21 @@ class Retriever:
         return [self._doc_from_row(idx, score) for idx, score in self._dense_search(query, k)]
 
     def retrieve(self, query: str, k: int = 5) -> List[Document]:
-        """Return the top-k most relevant chunks for `query`."""
-        return self.retrieve_dense(query, k=k)
+        """Return the top-k most relevant chunks for `query`.
+
+        Full hybrid pipeline: dense (FAISS) + sparse (BM25) candidates,
+        fused via RRF, then reranked by a cross-encoder scoring (query,
+        chunk) pairs directly -- the external interface is unchanged from
+        the pure-dense version (same signature, same Document shape); only
+        what happens inside changed.
+        """
+        if k <= 0:
+            return []
+        dense_hits = self._dense_search(query, DENSE_TOP_N)
+        bm25_hits = self._bm25_search(query, BM25_TOP_N)
+        fused = self._rrf_fuse([dense_hits, bm25_hits])[:RRF_POOL_SIZE]
+        reranked = self._rerank(query, fused, k)
+        return [self._doc_from_row(idx, score) for idx, score in reranked]
 
 
 _retriever: Optional[Retriever] = None
