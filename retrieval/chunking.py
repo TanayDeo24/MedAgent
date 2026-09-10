@@ -40,7 +40,11 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE_WORDS, overlap: int = CHU
     return chunks
 
 
-def chunk_abstract(record: Dict[str, Any]) -> List[Dict[str, Any]]:
+def chunk_abstract(
+    record: Dict[str, Any],
+    chunk_size: int = CHUNK_SIZE_WORDS,
+    overlap: int = CHUNK_OVERLAP_WORDS,
+) -> List[Dict[str, Any]]:
     """Chunk one corpus record (abstract + metadata) into retrievable chunks.
 
     Returns a list of chunk dicts carrying enough metadata for citation:
@@ -50,7 +54,7 @@ def chunk_abstract(record: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     abstract = record["abstract"]
     title = record.get("title", "")
-    raw_chunks = chunk_text(abstract)
+    raw_chunks = chunk_text(abstract, chunk_size=chunk_size, overlap=overlap)
 
     out = []
     for idx, chunk in enumerate(raw_chunks):
