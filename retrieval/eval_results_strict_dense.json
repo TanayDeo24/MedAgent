@@ -1,0 +1,187 @@
+{
+  "mode": "dense",
+  "variant": null,
+  "expand": false,
+  "eval_set_path": "retrieval/eval_set_strict.json",
+  "k": 10,
+  "num_queries": 17,
+  "num_queries_scored": 17,
+  "num_queries_skipped_no_relevant": 0,
+  "skipped_queries": [],
+  "mean_recall_at_10": 0.3408,
+  "median_recall_at_10": 0.3333,
+  "mean_latency_ms": 7.2,
+  "median_latency_ms": 6.6,
+  "per_query": [
+    {
+      "query": "What is the role of PD-L1 expression in predicting checkpoint inhibitor response?",
+      "area": "oncology",
+      "num_relevant_pmids": 8,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 3,
+      "recall_at_10": 0.375,
+      "latency_ms": 9.7
+    },
+    {
+      "query": "What are the outcomes of CAR-T cell therapy targeting BCMA in multiple myeloma?",
+      "area": "oncology",
+      "num_relevant_pmids": 24,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 8,
+      "recall_at_10": 0.3333333333333333,
+      "latency_ms": 7.9
+    },
+    {
+      "query": "Do statins reduce all-cause mortality in cardiovascular disease?",
+      "area": "cardiology",
+      "num_relevant_pmids": 19,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 8,
+      "recall_at_10": 0.42105263157894735,
+      "latency_ms": 12.7
+    },
+    {
+      "query": "How effective are TNF-alpha inhibitors for rheumatoid arthritis?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 18,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 9,
+      "recall_at_10": 0.5,
+      "latency_ms": 6.6
+    },
+    {
+      "query": "How do CFTR modulators treat cystic fibrosis?",
+      "area": "rare_disease",
+      "num_relevant_pmids": 23,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 5,
+      "recall_at_10": 0.21739130434782608,
+      "latency_ms": 7.6
+    },
+    {
+      "query": "How does resistance to osimertinib develop in EGFR-mutant lung cancer?",
+      "area": "oncology",
+      "num_relevant_pmids": 16,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 4,
+      "recall_at_10": 0.25,
+      "latency_ms": 6.2
+    },
+    {
+      "query": "What cardiovascular risks are associated with COX-2 inhibitors?",
+      "area": "cardiology",
+      "num_relevant_pmids": 19,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.3157894736842105,
+      "latency_ms": 8.7
+    },
+    {
+      "query": "How are PCSK9 inhibitors used to lower cholesterol?",
+      "area": "cardiology",
+      "num_relevant_pmids": 22,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 8,
+      "recall_at_10": 0.36363636363636365,
+      "latency_ms": 9.3
+    },
+    {
+      "query": "Why do kinase inhibitors sometimes cause cardiotoxicity?",
+      "area": "oncology",
+      "num_relevant_pmids": 5,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 2,
+      "recall_at_10": 0.4,
+      "latency_ms": 7.0
+    },
+    {
+      "query": "What is the connection between the gut microbiome and inflammatory bowel disease?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 23,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 7,
+      "recall_at_10": 0.30434782608695654,
+      "latency_ms": 5.8
+    },
+    {
+      "query": "Why did BACE inhibitors fail in Alzheimer's disease clinical trials?",
+      "area": "neurology",
+      "num_relevant_pmids": 9,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 4,
+      "recall_at_10": 0.4444444444444444,
+      "latency_ms": 5.7
+    },
+    {
+      "query": "What is the mechanism of JAK inhibitors in autoimmune disease?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 13,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 3,
+      "recall_at_10": 0.23076923076923078,
+      "latency_ms": 5.6
+    },
+    {
+      "query": "How do PARP inhibitors work in BRCA-mutated ovarian cancer?",
+      "area": "oncology",
+      "num_relevant_pmids": 12,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 3,
+      "recall_at_10": 0.25,
+      "latency_ms": 5.8
+    },
+    {
+      "query": "How effective are direct-acting antivirals for hepatitis C?",
+      "area": "infectious_disease",
+      "num_relevant_pmids": 21,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.2857142857142857,
+      "latency_ms": 6.8
+    },
+    {
+      "query": "What is known about the pathophysiology of long COVID?",
+      "area": "infectious_disease",
+      "num_relevant_pmids": 13,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.46153846153846156,
+      "latency_ms": 5.8
+    },
+    {
+      "query": "What is the current state of gene therapy for hemophilia?",
+      "area": "rare_disease",
+      "num_relevant_pmids": 18,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.3333333333333333,
+      "latency_ms": 5.3
+    },
+    {
+      "query": "What CGRP-targeted treatments exist for migraine?",
+      "area": "neurology",
+      "num_relevant_pmids": 26,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 8,
+      "recall_at_10": 0.3076923076923077,
+      "latency_ms": 6.4
+    }
+  ]
+}

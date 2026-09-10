@@ -341,10 +341,7 @@ work. No changes outside `retrieval/` and `data/`. `agent/nodes.py` and
 
 ---
 
-## 10. Pass 3 (2026-09-10): Strict relevance re-labeling — Step 1 checkpoint
-
-**Status: checkpoint only. No re-labeling has been run. Waiting for explicit
-go-ahead before proceeding to steps 2-5 below.**
+## 10. Pass 3 (2026-09-10): Strict relevance re-labeling — complete
 
 ### 10.1 Why this pass exists
 
@@ -502,12 +499,271 @@ obviously all the way to a ceiling that guarantees 0.9 is reachable in
 practice. That can only be known by actually running the full re-labeling
 and measurement, which is steps 2-5, not run yet.
 
-### 10.5 Checkpoint
+### 10.5 Step-1 checkpoint (approved) — then attempt 1's labeling bug
 
-**Stopping here per instructions.** Steps 2-5 (full re-labeling of all
-17-19 queries under this definition using the LLM judge, hand spot-check of
-5 queries from the new labels, and Recall@10 re-measurement for dense-only
-and the best-performing hybrid configuration) have **not** been run and
-will not be started without explicit go-ahead. The worked examples above
-are entirely by-hand, using real candidate text already on disk from the
-existing eval-set pool — no NIM calls were made to produce this checkpoint.
+Step 1 was approved. Full re-labeling ran next, reusing the exact same
+3-way-pooled candidate pools already in `eval_set.json`, one NIM call per
+query, matching the shape used for loose labeling.
+
+**Result: broken.** 12 of 14 successfully-labeled queries collapsed to
+exactly 0 or 1 relevant PMID, with almost no variation — a completely
+different pattern from the 5 hand-worked examples above (which showed
+45-75% survival, varying meaningfully by query). Hand spot-check of the
+actual picks confirmed why: the model was not independently judging every
+candidate. For the SGLT2 query it picked a passage stating *"the exact
+mechanisms...are unknown...purpose of this review is to summarize
+available literature"* — a pure scope statement, exactly what the
+definition excludes — while excluding four candidates with actual hazard
+ratios and p-values. For CGRP it returned zero relevant candidates despite
+the pool containing a direct mechanism-plus-effect claim (*"blockade of
+the peptide or the CGRP receptor are...powerful mechanisms to reduce
+migraine frequency"*). Only the PARP query, independently, produced
+correctly-varied output matching its hand-worked example. This attempt is
+preserved unmodified at `retrieval/eval_set_strict_buggy_v1.json` — not
+deleted, per instructions to keep the failure visible alongside the fix.
+
+**Diagnosis**: the model was converging on "pick the single best-sounding
+match" instead of the instructed "independently evaluate every candidate."
+The strict definition's phrasing ("directly answering the user's exact
+question," "a specific claim") plausibly primed a single-best-answer
+framing, and without an instruction to show per-candidate work, nothing
+stopped it from taking that shortcut.
+
+### 10.6 The fix, and a second constraint it exposed
+
+**Fix, attempt 1**: rewrote the prompt to require an explicit `[<number>]
+YES/NO - <reason>` verdict for every candidate, in order, before the final
+JSON list — restoring the "show your work per item" shape that already
+worked for loose labeling and for PARP. Verified this correctly forces
+independent judgment (varied, defensible per-item calls) — but at
+~50-58 candidates per pool, the verbose output does not fit the project's
+existing 90-second hard call timeout
+(`config.llm_config.LLM_CALL_TIMEOUT_SECONDS`, itself a deliberate fix for
+a prior real production hang, not something to raise casually): an
+8192-completion-token response only got through 41 of 54 candidates in
+77 seconds, and requesting more tokens (tested up to 20,000) just times
+out before finishing rather than producing more output in time.
+
+**Fix, attempt 2 (adopted)**: kept the identical per-candidate independent-
+verdict instruction, but batched each query's candidate pool into groups
+of 8, one NIM call per batch, merging relevant indices back across
+batches. Verified on a single batch (8 candidates, SGLT2's pool) before
+the full run: 43 seconds, comfortably under the timeout, and produced
+exactly the expected correction — the previously wrongly-picked "mechanisms
+unknown" passage was now correctly excluded, and the previously
+wrongly-excluded "RR 0.773" finding was now correctly included.
+
+This is a real, explicitly-flagged deviation from this project's "one NIM
+call per query" pattern used everywhere else — made necessary by the
+interaction between the correctness fix (independent per-item judgment)
+and the existing timeout infrastructure, not a shortcut. The relevance
+**definition did not change** between either fix attempt or the original
+buggy attempt; only the execution instruction did.
+
+The `parse_strict_response` parser was also written to anchor on the
+*last* `{` in each response rather than reusing the loose-labeling
+parser's first-bracket-match fallback — the per-candidate verdict lines
+(`[3] YES - ...`) would otherwise be misparsed as the final answer list by
+a naive regex, since a lone `[3]` trivially matches a "bracketed digit
+list" pattern.
+
+### 10.7 Full re-labeling under the fixed, batched prompt
+
+Ran to completion with real (not tight-loop) cooldowns between retry
+rounds, per explicit instruction: a full attempt hit 8/18 queries
+succeeding immediately, the remaining 10 failing on `503 Service
+Unavailable` or a `404`/`Nvcf-Status: errored` pattern from NVIDIA's
+backend (a different failure signature than the usual 503 overload,
+possibly a distinct transient backend issue). Rather than retrying
+immediately and repeatedly, applied a real cooldown-then-single-retry
+protocol, capped at 2 rounds:
+
+- Round 1: 4-minute real cooldown, then one retry pass over the 10
+  remaining queries → 8 more succeeded (16/18 total), 2 still failing
+  (SGLT2, CGRP).
+- Round 2 (final allowed): 4-minute real cooldown, then one retry pass
+  over the 2 remaining → CGRP succeeded, SGLT2 failed again.
+
+**Per the explicit 2-round cap, retrying stopped there.** Final labeled
+set: **17 of 18 queries** (SGLT2 excluded — persistent NIM 503s across
+every attempt in this pass, not a methodology choice, not silently
+dropped). All 17 successful labels show rich, varied relevant-PMID counts
+(range 5-26), not the uniform 0/1 collapse from the buggy attempt —
+direct evidence the fix worked at the mechanism level, independent of
+whether the resulting numbers are favorable.
+
+### 10.8 Re-verification against the 5 original hand-worked examples
+
+Comparing the fixed labels against the 5 queries hand-labeled in §10.3
+(before any labeling ran):
+
+| Query | Hand-picked relevant (sample) | Now in fixed strict labels? |
+|---|---|---|
+| Cardiotoxicity | MKK7/JNK mechanism (29248607) | **Yes** — present |
+| CAR-T/BCMA | 33272302, 39729503, 39432745, 40198877, 40057828 | **All 5 present** |
+| Statins | 23447425, 27838722, 28976376, 39037762, 25178118 | **All 5 present** |
+| PARP | 22489345 (mechanism), 27065456 (mechanism) | **Both present** |
+
+Every candidate independently judged relevant in the original hand review
+appears in the corresponding query's fixed strict label set. The reverse
+also held for the hand-judged-**not**-relevant candidates checked (e.g.
+statins' [6], [12], [16], CAR-T's [2], [6], [16], [17], [30]) — none of
+those made it into the fixed labels either. **This is a clean pass**: the
+fixed labels match the approved worked-example reasoning, not just in
+aggregate count but in which specific candidates were chosen.
+
+### 10.9 Fresh spot-check: 5 new queries, not in the original 5
+
+Hand-reviewed 8 candidates each (real text, not the LLM's stated reasoning)
+for CFTR, PCSK9, BACE, JAK, and long COVID — none of which were part of
+the original sign-off examples.
+
+- **BACE** (9/9 reviewed defensible, the cleanest of the five): every
+  included candidate states a specific trial finding or mechanism (e.g.
+  *"Verubecestat...was not effective in a phase 3 trial (EPOCH)...and was
+  associated..."*, *"BACE1 cleaves many other substrates in the brain that
+  may be contributing to cognitive worsening"*).
+- **JAK** and **long COVID**: roughly 5-6 of 8 reviewed candidates per
+  query are clearly correct (specific mechanism or finding statements);
+  the remainder are borderline — mostly definitional/scope sentences
+  ("Long COVID...emerges in a subset of patients after...") that a
+  maximally strict reading would exclude but which at least name specific
+  entities rather than being pure "we discuss X" statements.
+- **CFTR** and **PCSK9**: similar pattern, roughly half-to-majority
+  clearly correct, with a minority of softer inclusions (e.g. a
+  methodology/search-strategy sentence in the CFTR pool: *"III clinical
+  trials described on clinicaltrials.gov...Results of relevant trials
+  reported..."* — this should arguably have been excluded and was not).
+
+**Verdict: holds up well, not perfectly.** None of these 5 show the
+attempt-1 failure pattern (a single wrong pick, or zero picks despite
+clear candidates existing) — every query has a strong majority of
+correctly-judged candidates. A residual minority (very roughly 20-25% of
+reviewed candidates across these 5 queries) are soft over-inclusions where
+the model accepted a passage that names specific entities but doesn't
+quite state a standalone citable finding. This is real, reported
+plainly, and consistent with the same "LLM-assisted, not human-verified"
+limitation stated throughout this project — not a reason to distrust the
+labels wholesale, but a reason not to treat them as exact either.
+
+### 10.10 Recall@10 measurement, strict labels
+
+Measured `retrieve_dense()` and `retrieve_hybrid_reranked()` (the same two
+configurations compared throughout this whole retrieval-quality effort)
+against the 17 successfully strict-labeled queries.
+
+**Ceiling, computed the same way as the loose-label ceiling analysis**:
+
+```
+Strict relevant-PMID counts (n=17): [5, 8, 9, 12, 13, 13, 16, 18, 18, 19, 19, 21, 22, 23, 23, 24, 26]
+Mean theoretical ceiling (perfect oracle retriever): 0.6331
+```
+
+**This is essentially unchanged from the loose eval set's ceiling
+(0.6336)** — stated plainly because it directly contradicts the working
+hypothesis that motivated this whole pass (that loose labeling was
+inflating relevant-set sizes and suppressing the ceiling). What actually
+happened: strict labeling *did* shrink several over-inclusive loose counts
+(CAR-T 34→24, statins 28→19, osimertinib 27→16, JAK 23→13, long COVID
+22→13, gut microbiome 29→23) — but it *also grew* several
+loose counts that turn out to have been under-inclusive in the other
+direction (CFTR 1→23, COX-2 1→19, PCSK9 0→22, hepatitis C 1→21,
+hemophilia 1→18, BACE 1→9, cardiotoxicity 1→5) — the same double-sided
+loose-labeling unreliability flagged in §10.7's "rich, varied counts"
+observation, now visible in aggregate. These two effects very nearly
+cancel out. **The ceiling problem this whole pass set out to address by
+tightening the definition turns out not to be a definition problem at
+all — it is a direct, mechanical consequence of the corpus actually
+containing more than 10 genuinely relevant abstracts for most of these
+queries, independent of how strictly "relevant" is drawn.**
+
+**Measured results:**
+
+```
+Dense-only:  mean Recall@10 0.3408, median 0.3333, mean latency  7.2ms  (53.8% of ceiling)
+Hybrid:      mean Recall@10 0.4016, median 0.4167, mean latency 247.5ms (63.4% of ceiling)
+```
+
+Both numbers are **lower in absolute terms** than their loose-label
+counterparts (dense 0.5711→0.3408, hybrid 0.4832→0.4016) — the strict
+standard is a harder bar to satisfy in the top-10 even though the ceiling
+barely moved, meaning both methods are further from their (nearly
+identical) ceiling than before. **And both are far below 0.9.** Reported
+exactly as measured; the definition and prompt were not touched again
+after seeing these numbers.
+
+**A real, consistent, non-cherry-picked reversal**: under strict labels,
+hybrid beats or ties dense on 15 of 17 queries (dense wins outright only
+on cardiotoxicity, 0.40 vs 0.20, and long COVID, 0.46 vs 0.31):
+
+| Relevant | Ceiling | Dense | Hybrid | Query |
+|---:|---:|---:|---:|---|
+| 8 | 1.00 | 0.38 | **0.50** | PD-L1 predicting checkpoint response |
+| 24 | 0.42 | 0.33 | **0.42** | CAR-T/BCMA outcomes |
+| 19 | 0.53 | 0.42 | **0.47** | statins and all-cause mortality |
+| 18 | 0.56 | 0.50 | 0.50 | TNF-alpha, rheumatoid arthritis |
+| 23 | 0.43 | 0.22 | **0.30** | CFTR modulators |
+| 16 | 0.62 | 0.25 | **0.44** | osimertinib resistance |
+| 19 | 0.53 | 0.32 | **0.42** | COX-2 cardiovascular risk |
+| 22 | 0.45 | 0.36 | **0.45** | PCSK9 cholesterol |
+| 5 | 1.00 | **0.40** | 0.20 | kinase inhibitors, cardiotoxicity |
+| 23 | 0.43 | 0.30 | **0.35** | gut microbiome and IBD |
+| 9 | 1.00 | 0.44 | **0.56** | BACE inhibitor trial failures |
+| 13 | 0.77 | 0.23 | **0.38** | JAK inhibitor mechanism |
+| 12 | 0.83 | 0.25 | **0.42** | PARP inhibitor mechanism |
+| 21 | 0.48 | 0.29 | **0.33** | direct-acting antivirals, hep C |
+| 13 | 0.77 | **0.46** | 0.31 | long COVID pathophysiology |
+| 18 | 0.56 | 0.33 | **0.39** | gene therapy, hemophilia |
+| 26 | 0.38 | 0.31 | **0.38** | CGRP treatments, migraine |
+
+This is the clearest reversal of this entire two-pass effort: under the
+loose eval set, dense won in aggregate because it swept the
+single-relevant-PMID queries (6/6) while hybrid split them (4/6) — a
+high-variance, low-sample-size effect. Under strict labels, no query has
+fewer than 5 relevant PMIDs, that high-variance regime disappears, and
+hybrid's real advantage (visible even under loose labels on the
+multi-relevant-PMID subset, §7) shows through cleanly across nearly the
+whole set.
+
+### 10.11 What this means
+
+**0.9 is still not reached — nowhere close, on either method (0.34
+dense, 0.40 hybrid).** Tightening the relevance definition, even executed
+correctly after fixing a real labeling bug, did not raise the achievable
+ceiling, because the ceiling was never a definition problem: this corpus
+genuinely contains more than 10 relevant abstracts for most of these
+questions, and no amount of stricter labeling changes that arithmetic once
+enough real papers satisfy even a strict bar. Reported as measured, with
+no further adjustment to the definition or prompt after seeing this
+outcome.
+
+What this pass *did* establish, concretely:
+
+- **Hybrid retrieval is the better-measured configuration**, reversing
+  Pass 2's conclusion. That earlier result was an artifact of measuring
+  against a handful of high-variance, single-answer queries; a labeling
+  standard that produces richer, multi-item relevant sets removes that
+  artifact and shows hybrid's real, consistent advantage (15/17 queries).
+  `retrieve()`'s current default (dense-only, per Pass 2 §7-§8) should be
+  reconsidered in light of this — flagged here, not changed in this pass,
+  since changing the shipped default wasn't part of what was asked this
+  time.
+- **A second, real prompt-execution failure mode was found and fixed**
+  (the "converges on one best match" bug), on top of Pass 1 and 2's two
+  pipeline bugs (missing title context in reranking, duplicate-PMID
+  top-k) — a third instance of the same lesson: LLM-judged or LLM-driven
+  steps in this project have consistently had at least one real, fixable
+  defect each time they were actually scrutinized, not zero.
+- **n=17, not 18** — SGLT2 could not be labeled after 9 combined attempts
+  and 2 full real-cooldown retry rounds, excluded and reported as such,
+  not silently dropped or forced through with a degraded/partial label.
+
+### 10.12 Files
+
+| File | Purpose |
+|---|---|
+| `retrieval/build_eval_set_strict.py` | Builds the strict eval set (batched, fixed prompt) |
+| `retrieval/eval_set_strict.json` | Final strict labels (17/18 queries; schema documents the bug fix inline) |
+| `retrieval/eval_set_strict_buggy_v1.json` | Preserved record of the first (broken) labeling attempt |
+| `retrieval/eval_results_strict_dense.json` | Full per-query dense-only results, strict labels |
+| `retrieval/eval_results_strict_hybrid.json` | Full per-query hybrid results, strict labels |
