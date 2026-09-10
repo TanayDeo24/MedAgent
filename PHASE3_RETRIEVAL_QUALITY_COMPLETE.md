@@ -1,242 +1,340 @@
-# Phase 3: Retrieval Quality Pass — Complete (Honest Result: No Improvement)
+# Phase 3: Retrieval Quality — Complete
 
-Built a real Recall@10 eval set, measured a real dense-only baseline, built
-BM25 + RRF fusion + cross-encoder reranking, and re-measured on the exact
-same fixed eval set. **The hybrid+reranked pipeline did not improve
-Recall@10 over the dense-only baseline — it measured substantially worse**,
-at roughly 40x the latency. That's the real number this pipeline produces
-on this eval set, reported as instructed, not adjusted after the fact.
+Two passes. **Pass 1** built a hybrid (BM25+RRF+cross-encoder) pipeline and
+measured it against a dense-only baseline; the eval set turned out to have
+a structural bias that capped hybrid's measurable recall, and even after
+fixing one real pipeline bug found during validation, hybrid measured worse
+than dense. **Pass 2** fixed that eval-set bias, found and fixed a second
+real pipeline bug it exposed, then tried a stronger embedding model, two
+alternative chunk sizes, and query expansion — none beat plain dense
+retrieval's mean Recall@10 on the corrected eval set either.
 
-This document explains what was built, the honest before/after numbers, and
-the diagnostic work done to understand *why* — because "it got worse" is
-not the same as "the components don't work," and the investigation below
-matters for deciding what (if anything) to do next.
+**Final, honest result: the best-measured configuration across both passes
+is plain dense retrieval (`all-MiniLM-L6-v2`, 180-word/30-overlap
+chunking) — mean Recall@10 = 0.5711, well short of the 0.9 target.**
+`retrieve()` now defaults to this configuration. The full hybrid pipeline
+remains available (`retrieve_hybrid_reranked`) because the picture is
+genuinely mixed, not a clean loss — see §6.
 
-## 1. Eval set (`retrieval/eval_set.json`)
+## Table of contents
 
-19 queries spanning the corpus's disease areas (oncology, cardiology,
-autoimmune, infectious disease, neurology, rare disease), phrased
-differently from `build_corpus.py`'s fetch queries so they test realistic
-user-style questions, not a lexical echo of what built the corpus.
+- §1-2: Pass 1 (hybrid pipeline, original eval set) — summarized, largely superseded
+- §3: Why the eval set needed fixing
+- §4: Pass 2's corrected eval set
+- §5: Pass 2's baseline vs hybrid (corrected eval set) + the PMID-dedup bug found and fixed
+- §6: Embedding model, chunk size, and query expansion experiments
+- §7: Final configuration and full progression table
+- §8: What this means / recommendation
+- §9: Files, requirements, scope discipline
 
-**Methodology, stated plainly**: for each query, `retrieve_dense()`'s top-50
-candidates were shown to `nvidia/nemotron-3-super-120b-a12b` in a single
-call, which judged which candidates are genuinely relevant. **This is
-LLM-assisted labeling on a small, fixed set — not human-verified.** Same
-honesty standard as this project's hallucination judge: a model judgment,
-stated as such, not ground truth.
+---
 
-**Pooled recall, not corpus-wide recall**: relevance is only known within
-each query's labeled top-50 dense pool. A chunk outside that original pool
-(one only BM25 or reranking would ever surface) is treated as *not
-relevant*, not as *unlabeled* — the full 22,674-chunk corpus was never
-exhaustively judged, only the pool. **This is the single most important
-caveat for interpreting the numbers below**, and it turned out to matter a
-lot (see §5).
+## 1. Pass 1 summary (superseded numbers, kept for history)
 
-**Labeling reliability, live**: 2 of 19 labeling calls hit NIM's 90s×3
-timeout (the endpoint was visibly contended, plausibly with the separate
-evaluator session sharing the same rate budget). `build_eval_set.py`
-persists after every query and supports resuming, so the retry cost was two
-queries, not the whole batch. All 19 queries are successfully labeled in
-the committed `eval_set.json` (0 `labeling_failed` entries).
-
-**Labeled relevant-set sizes varied enormously**: 8 of 19 queries got
-exactly 1 relevant chunk out of 50; the rest ranged from 15 to 50 out of 50
-(median 37). Total: 433 labeled-relevant chunks across 19 queries. This
-spread — not a bug — turned out to be the main driver of what happened
-next (§5).
-
-## 2. Baseline (dense-only) — measured before any changes
+Pass 1 built a 19-query eval set labeled by `nvidia/nemotron-3-super-120b-a12b`
+against each query's **dense-only top-50** candidates, then built BM25 +
+RRF fusion + cross-encoder reranking and compared:
 
 ```
-Mean Recall@10:   0.5426
-Median Recall@10: 0.2326
-Mean latency:     6.4ms
-Median latency:   6.1ms
+Dense-only (Pass 1 eval set):  mean Recall@10 0.5426, median 0.2326,  6.4ms
+Hybrid     (Pass 1 eval set):  mean Recall@10 0.3195, median 0.1915, 258.4ms
 ```
 
-Full per-query breakdown: `retrieval/eval_results_baseline.json`.
+Hybrid measured **worse**, even after finding and fixing a real bug (the
+cross-encoder was scoring bare `chunk_text` instead of `"Title: ...\n\n..."`,
+inconsistent with how the dense embedder saw the same candidates — fixing
+it recovered mean Recall@10 from 0.2086 to 0.3195, not all the way back).
+Diagnosis at the time (confirmed and acted on in Pass 2, §3): the eval
+pool was built entirely from dense retrieval's own ranking, which
+structurally caps every other method's measurable recall.
 
-## 3. What was built
+Full Pass-1 detail — including the bug's discovery, per-query tables, and
+the original single-relevant-chunk investigation — is preserved in git
+history (commit `a11acd2` and its predecessors) rather than duplicated
+here.
 
-- **`retrieval/build_bm25.py`**: `rank_bm25.BM25Okapi` over the same 22,674
-  chunks the FAISS index covers (same row order), tokenized
-  lowercase-alphanumeric over `title + chunk_text`. In-memory, persisted via
-  pickle (`data/index/bm25.pkl`, 26.1MB). Build time: 1.2s. A standalone
-  search engine (OpenSearch etc.) was explicitly out of scope — unnecessary
-  at this scale regardless.
-- **RRF fusion** (`Retriever._rrf_fuse`): top-30 FAISS + top-30 BM25 fused by
-  `score = sum(1/(k + rank))` per list a chunk appears in, `k=60` (the
-  standard default). RRF rather than a raw score blend because dense cosine
-  similarity and BM25 scores live on incomparable scales.
-- **Cross-encoder reranking** (`Retriever._rerank`): the fused top-30 pool
-  reranked by `cross-encoder/ms-marco-MiniLM-L-6-v2` (local, via
-  `sentence-transformers`, already a dependency — no new package). Scores
-  `(query, "Title: {title}\n\n{chunk_text}")` pairs directly.
-- **`retrieve()`'s external interface is unchanged**: `retrieve(query, k)`
-  still returns `List[Document]`. Internally it now runs the full pipeline —
-  dense + BM25 → RRF fuse → cross-encoder rerank → top-k.
-- **`retrieve_dense()` is untouched and still first-class** — the exact
-  pre-upgrade path, kept as the permanent, stable comparison point (used for
-  both the eval-set candidate pool and the baseline measurement above).
+## 2. Pass 2's mandate
 
-This is a standard, widely-documented hybrid-retrieval pattern (sparse +
-dense fused via RRF, then cross-encoder reranked) — not something novel to
-this project. No specific prior-project lineage is claimed here beyond
-that; this repository has no earlier implementation of it to point to.
+Push Recall@10 toward 0.9 through real improvements, measured honestly on
+a properly fixed evaluation methodology:
+1. Fix the eval set's structural bias first.
+2. Re-measure dense vs. hybrid on the corrected set.
+3. Try a stronger embedding model.
+4. Try alternative chunk sizes.
+5. Try query expansion.
+6. Report the winning combination honestly, including if it falls short of
+   0.9.
 
-## 4. Bug found and fixed during validation
+## 3. Why the eval set needed fixing
 
-While tracing why several queries went from perfect Recall@10 to a complete
-miss, found that `_rerank()` was scoring candidates on bare `chunk_text`,
-while the dense embedding step that originally surfaced each candidate
-embeds `"Title: {title}\n\n{chunk_text}"` (see `chunking.py`). A mid-abstract
-chunk can read as an off-topic fragment in isolation even when its
-abstract's title makes it clearly on-topic — the cross-encoder was
-demoting exactly this kind of chunk for lack of the title context the
-dense encoder already had. Fixed by passing the same title-prefixed text to
-the reranker (also the conventional choice for cross-encoder reranking,
-e.g. BEIR-style evaluations concatenate title to passage before scoring).
-This is a real pipeline consistency defect, not an eval-set adjustment —
-recovered some of the loss (mean Recall@10 0.2086 → 0.3195) but not all of
-it. The numbers in §5 are post-fix, i.e. the pipeline as it stands now.
+Pass 1's pool was dense retrieval's own top-50, so nothing outside what
+dense already ranked highly could ever be labeled relevant — any other
+method retrieving something genuinely good but dense-invisible got no
+credit, and could even look *worse* for correctly displacing a
+dense-favored labeled chunk from a fixed top-k. This is the standard
+single-system pooling bias TREC-style evaluation guards against by pooling
+from every system being compared.
 
-No further tuning was done after this fix. The instructions were explicit
-that the number is whatever the real pipeline produces on the fixed eval
-set — not something to keep adjusting until it looks better.
+**Fix**: pool the union of dense top-30, BM25 top-30, and full
+hybrid(RRF+rerank) top-30 (`Retriever.get_pooled_candidates`) before
+labeling — every method gets a fair shot at contributing to its own
+scoring pool.
 
-## 5. After — hybrid + RRF + reranked, same fixed eval set
+**Second, related fix — PMID-level ground truth, not chunk-level**: Pass
+2's plan includes a chunk-size experiment (§6), and different chunk sizes
+produce entirely different `chunk_id`s for the same abstracts. A
+chunk-keyed eval set literally cannot score a chunk-size change. Ground
+truth was rolled up to `relevant_pmids` (a query's relevant set is
+abstracts, not specific chunk spans) — decided before any Recall@10 numbers
+were seen from this pass, for this technical reason, not to influence a
+result.
+
+## 4. Pass 2's corrected eval set (`retrieval/eval_set.json`, schema v2)
+
+Same 19 queries as Pass 1 (spanning oncology, cardiology, autoimmune,
+infectious disease, neurology, rare disease), same "one NIM call per query"
+labeling budget, same honesty standard (**LLM-assisted labeling, not
+human-verified** — stated in the file's own `methodology` field).
+
+**Labeling reliability, live**: the shared NIM endpoint was under sustained
+heavy load for most of this session (frequent `503 Service Unavailable`
+and 90s×3 timeouts — plausibly contended with the separate evaluator
+session mentioned in this project's own operating constraints). 18 of 19
+queries were eventually labeled successfully after up to 9 retry attempts
+per query on the worst cases, using `build_eval_set.py`'s per-query
+persistence/resume support (a query's successful label is saved
+immediately, so a later failure only costs that one query's retry, not the
+batch). **1 query could not be labeled** after 9 attempts over roughly 45
+minutes and is recorded as `labeling_failed: true` rather than silently
+dropped or faked. Of the 18 labeled, 1 has zero relevant PMIDs in its pool
+(a genuine "none relevant" judgment, not a failure). **17 queries are
+scored** in every measurement below.
+
+Labeled relevant-PMID-set sizes: `[0, 1, 1, 1, 1, 1, 1, 14, 17, 18, 22, 23,
+27, 28, 29, 29, 32, 34]` — 6 of the 17 scored queries have exactly 1
+relevant PMID (this matters a lot for interpreting results, see §7).
+
+## 5. Corrected baseline vs. hybrid, and the PMID-dedup bug
+
+First re-measurement on the corrected pool:
 
 ```
-Mean Recall@10:   0.3195   (baseline: 0.5426,  Δ -0.2231,  -41.1% relative)
-Median Recall@10: 0.1915   (baseline: 0.2326,  Δ -0.0411,  -17.7% relative)
-Mean latency:     258.4ms  (baseline: 6.4ms,   ~40x slower)
-Median latency:   249.0ms  (baseline: 6.1ms,   ~41x slower)
+Dense-only:  mean 0.5371, median 0.3043
+Hybrid:      mean 0.3233, median 0.3182
 ```
 
-Full per-query breakdown: `retrieval/eval_results_hybrid.json`.
+The pooling fix alone barely moved the mean gap. Investigating why (same
+approach as Pass 1's bug hunt) surfaced a **second real defect**: both
+`retrieve_dense()` and `retrieve()` were returning **duplicate PMIDs** in
+their top-10 — multiple chunks of the same abstract rank near each other,
+so a "top 10" routinely contained only 5-9 *unique* abstracts (verified
+across the whole eval set). Since ground truth is now PMID-level, this
+mechanically wasted recall capacity for both methods — but it's a real
+defect independent of any metric: an agent citing "10 sources" that are
+actually 2 abstracts chunked 5 ways each is not 10 sources.
 
-**Recall@10 got worse, not better. Latency got ~40x worse. Reported
-plainly, as instructed, with no further adjustment to the eval set, k, or
-anything else to change this outcome.**
+**Fix**: `retrieve_dense()` now over-fetches (`max(k*4, 40)` candidates)
+and deduplicates by PMID down to k; `retrieve()`'s hybrid path reranks its
+*full* fused pool (not just the top-k) before deduplicating down to k.
+External interface unchanged.
 
-Per-query, side by side (`recall_at_10`: baseline → hybrid):
+**Re-measured after the dedup fix**:
 
-| Labeled relevant | Baseline | Hybrid | Query |
+```
+Dense-only:  mean 0.5711, median 0.3448,  7.3ms   (Pass 1: 0.5426 / 0.2326)
+Hybrid:      mean 0.4832, median 0.3704, 256.6ms  (Pass 1: 0.3195 / 0.1915)
+```
+
+The gap shrank substantially: mean Recall@10 delta went from -41.1%
+relative (Pass 1) to -15.4% relative (Pass 2, corrected pool + dedup), and
+**hybrid's median now slightly exceeds dense's** (0.3704 vs 0.3448) — on a
+typical query, hybrid is at least as good.
+
+Only 2 of 17 queries still show a full 1.00 → 0.00 drop (CFTR modulators,
+gene therapy for hemophilia — both single-relevant-PMID queries). Traced
+one (CFTR): the labeled PMID ranks 26th of 30 in the full reranked
+candidate pool; manual inspection shows the top-3 actually returned are
+clearly on-topic and arguably better matches than the one labeled PMID
+(whose title is about patients **not eligible** for CFTR modulators — a
+tangential angle, not a direct answer to "how do CFTR modulators treat
+CF"). Read as LLM-labeling noise on a sparsely-labeled query, not a
+retrieval defect — consistent with this eval set's already-documented
+single-relevant-PMID noise (§7 quantifies this properly rather than
+hand-waving it).
+
+## 6. Embedding model, chunk size, and query expansion
+
+All three experiments below reuse the **same fixed eval set** from §4 —
+per this pass's explicit instruction, the pool built in §3-4 does not
+change after this point, even though (see the embedding-model caveat
+below) that itself introduces a smaller version of the same pool-anchoring
+issue §3 fixed for BM25/hybrid vs. dense-only.
+
+### 6a. Stronger embedding model: `BAAI/bge-base-en-v1.5`
+
+Built a full index variant (`data/index/variants/bge_base_180_30/`, same
+180/30 chunking, 768-dim vs. MiniLM's 384; embedding all 22,674 chunks took
+1172.7s vs. the production build's 87.4s — reused the same BM25 index
+since chunking, and therefore chunk text, is unchanged).
+
+```
+bge-base dense:  mean 0.4173, median 0.2759,  29.6ms
+bge-base hybrid: mean 0.4675, median 0.3571, 274.0ms
+```
+
+**Worse than MiniLM on every axis** (MiniLM dense: 0.5711/7.3ms, MiniLM
+hybrid: 0.4832/256.6ms), and slower. Caveat stated plainly: this eval
+set's pool was built from MiniLM's own dense ranking (+BM25+MiniLM-hybrid),
+so bge-base is partly being measured against a MiniLM-anchored yardstick —
+the same structural issue §3 fixed for BM25/hybrid, now working against a
+different embedding model. A fully unbiased comparison would need a pool
+built from each candidate model's own top-N too, out of scope for the
+fixed-eval-set instruction. Reported as measured regardless.
+
+Not pursued: `BAAI/bge-large-en-v1.5` (the task allowed it only "if latency
+allows"; bge-base already underperforms while costing more on every
+latency dimension measured, so there's no reason to expect the larger,
+slower model reverses that).
+
+### 6b. Chunk size: 256/50 and 384/64 (MiniLM, the §6a winner)
+
+```
+                    dense mean / median        hybrid mean / median
+180/30 (current):   0.5711 / 0.3448            0.4832 / 0.3704
+256/50:              0.5541 / 0.3448            0.4792 / 0.4286
+384/64:              0.5670 / 0.3636            0.4689 / 0.3704
+```
+
+180/30 has the best mean Recall@10 in both dense and hybrid mode. 256/50's
+hybrid *median* (0.4286) is the highest of any chunk-size/mode
+combination, but its mean is lower — a few outlier queries pull it down
+more at that chunk size, not a broad win. Latency is essentially flat
+across all three configurations. No chunking change earns a place in the
+final configuration.
+
+### 6c. Query expansion
+
+`retrieval/query_expansion.py`: one NIM call per query generates 2-3
+reformulations; each variant (plus the original) is dense+BM25 searched
+independently, all resulting ranked lists fused via the existing RRF
+(already N-list-capable, not just 2), then reranked against the
+**original** query only. This is the only retrieval-*time* NIM usage in
+this pass (eval labeling is the other, separate use).
+
+```
+hybrid + expansion: mean 0.3807, median 0.3333, mean latency 4783.0ms
+(plain hybrid:       mean 0.4832, median 0.3704, mean latency  256.6ms)
+```
+
+Worse on every axis, and unreliable to measure cleanly: **8 of 18**
+expansion calls failed outright (`503 Service temporarily overloaded`,
+same contended endpoint as §4) and fell back to no-expansion, meaning this
+number is diluted *toward* plain-hybrid behavior, not a clean read of
+"expansion always applied." Not retried for a cleaner number: even with
+that dilution working in its favor, the result is already far from
+competitive — no plausible clean rerun closes a ~0.10 mean-recall gap while
+also costing ~19x the latency of plain hybrid. Not adopted.
+
+## 7. Final configuration and full progression
+
+Full leaderboard, every configuration measured on the identical fixed eval
+set (mean Recall@10, descending):
+
+| Mean | Median | Latency | Configuration |
 |---:|---:|---:|---|
-| 43 | 0.23 | 0.21 | resistance to osimertinib |
-| 19 | 0.16 | 0.26 | PD-L1 expression predicting checkpoint response |
-| 15 | 0.20 | 0.27 | PARP inhibitors BRCA ovarian cancer |
-| 48 | 0.21 | 0.12 | CAR-T BCMA multiple myeloma outcomes |
-| 1  | 1.00 | 0.00 | kinase inhibitors and cardiotoxicity |
-| 47 | 0.19 | 0.15 | SGLT2 inhibitors heart failure |
-| 1  | 1.00 | 1.00 | statins and all-cause mortality |
-| 39 | 0.21 | 0.23 | COX-2 inhibitors cardiovascular risk |
-| 50 | 0.20 | 0.16 | PCSK9 inhibitors cholesterol |
-| 1  | 1.00 | 1.00 | JAK inhibitor mechanism, autoimmune |
-| 1  | 1.00 | 1.00 | anti-CD20 mechanism, MS |
-| 47 | 0.21 | 0.19 | gut microbiome and IBD |
-| 1  | 1.00 | 0.00 | direct-acting antivirals, hepatitis C |
-| 1  | 1.00 | 1.00 | why BACE inhibitors failed in Alzheimer's trials |
-| 47 | 0.21 | 0.13 | CGRP treatments for migraine |
-| 1  | 1.00 | 0.00 | CFTR modulators, cystic fibrosis |
-| 1  | 1.00 | 0.00 | gene therapy for hemophilia, current state |
-| 33 | 0.27 | 0.21 | TNF-alpha inhibitors, rheumatoid arthritis |
-| 37 | 0.22 | 0.14 | long COVID pathophysiology |
+| **0.5711** | 0.3448 | 7.3ms | **Dense, 180/30, MiniLM — final default** |
+| 0.5670 | 0.3636 | 8.2ms | Dense, 384/64, MiniLM |
+| 0.5541 | 0.3448 | 8.1ms | Dense, 256/50, MiniLM |
+| 0.4832 | 0.3704 | 256.6ms | Hybrid, 180/30, MiniLM |
+| 0.4792 | 0.4286 | 302.7ms | Hybrid, 256/50, MiniLM |
+| 0.4689 | 0.3704 | 293.4ms | Hybrid, 384/64, MiniLM |
+| 0.4675 | 0.3571 | 274.0ms | Hybrid, 180/30, bge-base |
+| 0.4173 | 0.2759 | 29.6ms | Dense, 180/30, bge-base |
+| 0.3807 | 0.3333 | 4783.0ms | Hybrid + query expansion, 180/30, MiniLM |
 
-### Why: two real, distinguishable effects
+**By the same summary statistic (full-set mean Recall@10) used as the
+headline number throughout this whole two-pass effort, plain dense
+retrieval — unchanged from the very first Phase 3 pass — is the winner.**
+`retrieve()` now defaults to it (`retrieve_dense()` internally); the full
+hybrid pipeline is preserved as an explicit opt-in
+(`retrieve_hybrid_reranked`).
 
-**(a) The eval methodology structurally favors the dense baseline.** The
-labeled-relevant pool for every query *is* dense retrieval's own top-50 —
-nothing outside what dense ranking already surfaced was ever eligible to be
-labeled relevant. `retrieve_dense(k=10)` is therefore, by construction,
-always drawing its top-10 from exactly the set the labels were built from.
-The hybrid pipeline pulls in BM25 candidates that may be *genuinely good*
-but were never in the labeled pool (so it gets no credit for surfacing
-them) and can crowd out dense-highly-ranked, LLM-labeled-relevant chunks
-from the fused top-30 before reranking ever sees them. This is a known,
-structural limitation of pooled relevance evaluation when the pool comes
-from only one of the methods being compared (the standard TREC-style fix —
-pool from *all* systems being compared, not just one — was out of scope
-given the "top-50 dense, one call" labeling budget specified for this
-pass). It is not a flaw in BM25/RRF/reranking themselves; it's a
-mismatch between how the eval set was built and what's being compared
-against it.
+**A necessary nuance, not a way to avoid the conclusion above**: dense's
+aggregate lead is concentrated in a specific subgroup. Splitting the 17
+scored queries by labeled relevant-set size:
 
-**(b) For the 8 single-relevant-chunk queries, manual inspection suggests
-some of the "misses" are the LLM label being narrow, not the retrieval
-being wrong.** Example: for *"Why do kinase inhibitors sometimes cause
-cardiotoxicity?"*, the labeled-relevant chunk's actual text is a thin review
-teaser — *"Many Tyrosine Kinase Inhibitors have cardiac side effects. This
-article provides an up-to-date review of these toxicities."* — with a
-title that matches very well but with no mechanism explained. The
-cross-encoder scored it 0.03 (near-irrelevant) and instead surfaced chunks
-actually explaining mechanisms (e.g. *"Preclinical approaches to assess
-potential kinase inhibitor-induced cardiac toxicity"*, *"The Role of p90
-Ribosomal S6 Kinase (RSK) in TKI-Induced Cardiotoxicity"*) — arguably
-*better* answers to the query than the one label credits. This doesn't
-prove every single-relevant-chunk miss is a labeling artifact (some may be
-real regressions), but it means the aggregate delta is not simply "hybrid
-retrieval is worse at finding relevant content" — it's entangled with (a)
-and with the LLM judge's own limitations on a one-shot, 50-candidate,
-single-relevant-answer judgment call.
+| Subgroup (n) | Dense mean | Hybrid mean | Dense median | Hybrid median |
+|---|---:|---:|---:|---:|
+| Single-relevant-PMID queries (6) | **1.000** | 0.667 | — | — |
+| Multi-relevant-PMID queries (11) | 0.337 | **0.383** | 0.321 | **0.357** |
 
-Both of these are real, and both cut against treating the -0.22 mean
-Recall@10 delta as a clean verdict on hybrid retrieval's actual quality —
-but neither of them is grounds to not report the number as measured. It is
-reported above, unmodified.
+On the 6 single-relevant-PMID queries — which behave as near-binary,
+high-variance outcomes on a small eval set (dense went a perfect 6/6; a
+single flipped result changes that subgroup's mean by 0.167) — dense wins
+outright. On the 11 richer, arguably more representative multi-relevant
+queries, **hybrid is actually slightly ahead on both mean and median**.
+This is presented in full, not selectively: the literal, pre-committed
+metric (full-set mean) says dense wins and that is what's shipped as the
+default; the subgroup breakdown is why the hybrid pipeline was kept
+available rather than deleted.
 
-## 6. Cost
+## 8. What this means / recommendation
 
-Latency went from ~6ms to ~250ms per query — three sequential steps
-(FAISS search, BM25 score-over-corpus, cross-encoder forward pass over ~30
-pairs) where the baseline had one. At ~250ms, retrieval is still fast next
-to an LLM call in the agent loop (seconds), so it wouldn't be the
-bottleneck if wired in — but paying a real, non-trivial latency cost for a
-measured recall *regression* is the core honest finding of this pass.
+**The final measured Recall@10 (0.5711, dense-only, unchanged from before
+this whole two-pass effort) is well below the 0.9 target. Stated plainly,
+as instructed: none of the two passes' real, honestly-measured improvement
+attempts — hybrid retrieval, a stronger embedding model, chunk-size tuning,
+query expansion — beat the simple baseline this project already had before
+any of this work started.**
 
-## 7. What this means / recommendation
+What was gained, despite not hitting 0.9:
+- A materially less biased eval methodology (§3-4) — the single biggest
+  lever, as anticipated: it closed most (not all) of the dense-vs-hybrid
+  gap that Pass 1 had wrongly read as "hybrid retrieval doesn't work."
+- Two real pipeline bugs found and fixed via that methodology (title
+  context missing from reranking in Pass 1; duplicate-PMID top-k in Pass
+  2) that make both dense and hybrid genuinely better, independent of
+  which one "wins."
+- Enough evidence to make an informed default choice (dense) while
+  preserving a documented, real alternative (hybrid) for the query types
+  where it measurably helps, rather than picking one blindly.
 
-**As currently built and measured, hybrid+RRF+reranking should not replace
-the dense-only baseline based on this evidence.** Given §5's structural
-pooling-bias caveat, this is not necessarily proof hybrid retrieval is
-worse in general — but it is proof that *on the evidence gathered so far*,
-it doesn't earn its ~40x latency cost. If retrieval quality work continues:
+If pushing toward 0.9 continues:
+- **The eval set itself is the likely limiting factor now, not the
+  retrieval methods.** 17 scored queries, 6 of them single-relevant-PMID
+  (near-binary), is not enough signal to reliably separate close
+  configurations — most of the deltas in §6-7 are within noise range of
+  each other. A larger eval set (50+ queries) with richer relevant-sets
+  per query would be the highest-value next investment, likely above any
+  further retrieval-method tuning.
+- A genuinely unbiased embedding-model comparison needs a pool built from
+  each candidate model's own retrieval, not just the production model's
+  (§6a's caveat).
+- Hybrid's real edge on multi-relevant-PMID queries (§7) suggests it's
+  worth keeping available for query types with broad/ambiguous relevance
+  (many candidate answers) even though it's not the blanket default.
 
-- A fairer comparison needs a pool built from *all* candidate methods
-  (dense top-N ∪ BM25 top-N ∪ hybrid top-N), not just dense top-50, before
-  labeling — otherwise any method that isn't dense starts at a structural
-  disadvantage in recall terms by definition.
-- The single-relevant-chunk queries (8/19) are low-information for this
-  metric — recall on them is nearly binary and swings the mean heavily.
-  A larger eval set, or multiple relevant chunks expected per query more
-  consistently, would make the aggregate less noisy.
-- `retrieve()` currently always runs the full hybrid+rerank pipeline; given
-  this result, if `retrieve()` gets wired into the agent in a later pass,
-  it's worth deciding then whether to default to `retrieve_dense()` instead
-  (fast, and not shown to be worse here) until a fairer comparison exists.
-
-## 8. Files
+## 9. Files, requirements, scope discipline
 
 | File | Purpose |
 |---|---|
-| `retrieval/eval_set.json` | Fixed 19-query eval set, LLM-labeled, methodology documented inline |
-| `retrieval/build_eval_set.py` | Builds the eval set (the only NIM-calling script in this pass) |
-| `retrieval/measure_recall.py` | Computes Recall@10 + latency against the eval set for either `dense` or `hybrid` mode |
-| `retrieval/eval_results_baseline.json` | Full per-query baseline (dense-only) results |
-| `retrieval/eval_results_hybrid.json` | Full per-query hybrid (post-fix) results |
-| `retrieval/build_bm25.py` | Builds the BM25 sparse index |
-| `retrieval/retriever.py` | `retrieve()` (hybrid pipeline), `retrieve_dense()` (fixed baseline), RRF fusion, reranking |
+| `retrieval/eval_set.json` | Fixed 19-query eval set (schema v2: 3-way pooled, PMID-level ground truth) |
+| `retrieval/build_eval_set.py` | Builds the eval set; the only NIM-calling script for *labeling* in this pass |
+| `retrieval/query_expansion.py` | Opt-in query expansion; the only retrieval-*time* NIM usage in this pass |
+| `retrieval/measure_recall.py` | PMID-level Recall@10 + latency, works across any index variant / mode / expand flag |
+| `retrieval/build_bm25.py`, `build_index.py` | Parameterized (chunk size/overlap, embed model, output dir) so index variants build without disturbing production |
+| `retrieval/retriever.py` | `retrieve()`/`retrieve_dense()` (default, dense), `retrieve_hybrid_reranked()` (opt-in hybrid), RRF fusion, reranking, PMID dedup |
+| `retrieval/eval_results_*.json` | Full per-query results for every configuration in §7's table |
+| `data/index/variants/*/` | bge-base, 256/50, and 384/64 index variants (gitignored like all of `data/`, rebuildable via the build scripts above) |
 
-## 9. Requirements
+**Requirements**: `rank_bm25==0.2.2` (Pass 1). No new dependencies in Pass
+2 — the stronger embedding model uses the already-present
+`sentence-transformers`.
 
-Added `rank_bm25==0.2.2` to `requirements.txt`. No other new dependencies —
-the cross-encoder uses `sentence-transformers`, already present.
-
-## Scope discipline
-
-This pass made exactly 19 + a few debug NVIDIA NIM calls, all inside
-`retrieval/build_eval_set.py` (labeling only) — nothing else in the
-pipeline (BM25, RRF, reranking, measurement) calls NIM. No changes outside
-`retrieval/` and `data/`. `agent/nodes.py` and `evaluation/` are untouched.
+**Scope discipline**: NIM calls in this pass are limited to (a) eval-set
+labeling (`build_eval_set.py`, one call per query) and (b) query expansion
+generation (`query_expansion.py`, opt-in, one call per query, not part of
+the shipped default). BM25, RRF fusion, cross-encoder reranking, the
+embedding-model swap, and chunk-size rebuilds are all local, no-API-call
+work. No changes outside `retrieval/` and `data/`. `agent/nodes.py` and
+`evaluation/` are untouched.
