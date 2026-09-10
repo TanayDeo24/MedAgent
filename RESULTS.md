@@ -76,6 +76,18 @@ cases** — 21 calls that would previously have had no enforced ceiling at all, 
 successfully recovered instead of stalling. See `EVAL_HANG_FIX_COMPLETE.md` for full
 detail and why a daemon thread was used instead of `ThreadPoolExecutor`.
 
+**Update (fix applied after this run)**: at the time this run happened, the same
+retry-with-fresh-client mechanism only covered *timeouts* — a real provider error
+like a `429` or `503` (both observed live in this run, see the failure
+characterization below) was caught and re-raised immediately with zero retry at this
+layer, relying entirely on each node's own try/except to contain the failure. This
+has since been extended to also retry on 429/503 with the same fresh-client-and-
+backoff pattern, sharing the same 3-attempt budget. Verified directly: a client
+failing twice with a 429 then succeeding now returns the successful result instead
+of raising; a non-retryable error (e.g. 401) still raises immediately, unaffected.
+Not yet re-validated against a full batch run, but should reduce the per-case
+failure rate attributable to transient provider errors in future runs.
+
 **Tool-hallucination counting**: Nemotron occasionally invents a tool name that
 doesn't exist (e.g. `pubchem`, `drugbank`, `fda_labels`, `kegg`, `europe_pmc`,
 `cochrane`, `clinicaltrials.gov`, `literature`, `fda`). `PLANNING_PROMPT` was tightened
@@ -96,13 +108,31 @@ rigor of human verification**: it measures whether the report stayed grounded in
 run's own retrieved data, not whether that data (or the report) is correct against
 reality, and the judge is the same underlying model family grading a different task,
 not an independent judge. See that module's docstring for the full list of limits.
-**In this run, the judge itself failed on 23 of the 29 freshly-run cases** (an
-unresolved, separate reliability issue documented in `EVAL_HANG_FIX_COMPLETE.md` —
-even after raising `max_tokens` to 8192, some real reports still exhaust Nemotron's
-internal reasoning budget before emitting the final JSON verdict). **The
+
+**In this run, the judge itself failed on 23 of the 29 freshly-run cases** (`max_tokens`
+was 8192 at the time — Nemotron's internal reasoning chain was exhausting the
+completion budget before emitting the final JSON verdict on real reports). **The
 hallucination-rate number below is therefore based on only 6 successfully-judged
 cases out of 60** — a genuinely small sample, reported as such rather than presented
 as if it covered the whole run.
+
+**Update (fix applied after this run, not re-run against it)**: `max_tokens` was
+raised 8192 → 16384. This was validated on 8 freshly-captured real (report,
+tool_results) pairs (a small new sample, not a re-run of the 60-case batch — no run
+before this one ever persisted full `final_report`/`tool_results`, only slimmed
+state, so the original 29 cases' actual report text no longer exists to re-judge):
+**judge success rate roughly doubled, from 2/8 (25%) at 8192 to 4/8 (50%) at 16384**.
+Every one of the 4 remaining failures at 16384 was a **90-second timeout**, not the
+original empty-content failure — the larger budget fully eliminated the truncation
+problem but revealed a second, distinct one: some reports' reasoning chains
+legitimately need more than 90s once given the room to run that long. **This is a
+real, meaningful improvement, not a full fix** — the judge should still be expected
+to fail on roughly half of real cases even with this change, until either a
+judge-specific timeout above 90s or a lighter-reasoning model is used instead (see
+`evaluation/hallucination_judge.py`'s docstring for the exact numbers and reasoning).
+The 42.9%/6-case figures below are **not corrected retroactively** — they reflect
+what this specific run actually measured, under the config that was live at the
+time; the fix's effect on the *sample size* would only show up in a future run.
 
 ## 4. Real numbers
 
@@ -114,7 +144,7 @@ as if it covered the whole run.
 | **Self-correction rate** | 93.1% | 91.7% | % of runs where the self-reflection loop actually looped (>1 iteration). Healthy target band is 20-40% per the metric's own design intent — this run is far above that, meaning the agent almost always felt it needed more research, which given the 37.9% success rate suggests looping isn't reliably converging on success. |
 | **Citation coverage** | 77.1% | 68.4% | Ratio of citation entries to total retrieved results. |
 | **Avg. confidence** | 0.465 | 0.225 | Agent's own self-assessed confidence (0-1) at verification time. |
-| **Avg. latency** | 177.5s | 209.4s | Wall-clock time per test case (agent run + hallucination judge). |
+| **Avg. latency** | 177.5s | 209.4s | Wall-clock time per test case (agent run + hallucination judge). **All 60 > Fresh, backwards from what missing judge-time data alone would predict — see explanation below the table.** |
 | **Hallucination rate** | **42.9%** (27/63 claims, from 6 successfully-judged cases) | same | See methodology caveat above — small sample, not comparable to a claim covering the full 60. |
 
 **Failure characterization (fresh cases only, n=18 failed of 29)**: 11 of 18 failures
@@ -127,6 +157,31 @@ a `502 Bad Gateway` from ClinicalTrials.gov (1 case), an LLM call that timed out
 all 3 attempts (1 case), and a synthesis-node JSON parse failure (1 case). **None of
 these caused a lost test case** — every one was caught by existing per-node error
 handling and the run continued; they just count as task failures, not batch failures.
+
+**Latency anomaly, investigated and explained**: "All 60" avg. latency (209.4s) being
+*higher* than "Fresh" (177.5s) looks backwards at first glance — the 31 reconstructed
+cases are missing hallucination-judge time entirely, which should pull their average
+*down*, not up. **It is not case 31's aborted hang getting miscounted** — that was
+checked directly and ruled out: case 31's `latency_seconds` is stored as `null` (its
+own agent run completed and only the post-hoc judge call hung), and the aggregation
+already treats `null` as contributing `0`, if anything *dragging the reconstructed
+average down* slightly rather than inflating it.
+
+**The real cause**: the 31 reconstructed cases (ids 1-31) ran during the *original,
+pre-fix* batch attempt, before `EVAL_HANG_FIX_COMPLETE.md`'s 90-second per-call hard
+timeout and 20-minute per-case wall-clock cap existed. Individual LLM calls and tool
+retries in that run had no enforced ceiling at all, so genuinely slow calls (stacked
+ChEMBL `500` retries, unbounded LLM waits) could and did run far longer than anything
+possible in the 29 freshly-run cases, which benefit from those caps bounding
+worst-case latency. Direct evidence: the two highest reconstructed latencies are
+case 2 at **820.0s** and case 4 at **662.9s** — both real, both from before either
+cap existed — versus a fresh-case maximum of 442.6s (id 1, this run). Excluding case
+31's `null` entirely (rather than treating it as `0`) makes the reconstructed
+average *higher* still (≈247.2s), confirming this isn't a data-handling artifact
+either. **The "Fresh" vs "All 60" latency comparison is therefore not apples-to-
+apples for a second reason beyond data completeness**: the two groups ran under
+genuinely different software versions with different latency-bounding behavior, not
+just different measurement completeness.
 
 ## 5. Real usage totals — replacing "5K+ autonomous workflows"
 
@@ -161,6 +216,12 @@ complete data**, driven mostly by the agent's own confidence self-assessment lan
 below 0.5 rather than outright crashes. Tool selection (85.3% precision) is
 reasonably strong. Self-correction almost always triggers but doesn't reliably lead
 to success. The hallucination-rate figure is not trustworthy at its current sample
-size (6 judged cases) and needs the judge's reliability issue fixed before it means
-much. None of this is disguised — it's the actual measured state of the system as of
-this run.
+size (6 judged cases) from this run. That reliability issue has since been partially
+fixed (judge success roughly doubled, 25%→50%, on a separate validation sample — §3)
+but not fully resolved, and the fix was not applied retroactively to this run's
+already-reported numbers (the original reports/tool_results no longer exist to
+re-judge). A future run under the updated judge config should see a materially
+larger judged sample, though still an incomplete one until the remaining
+timeout-based failure mode is also addressed. None of this is disguised — it's the
+actual measured state of the system as of this run, plus an honest account of what's
+changed since.
