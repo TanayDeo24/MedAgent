@@ -96,14 +96,31 @@ def judge_report_hallucinations(report: str, tool_results: Dict[str, Any]) -> Di
 
     # temperature=0.0 for consistent, repeatable judging rather than the
     # creative variance appropriate for the agent's own report-writing.
-    # max_tokens=8192 (not the 4096 first tried here): Nemotron emits a long
-    # internal reasoning_content chain before its final JSON answer, and
-    # that reasoning counts against the completion budget - on a real-size
-    # report + tool_results, 4096 was observed to be exhausted by reasoning
-    # alone, leaving an empty final `content` and a json.loads crash. Same
-    # underlying truncation issue already fixed this way for
-    # synthesis_node/report_generation_node (see agent/nodes.py).
-    llm = get_llm(temperature=0.0, max_tokens=8192)
+    # max_tokens=16384 (raised from 8192, which was itself raised from 4096):
+    # Nemotron emits a long internal reasoning_content chain before its final
+    # JSON answer, and that reasoning counts against the completion budget.
+    #
+    # Validated directly against 8 real captured (report, tool_results) pairs
+    # (not synthetic) - see RESULTS.md: 8192 succeeded on only 2/8 (both
+    # failing with an empty final `content`, i.e. reasoning alone exhausted
+    # the budget before any answer was emitted). 16384 succeeded on 4/8 - a
+    # real 2x improvement, but NOT a full fix. Critically, none of the 4
+    # remaining 16384 failures were empty-content anymore - all 4 were
+    # config.llm_config.LLM_CALL_TIMEOUT_SECONDS (90s) timeouts instead: the
+    # larger budget lets Nemotron reason for longer, and some real reports'
+    # reasoning chains now legitimately exceed 90s rather than being cut
+    # short. Raising max_tokens further would likely trade more
+    # empty-content failures for more timeout failures rather than actually
+    # reducing the total - the two failure modes are in tension via the same
+    # underlying cause (a long, uncontrollable internal reasoning chain).
+    # Fixing the remaining ~50% failure rate would need either a
+    # judge-specific timeout longer than 90s (LLM_CALL_TIMEOUT_SECONDS is
+    # currently a single global constant, not configurable per caller) or a
+    # different model without heavy internal chain-of-thought for this task
+    # - flagged as the next thing to try, not implemented here since 16384
+    # already met the bar of "meaningfully reduces failures" this fix was
+    # scoped to hit.
+    llm = get_llm(temperature=0.0, max_tokens=16384)
 
     # Truncate tool_results to keep the judge prompt within a reasonable
     # token budget - a full run's tool_results (up to 3 tools x 20-50
