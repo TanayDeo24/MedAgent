@@ -30,6 +30,12 @@ CHUNKS_PATH = DATA_DIR / "index" / "chunks.jsonl"
 META_PATH = DATA_DIR / "index" / "index_meta.json"
 BM25_PATH = DATA_DIR / "index" / "bm25.pkl"
 
+# Hybrid retrieval pipeline constants.
+DENSE_TOP_N = 30  # candidates pulled from FAISS before fusion
+BM25_TOP_N = 30  # candidates pulled from BM25 before fusion
+RRF_K = 60  # standard RRF constant (see _rrf_fuse)
+RRF_POOL_SIZE = 30  # fused candidates kept for reranking
+
 
 @dataclass
 class Document:
@@ -152,6 +158,43 @@ class Retriever:
             for score, idx in zip(scores[0], indices[0])
             if idx != -1
         ]
+
+    @staticmethod
+    def _rrf_fuse(ranked_lists: List[List[tuple]], k: int = RRF_K) -> List[tuple]:
+        """Reciprocal Rank Fusion over N ranked lists of (row_idx, score).
+
+        Standard formula: for each row_idx, sum 1/(k + rank) across every
+        list it appears in (rank is 1-indexed position in that list; a
+        row_idx absent from a list contributes 0 for it). k=60 is RRF's
+        usual default -- it flattens the influence of any single list's
+        exact rank positions, which matters here since dense cosine scores
+        and BM25 scores live on totally different, incomparable scales and
+        can't be combined directly.
+
+        Returns [(row_idx, fused_score), ...] sorted descending.
+        """
+        fused = {}
+        for ranked_list in ranked_lists:
+            for rank, (row_idx, _score) in enumerate(ranked_list, start=1):
+                fused[row_idx] = fused.get(row_idx, 0.0) + 1.0 / (k + rank)
+        return sorted(fused.items(), key=lambda pair: pair[1], reverse=True)
+
+    def retrieve_hybrid(
+        self,
+        query: str,
+        n: int = RRF_POOL_SIZE,
+        dense_n: int = DENSE_TOP_N,
+        bm25_n: int = BM25_TOP_N,
+    ) -> List[Document]:
+        """Dense + BM25, fused via RRF -- no reranking. Returns the top-n
+        fused candidates as Documents (`.score` is the RRF fused score, not
+        a similarity score -- it's only meaningful for ranking, not as an
+        absolute relevance measure).
+        """
+        dense_hits = self._dense_search(query, dense_n)
+        bm25_hits = self._bm25_search(query, bm25_n)
+        fused = self._rrf_fuse([dense_hits, bm25_hits])[:n]
+        return [self._doc_from_row(idx, score) for idx, score in fused]
 
     def retrieve_dense(self, query: str, k: int = 5) -> List[Document]:
         """Pure dense (FAISS cosine) retrieval -- the original, pre-hybrid
