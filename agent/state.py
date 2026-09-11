@@ -152,6 +152,17 @@ class AgentState(TypedDict):
         - relevance: str (why this source is relevant)
     """
 
+    retrieved_context: List[Dict[str, Any]]
+    """RAG-retrieved passages (local PubMed abstract corpus/index), used to
+    ground synthesis and report generation alongside live tool_results.
+
+    Populated once, in synthesis_node, via retrieval.retriever.retrieve()
+    against the current query, and reused by report_generation_node rather
+    than querying the index a second time. Each entry: pmid, title, text,
+    url, score. Distinct from tool_results["pubmed"], which comes from a
+    live PubMed API call, not this local retrieval index.
+    """
+
     # ═══════════════════════════════════════════════════════════
     # METADATA FIELDS
     # ═══════════════════════════════════════════════════════════
@@ -232,6 +243,7 @@ def create_initial_state(
         # Output
         final_report=None,
         citations=[],
+        retrieved_context=[],
 
         # Metadata
         start_time=datetime.now(),

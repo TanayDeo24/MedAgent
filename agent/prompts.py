@@ -213,14 +213,18 @@ ORIGINAL QUERY:
 TOOL RESULTS:
 {tool_results}
 
+RETRIEVED CONTEXT (local PubMed abstract passages, retrieved from a pre-built index for this query - NOT the same as a live tool_results["pubmed"] API call, but an equally valid grounding source):
+{retrieved_context}
+
 Analyze the results from all tools and synthesize the key findings.
 
 **SYNTHESIS RULES:**
-1. **Ground everything in tool results**: Only state facts that appear in the tool results. Do NOT add external knowledge.
-2. **Cross-reference findings**: Look for connections between results from different tools
+1. **Ground everything in tool results and retrieved context**: Only state facts that appear in the tool results or the retrieved context above. Do NOT add external knowledge.
+2. **Cross-reference findings**: Look for connections between results from different tools, and between tool results and the retrieved context
 3. **Identify patterns**: Note common themes, repeated compounds/targets, or consistent findings
 4. **Flag inconsistencies**: If different sources contradict, note it
 5. **Assess completeness**: Are there gaps in the information? What's missing?
+6. **Use the retrieved context to fill gaps**: Where tool_results are thin on a point, check whether the retrieved context supports or elaborates on it before calling it a gap
 
 **WHAT TO SYNTHESIZE:**
 - Common compounds/drugs mentioned across tools
@@ -357,6 +361,9 @@ SYNTHESIZED FINDINGS:
 ALL TOOL RESULTS:
 {tool_results}
 
+RETRIEVED CONTEXT (local PubMed abstract passages retrieved from a pre-built index for this query - a valid grounding source, distinct from any live tool_results["pubmed"] API call):
+{retrieved_context}
+
 CITATIONS:
 {citations}
 
@@ -415,8 +422,8 @@ Cross-reference findings from multiple sources.
 
 **CRITICAL REQUIREMENTS:**
 
-1. **Ground everything in tool results**: Do NOT add information not found in the tool results
-2. **Cite all claims**: Use inline citations like "(PubMed)" or "(ChEMBL)" or reference numbers [1]
+1. **Ground everything in tool results and retrieved context**: Do NOT add information not found in the tool results or the RETRIEVED CONTEXT above
+2. **Cite all claims**: Use inline citations like "(PubMed)" or "(ChEMBL)" or "(PubMed RAG)" for the retrieved context, or reference numbers [1]
 3. **Be honest about limitations**: If something wasn't found, say so
 4. **Use professional scientific language**: Clear, precise, objective
 5. **Structure for readability**: Use headers, bullets, tables where appropriate
