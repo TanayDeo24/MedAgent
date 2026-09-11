@@ -39,25 +39,15 @@ EVAL_SET_PATH = Path(__file__).resolve().parent / "eval_set.json"
 K = 10
 
 
-def measure(mode: str, variant: str = None, expand: bool = False, eval_set_path: Path = EVAL_SET_PATH) -> dict:
-    retriever = get_retriever_for_variant(variant)
-
-    if expand:
-        from retrieval.query_expansion import retrieve_with_expansion
-
-        def retrieve_fn(query, k):
-            return retrieve_with_expansion(retriever, query, k=k, mode=mode)
-    elif mode == "dense":
-        retrieve_fn = retriever.retrieve_dense
-    elif mode == "hybrid":
-        # Explicitly the hybrid pipeline, not retriever.retrieve -- that
-        # now defaults to dense (see Retriever.retrieve's docstring), and
-        # this script needs the hybrid path specifically regardless of what
-        # the production default is.
-        retrieve_fn = retriever.retrieve_hybrid_reranked
-    else:
-        raise ValueError(f"Unknown mode: {mode}")
-
+def run_eval(retrieve_fn, eval_set_path: Path, k: int = K) -> dict:
+    """Core eval loop, factored out of measure() so other scripts (the
+    HyDE/RRF-reweighting/combined experiments in
+    PHASE3_RETRIEVAL_QUALITY_COMPLETE.md section 12) can plug in an
+    arbitrary retrieve_fn(query, k) -> List[Document] against a fixed eval
+    set without duplicating this scoring logic. measure() below is just
+    this plus the mode/variant/expand bookkeeping for the CLI's existing
+    named configurations.
+    """
     with open(eval_set_path) as f:
         eval_set = json.load(f)
 
@@ -72,7 +62,7 @@ def measure(mode: str, variant: str = None, expand: bool = False, eval_set_path:
         relevant_pmids = set(item["relevant_pmids"])
 
         t0 = time.time()
-        docs = retrieve_fn(query, K)
+        docs = retrieve_fn(query, k)
         latency_ms = (time.time() - t0) * 1000
 
         retrieved_pmids = {d.pmid for d in docs}
@@ -96,12 +86,9 @@ def measure(mode: str, variant: str = None, expand: bool = False, eval_set_path:
 
     latencies = [q["latency_ms"] for q in per_query]
 
-    summary = {
-        "mode": mode,
-        "variant": variant,
-        "expand": expand,
+    return {
         "eval_set_path": str(eval_set_path),
-        "k": K,
+        "k": k,
         "num_queries": len(per_query),
         "num_queries_scored": len(scored),
         "num_queries_skipped_no_relevant": len(skipped),
@@ -112,6 +99,31 @@ def measure(mode: str, variant: str = None, expand: bool = False, eval_set_path:
         "median_latency_ms": round(statistics.median(latencies), 1),
         "per_query": per_query,
     }
+
+
+def measure(mode: str, variant: str = None, expand: bool = False, eval_set_path: Path = EVAL_SET_PATH) -> dict:
+    retriever = get_retriever_for_variant(variant)
+
+    if expand:
+        from retrieval.query_expansion import retrieve_with_expansion
+
+        def retrieve_fn(query, k):
+            return retrieve_with_expansion(retriever, query, k=k, mode=mode)
+    elif mode == "dense":
+        retrieve_fn = retriever.retrieve_dense
+    elif mode == "hybrid":
+        # Explicitly the hybrid pipeline, not retriever.retrieve -- that
+        # now defaults to dense (see Retriever.retrieve's docstring), and
+        # this script needs the hybrid path specifically regardless of what
+        # the production default is.
+        retrieve_fn = retriever.retrieve_hybrid_reranked
+    else:
+        raise ValueError(f"Unknown mode: {mode}")
+
+    summary = run_eval(retrieve_fn, eval_set_path)
+    summary["mode"] = mode
+    summary["variant"] = variant
+    summary["expand"] = expand
     return summary
 
 

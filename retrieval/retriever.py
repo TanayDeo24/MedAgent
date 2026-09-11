@@ -203,23 +203,32 @@ class Retriever:
         ]
 
     @staticmethod
-    def _rrf_fuse(ranked_lists: List[List[tuple]], k: int = RRF_K) -> List[tuple]:
+    def _rrf_fuse(
+        ranked_lists: List[List[tuple]], k: int = RRF_K, weights: Optional[List[float]] = None
+    ) -> List[tuple]:
         """Reciprocal Rank Fusion over N ranked lists of (row_idx, score).
 
-        Standard formula: for each row_idx, sum 1/(k + rank) across every
-        list it appears in (rank is 1-indexed position in that list; a
-        row_idx absent from a list contributes 0 for it). k=60 is RRF's
-        usual default -- it flattens the influence of any single list's
-        exact rank positions, which matters here since dense cosine scores
-        and BM25 scores live on totally different, incomparable scales and
-        can't be combined directly.
+        Standard formula: for each row_idx, sum weight_i * 1/(k + rank)
+        across every list it appears in (rank is 1-indexed position in that
+        list; a row_idx absent from a list contributes 0 for it). k=60 is
+        RRF's usual default -- it flattens the influence of any single
+        list's exact rank positions, which matters here since dense cosine
+        scores and BM25 scores live on totally different, incomparable
+        scales and can't be combined directly.
+
+        `weights` (one per list, same order as `ranked_lists`) defaults to
+        all-1.0, i.e. the original unweighted formula -- added so a caller
+        can favor one retrieval method's ranking over another's (e.g. BM25
+        for entity-heavy queries) without changing the fusion math itself.
 
         Returns [(row_idx, fused_score), ...] sorted descending.
         """
+        if weights is None:
+            weights = [1.0] * len(ranked_lists)
         fused = {}
-        for ranked_list in ranked_lists:
+        for weight, ranked_list in zip(weights, ranked_lists):
             for rank, (row_idx, _score) in enumerate(ranked_list, start=1):
-                fused[row_idx] = fused.get(row_idx, 0.0) + 1.0 / (k + rank)
+                fused[row_idx] = fused.get(row_idx, 0.0) + weight / (k + rank)
         return sorted(fused.items(), key=lambda pair: pair[1], reverse=True)
 
     def retrieve_hybrid(
@@ -284,34 +293,64 @@ class Retriever:
         deduped = self._dedup_rows_by_pmid(candidates, k)
         return [self._doc_from_row(idx, score) for idx, score in deduped]
 
-    def retrieve_hybrid_reranked(self, query: str, k: int = 5) -> List[Document]:
-        """Full hybrid pipeline: dense (FAISS) + sparse (BM25) candidates,
-        fused via RRF, reranked by a cross-encoder scoring (query, chunk)
-        pairs directly, then deduplicated by PMID.
+    def retrieve_hybrid_custom(
+        self,
+        query: str,
+        k: int = 5,
+        dense_query: Optional[str] = None,
+        dense_weight: float = 1.0,
+        bm25_weight: float = 1.0,
+    ) -> List[Document]:
+        """General hybrid pipeline behind retrieve_hybrid_reranked, with two
+        knobs added for the final optimization pass (see
+        PHASE3_RETRIEVAL_QUALITY_COMPLETE.md section 12):
 
-        NOT the default `retrieve()` path (see that method's docstring for
-        why) -- kept as an explicit, opt-in method. On this project's fixed
-        19-query eval set (see PHASE3_RETRIEVAL_QUALITY_COMPLETE.md), this
-        pipeline measured a LOWER mean Recall@10 than plain retrieve_dense()
-        (0.4832 vs 0.5711) at ~35x the latency (257ms vs 7ms), though it
-        measured slightly BETTER than dense on the subset of queries with
-        more than one labeled-relevant abstract (mean 0.383 vs 0.337) --
-        dense's aggregate edge concentrates in a handful of single-relevant-
-        abstract queries that behave as high-variance, near-binary outcomes
-        on a small eval set, not a broad-based advantage. Worth revisiting
-        if a larger eval set becomes available, or if a caller specifically
-        wants BM25's lexical-match recall for terminology-heavy queries.
+        - `dense_query`: text to embed for the DENSE leg only, if different
+          from `query` (HyDE -- embed a hypothetical answer passage instead
+          of the question itself, to close the phrasing gap between how
+          questions are asked and how answers are written). BM25 and the
+          final rerank always use the original `query`, since sparse
+          lexical matching and "does this passage actually answer what was
+          asked" both still need the real question, not a hypothetical
+          answer to it.
+        - `dense_weight` / `bm25_weight`: per-list weights passed to
+          _rrf_fuse, letting one retrieval method's ranking dominate fusion
+          (e.g. bm25_weight > 1.0 favors BM25 for entity-heavy queries).
+
+        Defaults (dense_query=None, both weights=1.0) reproduce
+        retrieve_hybrid_reranked's original unweighted behavior exactly.
         """
         if k <= 0:
             return []
-        dense_hits = self._dense_search(query, DENSE_TOP_N)
+        dense_hits = self._dense_search(dense_query or query, DENSE_TOP_N)
         bm25_hits = self._bm25_search(query, BM25_TOP_N)
-        fused = self._rrf_fuse([dense_hits, bm25_hits])[:RRF_POOL_SIZE]
+        fused = self._rrf_fuse(
+            [dense_hits, bm25_hits], weights=[dense_weight, bm25_weight]
+        )[:RRF_POOL_SIZE]
         # Rerank the full fused pool (not capped to k) so there's enough
-        # depth left to dedup by PMID down to k afterward.
+        # depth left to dedup by PMID down to k afterward. Always reranks
+        # against the original query -- see dense_query note above.
         reranked = self._rerank(query, fused, len(fused))
         deduped = self._dedup_rows_by_pmid(reranked, k)
         return [self._doc_from_row(idx, score) for idx, score in deduped]
+
+    def retrieve_hybrid_reranked(self, query: str, k: int = 5) -> List[Document]:
+        """Full hybrid pipeline: dense (FAISS) + sparse (BM25) candidates,
+        fused via RRF, reranked by a cross-encoder scoring (query, chunk)
+        pairs directly, then deduplicated by PMID. Thin wrapper over
+        retrieve_hybrid_custom with its default (unweighted, no-HyDE)
+        settings -- kept as its own method since it's the identity this
+        project's eval results and reports have referred to it by
+        throughout.
+
+        Measured, on the strict survey-query eval set, to beat plain
+        retrieve_dense() (0.4016 vs 0.3408 mean Recall@10) and, on the
+        grounding-query eval set, to beat it by a much larger margin (0.6638
+        vs 0.4761) -- see PHASE3_RETRIEVAL_QUALITY_COMPLETE.md sections 10
+        and 11. See Retriever.retrieve's docstring for what `retrieve()`
+        actually calls by default and why.
+        """
+        return self.retrieve_hybrid_custom(query, k=k)
 
     def retrieve(self, query: str, k: int = 5) -> List[Document]:
         """Return the top-k most relevant chunks for `query`, one per PMID.
