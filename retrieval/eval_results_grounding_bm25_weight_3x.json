@@ -1,0 +1,259 @@
+{
+  "eval_set_path": "/Users/tanaydeo/Documents/medagent-rag/retrieval/eval_set_grounding.json",
+  "k": 10,
+  "num_queries": 24,
+  "num_queries_scored": 21,
+  "num_queries_skipped_no_relevant": 3,
+  "skipped_queries": [
+    "What absolute risk reduction in major coronary events do statins provide for primary prevention?",
+    "What progression-free survival benefit did olaparib maintenance therapy show in BRCA-mutated ovarian cancer in the SOLO1 trial?",
+    "What is the proposed mechanism connecting APOE4 genotype to Alzheimer's disease risk?"
+  ],
+  "mean_recall_at_10": 0.6549,
+  "median_recall_at_10": 0.6,
+  "mean_latency_ms": 274.3,
+  "median_latency_ms": 270.9,
+  "per_query": [
+    {
+      "query": "What EGFR mutation confers resistance to osimertinib after initial response in NSCLC?",
+      "area": "oncology",
+      "num_relevant_pmids": 6,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 2,
+      "recall_at_10": 0.3333333333333333,
+      "latency_ms": 324.7
+    },
+    {
+      "query": "What is the mechanism by which PARP inhibitors cause synthetic lethality in BRCA-mutated cancer cells?",
+      "area": "oncology",
+      "num_relevant_pmids": 12,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 5,
+      "recall_at_10": 0.4166666666666667,
+      "latency_ms": 279.4
+    },
+    {
+      "query": "What absolute risk reduction in major coronary events do statins provide for primary prevention?",
+      "area": "cardiology",
+      "num_relevant_pmids": 0,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 0,
+      "recall_at_10": null,
+      "latency_ms": 292.0
+    },
+    {
+      "query": "What ACR20 response improvement did TNF-alpha inhibitors like adalimumab show in rheumatoid arthritis trials?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 2,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 1,
+      "recall_at_10": 0.5,
+      "latency_ms": 312.8
+    },
+    {
+      "query": "What cardiovascular safety signal was identified in the ORAL Surveillance trial for tofacitinib?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 5,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 4,
+      "recall_at_10": 0.8,
+      "latency_ms": 257.2
+    },
+    {
+      "query": "What cytokine signaling pathway do JAK inhibitors block in autoimmune disease treatment?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 6,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 3,
+      "recall_at_10": 0.5,
+      "latency_ms": 250.5
+    },
+    {
+      "query": "What improvement in sweat chloride concentration do triple-combination CFTR modulators achieve in cystic fibrosis patients?",
+      "area": "rare_disease",
+      "num_relevant_pmids": 2,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 2,
+      "recall_at_10": 1.0,
+      "latency_ms": 260.0
+    },
+    {
+      "query": "What progression-free survival benefit did olaparib maintenance therapy show in BRCA-mutated ovarian cancer in the SOLO1 trial?",
+      "area": "oncology",
+      "num_relevant_pmids": 0,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 0,
+      "recall_at_10": null,
+      "latency_ms": 305.1
+    },
+    {
+      "query": "What effect did empagliflozin show on hospitalization for heart failure in the EMPEROR-Reduced trial?",
+      "area": "cardiology",
+      "num_relevant_pmids": 4,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 4,
+      "recall_at_10": 1.0,
+      "latency_ms": 278.2
+    },
+    {
+      "query": "What cardiovascular safety finding led to rofecoxib's market withdrawal?",
+      "area": "cardiology",
+      "num_relevant_pmids": 11,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.5454545454545454,
+      "latency_ms": 277.5
+    },
+    {
+      "query": "What is the mechanism by which SGLT2 inhibitors provide cardioprotective benefits independent of glucose lowering?",
+      "area": "cardiology",
+      "num_relevant_pmids": 6,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 5,
+      "recall_at_10": 0.8333333333333334,
+      "latency_ms": 256.9
+    },
+    {
+      "query": "What finding from the Scandinavian Simvastatin Survival Study (4S trial) established statins' mortality benefit?",
+      "area": "cardiology",
+      "num_relevant_pmids": 1,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 1,
+      "recall_at_10": 1.0,
+      "latency_ms": 287.8
+    },
+    {
+      "query": "What is the role of TNF-alpha in the pathophysiology of rheumatoid arthritis joint damage?",
+      "area": "autoimmune",
+      "num_relevant_pmids": 10,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 7,
+      "recall_at_10": 0.7,
+      "latency_ms": 291.8
+    },
+    {
+      "query": "What sustained virologic response rate do direct-acting antivirals achieve in chronic hepatitis C treatment?",
+      "area": "infectious_disease",
+      "num_relevant_pmids": 12,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 7,
+      "recall_at_10": 0.5833333333333334,
+      "latency_ms": 250.1
+    },
+    {
+      "query": "What is a proposed mechanism underlying persistent symptoms in long COVID?",
+      "area": "infectious_disease",
+      "num_relevant_pmids": 17,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 9,
+      "recall_at_10": 0.5294117647058824,
+      "latency_ms": 235.3
+    },
+    {
+      "query": "What autonomic nervous system abnormalities have been documented in long COVID patients?",
+      "area": "infectious_disease",
+      "num_relevant_pmids": 9,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 7,
+      "recall_at_10": 0.7777777777777778,
+      "latency_ms": 273.0
+    },
+    {
+      "query": "Why did the EPOCH trial of verubecestat fail in Alzheimer's disease?",
+      "area": "neurology",
+      "num_relevant_pmids": 4,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 4,
+      "recall_at_10": 1.0,
+      "latency_ms": 241.6
+    },
+    {
+      "query": "What brain volume changes have been observed with BACE inhibitor treatment in Alzheimer's disease trials?",
+      "area": "neurology",
+      "num_relevant_pmids": 1,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 1,
+      "recall_at_10": 1.0,
+      "latency_ms": 268.5
+    },
+    {
+      "query": "What is the proposed mechanism connecting APOE4 genotype to Alzheimer's disease risk?",
+      "area": "neurology",
+      "num_relevant_pmids": 0,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 0,
+      "recall_at_10": null,
+      "latency_ms": 262.2
+    },
+    {
+      "query": "What is the C797S mutation's role in resistance to third-generation EGFR tyrosine kinase inhibitors?",
+      "area": "neurology",
+      "num_relevant_pmids": 10,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.6,
+      "latency_ms": 302.2
+    },
+    {
+      "query": "What is the mechanism by which CFTR modulators restore chloride channel function in cystic fibrosis?",
+      "area": "rare_disease",
+      "num_relevant_pmids": 7,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 1,
+      "recall_at_10": 0.14285714285714285,
+      "latency_ms": 281.4
+    },
+    {
+      "query": "What resistance mechanism to BCMA-directed CAR-T therapy involves loss of target antigen expression?",
+      "area": "oncology",
+      "num_relevant_pmids": 10,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.6,
+      "latency_ms": 262.1
+    },
+    {
+      "query": "What mechanism do CGRP-targeting monoclonal antibodies use to prevent migraine?",
+      "area": "neurology",
+      "num_relevant_pmids": 13,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 6,
+      "recall_at_10": 0.46153846153846156,
+      "latency_ms": 264.6
+    },
+    {
+      "query": "What gene therapy approach was approved for spinal muscular atrophy treatment?",
+      "area": "rare_disease",
+      "num_relevant_pmids": 7,
+      "num_retrieved": 10,
+      "num_unique_retrieved_pmids": 10,
+      "num_hits": 3,
+      "recall_at_10": 0.42857142857142855,
+      "latency_ms": 268.9
+    }
+  ],
+  "tag": "bm25_weight_3x"
+}
