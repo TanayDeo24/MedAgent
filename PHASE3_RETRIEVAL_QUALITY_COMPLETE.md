@@ -913,3 +913,146 @@ weaker, though that change is flagged here, not made in this pass.
 | `retrieval/eval_set_grounding.json` | Final grounding labels (24/29 queries; 5 excluded after 2 cooldown-retry rounds, reported explicitly) |
 | `retrieval/eval_results_grounding_dense.json` | Full per-query dense-only results |
 | `retrieval/eval_results_grounding_hybrid.json` | Full per-query hybrid results |
+
+## 12. Final optimization pass (2026-09-11): time-boxed, last round
+
+This is the last retrieval-quality round before wiring `retrieve()` into
+the agent (`agent/nodes.py`, not yet touched). Target: close some of the
+0.285 gap between grounding-query hybrid Recall@10 (0.6638) and its
+oracle ceiling (0.9492) — chosen over the survey set because the survey
+set is already close to its own ceiling (69.9%) while the grounding set
+has more real headroom. Measured against the existing, locked grounding
+eval set only — not regenerated, re-pooled, or re-labeled.
+
+Three techniques were tried, individually, against the fixed 24-query
+grounding eval set (21 scored):
+
+### 12.1 HyDE (hypothetical document embeddings)
+
+One NIM call per query generates a short hypothetical answer passage
+(`retrieval/hyde.py`); that passage is embedded for the dense leg instead
+of the raw question, on the theory that dense retrieval's real weakness is
+matching *question* phrasing against *answer* phrasing in the corpus.
+24/24 passages generated successfully (21 on the first pass, 3 more on an
+immediate cache-resuming rerun that only re-attempted the missing ones).
+
+```
+HyDE dense-only:        mean Recall@10 0.4223  (vs. plain dense 0.4761  — worse)
+HyDE + full hybrid:     mean Recall@10 0.6437  (vs. existing hybrid 0.6638 — worse)
+```
+
+Did not help either the dense or the hybrid path. A single-shot,
+unfiltered hypothetical passage evidently introduces as much noise
+(invented specifics that don't match any real passage) as it removes
+phrasing mismatch, at least for this corpus and this generation prompt.
+
+### 12.2 Embedding model upgrade (BGE), re-tested on grounding queries
+
+The `bge_base_180_30` index variant built in an earlier pass (measured
+only against survey queries there) was re-measured against the grounding
+set specifically:
+
+```
+BGE dense-only:   mean Recall@10 0.5363  (vs. plain dense 0.4761 — BETTER)
+BGE + full hybrid: mean Recall@10 0.6325 (vs. existing hybrid 0.6638 — worse)
+```
+
+BGE's dense-only embeddings are measurably better than MiniLM's on this
+task in isolation — but that gain does not survive once BM25 + RRF fusion
++ cross-encoder reranking are back in the pipeline, which is what actually
+ships. Not adopted.
+
+### 12.3 RRF reweighting toward BM25
+
+Grounding queries lean on precise named entities (trial names, drug names,
+specific numbers) — exactly BM25's strength, and exactly why
+empagliflozin/EMPEROR-Reduced, ACR20/adalimumab, and sweat chloride/CFTR
+already hit Recall@10 = 1.00 under the existing equal-weight fusion.
+`Retriever._rrf_fuse` and a new `retrieve_hybrid_custom` method were
+extended to accept per-list weights (see `retrieval/retriever.py`):
+
+```
+bm25_weight=2.0 (dense_weight=1.0): mean Recall@10 0.6549 (vs. existing 0.6638 — worse)
+bm25_weight=3.0 (dense_weight=1.0): mean Recall@10 0.6549 (identical to 2.0x)
+```
+
+Both weighted variants measured slightly *below* the existing unweighted
+(1.0/1.0) hybrid. The 2.0x/3.0x tie indicates RRF's rank-based fusion
+already lets BM25 dominate the fused order at these queries once its
+weight exceeds dense's by any meaningful margin — there isn't a sweeter
+spot further out to find with a bigger multiplier. Not adopted.
+
+### 12.4 Combinations
+
+Per the plan: only combine techniques that individually beat the existing
+hybrid baseline (0.6638). **None did** — HyDE, BGE, and BM25-reweighting
+all measured below it individually, on both the dense-only and full-hybrid
+variants tested. No combined configuration was run, since there was
+nothing to combine that had already shown a positive contribution.
+
+### 12.5 Full comparison table (grounding set, 21 scored queries)
+
+| Configuration | Mean Recall@10 | % of ceiling (0.9492) | Mean latency |
+|---|---|---|---|
+| Dense-only (MiniLM) | 0.4761 | 50.2% | 6.5ms |
+| **Hybrid (MiniLM, unweighted) — existing, unchanged** | **0.6638** | **69.9%** | 284.0ms |
+| BGE dense-only | 0.5363 | 56.5% | 27.3ms |
+| BGE + hybrid | 0.6325 | 66.6% | 282.9ms |
+| HyDE dense-only | 0.4223 | 44.5% | 11.0ms |
+| HyDE + hybrid | 0.6437 | 67.8% | 287.2ms |
+| Hybrid, BM25 weight 2.0x | 0.6549 | 69.0% | 282.3ms |
+| Hybrid, BM25 weight 3.0x | 0.6549 | 69.0% | 274.3ms |
+
+### 12.6 Result: no improvement found — existing hybrid ships unchanged
+
+**This is a real, honest negative result, reported as such.** Three
+different, individually reasonable techniques were tried against real
+headroom (a 0.285-point gap to ceiling) and none of them closed any of it.
+The existing hybrid pipeline (dense + BM25, equal-weight RRF fusion,
+cross-encoder reranking, MiniLM embeddings) that was already built in
+earlier passes remains the best-measured configuration on the grounding
+set, out of all eight variants compared above.
+
+**Final grounding-query Recall@10: 0.6638 (hybrid), 0.4761 (dense) — unchanged
+from section 11.5. Final paired result, to be used everywhere from here
+forward:**
+
+```
+Survey queries:    hybrid 0.4016 / dense 0.3408   (oracle ceiling 0.6331)
+Grounding queries: hybrid 0.6638 / dense 0.4761   (oracle ceiling 0.9492)
+```
+
+**0.9 was not reached on either eval set, after two full optimization
+passes.** This is the final number for both, per this round's explicit
+instruction to ship whatever step 1-4 produced with no further rounds.
+
+### 12.7 `retrieve()`'s default is now the hybrid pipeline
+
+This round's explicit instruction was to lock in whichever configuration
+actually won as `retrieve()`'s real, shipped behavior — not just report
+experiment numbers separately from what's live. Since the existing hybrid
+pipeline beat every new technique tried this round (and, per §10.10/§11.5,
+already beat dense-only on both eval sets from earlier passes), `retrieve()`
+now calls `retrieve_hybrid_reranked()` by default instead of `retrieve_dense()`
+— reversing the dense-only default chosen in section 7-8 of the first
+retrieval-quality pass, which was made on much thinner evidence (a
+19-query eval set, before the pooling-bias fix, before strict relevance
+labeling, before the grounding-query eval set existed). `retrieve_dense()`
+remains available as an explicit, separately-callable method (and is still
+what the eval-set builder's candidate pooling uses internally), but is no
+longer what `retrieve()`/`retrieve()` module-level callers get by default.
+
+This is a real behavior and latency change for any future caller of
+`retrieve()`: ~284ms mean per call instead of ~7ms, in exchange for a
+consistently higher Recall@10 on every eval set measured in this project.
+
+### 12.8 Files
+
+| File | Purpose |
+|---|---|
+| `retrieval/hyde.py` | HyDE hypothetical-passage generation + on-disk cache builder |
+| `retrieval/hyde_cache_grounding.json` | Cached hypothetical passages for all 24 grounding queries (24/24, after one cache-resuming retry) |
+| `retrieval/retriever.py` | `_rrf_fuse` now accepts per-list `weights`; new `retrieve_hybrid_custom(dense_query, dense_weight, bm25_weight)`; `retrieve()` now defaults to `retrieve_hybrid_reranked()` |
+| `retrieval/measure_recall.py` | Eval loop factored out into `run_eval()` for reuse by the experiment script |
+| `retrieval/experiment_grounding_optimization.py` | Runs all techniques + combinations against the locked grounding eval set |
+| `retrieval/eval_results_grounding_{bge_dense,bge_hybrid,hyde_dense_only,hyde_hybrid,bm25_weight_2x,bm25_weight_3x}.json` | Full per-query results for each technique tested |
