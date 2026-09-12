@@ -134,6 +134,37 @@ The 42.9%/6-case figures below are **not corrected retroactively** — they refl
 what this specific run actually measured, under the config that was live at the
 time; the fix's effect on the *sample size* would only show up in a future run.
 
+**Update 2 (final attempt, did not pan out)**: the two options flagged above — a
+judge-specific timeout or a lighter model — were tried. A judge-specific
+`call_timeout` was added to `config/llm_config.py`'s `get_llm()` (generically
+useful, kept), and the judge was switched to a lighter, non-reasoning-oriented
+model with a 120s timeout. Tested head-to-head against a **fresh 10-case sample**
+(different cases than the 8 above — `evaluator.py` now persists full
+`final_report`/`tool_results` per case going forward, so future re-validation
+won't need a side capture script): **the lighter model succeeded on 0/10 — every
+single case failed**, through three distinct failure modes (its own 120s
+timeouts, meaning it still reasons heavily despite being marketed as
+non-reasoning; NVIDIA-side `"Worker local total request limit reached (16/16)"`
+capacity exhaustion, since it's a low-capacity preview endpoint; and one
+malformed-JSON response). The original model, run against this same fresh
+sample for comparison, succeeded on **3/10** — worse than the 4/8 (50%) measured
+on the earlier sample, underscoring that success rate varies meaningfully by
+which reports happen to be in the sample. **The model swap was not shipped** —
+`evaluation/hallucination_judge.py` ships on the original
+`nvidia/nemotron-3-super-120b-a12b` at `max_tokens=16384`, exactly the
+previously-measured config, since shipping a strictly worse config would be
+indefensible and the task's own instructions were explicit not to attempt a
+third fix once this one failed to pan out.
+
+Combined across both real samples collected for this judge (8 cases + 10 cases,
+28 judge attempts total on 18 unique report/tool_results pairs across both
+samples, using the original model): **7 successes out of 18 attempts (~39%)**.
+This is the honest current reliability estimate for this judge — meaningfully
+unreliable, not a solved problem, and every future run's hallucination-rate
+number should be read with this in mind: whatever fraction of a batch's judge
+calls actually succeed is the real sample size backing that number, and it
+should be stated plainly, not implied to cover the whole run.
+
 ## 4. Real numbers
 
 | Metric | Fresh (n=29) | All 60 | What it means |
@@ -216,12 +247,17 @@ complete data**, driven mostly by the agent's own confidence self-assessment lan
 below 0.5 rather than outright crashes. Tool selection (85.3% precision) is
 reasonably strong. Self-correction almost always triggers but doesn't reliably lead
 to success. The hallucination-rate figure is not trustworthy at its current sample
-size (6 judged cases) from this run. That reliability issue has since been partially
-fixed (judge success roughly doubled, 25%→50%, on a separate validation sample — §3)
-but not fully resolved, and the fix was not applied retroactively to this run's
-already-reported numbers (the original reports/tool_results no longer exist to
-re-judge). A future run under the updated judge config should see a materially
-larger judged sample, though still an incomplete one until the remaining
-timeout-based failure mode is also addressed. None of this is disguised — it's the
-actual measured state of the system as of this run, plus an honest account of what's
-changed since.
+size (6 judged cases) from this run. That reliability issue was worked on twice more
+since (§3, "Update"/"Update 2"): raising `max_tokens` gave a real but partial
+improvement (25%→50% on one 8-case sample), and a follow-up attempt to switch to a
+lighter model to fix the rest **failed outright** (0/10 on a fresh sample, worse than
+the original model's 3/10 on that same sample) and was not shipped. Combined across
+both real validation samples, this judge's honest measured reliability is ~39%
+(7/18) — a real, still-open problem, not a solved one. Neither fix was applied
+retroactively to this run's already-reported numbers (the original reports/
+tool_results no longer exist to re-judge). A future run under the current judge
+config should see a materially larger judged sample than this run's 6, but still an
+incomplete and unreliable one — roughly 6 in 10 judge calls should still be expected
+to fail. None of this is disguised — it's the actual measured state of the system as
+of this run, plus an honest account of what's changed since, including the attempt
+that didn't work.

@@ -188,7 +188,7 @@ class _RateLimitedChatNVIDIA:
     evaluation runs (though that's where it matters most in practice).
     """
 
-    def __init__(self, llm: ChatNVIDIA, construct_kwargs: dict):
+    def __init__(self, llm: ChatNVIDIA, construct_kwargs: dict, call_timeout: Optional[float] = None):
         self._llm = llm
         # Kept so a timed-out attempt can discard this client and build a
         # genuinely fresh one for the retry, rather than reusing whatever
@@ -197,6 +197,14 @@ class _RateLimitedChatNVIDIA:
         # suggest connection reuse may itself have been part of what went
         # stale, not just an unlucky single request.
         self._construct_kwargs = construct_kwargs
+        # Per-instance override of the global LLM_CALL_TIMEOUT_SECONDS hard
+        # timeout, for callers whose own task legitimately needs a different
+        # ceiling than every other node's default (e.g. the hallucination
+        # judge's heavier internal reasoning chain on some inputs - see
+        # evaluation/hallucination_judge.py). Falls back to the global
+        # constant when not given, so every existing get_llm() caller is
+        # unaffected.
+        self._call_timeout = call_timeout if call_timeout is not None else LLM_CALL_TIMEOUT_SECONDS
 
     def invoke(self, *args, **kwargs):
         global _llm_call_count
@@ -224,7 +232,7 @@ class _RateLimitedChatNVIDIA:
 
             try:
                 completed, result = _invoke_with_hard_timeout(
-                    self._llm, args, kwargs, LLM_CALL_TIMEOUT_SECONDS
+                    self._llm, args, kwargs, self._call_timeout
                 )
             except Exception as e:
                 logger.info(
@@ -258,11 +266,11 @@ class _RateLimitedChatNVIDIA:
                 return result
 
             last_exc = LLMCallTimeoutError(
-                f"LLM call did not return within {LLM_CALL_TIMEOUT_SECONDS}s "
+                f"LLM call did not return within {self._call_timeout}s "
                 f"(attempt {attempt + 1}/{LLM_CALL_MAX_ATTEMPTS})"
             )
             logger.warning(
-                f"[LLM TIMEOUT] Call exceeded {LLM_CALL_TIMEOUT_SECONDS}s "
+                f"[LLM TIMEOUT] Call exceeded {self._call_timeout}s "
                 f"(attempt {attempt + 1}/{LLM_CALL_MAX_ATTEMPTS}) - discarding "
                 f"client and retrying with a fresh connection"
             )
@@ -283,7 +291,8 @@ def get_llm(
     temperature: float = 0.3,
     max_tokens: int = 2048,
     timeout: int = 30,
-    model: str = NVIDIA_MODEL
+    model: str = NVIDIA_MODEL,
+    call_timeout: Optional[float] = None
 ) -> "_RateLimitedChatNVIDIA":
     """Initialize NVIDIA NIM Nemotron LLM with specified parameters.
 
@@ -293,8 +302,19 @@ def get_llm(
         temperature: Controls randomness (0.0 = deterministic, 1.0 = creative).
                     Default 0.3 for balanced reasoning.
         max_tokens: Maximum tokens in response. Default 2048.
-        timeout: Request timeout in seconds. Default 30.
+        timeout: Request timeout in seconds. Default 30. This is
+            ChatNVIDIA's own constructor-level timeout, which was observed
+            NOT to bound an already-open connection that stops sending data
+            (see LLM_CALL_TIMEOUT_SECONDS's docstring) - it's not the real
+            enforced ceiling.
         model: NVIDIA NIM model name. Default "nvidia/nemotron-3-super-120b-a12b".
+        call_timeout: Overrides the module-global LLM_CALL_TIMEOUT_SECONDS
+            hard wall-clock cap (the one that's actually enforced) for THIS
+            get_llm() instance only. Use when a specific caller's task
+            legitimately needs a different ceiling than every other node's
+            default - e.g. the hallucination judge, which needs longer than
+            the 90s default on inputs that trigger a heavy internal
+            reasoning chain. None (default) uses the global constant.
 
     Returns:
         Configured ChatNVIDIA instance ready for use.
@@ -338,7 +358,7 @@ def get_llm(
         timeout=timeout,
     )
     llm = ChatNVIDIA(**construct_kwargs)
-    return _RateLimitedChatNVIDIA(llm, construct_kwargs)
+    return _RateLimitedChatNVIDIA(llm, construct_kwargs, call_timeout=call_timeout)
 
 
 def test_llm_connection() -> bool:

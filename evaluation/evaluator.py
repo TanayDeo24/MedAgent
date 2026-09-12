@@ -146,10 +146,12 @@ class AgentEvaluator:
 
     def _append_incremental_result(self, run_id: str, result: Dict) -> None:
         """Persist one case's result to disk immediately, not batched at
-        the end. Uses a slimmed copy (full final_report/tool_results text
-        stripped from the stored state) to keep the file from growing
-        unbounded across a 60+ case run - the full state is only ever
-        needed in-memory, for this same process's own aggregate metrics.
+        the end. Uses a slimmed copy of the state (see _slim_state) - not
+        the raw LangChain message objects, which don't serialize cleanly and
+        add nothing final_report/tool_results/intermediate_thoughts don't
+        already carry - but DOES keep final_report and tool_results in full,
+        since the baseline-vs-RAG comparison run needs to inspect real
+        reports after the fact, not just aggregate metrics.
 
         Thread-safe: the whole read-serialize-write is done under
         _incremental_write_lock so concurrent case-level execution (Phase 3)
@@ -165,12 +167,31 @@ class AgentEvaluator:
 
     @staticmethod
     def _slim_state(state: Dict) -> Dict:
-        """Same reduction _save_report() applies at the very end, applied
-        per-case instead so incremental persistence doesn't balloon in size."""
+        """Reduce a full AgentState down to what's worth persisting per case.
+
+        Drops `messages` (raw LangChain BaseMessage objects - not cleanly
+        JSON-serializable and redundant with final_report/tool_results/
+        intermediate_thoughts) and `research_plan` (large intermediate JSON
+        blob, superseded by final_report). Keeps everything a later
+        inspection of "what did this run actually produce" needs:
+        final_report, tool_results, citations, and retrieved_context (the
+        RAG-retrieved passages, see agent/state.py) - previously all four
+        were stripped here, which meant no run ever persisted enough to
+        inspect a real report after the fact (see PHASE3_WIRING_COMPLETE.md/
+        the hallucination-judge fix, which had to run a small side batch
+        just to get real (report, tool_results) pairs to test against,
+        since no prior run had kept them). Used both for incremental
+        per-case persistence and the final aggregate report (_save_report),
+        so both stay in sync automatically.
+        """
         return {
             "confidence_score": state.get("confidence_score"),
             "current_step": state.get("current_step"),
             "errors": state.get("errors"),
+            "final_report": state.get("final_report"),
+            "tool_results": state.get("tool_results"),
+            "citations": state.get("citations"),
+            "retrieved_context": state.get("retrieved_context"),
         }
 
     def run_evaluation(
@@ -769,18 +790,16 @@ class AgentEvaluator:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = results_dir / f"evaluation_{timestamp}.json"
 
-        # Remove detailed state from results for cleaner JSON
-        # (state objects are very large)
+        # Reduce each result's full state to what's worth persisting -
+        # same _slim_state() reduction used for incremental per-case
+        # persistence (see its docstring), applied here too so the final
+        # aggregate report and the incremental file never disagree about
+        # what got kept.
         report_copy = report.copy()
         if "detailed_results" in report_copy:
             for result in report_copy["detailed_results"]:
                 if "state" in result:
-                    # Keep only essential state info
-                    result["state"] = {
-                        "confidence_score": result["state"].get("confidence_score"),
-                        "current_step": result["state"].get("current_step"),
-                        "errors": result["state"].get("errors"),
-                    }
+                    result["state"] = self._slim_state(result["state"])
 
         # Save
         with open(filename, 'w') as f:

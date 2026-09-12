@@ -49,6 +49,66 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+# Third and FINAL reliability attempt (after max_tokens 4096->8192->16384 -
+# see judge_report_hallucinations' docstring) - a lighter, non-reasoning
+# model was tried and it made things WORSE, not better. Documented here in
+# full because the next person tempted to "just try a smaller model" should
+# see this result first instead of re-discovering it the hard way.
+#
+# What was tried: "nvidia/nemotron-3-nano-30b-a3b" (the originally intended
+# target, NVIDIA's documented default for structured-output tasks) turned
+# out to be dead - HTTP 410 Gone, EOL 2026-09-01, confirmed live against the
+# real endpoint. So were "nvidia/nvidia-nemotron-nano-9b-v2" and
+# "nvidia/llama-3.1-nemotron-nano-8b-v1" (both EOL 2026-08-26) - NVIDIA's
+# nano tier has been churning fast. The verified-live replacement,
+# "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", was tried instead, with
+# its `thinking_mode=False` kwarg (a real, NVIDIA-documented lever that
+# injects a "detailed thinking off" system directive - measurably cut
+# latency on a trivial test prompt, 13.9s vs 25.8s) and its own 120s timeout
+# (vs. the 90s global default).
+#
+# Result, tested head-to-head against a real, fresh 10-case sample of
+# captured (report, tool_results) pairs (same prompt, same data, only the
+# model/config differed): the OLD model (nvidia/nemotron-3-super-120b-a12b,
+# max_tokens=16384, default 90s timeout) succeeded on 3/10. The NEW model
+# succeeded on 0/10 - every single case failed, via three distinct failure
+# modes: its own 120s timeouts (so `thinking_mode=False` did NOT eliminate
+# the underlying issue - this model's name has "-reasoning" in it for a
+# reason, per NVIDIA's own docs describing it as reasoning by default even
+# with that flag), NVIDIA-side "Worker local total request limit reached
+# (16/16)" 503s (this is a low-capacity preview endpoint, observed
+# saturated by other users' traffic - not something this project's own
+# rate limiting can work around), and one malformed-JSON response. There
+# was not one case where the new model succeeded, so no side-by-side
+# verdict-quality comparison was even possible - that absence is itself
+# part of the honest result, not a gap in this note.
+#
+# Conclusion: the model swap is NOT shipped. Reverted to the original model
+# below. This judge's real, measured reliability across the two real
+# samples collected across this project's history (8 cases at the
+# max_tokens=16384 fix, 4/8 succeeded; this pass's fresh 10 cases, 3/10
+# succeeded) is roughly 7/18 (~39%) - meaningfully unreliable, and reported
+# as such rather than glossed over. See RESULTS.md for how this factors
+# into the overall hallucination-rate number reported for any given run:
+# whatever sample size a batch's successful judge calls leave should be
+# stated plainly, the same as every other number in this project.
+HALLUCINATION_JUDGE_MODEL = "nvidia/nemotron-3-super-120b-a12b"
+# No thinking_mode override for this model - that kwarg is specific to
+# Nemotron's reasoning-toggle models (see above); the model actually shipped
+# here was never validated with it and there's no evidence it either exists
+# or does anything for this model family.
+HALLUCINATION_JUDGE_MODEL_KWARGS = {}
+# Kept at the global default (config.llm_config.LLM_CALL_TIMEOUT_SECONDS,
+# currently 90s) rather than overriding to 120s here - the 3/10 and 4/8
+# success rates above were BOTH measured with this model at the 90s
+# default, and shipping any different timeout would mean shipping a config
+# that was never actually the one validated. call_timeout=None below uses
+# that global default; the get_llm() call_timeout parameter itself (see
+# config/llm_config.py) is still a real, independently useful addition for
+# any future caller that needs a genuinely different ceiling - it's just
+# not exercised by this module as shipped.
+HALLUCINATION_JUDGE_TIMEOUT_SECONDS = None
+
 
 HALLUCINATION_JUDGE_PROMPT = """You are an independent fact-checking auditor. You did NOT write the report below and have no stake in it being good - your only job is to check it against the evidence provided.
 
@@ -96,31 +156,40 @@ def judge_report_hallucinations(report: str, tool_results: Dict[str, Any]) -> Di
 
     # temperature=0.0 for consistent, repeatable judging rather than the
     # creative variance appropriate for the agent's own report-writing.
-    # max_tokens=16384 (raised from 8192, which was itself raised from 4096):
-    # Nemotron emits a long internal reasoning_content chain before its final
-    # JSON answer, and that reasoning counts against the completion budget.
     #
-    # Validated directly against 8 real captured (report, tool_results) pairs
-    # (not synthetic) - see RESULTS.md: 8192 succeeded on only 2/8 (both
-    # failing with an empty final `content`, i.e. reasoning alone exhausted
-    # the budget before any answer was emitted). 16384 succeeded on 4/8 - a
-    # real 2x improvement, but NOT a full fix. Critically, none of the 4
-    # remaining 16384 failures were empty-content anymore - all 4 were
-    # config.llm_config.LLM_CALL_TIMEOUT_SECONDS (90s) timeouts instead: the
-    # larger budget lets Nemotron reason for longer, and some real reports'
-    # reasoning chains now legitimately exceed 90s rather than being cut
-    # short. Raising max_tokens further would likely trade more
-    # empty-content failures for more timeout failures rather than actually
-    # reducing the total - the two failure modes are in tension via the same
-    # underlying cause (a long, uncontrollable internal reasoning chain).
-    # Fixing the remaining ~50% failure rate would need either a
-    # judge-specific timeout longer than 90s (LLM_CALL_TIMEOUT_SECONDS is
-    # currently a single global constant, not configurable per caller) or a
-    # different model without heavy internal chain-of-thought for this task
-    # - flagged as the next thing to try, not implemented here since 16384
-    # already met the bar of "meaningfully reduces failures" this fix was
-    # scoped to hit.
-    llm = get_llm(temperature=0.0, max_tokens=16384)
+    # History of this call's config, for anyone re-litigating it:
+    #   - max_tokens 4096 -> 8192 -> 16384, all on the big reasoning model
+    #     (nvidia/nemotron-3-super-120b-a12b): validated against 8 real
+    #     captured (report, tool_results) pairs, 8192 succeeded on only 2/8
+    #     (empty final `content` - the model's own internal
+    #     reasoning_content chain exhausted the completion budget before any
+    #     answer was emitted), 16384 succeeded on 4/8. A real improvement,
+    #     not a fix - and critically, none of the 4 remaining 16384 failures
+    #     were empty-content anymore; all 4 were 90s timeouts, because the
+    #     larger budget let the model reason for even longer instead of
+    #     getting cut short. Raising max_tokens further would trade one
+    #     failure mode for the other, not reduce the total - both come from
+    #     the same underlying cause, an uncontrollable internal reasoning
+    #     chain on a large reasoning model.
+    #   - Third attempt, NOT adopted: switching to a lighter model
+    #     (nvidia/nemotron-3-nano-omni-30b-a3b-reasoning, the closest live
+    #     replacement for the originally-intended but now-dead nano model)
+    #     was tried and tested head-to-head against a fresh 10-case sample.
+    #     It made reliability WORSE, not better: 0/10 succeeded, vs. the old
+    #     model's 3/10 on the exact same sample - see HALLUCINATION_JUDGE_MODEL's
+    #     comment above for the full failure breakdown (its own timeouts,
+    #     NVIDIA-side capacity exhaustion on that preview endpoint, and
+    #     malformed JSON output). Reverted; HALLUCINATION_JUDGE_MODEL is back
+    #     to the original nvidia/nemotron-3-super-120b-a12b. This judge's
+    #     real measured reliability remains roughly 7/18 (~39%) across both
+    #     real samples collected - meaningfully unreliable, reported
+    #     honestly rather than as fixed.
+    llm = get_llm(
+        temperature=0.0,
+        max_tokens=16384,
+        model=HALLUCINATION_JUDGE_MODEL,
+        call_timeout=HALLUCINATION_JUDGE_TIMEOUT_SECONDS,
+    )
 
     # Truncate tool_results to keep the judge prompt within a reasonable
     # token budget - a full run's tool_results (up to 3 tools x 20-50
@@ -138,7 +207,7 @@ def judge_report_hallucinations(report: str, tool_results: Dict[str, Any]) -> Di
     prompt = HALLUCINATION_JUDGE_PROMPT.format(report=report_for_judge, tool_results=tool_results_json)
 
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = llm.invoke([HumanMessage(content=prompt)], **HALLUCINATION_JUDGE_MODEL_KWARGS)
         tokens_used = 0
         usage = getattr(response, "usage_metadata", None)
         if isinstance(usage, dict):
