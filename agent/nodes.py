@@ -14,6 +14,7 @@ All nodes use the LLM to make autonomous decisions and return structured outputs
 """
 
 import json
+import threading
 from typing import Dict, Any, List, Tuple
 from agent.state import AgentState
 from agent.prompts import (
@@ -53,6 +54,26 @@ except Exception as e:
     # handle a retrieve_passages() failure gracefully and continue without
     # RAG context, same as any other optional-enrichment failure in this file.
     logger.warning(f"[RAG] Retriever failed to load at import time: {e}")
+
+# Serializes every retrieve_passages() call across concurrently-running test
+# cases (evaluation/evaluator.py's concurrency=N case-level parallelism).
+# Discovered live, not theoretical: the baseline-vs-RAG comparison run
+# (RESULTS_RAG_COMPARISON.md) crashed the whole process on its RAG-enabled
+# arm with "failed assertion _status < MTLCommandBufferStatusCommitted" -
+# two worker threads both reached retrieve()'s SentenceTransformer.encode()
+# call (a Metal/MPS forward pass on this machine) at the same moment.
+# Apple's Metal backend is not safe for concurrent command-buffer submission
+# from multiple threads without external synchronization - PyTorch's own
+# CPU/CUDA ops don't need this, but MPS does. retrieve() itself
+# (retrieval/retriever.py) isn't touched here - this is a thread-safety fix
+# at the call site, not a change to retrieval quality or configuration.
+# Costs real concurrency (RAG calls now queue instead of running in
+# parallel across cases), but that's the correct tradeoff versus a crashed
+# batch - retrieval is fast (single-digit seconds, see PHASE3_WIRING_COMPLETE.md's
+# timing notes) relative to the LLM calls surrounding it, so the serialization
+# cost is small next to what concurrency=N is actually parallelizing (the
+# LLM-bound majority of each case's latency).
+_rag_retrieval_lock = threading.Lock()
 
 
 def _accumulate_tokens(state: AgentState, response: Any) -> None:
@@ -327,7 +348,11 @@ def _retrieve_rag_context(query: str) -> List[Dict[str, Any]]:
     in this file (e.g. ChEMBL name backfill) is handled.
     """
     try:
-        docs = _dedupe_retrieved_by_pmid(retrieve_passages(query, k=RAG_RETRIEVAL_K))
+        # See _rag_retrieval_lock's comment: serializes concurrent
+        # retrieve() calls to avoid a real, observed Metal/MPS crash under
+        # case-level concurrency.
+        with _rag_retrieval_lock:
+            docs = _dedupe_retrieved_by_pmid(retrieve_passages(query, k=RAG_RETRIEVAL_K))
     except Exception as e:
         logger.warning(f"[RAG] retrieve() failed for query {query!r}: {e}")
         return []
