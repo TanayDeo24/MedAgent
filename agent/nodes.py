@@ -755,8 +755,23 @@ def synthesis_node(state: AgentState) -> AgentState:
         # Retrieve RAG context once here (not in report_generation_node too)
         # so both nodes ground against the exact same retrieved set for this
         # run instead of querying the index twice for the same query.
-        state["retrieved_context"] = _retrieve_rag_context(query)
-        logger.info(f"[SYNTHESIS] Retrieved {len(state['retrieved_context'])} RAG passages")
+        #
+        # Gated on state["use_rag"] (set by MedAgent.__init__'s use_rag
+        # param, see agent/graph.py) for the baseline-vs-RAG comparison run
+        # - defaults to True (preserves the behavior every prior wiring/
+        # verification pass already exercised) when the key is absent, so
+        # existing callers that never set it are unaffected. When False,
+        # every downstream RAG-specific effect (the prompt's RETRIEVED
+        # CONTEXT section reading as empty, the "PubMed RAG" citations in
+        # report_generation_node not appearing) follows automatically from
+        # retrieved_context simply being [] - no other node needs its own
+        # use_rag check.
+        if state.get("use_rag", True):
+            state["retrieved_context"] = _retrieve_rag_context(query)
+            logger.info(f"[SYNTHESIS] Retrieved {len(state['retrieved_context'])} RAG passages")
+        else:
+            state["retrieved_context"] = []
+            logger.info("[SYNTHESIS] RAG disabled (use_rag=False) - skipping retrieval")
 
         # Create prompt
         prompt = SYNTHESIS_PROMPT.format(

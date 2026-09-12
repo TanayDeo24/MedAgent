@@ -373,7 +373,8 @@ class AgentEvaluator:
             futures = {
                 executor.submit(self._run_and_record_case, tc, run_id, MedAgent(
                     max_iterations=self.agent.max_iterations,
-                    temperature=self.agent.temperature
+                    temperature=self.agent.temperature,
+                    use_rag=self.agent.use_rag
                 )): tc
                 for tc in remaining
             }
@@ -736,7 +737,8 @@ class AgentEvaluator:
             "timestamp": datetime.now().isoformat(),
             "agent_config": {
                 "max_iterations": self.agent.max_iterations,
-                "temperature": self.agent.temperature
+                "temperature": self.agent.temperature,
+                "use_rag": self.agent.use_rag
             },
             "total_tests": len(self.results),
             "workflows_run": len(self.results),

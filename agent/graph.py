@@ -163,16 +163,27 @@ class MedAgent:
     def __init__(
         self,
         max_iterations: int = 10,
-        temperature: float = 0.3
+        temperature: float = 0.3,
+        use_rag: bool = True
     ):
         """Initialize the MedAgent.
 
         Args:
             max_iterations: Maximum reasoning loops before stopping
             temperature: LLM creativity (0.0 = deterministic, 1.0 = creative)
+            use_rag: Whether synthesis_node retrieves local RAG passages
+                (retrieval.retriever.retrieve()) to ground synthesis/report
+                generation, in addition to live tool_results. Default True
+                preserves existing behavior. Added for the baseline-vs-RAG
+                comparison run (RESULTS_RAG_COMPARISON.md) - set False to
+                reproduce the pre-RAG pipeline exactly (no retrieval call,
+                empty retrieved_context, no "PubMed RAG" citations),
+                everything else (tools, prompts minus the RAG section,
+                non-RAG citations) unchanged.
         """
         self.max_iterations = max_iterations
         self.temperature = temperature
+        self.use_rag = use_rag
 
         # Build the graph
         logger.info(f"Initializing MedAgent (max_iterations={max_iterations})")
@@ -214,6 +225,13 @@ class MedAgent:
             query=query,
             max_iterations=self.max_iterations
         )
+        # create_initial_state() defaults use_rag=True; override with this
+        # instance's own setting. (AgentState.use_rag is declared in
+        # agent/state.py, not left as an ad hoc extra key - confirmed via a
+        # minimal repro that LangGraph's StateGraph silently drops any state
+        # key not declared in its schema before the first node ever sees it,
+        # so this override would otherwise silently do nothing.)
+        initial_state["use_rag"] = self.use_rag
 
         # Run the graph
         # LangGraph's recursion_limit counts every node visit, not research
@@ -407,5 +425,5 @@ class MedAgent:
         """String representation of the agent."""
         return (
             f"MedAgent(max_iterations={self.max_iterations}, "
-            f"temperature={self.temperature})"
+            f"temperature={self.temperature}, use_rag={self.use_rag})"
         )

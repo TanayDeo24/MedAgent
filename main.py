@@ -35,6 +35,15 @@ def main() -> int:
         default=0.3,
         help="LLM temperature for the agent's reasoning nodes (default: 0.3)",
     )
+    parser.add_argument(
+        "--no-rag",
+        action="store_true",
+        help=(
+            "Disable RAG retrieval (retrieval.retriever.retrieve()) in "
+            "synthesis_node - reproduces the pre-RAG pipeline exactly. "
+            "Default is RAG enabled."
+        ),
+    )
     args = parser.parse_args()
 
     if not settings.NVIDIA_API_KEY:
@@ -52,7 +61,11 @@ def main() -> int:
     # message instead of an import-time crash deep inside langchain_nvidia_ai_endpoints.
     from agent.graph import MedAgent
 
-    agent = MedAgent(max_iterations=args.max_iterations, temperature=args.temperature)
+    agent = MedAgent(
+        max_iterations=args.max_iterations,
+        temperature=args.temperature,
+        use_rag=not args.no_rag,
+    )
 
     print(f"Running MedAgent on query: {args.query}\n")
     result = agent.run(args.query)

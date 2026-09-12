@@ -72,6 +72,17 @@ class AgentState(TypedDict):
     max_iterations: int
     """Maximum number of reasoning loops allowed. Prevents infinite loops."""
 
+    use_rag: bool
+    """Whether synthesis_node retrieves local RAG passages (see agent/nodes.py's
+    _retrieve_rag_context) to ground synthesis/report generation, in addition
+    to live tool_results. Set from MedAgent's use_rag constructor param
+    (agent/graph.py). Declared here (not left as an ad hoc extra key) because
+    LangGraph's StateGraph filters state to schema-declared keys only -
+    confirmed directly: an undeclared key set on the initial state dict is
+    silently dropped before the first node ever sees it, rather than passed
+    through. Default True in create_initial_state() preserves existing
+    behavior for any caller that doesn't set it explicitly."""
+
     # ═══════════════════════════════════════════════════════════
     # TOOL USAGE FIELDS
     # ═══════════════════════════════════════════════════════════
@@ -229,6 +240,7 @@ def create_initial_state(
         research_plan=None,
         current_step=0,
         max_iterations=max_iterations,
+        use_rag=True,
 
         # Tool usage
         tools_to_call=[],
