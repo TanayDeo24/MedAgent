@@ -40,7 +40,7 @@ publication-grade hallucination measurement.
 """
 
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from langchain_core.messages import HumanMessage
 
@@ -115,13 +115,16 @@ HALLUCINATION_JUDGE_PROMPT = """You are an independent fact-checking auditor. Yo
 REPORT TO AUDIT:
 {report}
 
-RETRIEVED TOOL DATA (the ONLY source of truth this report is allowed to draw from - PubMed/ClinicalTrials.gov/ChEMBL results actually retrieved during this run):
+RETRIEVED TOOL DATA (source of truth #1 - PubMed/ClinicalTrials.gov/ChEMBL results actually retrieved during this run via live API calls):
 {tool_results}
+
+RETRIEVED RAG CONTEXT (source of truth #2, equally valid - local PubMed abstract passages retrieved from a pre-built index for this run's query; distinct from source #1 above, but a claim grounded here is just as supported as one grounded in tool_results):
+{retrieved_context}
 
 TASK:
 1. Extract every distinct factual claim from the REPORT (a claim is a specific, checkable assertion - e.g. "Drug X is approved for Y", "Trial NCT12345 showed Z", "Drug X targets protein Y"). Do not count generic statements, hedges ("may be useful"), or section headers as claims.
-2. For each claim, decide whether it is DIRECTLY SUPPORTED by the RETRIEVED TOOL DATA above. A claim is supported only if the specific fact (drug name, trial ID, phase, mechanism, etc.) actually appears in or is a straightforward restatement of the tool data - not if it merely sounds plausible or matches general medical knowledge you have from training.
-3. Count claims that are NOT supported by the retrieved tool data as hallucinated, even if they happen to be true in the real world - the report is only allowed to state what this run's tools actually retrieved.
+2. For each claim, decide whether it is DIRECTLY SUPPORTED by EITHER source of truth above (RETRIEVED TOOL DATA or RETRIEVED RAG CONTEXT - check both, a claim only needs to be supported by one). A claim is supported only if the specific fact (drug name, trial ID, phase, mechanism, etc.) actually appears in or is a straightforward restatement of one of the two sources - not if it merely sounds plausible or matches general medical knowledge you have from training.
+3. Count claims that are NOT supported by either source as hallucinated, even if they happen to be true in the real world - the report is only allowed to state what this run actually retrieved, from either source.
 
 Return ONLY valid JSON with this exact structure:
 
@@ -136,13 +139,35 @@ Return ONLY valid JSON with this exact structure:
 Return ONLY the JSON, no additional text or explanation."""
 
 
-def judge_report_hallucinations(report: str, tool_results: Dict[str, Any]) -> Dict[str, Any]:
+def judge_report_hallucinations(
+    report: str,
+    tool_results: Dict[str, Any],
+    retrieved_context: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
     """Run the LLM-judge audit on one completed run's report.
 
     Args:
         report: The agent's final_report markdown for one test case.
-        tool_results: That same run's state["tool_results"] - the only data
-            the report is allowed to be grounded in.
+        tool_results: That same run's state["tool_results"] - one of the two
+            valid sources of truth the report is allowed to be grounded in.
+        retrieved_context: That same run's state["retrieved_context"] (the
+            RAG-retrieved passages - see agent/state.py), the OTHER valid
+            source of truth. Optional / defaults to None (treated as empty)
+            for backward compatibility with any caller that predates RAG.
+
+            This parameter exists because of a real bug found during the
+            baseline-vs-RAG comparison run (RESULTS_RAG_COMPARISON.md):
+            before it existed, this function only ever checked claims
+            against tool_results, so on any RAG-enabled run, every claim
+            correctly grounded in retrieved_context (not tool_results) was
+            counted as hallucinated simply because the judge was never shown
+            the data that actually supported it. That inflated the RAG arm's
+            measured hallucination rate to 73.6% (vs. the baseline arm's
+            20.0% on the same cases) - not because RAG-grounded reports were
+            actually less accurate, but because the judge was blind to the
+            one thing that would have shown otherwise. Fixed by passing this
+            through and adding it to the prompt as a second, equally-valid
+            source of truth (see HALLUCINATION_JUDGE_PROMPT).
 
     Returns:
         {"total_claims": int, "hallucinated_claims": int, "claims": [...],
@@ -204,7 +229,24 @@ def judge_report_hallucinations(report: str, tool_results: Dict[str, Any]) -> Di
     if len(report_for_judge) > 8000:
         report_for_judge = report_for_judge[:8000] + "\n... (truncated for judge prompt budget)"
 
-    prompt = HALLUCINATION_JUDGE_PROMPT.format(report=report_for_judge, tool_results=tool_results_json)
+    # Same truncation treatment as tool_results above, for the same reason -
+    # a full retrieved_context (up to RAG_RETRIEVAL_K=10 passages, see
+    # agent/nodes.py) can be large.
+    if retrieved_context:
+        retrieved_context_text = "\n\n".join(
+            f"[PMID {entry.get('pmid')}] {entry.get('title')}\n{entry.get('text')}"
+            for entry in retrieved_context
+        )
+        if len(retrieved_context_text) > 15000:
+            retrieved_context_text = retrieved_context_text[:15000] + "\n... (truncated for judge prompt budget)"
+    else:
+        retrieved_context_text = "(none - this run did not use RAG retrieval, or none was returned)"
+
+    prompt = HALLUCINATION_JUDGE_PROMPT.format(
+        report=report_for_judge,
+        tool_results=tool_results_json,
+        retrieved_context=retrieved_context_text,
+    )
 
     try:
         response = llm.invoke([HumanMessage(content=prompt)], **HALLUCINATION_JUDGE_MODEL_KWARGS)

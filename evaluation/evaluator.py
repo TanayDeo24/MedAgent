@@ -489,7 +489,8 @@ class AgentEvaluator:
         reset_thread_llm_call_count()
         hallucination_judge = judge_report_hallucinations(
             state.get("final_report", ""),
-            state.get("tool_results", {})
+            state.get("tool_results", {}),
+            state.get("retrieved_context") or []
         )
         llm_calls_this_case = agent_llm_calls + get_thread_llm_call_count()
 
