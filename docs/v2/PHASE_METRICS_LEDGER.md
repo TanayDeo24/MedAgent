@@ -532,3 +532,73 @@ measured for comparison, with causal attribution kept separate per metric
 - Any claim that the ChEMBL `search_by_target` wrong-entity behavior or
   the PubMed RAG relevance-floor gap has been fixed — both are named,
   accepted limitations, explicitly not addressed in Phase 4.
+
+## Phase 5: Evidence + Provenance
+
+Final architecture: `evidence/adapters.py` + `evidence/registry.py`, a
+model-free, deterministic layer that normalizes real PubMed (RAG + live),
+ClinicalTrials.gov, and ChEMBL source outputs into the canonical, typed
+`Evidence` object (`evidence/models.py`). Wired into the LangGraph pipeline
+as `agent.nodes.evidence_normalization_node`, inserted
+`synthesis -> evidence_normalization -> verification` in `agent/graph.py`.
+Frozen config: `artifacts/v2/phase5_frozen_config.json`.
+
+Same 72 real records used for both the old-pipeline baseline
+(`artifacts/v2/phase5_baseline_results.json`) and the new Evidence layer
+(dev+validation 58 + held-out 14), so before/after deltas below are
+population-comparable, not just directionally suggestive.
+
+| Metric | Before (old `citations`) | After (Evidence) | Delta | Comparability |
+|---|---|---|---|---|
+| Provenance completeness (overall) | 0% (no combined definition existed) | 100% (152/152 dev+val, 45/45 held-out) | +100pp | COMPARABLE |
+| Source URL construction rate | 27.8% (72 replayed citations) | 100% | +72.2pp | COMPARABLE |
+| Content retention at citation level | 0.0% | 100% | +100pp | COMPARABLE |
+| Trace linkage (call_id) | 0.0% | 100% (tool-backed); RAG's `call_id=None` is N/A-by-design | +100pp | COMPARABLE |
+| Fabricated source IDs | not measured | 0 | — | NON-COMPARABLE (new gate, no prior baseline) |
+| Normalization coverage | no equivalent concept | 100% (72/72) | — | NON-COMPARABLE |
+| Serialization success | no defined contract | 100% (197/197) | — | NON-COMPARABLE |
+| Normalization latency P50 | N/A | 0.0155ms (pure adapter cost, excludes network/LLM) | — | NON-COMPARABLE |
+
+Full metric-by-metric detail (n, definitions, caveats): `artifacts/v2/phase_metrics_ledger.json`'s `phase_5_evidence_provenance` key.
+
+### Hard safety gates
+
+All 10 gates (`docs/v2/PHASE5_GATE_PLAN.md` Section 3) measured 0 on both
+dev+validation and held-out (`docs/v2/PHASE5_HELDOUT_RESULTS.md`,
+`docs/v2/PHASE5_FINAL_GATE_AUDIT.md`). Zero fabricated/corrupted IDs, zero
+secret leaks, zero cross-source collisions, across 197 real Evidence
+records.
+
+### Live integration (this cloud session)
+
+4/4 bounded fresh integration checks passed
+(`artifacts/v2/phase5_live_integration_results.json`): PubMed local RAG,
+ClinicalTrials, ChEMBL, and the legitimate PubMed placeholder/skip path.
+`clinicaltrials.gov`/`ebi.ac.uk`/`eutils.ncbi.nlm.nih.gov` were not
+allowlisted in this cloud session's network policy (only `api.cerebras.ai`
+was added for the Phase-2 verification), so all 4 checks used real,
+previously-captured raw records from the benchmark's development split
+rather than fresh network calls — documented transparently, not
+fabricated.
+
+### Adapter consistency reconciliation
+
+The documented `chembl_target_or_indication_result_to_evidence` empty-content
+behavior was inspected directly in current code: it already returns `None`
+(canonical skip), not `ValueError` — the amendment described in
+`docs/v2/PHASE5_HELDOUT_RESULTS.md` is already present, with a passing
+regression test (`test_chembl_molecule_result_with_no_real_content_returns_none`).
+No code change was required or made.
+
+### NOT resume-safe / explicitly non-comparable
+
+- Any claim that Phase 5 fixed the citation/reference detachment
+  (`state["citations"]` vs. `## References`) — it did not; that closure is
+  explicitly Phase 6/7's job (`docs/v2/PHASE5_EVIDENCE_CONTRACT.md` Section 0).
+- Any claim of citation faithfulness, claim grounding, verified-claim
+  accuracy, or hallucination reduction — none of these exist yet.
+- Any claim that Phase 5 improved retrieval quality or network/LLM
+  latency — it is a pure downstream normalization layer.
+- Any claim that the original 14-case `phase5_heldout` split was rerun as
+  blind evidence in this session — it was not; only current *code* was
+  inspected for the adapter consistency check.

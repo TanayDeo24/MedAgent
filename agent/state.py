@@ -10,6 +10,8 @@ from datetime import datetime
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 
+from evidence.models import Evidence
+
 
 class AgentState(TypedDict):
     """State that flows through the MedAgent graph.
@@ -172,7 +174,40 @@ class AgentState(TypedDict):
     than querying the index a second time. Each entry: pmid, title, text,
     url, score. Distinct from tool_results["pubmed"], which comes from a
     live PubMed API call, not this local retrieval index.
+
+    This is the pre-existing legacy shape (a lossy plain-dict projection of
+    the underlying retrieval.retriever.Document objects, dropping chunk_id/
+    corpus_index_version/num_chunks) kept unchanged for report_generation_node's
+    existing "PubMed RAG" citation building (Phase 5 does not touch that
+    path - see docs/v2/PHASE5_EVIDENCE_CONTRACT.md Section 0/10). Phase 5's
+    `evidence` field below is the non-lossy replacement for anything that
+    needs full provenance.
     """
+
+    rag_documents: List[Any]
+    """The raw retrieval.retriever.Document objects underlying this run's
+    `retrieved_context` (same retrieve() call, populated alongside it in
+    synthesis_node - not a second retrieval). Exists solely so
+    evidence_normalization_node (Phase 5) can build provenance-complete
+    PubMed RAG Evidence (chunk_id, corpus_index_version, num_chunks) without
+    those fields having to survive the lossy `retrieved_context` dict
+    projection that report_generation_node's legacy citation path already
+    depends on unchanged. Not part of the Phase 1-4 contract; internal to
+    the Phase 5 wiring only."""
+
+    evidence: List[Evidence]
+    """Phase 5's canonical, provenance-complete Evidence collection (see
+    docs/v2/PHASE5_EVIDENCE_CONTRACT.md), produced by
+    agent.nodes.evidence_normalization_node from this run's tool_results,
+    tool_call_history, and rag_documents via the frozen
+    evidence.registry.DEFAULT_ADAPTER_REGISTRY. Model-free: no LLM call
+    ever produces or alters this list. Distinct from and does not replace
+    `citations` (the pre-existing, structurally-disconnected LLM-facing
+    citation list used by report_generation_node - see the Phase 5 audit's
+    Section 0 finding, `docs/v2/PHASE5_EVIDENCE_CONTRACT.md`). Recomputed
+    from scratch (not appended) on every evidence_normalization_node visit,
+    since tool_results/tool_call_history/rag_documents only grow across the
+    verification self-reflection loop's iterations."""
 
     # ═══════════════════════════════════════════════════════════
     # METADATA FIELDS
@@ -256,6 +291,8 @@ def create_initial_state(
         final_report=None,
         citations=[],
         retrieved_context=[],
+        rag_documents=[],
+        evidence=[],
 
         # Metadata
         start_time=datetime.now(),

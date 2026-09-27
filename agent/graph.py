@@ -14,6 +14,7 @@ from agent.nodes import (
     query_analysis_node,
     tool_orchestration_node,
     synthesis_node,
+    evidence_normalization_node,
     verification_node,
     report_generation_node
 )
@@ -82,6 +83,12 @@ def build_agent_graph() -> StateGraph:
       ↓
     synthesis (combine and cross-reference findings)
       ↓
+    evidence_normalization (Phase 5: tool_results/tool_call_history/
+                             rag_documents -> typed Evidence[], via the
+                             frozen evidence.registry adapter registry -
+                             model-free, no LLM call, does not touch
+                             citations/final_report)
+      ↓
     verification (self-reflect on quality)
       ↓
     [CONDITIONAL ROUTING]
@@ -104,11 +111,13 @@ def build_agent_graph() -> StateGraph:
     # Initialize the state graph
     workflow = StateGraph(AgentState)
 
-    # Add all 5 reasoning nodes (planning + tool_execution are now one
-    # combined tool_orchestration node - see docstring above)
+    # Add all 6 reasoning nodes (planning + tool_execution are now one
+    # combined tool_orchestration node - see docstring above -
+    # evidence_normalization is Phase 5's added node)
     workflow.add_node("query_analysis", query_analysis_node)
     workflow.add_node("tool_orchestration", tool_orchestration_node)
     workflow.add_node("synthesis", synthesis_node)
+    workflow.add_node("evidence_normalization", evidence_normalization_node)
     workflow.add_node("verification", verification_node)
     workflow.add_node("report_generation", report_generation_node)
 
@@ -121,8 +130,13 @@ def build_agent_graph() -> StateGraph:
     # After tool orchestration, always synthesize
     workflow.add_edge("tool_orchestration", "synthesis")
 
-    # After synthesis, always verify (self-reflect)
-    workflow.add_edge("synthesis", "verification")
+    # After synthesis, normalize this iteration's real source outputs into
+    # typed Evidence[] (Phase 5 boundary - see evidence_normalization_node's
+    # docstring in agent/nodes.py)
+    workflow.add_edge("synthesis", "evidence_normalization")
+
+    # After evidence normalization, always verify (self-reflect)
+    workflow.add_edge("evidence_normalization", "verification")
 
     # CONDITIONAL ROUTING: verification decides next step
     # This is where the agent becomes autonomous!
@@ -141,7 +155,7 @@ def build_agent_graph() -> StateGraph:
     # Compile the graph
     compiled_graph = workflow.compile()
 
-    logger.info("Agent graph compiled successfully with 5 nodes and conditional routing")
+    logger.info("Agent graph compiled successfully with 6 nodes and conditional routing")
 
     return compiled_graph
 

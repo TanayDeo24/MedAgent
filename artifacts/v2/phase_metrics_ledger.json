@@ -2,7 +2,12 @@
   "ledger_version": "1.2.0",
   "generated_at": "2026-09-25",
   "purpose": "Authoritative, artifact-traced before/after metric record for resume/report use. Every value recomputed directly from raw source artifacts at ledger-freeze time, not copied from prior prose.",
-  "phases_recorded": ["phase_2_biomedical_nlu", "phase_3_tool_orchestration", "phase_4_heterogeneous_retrieval"],
+  "phases_recorded": [
+    "phase_2_biomedical_nlu",
+    "phase_3_tool_orchestration",
+    "phase_4_heterogeneous_retrieval",
+    "phase_5_evidence_provenance"
+  ],
   "phase_4_heterogeneous_retrieval": {
     "final_winner": {
       "pubmed": "local RAG hybrid pipeline (retrieval/retriever.py) - validated, not replaced",
@@ -260,10 +265,24 @@
       "semantic_qwen_specific_tuning": "NONE",
       "prompt_version": "STRUCTURED_EXTRACTION_PROMPT (unmodified active control, byte-identical to what the Nemotron control used)",
       "prior_control_archived_at": "artifacts/v2/nlu_frozen_config_v2_pre_qwen_archive.json",
-      "tests_at_freeze": {"passed": 139, "failed": 0, "skipped": 0},
-      "phase_2_gates_at_freeze": {"total": 23, "passed": 23, "failed": 0, "source": "docs/v2/PHASE2_FINAL_GATE_AUDIT.md"}
+      "tests_at_freeze": {
+        "passed": 139,
+        "failed": 0,
+        "skipped": 0
+      },
+      "phase_2_gates_at_freeze": {
+        "total": 23,
+        "passed": 23,
+        "failed": 0,
+        "source": "docs/v2/PHASE2_FINAL_GATE_AUDIT.md"
+      }
     },
-    "benchmark": {"name": "nlu_benchmark", "version": "1.1.0", "split": "dev", "n": 45},
+    "benchmark": {
+      "name": "nlu_benchmark",
+      "version": "1.1.0",
+      "split": "dev",
+      "n": 45
+    },
     "metrics": [
       {
         "phase": "2",
@@ -488,6 +507,161 @@
       "Any cost-per-N-calls figure not explicitly labeled a projection",
       "Any claim that GPT-OSS-120B was a viable or partially-viable Phase-2 candidate (it was permanently rejected across 3 rounds)",
       "Any claim that the Cerebras Free Trial billing arrangement is a resolved permanent production deployment decision (it is a $5/30-day trial expiring 2026-10-25 UTC)"
+    ]
+  },
+  "phase_5_evidence_provenance": {
+    "final_winner": {
+      "architecture": "evidence/adapters.py + evidence/registry.py (canonical typed Evidence model, model-free)",
+      "frozen_config_path": "artifacts/v2/phase5_frozen_config.json",
+      "status_docs": [
+        "docs/v2/PHASE5_EVIDENCE_CONTRACT.md",
+        "docs/v2/PHASE5_GATE_PLAN.md",
+        "docs/v2/PHASE5_EVIDENCE_PROVENANCE.md",
+        "docs/v2/PHASE5_FINAL_GATE_AUDIT.md"
+      ],
+      "langgraph_integration": "agent.nodes.evidence_normalization_node, wired synthesis -> evidence_normalization -> verification in agent/graph.py",
+      "post_freeze_amendment": "none required - chembl_target_or_indication_result_to_evidence already returns None (canonical skip) for the documented empty-content case; regression test test_chembl_molecule_result_with_no_real_content_returns_none already present and passing"
+    },
+    "benchmark": {
+      "manifest": "artifacts/v2/phase5_benchmark_manifest.json",
+      "total_cases": 72,
+      "development": 43,
+      "validation": 15,
+      "phase5_heldout": 14,
+      "note": "Same 72 real records also replayed against the OLD pipeline's state['citations'] builder for the baseline comparison (artifacts/v2/phase5_baseline_results.json) - same population, so before/after deltas below are COMPARABLE, not just directionally suggestive."
+    },
+    "metrics": [
+      {
+        "metric": "provenance_completeness_overall",
+        "before": 0.0,
+        "before_definition": "artifacts/v2/phase5_baseline_results.json's pct_retaining_supporting_text_or_field_content_in_citation_entry (0.0%) and pct_with_individual_record_trace_link_call_id (0.0%) combined - the old citations builder retained neither supporting content nor trace linkage for any of the 72 replayed records",
+        "after": 100.0,
+        "after_definition": "docs/v2/PHASE5_GATE_PLAN.md Section 1's provenance-completeness definition, measured on 152/152 dev+validation Evidence records and 45/45 held-out Evidence records",
+        "absolute_delta_percentage_points": 100.0,
+        "relative_delta": "undefined (0 in denominator) - reported as +100 percentage points, not a relative percentage, per directive Step 20",
+        "benchmark": "phase5_benchmark_manifest, 72 real records (58 dev+validation + 14 held-out)",
+        "n_before": 72,
+        "n_after": 197,
+        "n_after_note": "197 = 152 (dev+validation) + 45 (held-out) Evidence objects produced from the same 72 source records - one input record can fan out into multiple field-level Evidence objects (ClinicalTrials), which the old flat citations list never did",
+        "comparability": "COMPARABLE",
+        "held_out_support": "held-out 45/45 = 100%, consistent with dev+validation",
+        "caveat": "Denominators differ in kind (72 replayed citations vs. 197 Evidence objects) because Evidence is a finer-grained unit than the old citation - the percentage-of-population metric (100% of 72 real records produced provenance-complete Evidence-or-a-legitimate-skip) is what's directly comparable, not a raw count-to-count ratio.",
+        "resume_safe": true
+      },
+      {
+        "metric": "source_url_construction_rate",
+        "before": 27.8,
+        "before_definition": "artifacts/v2/phase5_baseline_results.json pct_with_direct_source_url (only PubMed RAG's pre-existing corpus URL passed through; 0% constructed for PubMed-live/ClinicalTrials/ChEMBL)",
+        "after": 100.0,
+        "after_definition": "make_source_url() deterministically derives a real URL for every Evidence record from a verified source_record_id, all 4 sources",
+        "absolute_delta_percentage_points": 72.2,
+        "benchmark": "phase5_benchmark_manifest, 72 real records",
+        "n_before": 72,
+        "n_after": 197,
+        "comparability": "COMPARABLE",
+        "held_out_support": "confirmed on held-out (45/45 deterministic URLs)",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "content_retention_at_citation_level",
+        "before": 0.0,
+        "before_definition": "artifacts/v2/phase5_baseline_results.json pct_retaining_supporting_text_or_field_content_in_citation_entry",
+        "after": 100.0,
+        "after_definition": "docs/v2/PHASE5_GATE_PLAN.md content-fidelity definition: % of Evidence.content exactly traceable to source (verbatim or exact field value)",
+        "absolute_delta_percentage_points": 100.0,
+        "relative_delta": "undefined (0 in denominator) - reported as +100 percentage points",
+        "benchmark": "phase5_benchmark_manifest, 72 real records",
+        "n_before": 72,
+        "n_after": 197,
+        "comparability": "COMPARABLE",
+        "held_out_support": "45/45 = 100% held-out",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "trace_linkage_call_id",
+        "before": 0.0,
+        "before_definition": "artifacts/v2/phase5_baseline_results.json pct_with_individual_record_trace_link_call_id",
+        "after": 100.0,
+        "after_definition": "trace_linkage.evidence_to_call_id_link in phase5_validation_results.json - 100% for tool-backed sources; PubMed RAG's call_id=None is N/A-by-design, not a failure, per the frozen contract",
+        "absolute_delta_percentage_points": 100.0,
+        "relative_delta": "undefined (0 in denominator) - reported as +100 percentage points",
+        "benchmark": "phase5_benchmark_manifest, 72 real records",
+        "n_before": 72,
+        "n_after": 197,
+        "comparability": "COMPARABLE",
+        "held_out_support": "0 trace-link failures in held-out",
+        "caveat": "PubMed RAG (no Phase-3 tool call exists for it) is scored N/A, not a failure, on this metric - consistent treatment before and after.",
+        "resume_safe": true
+      },
+      {
+        "metric": "source_id_integrity_fabricated_count",
+        "before": null,
+        "before_definition": "not measured by the old pipeline's baseline (no fabrication-detection methodology existed for state['citations'])",
+        "after": 0,
+        "after_definition": "fabricated source IDs count, hard gate, must equal 0",
+        "comparability": "NON_COMPARABLE",
+        "benchmark": "phase5_benchmark_manifest, 197 Evidence records (dev+validation+held-out)",
+        "n_after": 197,
+        "held_out_support": "0/45 held-out",
+        "caveat": "No baseline measurement exists for this property on the old pipeline - reported as a new Phase-5 gate result, not a before/after delta.",
+        "resume_safe": true
+      },
+      {
+        "metric": "normalization_coverage",
+        "before": null,
+        "after": 100.0,
+        "after_definition": "% of retrieved/tool candidates successfully normalized into valid Evidence-or-a-documented-legitimate-skip (coverage metric, phase5_validation_results.json)",
+        "comparability": "NON_COMPARABLE",
+        "benchmark": "phase5_benchmark_manifest, 58 dev+validation + 14 held-out = 72 cases",
+        "n_after": 72,
+        "held_out_support": "14/14 = 100% held-out",
+        "caveat": "No equivalent 'coverage' concept existed in the old citations pipeline to compare against.",
+        "resume_safe": true
+      },
+      {
+        "metric": "serialization_success_rate",
+        "before": null,
+        "after": 100.0,
+        "after_definition": "Evidence model_dump_json/model_validate_json roundtrip success rate",
+        "comparability": "NON_COMPARABLE",
+        "benchmark": "phase5_benchmark_manifest, 197 Evidence records",
+        "n_after": 197,
+        "held_out_support": "45/45 held-out",
+        "caveat": "The old citations list was a plain dict with no defined serialization contract to compare against.",
+        "resume_safe": true
+      },
+      {
+        "metric": "normalization_latency_p50_ms",
+        "before": null,
+        "after": 0.0155,
+        "after_definition": "artifacts/v2/phase5_normalization_performance.json overall.p50 - pure adapter transformation time only, excludes retrieval/API/LLM latency entirely",
+        "comparability": "NON_COMPARABLE",
+        "benchmark": "58 dev+validation real records x20 repeats = 1160 adapter calls",
+        "n_after": 1160,
+        "held_out_support": "N/A - performance was not separately measured on held-out (dev+validation used deliberately to avoid re-touching held-out)",
+        "caveat": "Not a network/LLM latency claim - Phase 5 does not claim to improve retrieval or Cerebras latency.",
+        "resume_safe": true
+      }
+    ],
+    "hard_safety_gates": {
+      "count": 10,
+      "passed": 10,
+      "failed": 0,
+      "source": "docs/v2/PHASE5_GATE_PLAN.md Section 3, verified in docs/v2/PHASE5_HELDOUT_RESULTS.md and docs/v2/PHASE5_FINAL_GATE_AUDIT.md"
+    },
+    "live_integration": {
+      "checks_run": 4,
+      "checks_passed": 4,
+      "artifact": "artifacts/v2/phase5_live_integration_results.json",
+      "environment_constraint": "clinicaltrials.gov/ebi.ac.uk/eutils.ncbi.nlm.nih.gov not allowlisted in this cloud session's network policy (only api.cerebras.ai was added) - all 4 checks used real, previously-captured raw records from the benchmark's development split rather than fresh network calls; documented transparently, not fabricated data."
+    },
+    "resume_unsafe_claims": [
+      "Any claim that Phase 5 fixed the citation/reference detachment - it did not; that is explicitly deferred to Phase 6/7 (docs/v2/PHASE5_EVIDENCE_CONTRACT.md Section 0)",
+      "Any claim of citation faithfulness, claim grounding, or hallucination reduction - Phase 5 produces typed Evidence[] only, no claim-to-evidence verification exists yet",
+      "Any claim that Phase 5 improved retrieval quality, API latency, or LLM/Cerebras latency - Phase 5 is a pure normalization layer downstream of Phase 3/4",
+      "Any claim that the original 14-case phase5_heldout split was reused as blind evidence after the ChEMBL adapter consistency check - it was not; that check inspected CURRENT CODE, not a held-out rerun"
     ]
   }
 }

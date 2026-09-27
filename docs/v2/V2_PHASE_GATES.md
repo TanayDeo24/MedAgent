@@ -1,5 +1,10 @@
 # MedAgent V2 — Phase Gates (Phase 2 through 13)
 
+**Before starting or advancing a phase in a local environment, check
+`docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md`. Any blocking OPEN carryover item
+there is a hard progression gate, in addition to the phase exit gates
+below.**
+
 **Status:** design contract, Phase 1. No phase below is implemented. Every
 phase's exit gate must be satisfied by a **measurable artifact or executable
 behavior**, referencing the metrics in `EVALUATION_CONTRACT.md` and the

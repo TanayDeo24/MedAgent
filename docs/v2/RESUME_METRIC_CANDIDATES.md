@@ -168,3 +168,61 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   dev+validation cases) or PubMed RAG's lack of a relevance floor has been
   fixed — both are explicitly named, accepted limitations, not addressed
   in Phase 4.
+
+## Resume-safe claims (Phase 5)
+
+- Normalized heterogeneous PubMed (local RAG + live API), ClinicalTrials.gov,
+  and ChEMBL outputs into a single canonical, typed `Evidence` object
+  (`evidence/models.py`), replacing an ad hoc per-source citation shape with
+  one deterministic, model-free transformation layer.
+- **100% provenance completeness** on the frozen Phase-5 evaluation
+  population — 152/152 dev+validation Evidence records, 45/45 held-out
+  Evidence records (72 real source records total, never synthetic-only).
+- **100% source-ID integrity** — 0 fabricated source IDs, 0 corrupted
+  source IDs, across all 197 real Evidence records produced (dev+
+  validation + held-out).
+- **Complete trace linkage** from Evidence back to its retrieval/source
+  lineage — 100% Evidence→RetrievalCandidate and Evidence→source-record
+  link success; PubMed RAG's `call_id=None` is a correct, N/A-by-design
+  value (no Phase-3 tool call produced it), not a missing-data gap.
+- **Zero fabricated IDs inside Evidence**, verified empirically on
+  genuinely held-out data (14 cases, one-shot, never reused).
+- Source-faithful Evidence normalization across all three heterogeneous
+  sources, with all 10 predeclared hard safety gates (fabricated/corrupted
+  IDs, source mislabeling, secret leaks, cross-source ID collisions, etc.)
+  passing at 0 on both dev+validation and held-out.
+- 4/4 fresh, bounded live integration checks passed in this session
+  (`artifacts/v2/phase5_live_integration_results.json`), confirming the
+  frozen adapter/registry code path against real source data (network
+  access constraints in this cloud session required using
+  previously-captured real records for 3 of the 4 checks — documented
+  transparently, not fabricated).
+- Sub-millisecond normalization overhead (P50 0.0155ms, P95 0.125ms across
+  1160 real-record adapter calls), measured separately from and never
+  conflated with retrieval/API/LLM latency.
+
+## Not resume-safe (Phase 5)
+
+- **Any claim that Phase 5 fixed the citation/reference detachment.** The
+  audit found `state["citations"]` and the LLM-written `## References`
+  section have zero structural connection — Phase 5 makes that
+  detachment fixable (via the typed `Evidence[]` collection) but does
+  NOT fix it. That closure is explicitly deferred to Phase 6/7.
+- **Any citation faithfulness, citation correctness, or claim-grounding
+  claim.** No claim-to-evidence verification system exists yet.
+- **Any grounded-answer accuracy, hallucination-reduction, or final
+  answer-reliability claim.** Phase 5 produces typed Evidence only; no
+  answer generation exists in this phase.
+- **Any end-to-end task-completion claim.** Phase 5's scope stops at
+  `Evidence[]` in `AgentState`; report generation and final citations are
+  explicitly unmodified (verified: `state["citations"]`/
+  `state["final_report"]` are set only by the pre-existing
+  `report_generation_node`, never by `evidence_normalization_node`).
+- **Any claim that Phase 5 improved retrieval quality or reduced
+  network/Cerebras latency.** It is a pure downstream, model-free
+  normalization layer; measured normalization latency is separate from
+  and additive to (not a replacement for) retrieval/LLM latency.
+- **Any claim that the original 14-case `phase5_heldout` split was rerun
+  as blind evidence in this session.** It was not — only current *code*
+  was inspected for the documented ChEMBL adapter consistency item; no
+  code change was needed since the fix was already present.

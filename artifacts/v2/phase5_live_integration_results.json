@@ -1,0 +1,88 @@
+{
+  "run_date": "2026-09-27",
+  "environment_note": "clinicaltrials.gov, www.ebi.ac.uk, eutils.ncbi.nlm.nih.gov are NOT allowlisted in this cloud session's outbound network policy (only api.cerebras.ai was added per the prior network-access change) - confirmed via direct curl (agent-proxy connect_rejected, organization policy). All four checks therefore use real, already-captured raw_record data from artifacts/v2/phase5_benchmark_manifest.json's development split (never phase5_heldout) as adapter input, exactly as check 1 (PubMed RAG) already required due to the missing local index. This is a live INTEGRATION check of the adapter/registry code path against real (previously-fetched) source data, not a new network call in this session, and not a benchmark rerun.",
+  "checks": {
+    "check1_pubmed_rag": {
+      "evidence_created": true,
+      "evidence_id": "pubmed:29119148:chunk:1",
+      "source_record_id": "29119148",
+      "pmid_matches_input": true,
+      "chunk_id_present_in_evidence_id": true,
+      "chunk_index": 1,
+      "num_chunks": 2,
+      "content_matches_source_verbatim": true,
+      "title": "Brigatinib for the treatment of ALK-positive advanced non-small cell lung cancer patients.",
+      "journal": "Drugs of today (Barcelona, Spain : 1998)",
+      "year": "2017",
+      "doi": "10.1358/dot.2017.53.8.2676119",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/29119148/",
+      "retrieval_method": "rag_hybrid_rerank",
+      "retrieval_rank": 1,
+      "retrieval_score": 6.694873332977295,
+      "corpus_index_version": "unavailable_in_this_session_no_index_meta_json",
+      "call_id_is_none_by_design": true,
+      "serialization_roundtrip_ok": true,
+      "latency_ms": 0.117
+    },
+    "check2_clinical_trials": {
+      "evidence_created": true,
+      "count": 9,
+      "all_share_nct_evidence_id": true,
+      "nct_id_matches_input": true,
+      "evidence_types": [
+        "trial_field",
+        "trial_field",
+        "trial_field",
+        "trial_field",
+        "trial_field",
+        "trial_field",
+        "trial_field",
+        "trial_phase",
+        "trial_status"
+      ],
+      "field_paths_populated": [
+        "protocolSection.conditionsModule.conditions",
+        "protocolSection.descriptionModule.briefSummary",
+        "protocolSection.designModule.enrollmentInfo.count",
+        "protocolSection.sponsorCollaboratorsModule.leadSponsor.name",
+        "protocolSection.statusModule.completionDateStruct.date",
+        "protocolSection.statusModule.overallStatus",
+        "protocolSection.statusModule.startDateStruct.date"
+      ],
+      "source_url": "https://clinicaltrials.gov/study/NCT03535740",
+      "call_id_threaded": true,
+      "retrieval_rank_threaded": true,
+      "content_examples": {
+        "trial_status": "COMPLETED",
+        "trial_phase": "PHASE2",
+        "trial_field": "The primary purpose of this study is to determine the effica"
+      },
+      "serialization_roundtrip_ok": true,
+      "latency_ms": 0.235
+    },
+    "check3_chembl": {
+      "evidence_created": true,
+      "evidence_id": "chembl:CHEMBL941",
+      "chembl_id_matches_input": true,
+      "evidence_type": "compound_identity",
+      "match_type_preserved": true,
+      "content": "IMATINIB",
+      "no_fabricated_confidence": true,
+      "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL941/",
+      "call_id_threaded": true,
+      "retrieval_method": "resolve_compound_name",
+      "serialization_roundtrip_ok": true,
+      "latency_ms": 0.04
+    },
+    "check4_pubmed_skip": {
+      "expected_skip": true,
+      "exception_escaped": false,
+      "fake_evidence_created": false,
+      "fabricated_id": false,
+      "input_pmid": "2",
+      "input_abstract_field": "No abstract available",
+      "result": "PASS: legitimate skip, no exception, no fake Evidence",
+      "latency_ms": 0.002
+    }
+  }
+}

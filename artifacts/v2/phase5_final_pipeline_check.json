@@ -1,0 +1,26 @@
+{
+  "run_date": "2026-09-27",
+  "purpose": "Bounded real V2 pipeline check through the Phase-5 boundary (directive Step 24), one source-focused real query, via the actual compiled LangGraph (agent.graph.MedAgent), not a unit test of individual nodes.",
+  "query": "What is the mechanism of action of imatinib?",
+  "production_model_used_for_nlu_and_orchestration": "qwen-3.8-27b (Cerebras, candidate_g_cerebras_qwen) - frozen Phase-2 production model, confirmed used (query_analysis_node delegates to nlu.understand_query_with_result -> the frozen config) - GPT-OSS was NOT used",
+  "results": {
+    "phase2_nlu_success": true,
+    "phase2_nlu_note": "query_analysis_node completed with no error; intent extracted as compound_information via the frozen Cerebras qwen-3.8-27b architecture",
+    "phase3_orchestration_success": true,
+    "phase3_orchestration_note": "tool_orchestration_node's Cerebras native-tool-calling round trip succeeded (selected chembl/resolve_compound_name) - Cerebras reachability confirmed a second time in this session, this time through the real graph node, not a standalone script",
+    "phase4_retrieval_success": false,
+    "phase4_retrieval_note": "The SELECTED tool execution (ChEMBL resolve_compound_name -> www.ebi.ac.uk) failed with a network ProxyError (403 Forbidden on the egress proxy tunnel) - the same pre-existing environment constraint already documented in phase5_live_integration_results.json (clinicaltrials.gov/ebi.ac.uk/eutils.ncbi.nlm.nih.gov are not allowlisted in this cloud session, only api.cerebras.ai was added). This is an environment limitation, not a Phase-3/4/5 code defect - Phase 3's orchestration correctly selected and attempted the call; Phase 4's tool correctly reported the failure via its own retry/error path (utils.retry_handler, 4 attempts, then a clean error, no crash).",
+    "phase5_evidence_success": true,
+    "phase5_evidence_note": "evidence_normalization_node ran cleanly and produced 0 Evidence records - the CORRECT outcome given zero real source data reached it this run (the one selected tool call failed at the network layer before producing any data to normalize). No exception escaped, no fake Evidence was fabricated to compensate for the missing network access. Evidence[] existing-but-empty here is a downstream consequence of the network constraint above, not a Phase-5 defect - see phase5_live_integration_results.json for confirmation that the SAME registry/adapter code path correctly produces provenance-complete Evidence when given real (previously-captured) source data.",
+    "evidence_ids_intact": "N/A - 0 Evidence produced this run (see above); ID/provenance correctness already confirmed via the 4 live integration checks",
+    "provenance_intact": "N/A - same reason",
+    "trace_intact": "N/A - same reason",
+    "answer_generation_work_added": false,
+    "citation_generation_work_added": false,
+    "secret_leakage": false,
+    "secret_leakage_note": "All logged errors contain only hostnames/status codes (ProxyError text, NVIDIA_API_KEY-missing message naming the env var name only, never a value) - reviewed directly, no key material present in any error string.",
+    "unrelated_pre_existing_failure_observed": "synthesis_node/verification_node/report_generation_node (Phase 1 legacy nodes, use config.llm_config.get_llm() -> NVIDIA NIM, NOT Cerebras) failed with 'NVIDIA_API_KEY not found' - this environment has no NVIDIA_API_KEY configured. Unrelated to Phase 5 and to the Cerebras production model; report_generation_node's own pre-existing exception handler produced its existing fallback report text (not a new system) rather than crashing the run - confirmed final_report is non-None (the fallback), not a new answer-generation path."
+  },
+  "graph_completion": "The full compiled graph (6 nodes: query_analysis -> tool_orchestration -> synthesis -> evidence_normalization -> verification -> report_generation) ran to completion without crashing, at max_iterations=1, current_step reached 1 as expected, intermediate_thoughts recorded the evidence_normalization step's own log line ('Evidence normalization: 0 typed Evidence record(s) produced').",
+  "conclusion": "The Phase-5 wiring itself is proven correct and non-bypassable through the real graph; the zero-Evidence outcome in this specific run is fully attributable to two pre-existing, already-documented environment constraints (outbound network policy not allowlisting clinicaltrials.gov/ebi.ac.uk/eutils.ncbi.nlm.nih.gov, and no NVIDIA_API_KEY configured in this cloud session) rather than any Phase-5 defect."
+}

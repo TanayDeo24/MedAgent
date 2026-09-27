@@ -1,0 +1,43 @@
+{
+  "plan_name": "phase5_live_integration_plan",
+  "created": "2026-09-27",
+  "purpose": "Four bounded, fresh integration checks proving evidence/adapters.py + evidence/registry.py produce correct, provenance-complete Evidence from real source outputs in THIS cloud session, distinct from the frozen dev/validation (58 cases) and held-out (14 cases) benchmark runs. These are integration checks, not a new benchmark, not a held-out rerun, not an optimization round.",
+  "environment_constraint": {
+    "local_rag_index_missing": "This cloud checkout has no data/index/ directory (faiss.index, chunks.jsonl, index_meta.json, bm25.pkl are build artifacts, not committed to git, and were never built in this container -- confirmed: agent.nodes logged '[RAG] Retriever failed to load at import time: RAG index not found'). A fresh retrieval.retriever.retrieve() call is therefore not possible in this session.",
+    "resolution": "For check 1 (PubMed local RAG), use one real retrieval.retriever.Document-shaped raw_record already captured (via a genuine retrieve() call made during Phase-5 benchmark construction on a machine that DID have the index built) from artifacts/v2/phase5_benchmark_manifest.json's development or validation split (never the phase5_heldout split, per directive Step 3's 'avoid reusing the original held-out examples where practical'). This is not fabricated or synthetic data -- the manifest's own methodology_notes confirm it was fetched via a real retrieve() call, no mocking. This substitution is recorded transparently as an environment limitation, not a defect."
+  },
+  "checks": [
+    {
+      "id": 1,
+      "source": "pubmed_rag",
+      "operation": "pubmed_rag_document_to_evidence",
+      "input_provenance": "artifacts/v2/phase5_benchmark_manifest.json, development or validation split, one pubmed_rag case's raw_record (real retrieve() output captured at benchmark-build time)",
+      "note": "Environment substitution per environment_constraint above; not a fresh retrieve() call in this session."
+    },
+    {
+      "id": 2,
+      "source": "clinical_trials",
+      "operation": "clinical_trial_to_evidence_records",
+      "input_provenance": "fresh real call in this session: tools.clinical_trials_tool.ClinicalTrialsTool().search_trials() or get_trial_details(), live clinicaltrials.gov v2 API"
+    },
+    {
+      "id": 3,
+      "source": "chembl",
+      "operation": "chembl_resolve_compound_name_to_evidence and/or chembl_target_or_indication_result_to_evidence",
+      "input_provenance": "fresh real call in this session: tools.chembl_tool.ChEMBLTool(), live EBI ChEMBL API"
+    },
+    {
+      "id": 4,
+      "source": "pubmed_live_skip",
+      "operation": "pubmed_live_result_to_evidence",
+      "input_provenance": "fresh real call in this session: tools.pubmed_tool.PubMedTool().get_paper_details() against one of the real old low-numbered PMIDs (e.g. PMID 2, 3) already documented in phase5_benchmark_manifest.json to trigger NCBI's real absent-<AbstractText> response and the tool's own 'No abstract available' placeholder -- exercising the legitimate skip path against a genuine live API response, not a mock."
+    }
+  ],
+  "out_of_scope": [
+    "no new benchmark scoring",
+    "no optimization of any adapter",
+    "no rerun of the original 14-case phase5_heldout split as blind evidence",
+    "no LLM/Cerebras calls (evidence/ remains model-free)",
+    "no report generation or citation changes"
+  ]
+}

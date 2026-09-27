@@ -18,7 +18,7 @@ All nodes use the LLM to make autonomous decisions and return structured outputs
 
 import json
 import threading
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from agent.state import AgentState
 from agent.prompts import (
     QUERY_ANALYSIS_PROMPT,
@@ -34,9 +34,12 @@ from orchestration.candidate_b_native_tools import (
     execute_validated_call,
 )
 from orchestration.models import ToolName
-from retrieval.retriever import retrieve as retrieve_passages, _get_retriever
+from retrieval.retriever import retrieve as retrieve_passages, _get_retriever, META_PATH
 from utils.logger import get_logger
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+
+from evidence.models import Evidence, SourceType
+from evidence.registry import DEFAULT_ADAPTER_REGISTRY, EvidenceAdapterError
 
 logger = get_logger(__name__)
 
@@ -351,9 +354,15 @@ def _dedupe_retrieved_by_pmid(documents: List[Any]) -> List[Any]:
     return deduped
 
 
-def _retrieve_rag_context(query: str) -> List[Dict[str, Any]]:
-    """Run RAG retrieve() for `query`, dedupe by PMID, and return plain dicts
-    (pmid/title/text/url/score) ready to drop into a prompt or state.
+def _retrieve_rag_documents(query: str) -> List[Any]:
+    """Run RAG retrieve() for `query` and dedupe by PMID, returning the raw
+    `retrieval.retriever.Document` objects (never downgraded to a dict here)
+    - the single real retrieve() call shared by both `_retrieve_rag_context`
+    (the pre-existing lossy dict projection report_generation_node's legacy
+    citation path depends on) and evidence_normalization_node (Phase 5,
+    needs chunk_id/corpus_index_version/num_chunks, which the dict
+    projection has always dropped per docs/v2/PHASE5_EVIDENCE_CONTRACT.md
+    Section 0's audit finding).
 
     Returns an empty list (rather than raising) on any retrieval failure -
     RAG context is an enrichment on top of the existing tool_results-only
@@ -366,11 +375,19 @@ def _retrieve_rag_context(query: str) -> List[Dict[str, Any]]:
         # retrieve() calls to avoid a real, observed Metal/MPS crash under
         # case-level concurrency.
         with _rag_retrieval_lock:
-            docs = _dedupe_retrieved_by_pmid(retrieve_passages(query, k=RAG_RETRIEVAL_K))
+            return _dedupe_retrieved_by_pmid(retrieve_passages(query, k=RAG_RETRIEVAL_K))
     except Exception as e:
         logger.warning(f"[RAG] retrieve() failed for query {query!r}: {e}")
         return []
 
+
+def _retrieve_rag_context(docs: List[Any]) -> List[Dict[str, Any]]:
+    """Project already-retrieved RAG `Document` objects (from
+    `_retrieve_rag_documents`) into the pre-existing plain-dict shape
+    (pmid/title/text/url/score) ready to drop into a prompt or state.
+    Unchanged shape/behavior from before Phase 5 - report_generation_node's
+    legacy "PubMed RAG" citation path reads exactly these keys and no
+    others (see docs/v2/PHASE5_EVIDENCE_PROVENANCE.md)."""
     return [
         {
             "pmid": doc.pmid,
@@ -381,6 +398,32 @@ def _retrieve_rag_context(query: str) -> List[Dict[str, Any]]:
         }
         for doc in docs
     ]
+
+
+def _get_corpus_index_version() -> Optional[str]:
+    """Deterministic corpus/index identity string for Phase 5's
+    `Provenance.corpus_index_version`, built ONLY from fields actually
+    recorded in `data/index/index_meta.json` (retrieval/build_index.py's own
+    output) - never a stronger version guarantee than what's actually
+    shipped (docs/v2/PHASE5_EVIDENCE_CONTRACT.md Section 11). There is no
+    single canonical "version" field in index_meta.json (Phase 4's
+    documented corpus-reproducibility gap, not resolved here), so this
+    composes the fields that do exist and are load-bearing for reproducing
+    the index (embedding_model, num_abstracts, num_chunks) into one string.
+    Returns None (never a fabricated placeholder) if the index/meta file
+    isn't present in this environment - callers must treat None as a real,
+    honest "unavailable" value, not an error to work around."""
+    try:
+        with open(META_PATH) as f:
+            meta = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+    return (
+        f"embedding_model={meta.get('embedding_model', 'unknown')};"
+        f"num_abstracts={meta.get('num_abstracts', 'unknown')};"
+        f"num_chunks={meta.get('num_chunks', 'unknown')}"
+    )
 
 
 def _format_retrieved_context(retrieved_context: List[Dict[str, Any]]) -> str:
@@ -874,9 +917,12 @@ def synthesis_node(state: AgentState) -> AgentState:
         # retrieved_context simply being [] - no other node needs its own
         # use_rag check.
         if state.get("use_rag", True):
-            state["retrieved_context"] = _retrieve_rag_context(query)
+            rag_docs = _retrieve_rag_documents(query)
+            state["rag_documents"] = rag_docs
+            state["retrieved_context"] = _retrieve_rag_context(rag_docs)
             logger.info(f"[SYNTHESIS] Retrieved {len(state['retrieved_context'])} RAG passages")
         else:
+            state["rag_documents"] = []
             state["retrieved_context"] = []
             logger.info("[SYNTHESIS] RAG disabled (use_rag=False) - skipping retrieval")
 
@@ -923,6 +969,176 @@ def synthesis_node(state: AgentState) -> AgentState:
         logger.error(f"[SYNTHESIS] Failed: {e}", exc_info=True)
         state["errors"].append(f"Synthesis failed: {str(e)}")
         state["intermediate_thoughts"].append(f"⚠ Synthesis error: {str(e)}")
+
+    return state
+
+
+# =============================================================================
+# PHASE 5: EVIDENCE NORMALIZATION
+# =============================================================================
+
+# (SourceType, sub_key) for each real ToolName/operation pair this graph can
+# produce, per orchestration/models.py's Literal operation names - the
+# ClinicalTrials/PubMed "sub_key" doesn't equal the operation string itself
+# (evidence/registry.py's sub_keys were named around adapter *granularity*,
+# not 1:1 with orchestration operation names), so this maps explicitly
+# rather than assuming string equality.
+_TOOL_OPERATION_TO_ADAPTER_SUB_KEY = {
+    (ToolName.PUBMED, "search_pubmed"): "live",
+    (ToolName.CLINICAL_TRIALS, "search_trials"): "trial",
+    (ToolName.CHEMBL, "search_by_target"): "search_by_target",
+    (ToolName.CHEMBL, "search_by_indication"): "search_by_indication",
+    (ToolName.CHEMBL, "get_drug_info"): "get_drug_info",
+    (ToolName.CHEMBL, "resolve_compound_name"): "resolve_compound_name",
+}
+
+
+def _tool_results_by_call(state: AgentState) -> List[Tuple[str, str, Optional[str], List[Any]]]:
+    """Reconstruct, for each successful entry in `tool_call_history`, exactly
+    which items in `tool_results[tool_key]` that specific call produced -
+    `tool_results` itself is a flat per-tool list (tool_orchestration_node
+    `.extend()`s it call-by-call) with no per-item call_id, so this walks
+    `tool_call_history` in the same append order or produced it and slices
+    out `results_count` items per entry, positionally. Deterministic and
+    exact as long as tool_orchestration_node's own accumulation order is
+    unchanged (verified directly against agent/nodes.py above - not
+    guessed) - never invents a call_id for an item, and never misattributes
+    one call's items to another's.
+
+    Returns a list of (tool_key, operation, call_id, items) tuples, one per
+    successful tool_call_history entry with results_count > 0.
+    """
+    tool_results = state.get("tool_results", {}) or {}
+    history = state.get("tool_call_history", []) or []
+
+    pointers: Dict[str, int] = {}
+    grouped: List[Tuple[str, str, Optional[str], List[Any]]] = []
+
+    for entry in history:
+        tool_key = entry.get("tool")
+        if not tool_key or not entry.get("success"):
+            continue
+        n = entry.get("results_count", 0) or 0
+        if n <= 0:
+            continue
+        items_for_tool = tool_results.get(tool_key)
+        if not isinstance(items_for_tool, list):
+            continue
+        start = pointers.get(tool_key, 0)
+        chunk = items_for_tool[start:start + n]
+        pointers[tool_key] = start + n
+        if not chunk:
+            continue
+        grouped.append((tool_key, entry.get("operation"), entry.get("call_id"), chunk))
+
+    return grouped
+
+
+def evidence_normalization_node(state: AgentState) -> AgentState:
+    """Phase 5 boundary: normalize this run's real source outputs (RAG
+    Documents, tool_results/tool_call_history) into the canonical, typed
+    `Evidence[]` collection via the frozen `evidence.registry.
+    DEFAULT_ADAPTER_REGISTRY` - see docs/v2/PHASE5_EVIDENCE_CONTRACT.md and
+    docs/v2/PHASE5_EVIDENCE_PROVENANCE.md.
+
+    Runs immediately after synthesis_node (the point in this loop iteration
+    where both this iteration's tool orchestration results AND RAG
+    retrieval, the two real Phase-4 retrieval paths, are available) and
+    before verification_node. Recomputes `state["evidence"]` from scratch
+    on every visit (not append-only) because tool_results/tool_call_history/
+    rag_documents themselves only ever grow across the verification
+    self-reflection loop's iterations - recomputing avoids double-counting
+    without needing extra bookkeeping.
+
+    Deliberately narrow: this function calls no LLM, generates no facts, no
+    claims, no answer text, no citation numbers, and never touches
+    `state["citations"]`/`state["final_report"]` (those remain
+    report_generation_node's existing, structurally-disconnected legacy
+    path per the Phase 5 audit's Section 0 finding - fixing that
+    connection is explicitly Phase 6/7's job, not this node's). A
+    malformed/unsupported record (an adapter's own `ValueError` or an
+    unregistered (source_type, sub_key) `EvidenceAdapterError`) is caught,
+    logged, and skipped per-record - it never crashes the whole node or the
+    graph run, matching how every other optional/best-effort signal in this
+    file (RAG retrieval, ChEMBL name backfill) already degrades gracefully
+    rather than failing hard.
+    """
+    evidence: List[Evidence] = []
+    normalization_errors: List[str] = []
+
+    # --- PubMed local RAG (Phase 4's other real retrieval path) ---
+    corpus_index_version = _get_corpus_index_version()
+    for rank, doc in enumerate(state.get("rag_documents", []) or [], start=1):
+        try:
+            evidence.extend(
+                DEFAULT_ADAPTER_REGISTRY.normalize(
+                    SourceType.PUBMED,
+                    "rag",
+                    doc,
+                    corpus_index_version=corpus_index_version,
+                    retrieval_rank=rank,
+                )
+            )
+        except (ValueError, EvidenceAdapterError) as e:
+            normalization_errors.append(f"pubmed_rag rank={rank}: {e}")
+
+    # --- Tool-backed sources (Phase 3 orchestration + Phase 4 live tools) ---
+    for tool_key, operation, call_id, items in _tool_results_by_call(state):
+        try:
+            tool_name = ToolName(tool_key)
+        except ValueError:
+            normalization_errors.append(f"unrecognized tool_key={tool_key!r}")
+            continue
+
+        sub_key = _TOOL_OPERATION_TO_ADAPTER_SUB_KEY.get((tool_name, operation))
+        if sub_key is None:
+            # No registered Phase-5 adapter for this (tool, operation) pair -
+            # deterministic skip, never a silent guess at which adapter to use.
+            normalization_errors.append(
+                f"no adapter sub_key for tool={tool_key!r} operation={operation!r}"
+            )
+            continue
+
+        source_type = SourceType.PUBMED if tool_name == ToolName.PUBMED else (
+            SourceType.CLINICAL_TRIALS if tool_name == ToolName.CLINICAL_TRIALS else SourceType.CHEMBL
+        )
+
+        for rank, item in enumerate(items, start=1):
+            try:
+                if sub_key == "resolve_compound_name":
+                    evidence.extend(
+                        DEFAULT_ADAPTER_REGISTRY.normalize(
+                            source_type, sub_key, item, call_id=call_id,
+                        )
+                    )
+                else:
+                    evidence.extend(
+                        DEFAULT_ADAPTER_REGISTRY.normalize(
+                            source_type, sub_key, item, call_id=call_id, retrieval_rank=rank,
+                        )
+                    )
+            except (ValueError, EvidenceAdapterError) as e:
+                normalization_errors.append(
+                    f"{tool_key}/{operation} call_id={call_id} rank={rank}: {e}"
+                )
+
+    state["evidence"] = evidence
+
+    if normalization_errors:
+        logger.warning(
+            f"[EVIDENCE NORMALIZATION] {len(normalization_errors)} record(s) skipped "
+            f"(malformed/unsupported, not fatal): {normalization_errors[:5]}"
+            + (" ..." if len(normalization_errors) > 5 else "")
+        )
+    logger.info(
+        f"[EVIDENCE NORMALIZATION] Produced {len(evidence)} Evidence record(s) "
+        f"({len(normalization_errors)} skipped)"
+    )
+    state["intermediate_thoughts"].append(
+        f"Evidence normalization: {len(evidence)} typed Evidence record(s) produced"
+        + (f", {len(normalization_errors)} record(s) skipped (malformed/unsupported)"
+           if normalization_errors else "")
+    )
 
     return state
 

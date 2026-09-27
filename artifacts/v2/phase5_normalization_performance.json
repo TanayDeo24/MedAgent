@@ -1,0 +1,56 @@
+{
+  "benchmark_name": "phase5_normalization_performance",
+  "created": "2026-09-27",
+  "methodology": "Measures ONLY evidence/adapters.py transformation latency (pure Python, no network/LLM calls) - excludes retrieval latency, external API latency, and Cerebras/LLM latency entirely, per directive Step 19. Population: all 58 development+validation real records from artifacts/v2/phase5_benchmark_manifest.json (phase5_heldout excluded, kept spent), each adapter call repeated 20x to stabilize the distribution (pure-function repeatability, not a re-scoring of held-out data).",
+  "units": "milliseconds",
+  "overall": {
+    "n": 1160,
+    "mean": 0.0352,
+    "p50": 0.0155,
+    "p90": 0.1038,
+    "p95": 0.1251,
+    "max": 1.4305
+  },
+  "per_source": {
+    "pubmed": {
+      "n": 620,
+      "mean": 0.0185,
+      "p50": 0.0156,
+      "p90": 0.0219,
+      "p95": 0.0285,
+      "max": 1.4305
+    },
+    "clinical_trials": {
+      "n": 220,
+      "mean": 0.1144,
+      "p50": 0.1038,
+      "p90": 0.1582,
+      "p95": 0.1687,
+      "max": 0.2994
+    },
+    "chembl": {
+      "n": 320,
+      "mean": 0.0132,
+      "p50": 0.0128,
+      "p90": 0.0155,
+      "p95": 0.0196,
+      "max": 1.2596
+    }
+  },
+  "coverage": {
+    "input_source_records_processed": 1160,
+    "evidence_objects_emitted": 3040,
+    "legitimate_skips": 200,
+    "malformed_inputs_rejected": 0,
+    "duplicates_removed": "N/A - this benchmark does not dedupe across cases (dedup is a downstream/consumer concern per the frozen contract, not an adapter responsibility)",
+    "serialization_attempts": 3040,
+    "serialization_successes": 3040,
+    "serialization_success_rate": 1.0,
+    "average_evidence_objects_per_input_record": 3.1667
+  },
+  "explicit_non_claims": [
+    "Phase 5 does not improve network/API latency.",
+    "Phase 5 does not improve LLM/Cerebras latency.",
+    "This benchmark measures Python-side transformation cost only."
+  ]
+}
