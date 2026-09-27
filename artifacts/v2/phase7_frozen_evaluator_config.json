@@ -1,0 +1,30 @@
+{
+  "phase": "7_grounding_evaluation",
+  "config_version": 1,
+  "frozen_date": "2026-09-27",
+  "selected_architecture": "candidate_b_semantic_judge",
+  "selected_architecture_note": "Structured semantic claim/evidence judge via one Cerebras strict-JSON-schema call. Selected over candidate_a_deterministic (weak baseline, 5/22 dev, 2/5 validation - cannot detect paraphrase/overclaiming/contradiction beyond exact numerals) and candidate_c_hybrid (real, measured defect: the deterministic numeric precheck's word-boundary number extraction is asymmetric between free prose claims and compact enum-style Evidence fields like 'PHASE2'/'CHEMBL941', causing false CONTRADICTED overrides - 16/22 dev after a partial fix, still worse than Candidate B alone; not worth further engineering since B alone reaches 100% dev+validation).",
+  "provider": "Cerebras",
+  "model": "qwen-3.8-27b",
+  "reasoning_effort": "none",
+  "rate_limit_key": "cerebras_free_trial",
+  "same_model_as_generator_caveat": "The frozen Phase-6 generator (candidate_b_structured) and this Phase-7 evaluator (candidate_b_semantic_judge) both use Cerebras qwen-3.8-27b. This is NOT cross-model independent validation - it is a separate evaluation path, isolated from the generator's prompt/context/candidate-identity, validated against independently-authored, Evidence-backed gold labels never seen by the generator.",
+  "prompt_version": "_SYSTEM_PROMPT v2 (grounding_eval/judge.py) - v2 includes the CONTRADICTED-vs-PARTIALLY_SUPPORTED clarification added after a real dev-split defect (see phase7_failure_analysis.json)",
+  "output_schema_version": "_JUDGMENT_JSON_SCHEMA v1 (grounding_eval/judge.py)",
+  "label_taxonomy_version": "grounding_eval/models.py::SupportLabel v1 (4 labels), CitationRelation v1 (4 relations)",
+  "numeric_check_logic": "NOT part of the selected architecture (Candidate A/C only) - Candidate B relies entirely on the semantic judge's own reading of numeric fields in the Evidence block",
+  "multi_evidence_logic": "single Cerebras call receives all cited Evidence together, judges sufficiency holistically per contract Section 6",
+  "benchmark_version": "phase7_grounding_benchmark 1.0.0 (artifacts/v2/phase7_benchmark_manifest.json)",
+  "dev_validation_result": "27/27 = 100% accuracy, macro-F1 1.0 across all 4 classes (artifacts/v2/phase7_validation_results.json)",
+  "thresholds_predeclared": {
+    "support_label_macro_f1": ">=0.90",
+    "unsupported_contradicted_detection_recall": ">=0.95",
+    "schema_valid_rate": "100%",
+    "hard_safety_gates": "100%"
+  },
+  "known_accepted_limitations": [
+    "Benchmark scale (36 claim-level cases) is smaller than the suggested 60-case target - a first Phase-7 benchmark, not claimed as equivalent statistical power",
+    "No genuinely independent (different-provider) evaluator was validated in this cloud session - see CTL item for cross-model validation",
+    "Evaluator and generator share the same model family (qwen-3.8-27b) - documented as a caveat everywhere, never described as cross-model validation"
+  ]
+}

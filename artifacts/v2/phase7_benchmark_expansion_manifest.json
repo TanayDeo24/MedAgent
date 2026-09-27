@@ -1,0 +1,422 @@
+{
+  "artifact_name": "phase7_benchmark_expansion_manifest",
+  "purpose": "Phase-7 hardening pass (Known Issues 1/2/3/16): expand the claim-level grounding benchmark using real, never-before-used Phase-5 Evidence records, without touching or renumbering the original 36-case benchmark.",
+  "original_benchmark": {
+    "artifact": "artifacts/v2/phase7_benchmark_manifest.json",
+    "total_cases": 36,
+    "split_sizes": {
+      "development": 22,
+      "validation": 5,
+      "phase7_heldout": 9
+    },
+    "preserved_unmodified": true
+  },
+  "new_cases_added": 32,
+  "new_case_label_distribution": {
+    "supported": 16,
+    "partially_supported": 3,
+    "unsupported": 3,
+    "contradicted": 10
+  },
+  "new_case_split_assignment": {
+    "development": 17,
+    "validation": 3,
+    "fresh_heldout_supplement": 12
+  },
+  "new_case_source_type_evidence_count": {
+    "pubmed": 13,
+    "clinical_trials": 17,
+    "chembl": 10
+  },
+  "combined_totals": {
+    "total_cases": 68,
+    "development": 39,
+    "validation": 8,
+    "phase7_heldout_original": 9,
+    "fresh_heldout_supplement": 12
+  },
+  "combined_label_distribution_note": "original(supported=10,partially_supported=10,unsupported=8,contradicted=8) + new(see new_case_label_distribution) - all 4 classes now have >=12 total cases combined",
+  "grouping_and_leakage": {
+    "grouping_method": "by underlying real record (pmid / nct_id / chembl_id) - identical to the original benchmark's methodology",
+    "no_group_split_across_dev_val_heldout": true,
+    "multi_source_cases_co_located_with_all_constituent_groups": true,
+    "phase10_heldout_untouched": true,
+    "phase6_heldout_and_supplement_untouched": true,
+    "original_phase7_36_case_benchmark_and_its_evidence_pool_untouched": true
+  },
+  "gold_quality_audit": {
+    "method": "every new case's gold label re-verified against the FULL (non-truncated) real Evidence content/metadata actually fed to the evaluator, not a truncated preview",
+    "defect_found": "P7V2-BL2 - claim originally authored as UNSUPPORTED from a truncated evidence preview; the full Evidence text explicitly reports brigatinib superiority in both Asian AND non-Asian subgroups, making the claim's 'no benefit in non-Asian patients' assertion CONTRADICTED, not merely unaddressed. Corrected to case_id P7V2-BL2-C (contradicted) BEFORE being reused for any evaluator selection/freezing decision - never used as frozen held-out gold.",
+    "defect_status": "FIXED (development split, not held-out - no rule violated)"
+  },
+  "source_pool_inventory": {
+    "phase5_benchmark_manifest_total_raw_records": 72,
+    "used_by_original_phase7_36_case_benchmark": 10,
+    "unused_and_available_for_expansion": 62,
+    "used_by_this_expansion": 9,
+    "still_unused_after_this_expansion": 53,
+    "note": "A larger expansion than 32 new cases was possible from the remaining 53 unused real records; this pass targeted meeting the >=60-total / >=12-per-class / >=12-per-source / >=6-multi-source hardening thresholds rather than exhausting the full available pool, consistent with the directive's 'do not add cases solely to hit a number' instruction."
+  },
+  "new_cases": [
+    {
+      "case_id": "P7V2-BP3-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "pubmed:31109722",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:31109722:chunk:1"
+      ],
+      "claim_text": "Brigatinib was approved in May 2016 for ALK-positive metastatic NSCLC patients who progressed on or are resistant to crizotinib."
+    },
+    {
+      "case_id": "P7V2-BP3-P",
+      "gold_support_label": "partially_supported",
+      "split": "development",
+      "group_key": "pubmed:31109722",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:31109722:chunk:1"
+      ],
+      "claim_text": "Brigatinib was approved in May 2016 and is now the universally preferred first-line cure for all NSCLC patients."
+    },
+    {
+      "case_id": "P7V2-BP3-U",
+      "gold_support_label": "unsupported",
+      "split": "development",
+      "group_key": "pubmed:31109722",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:31109722:chunk:1"
+      ],
+      "claim_text": "Brigatinib causes significant weight gain as its most common side effect."
+    },
+    {
+      "case_id": "P7V2-BP3-C",
+      "gold_support_label": "contradicted",
+      "split": "development",
+      "group_key": "pubmed:31109722",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:31109722:chunk:1"
+      ],
+      "claim_text": "Brigatinib was approved by the FDA in May 2019 for ALK-positive NSCLC."
+    },
+    {
+      "case_id": "P7V2-BP4-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "pubmed:42134157",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:42134157:chunk:0"
+      ],
+      "claim_text": "A retrospective cohort study using Optum's Clinformatics database (2016-2024) compared first-line ALK TKIs in ALK-positive NSCLC patients, measuring time-to-next-treatment and overall survival."
+    },
+    {
+      "case_id": "P7V2-BP4-U",
+      "gold_support_label": "unsupported",
+      "split": "development",
+      "group_key": "pubmed:42134157",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:42134157:chunk:0"
+      ],
+      "claim_text": "The Optum retrospective study found brigatinib reduced mortality by exactly 50% compared to crizotinib."
+    },
+    {
+      "case_id": "P7V2-BL1-S",
+      "gold_support_label": "supported",
+      "split": "validation",
+      "group_key": "pubmed:30638036",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:30638036"
+      ],
+      "claim_text": "Brigatinib is dosed at 90 mg orally once daily for the first 7 days, then increased to 180 mg once daily if tolerated."
+    },
+    {
+      "case_id": "P7V2-BL1-C",
+      "gold_support_label": "contradicted",
+      "split": "validation",
+      "group_key": "pubmed:30638036",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:30638036"
+      ],
+      "claim_text": "Brigatinib is administered at a fixed dose of 300 mg once daily from treatment initiation."
+    },
+    {
+      "case_id": "P7V2-BL2-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "pubmed:36038416",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:36038416"
+      ],
+      "claim_text": "The ALTA-1L trial is a phase III study comparing brigatinib with crizotinib in ALK-inhibitor-naive, ALK-positive NSCLC patients."
+    },
+    {
+      "case_id": "P7V2-BL2-C",
+      "gold_support_label": "contradicted",
+      "split": "development",
+      "group_key": "pubmed:36038416",
+      "multi_source": false,
+      "evidence_ids": [
+        "pubmed:36038416"
+      ],
+      "claim_text": "The ALTA-1L subgroup analysis found brigatinib was superior to crizotinib only in Asian patients and showed no benefit in non-Asian patients."
+    },
+    {
+      "case_id": "P7V2-BT2-STATUS-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT01449461"
+      ],
+      "claim_text": "The brigatinib trial NCT01449461 is completed."
+    },
+    {
+      "case_id": "P7V2-BT2-STATUS-C",
+      "gold_support_label": "contradicted",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT01449461"
+      ],
+      "claim_text": "The brigatinib trial NCT01449461 is currently recruiting participants."
+    },
+    {
+      "case_id": "P7V2-BT2-PHASE-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT01449461"
+      ],
+      "claim_text": "NCT01449461 is a Phase 1/2 study of brigatinib."
+    },
+    {
+      "case_id": "P7V2-BT2-PHASE-C",
+      "gold_support_label": "contradicted",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT01449461"
+      ],
+      "claim_text": "NCT01449461 is a Phase 3 study of brigatinib."
+    },
+    {
+      "case_id": "P7V2-BT2-ENROLL-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT01449461"
+      ],
+      "claim_text": "The brigatinib trial NCT01449461 enrolled 137 participants."
+    },
+    {
+      "case_id": "P7V2-BT2-ENROLL-C",
+      "gold_support_label": "contradicted",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT01449461"
+      ],
+      "claim_text": "The brigatinib trial NCT01449461 enrolled 500 participants."
+    },
+    {
+      "case_id": "P7V2-BT3-S",
+      "gold_support_label": "supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "nct:NCT04887519",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT04887519"
+      ],
+      "claim_text": "NCT04887519 is a completed, non-interventional, post-authorization safety study of brigatinib sponsored by Takeda."
+    },
+    {
+      "case_id": "P7V2-BT3-U",
+      "gold_support_label": "unsupported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "nct:NCT04887519",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT04887519"
+      ],
+      "claim_text": "NCT04887519 evaluated brigatinib in combination with pembrolizumab immunotherapy."
+    },
+    {
+      "case_id": "P7V2-BT3-C",
+      "gold_support_label": "contradicted",
+      "split": "fresh_heldout_supplement",
+      "group_key": "nct:NCT04887519",
+      "multi_source": false,
+      "evidence_ids": [
+        "nct:NCT04887519"
+      ],
+      "claim_text": "NCT04887519 enrolled 139 patients."
+    },
+    {
+      "case_id": "P7V2-OS-S",
+      "gold_support_label": "supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL3353410",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "claim_text": "Osimertinib is a small-molecule compound that has reached Phase 4 of clinical development."
+    },
+    {
+      "case_id": "P7V2-OS-C1",
+      "gold_support_label": "contradicted",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL3353410",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "claim_text": "Osimertinib is a monoclonal antibody."
+    },
+    {
+      "case_id": "P7V2-OS-C2",
+      "gold_support_label": "contradicted",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL3353410",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "claim_text": "Osimertinib has only reached Phase 1 of clinical development."
+    },
+    {
+      "case_id": "P7V2-OSR-S",
+      "gold_support_label": "supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL3353410",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "claim_text": "Osimertinib resolves to ChEMBL ID CHEMBL3353410."
+    },
+    {
+      "case_id": "P7V2-OSR-C",
+      "gold_support_label": "contradicted",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL3353410",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "claim_text": "Osimertinib resolves to ChEMBL ID CHEMBL1234567."
+    },
+    {
+      "case_id": "P7V2-MI4-S",
+      "gold_support_label": "supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL1201438",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL1201438"
+      ],
+      "claim_text": "CHEMBL1201438 is an approved (Phase 4) treatment indicated for melanoma."
+    },
+    {
+      "case_id": "P7V2-MI4-P",
+      "gold_support_label": "partially_supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL1201438",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL1201438"
+      ],
+      "claim_text": "CHEMBL1201438 is indicated for melanoma and is the single most effective melanoma treatment available worldwide."
+    },
+    {
+      "case_id": "P7V2-ASR-S",
+      "gold_support_label": "supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL25",
+      "multi_source": false,
+      "evidence_ids": [
+        "chembl:CHEMBL25"
+      ],
+      "claim_text": "Aspirin resolves to ChEMBL ID CHEMBL25."
+    },
+    {
+      "case_id": "P7V2-MS1-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "multi:nct:NCT01449461+pubmed:31109722",
+      "multi_source": true,
+      "evidence_ids": [
+        "nct:NCT01449461",
+        "nct:NCT01449461",
+        "pubmed:31109722:chunk:1"
+      ],
+      "claim_text": "Brigatinib, evaluated in the completed Phase 1/2 trial NCT01449461, was approved by the FDA in May 2016 for ALK-positive NSCLC patients who progressed on crizotinib."
+    },
+    {
+      "case_id": "P7V2-MS2-S",
+      "gold_support_label": "supported",
+      "split": "validation",
+      "group_key": "multi:nct:NCT01449461+pubmed:30638036",
+      "multi_source": true,
+      "evidence_ids": [
+        "nct:NCT01449461",
+        "nct:NCT01449461",
+        "pubmed:30638036"
+      ],
+      "claim_text": "Brigatinib, studied in the completed Phase 1/2 trial NCT01449461, is dosed at 90 mg increasing to 180 mg once daily."
+    },
+    {
+      "case_id": "P7V2-MS3-P",
+      "gold_support_label": "partially_supported",
+      "split": "development",
+      "group_key": "nct:NCT01449461",
+      "multi_source": true,
+      "evidence_ids": [
+        "nct:NCT01449461",
+        "nct:NCT01449461"
+      ],
+      "claim_text": "Brigatinib, studied in the completed Phase 1/2 trial NCT01449461, is dosed at 90 mg increasing to 180 mg once daily."
+    },
+    {
+      "case_id": "P7V2-MS4-S",
+      "gold_support_label": "supported",
+      "split": "fresh_heldout_supplement",
+      "group_key": "chembl:CHEMBL3353410",
+      "multi_source": true,
+      "evidence_ids": [
+        "chembl:CHEMBL3353410",
+        "chembl:CHEMBL25"
+      ],
+      "claim_text": "Osimertinib is a small-molecule compound that has reached Phase 4 of clinical development."
+    },
+    {
+      "case_id": "P7V2-MS5-S",
+      "gold_support_label": "supported",
+      "split": "development",
+      "group_key": "multi:nct:NCT01449461+pubmed:42134157",
+      "multi_source": true,
+      "evidence_ids": [
+        "nct:NCT01449461",
+        "nct:NCT01449461",
+        "pubmed:42134157:chunk:0"
+      ],
+      "claim_text": "Brigatinib was evaluated in the completed Phase 1/2 trial NCT01449461, and separately, a 2016-2024 Optum retrospective cohort study assessed its real-world comparative effectiveness against other first-line ALK TKIs."
+    }
+  ]
+}

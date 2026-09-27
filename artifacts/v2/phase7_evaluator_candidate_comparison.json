@@ -1,0 +1,30 @@
+{
+  "comparison_name": "phase7_evaluator_candidate_comparison",
+  "created": "2026-09-27",
+  "methodology": "All three candidates measured on the SAME 22 real development cases (Candidate C measured twice: v1 with a naive numeric regex, v2 after fixing a real word-boundary defect found in v1). Candidate A/B additionally measured on 5 validation cases. Phase-7 held-out untouched during this comparison.",
+  "candidates": {
+    "candidate_a_deterministic": {
+      "architecture": "numeric exact-match + lexical word-overlap, no LLM call",
+      "dev_validation_correct": 7,
+      "dev_validation_total": 27,
+      "dev_validation_accuracy": 0.2593,
+      "limitation": "cannot detect paraphrase/overclaiming/non-numeric contradiction"
+    },
+    "candidate_b_semantic_judge": {
+      "architecture": "single Cerebras qwen-3.8-27b strict-JSON-schema call judging the whole claim + all cited Evidence together",
+      "dev_validation_correct": 27,
+      "dev_validation_total": 27,
+      "dev_validation_accuracy": 1.0,
+      "note": "22/22 dev + 5/5 validation AFTER a real prompt fix (see failure analysis F1: judge was using outside biomedical/regulatory knowledge to call CONTRADICTED instead of PARTIALLY_SUPPORTED when Evidence simply didn't address the overclaimed part). Before the fix: 20/22 dev."
+    },
+    "candidate_c_hybrid": {
+      "architecture": "deterministic numeric precheck (hard override) + Candidate B semantic judge",
+      "dev_accuracy_v1_naive_regex": 0.5,
+      "dev_accuracy_v2_fixed_word_boundary_regex": 0.7273,
+      "real_defect_found": "the deterministic numeric-mismatch check is asymmetric between free-prose claim text (numbers separated by spaces, e.g. 'Phase 2') and compact enum-style Evidence field values (e.g. 'PHASE2', 'CHEMBL941') - even after fixing v1's worse defect (treating digits embedded in NCT/ChEMBL identifiers as claimed numeric facts), the extraction still misses digits glued to letters on the EVIDENCE side, causing false CONTRADICTED overrides on otherwise-correct claims.",
+      "decision": "NOT SELECTED - Candidate B alone already reaches 100% dev+validation without this fragility; not worth further engineering effort for a candidate that is not going to be chosen."
+    }
+  },
+  "selected": "candidate_b_semantic_judge",
+  "selection_reason": "Highest accuracy (100% dev+validation after the one real prompt fix), simplest architecture (no extra deterministic layer to introduce new failure modes), and the found Candidate-C defect demonstrates that a naive deterministic layer is actively harmful here, not merely unnecessary."
+}

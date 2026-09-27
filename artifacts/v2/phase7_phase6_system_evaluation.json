@@ -1,0 +1,438 @@
+{
+  "evaluation_name": "phase7_phase6_system_evaluation",
+  "created": "2026-09-27",
+  "evaluator_used": "candidate_b_semantic_judge (frozen, validated: 27/27 dev+validation, 9/9 held-out, macro-F1 1.0)",
+  "generator_evaluated": "candidate_b_structured (frozen Phase-6, Cerebras qwen-3.8-27b, unchanged since Phase-6 freeze)",
+  "generator_tuned_during_measurement": false,
+  "total_answers": 8,
+  "total_factual_claims": 16,
+  "supported_claims": 16,
+  "partially_supported_claims": 0,
+  "unsupported_claims": 0,
+  "contradicted_claims": 0,
+  "claim_support_rate": 1.0,
+  "partial_support_rate": 0.0,
+  "unsupported_claim_rate": 0.0,
+  "contradiction_rate": 0.0,
+  "citation_precision_mean": 1.0,
+  "claim_citation_coverage_mean": 1.0,
+  "citation_set_sufficiency": "not separately measured beyond claim_citation_coverage in this evaluation set (no multi-required-Evidence-group case was included in the 8-case system-eval selection) - see accepted limitations",
+  "irrelevant_citation_rate": 0.0,
+  "numeric_claim_support_rate": "1/1 = 100% (P6-D8, the single dedicated numeric case in this set)",
+  "answer_level_fully_grounded_rate": 1.0,
+  "abstention_grounding_correctness": "2/2 correct (both zero/insufficient-evidence cases P6-D5, P6-D6 correctly abstained with 0 factual claims, per Phase-6's own structural guarantee, reconfirmed here at the semantic level - no fabricated claim existed to evaluate)",
+  "conflict_grounding_correctness": "1/1 - P6-D7 (melanoma phase variation case) produced 3 real claims, all judged SUPPORTED (no fabricated consensus, no averaging - each claim correctly cites its own distinct real max_phase value)",
+  "source_breakdown": {
+    "pubmed": {
+      "claims": 4,
+      "supported": 4,
+      "unsupported": 0,
+      "contradicted": 0
+    },
+    "clinical_trials": {
+      "claims": 2,
+      "supported": 2,
+      "unsupported": 0,
+      "contradicted": 0
+    },
+    "chembl": {
+      "claims": 5,
+      "supported": 5,
+      "unsupported": 0,
+      "contradicted": 0
+    },
+    "multi_source": {
+      "claims": 5,
+      "supported": 5,
+      "unsupported": 0,
+      "contradicted": 0
+    },
+    "n/a_abstained": {
+      "claims": 0,
+      "supported": 0,
+      "unsupported": 0,
+      "contradicted": 0
+    }
+  },
+  "case_level_detail": [
+    {
+      "case_id": "P6-D1",
+      "categories": [
+        "pubmed_only",
+        "evidence_multiple_source_records"
+      ],
+      "query": "What clinical evidence supports brigatinib for ALK-positive advanced NSCLC?",
+      "n_evidence": 2,
+      "rendered_text": "Brigatinib has demonstrated high activity and durable responses in patients with ALK-positive advanced NSCLC who are resistant to crizotinib, including in intracranial disease.[1] Brigatinib is effective against various ALK resistance mutations, such as G1269A, C1156Y, I1171S/T, and V1180L.[1] The FDA has approved brigatinib for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib.[1] As a first-line treatment for ALK-positive advanced NSCLC, brigatinib demonstrates superior progression-free survival (PFS) compared to chemotherapy or crizotinib.[2] Clinical evidence supports brigatinib as a therapeutic option for ALK-positive advanced NSCLC in both the second-line setting (post-crizotinib) and the first-line setting, with demonstrated efficacy in both systemic and intracranial disease.[1][2]",
+      "abstained": false,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 1011.7740631103516,
+      "factual_claim_count": 4,
+      "supported_count": 4,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0,
+      "eval_llm_calls": 4,
+      "eval_latency_ms": 47730.54599761963,
+      "claim_judgments": [
+        {
+          "claim_id": "c-0",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:29119148:chunk:1",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the specific clinical trial outcomes and disease scope detailed in the evidence."
+        },
+        {
+          "claim_id": "c-1",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:29119148:chunk:1",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the specific mutations and activity described in the evidence."
+        },
+        {
+          "claim_id": "c-2",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:29119148:chunk:1",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim is verbatim supported by evidence"
+        },
+        {
+          "claim_id": "c-3",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:39368244:chunk:0",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim is directly and fully supported by the cited evidence text."
+        }
+      ]
+    },
+    {
+      "case_id": "P6-D2",
+      "categories": [
+        "clinicaltrials_only",
+        "same_source_record_multi_evidence"
+      ],
+      "query": "What is the status and phase of the brigatinib trial NCT03535740?",
+      "n_evidence": 9,
+      "rendered_text": "The status of the brigatinib trial NCT03535740 is COMPLETED.[1] The phase of the brigatinib trial NCT03535740 is PHASE2.[1]",
+      "abstained": false,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 12127.840757369995,
+      "factual_claim_count": 2,
+      "supported_count": 2,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0,
+      "eval_llm_calls": 2,
+      "eval_latency_ms": 24185.500621795654,
+      "claim_judgments": [
+        {
+          "claim_id": "c-0",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "nct:NCT03535740",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim matches evidence status field exactly"
+        },
+        {
+          "claim_id": "c-1",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "nct:NCT03535740",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim matches evidence phase field"
+        }
+      ]
+    },
+    {
+      "case_id": "P6-D3",
+      "categories": [
+        "chembl_only",
+        "duplicate_redundant_evidence"
+      ],
+      "query": "What is imatinib's ChEMBL identifier?",
+      "n_evidence": 2,
+      "rendered_text": "Imatinib's ChEMBL identifier is CHEMBL941.[1]",
+      "abstained": false,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 12098.216533660889,
+      "factual_claim_count": 1,
+      "supported_count": 1,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0,
+      "eval_llm_calls": 1,
+      "eval_latency_ms": 12094.444513320923,
+      "claim_judgments": [
+        {
+          "claim_id": "c-0",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "chembl:CHEMBL941",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim directly matches evidence identifier"
+        }
+      ]
+    },
+    {
+      "case_id": "P6-D4",
+      "categories": [
+        "multi_source",
+        "synthesis_across_units"
+      ],
+      "query": "Summarize what published literature and clinical trials say about brigatinib for ALK-positive NSCLC.",
+      "n_evidence": 10,
+      "rendered_text": "Brigatinib is active against various ALK resistance mutations, including G1269A, C1156Y, I1171S/T, and V1180L.[1] Clinical trials have confirmed that brigatinib has high activity and durable response in crizotinib-resistant patients, including in intracranial disease.[1] Brigatinib received FDA approval for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib.[1] A completed Phase 2 clinical trial (NCT03535740) evaluated brigatinib in 103 patients with ALK-positive advanced NSCLC who had progressed on alectinib or ceritinib.[2] The primary purpose of the NCT03535740 trial was to determine the efficacy of brigatinib by confirmed objective response rate (ORR) using RECIST criteria.[2] The literature and clinical trials indicate that brigatinib is being evaluated and utilized in multiple lines of therapy for ALK-positive NSCLC, including after crizotinib, alectinib, and ceritinib.[1][2]",
+      "abstained": false,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 12306.923151016235,
+      "factual_claim_count": 5,
+      "supported_count": 5,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0,
+      "eval_llm_calls": 5,
+      "eval_latency_ms": 59946.38514518738,
+      "claim_judgments": [
+        {
+          "claim_id": "c-0",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:29119148:chunk:1",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the specific mutations listed in the evidence."
+        },
+        {
+          "claim_id": "c-1",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:29119148:chunk:1",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim is directly and fully supported by the cited evidence text."
+        },
+        {
+          "claim_id": "c-2",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "pubmed:29119148:chunk:1",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim is verbatim supported by evidence"
+        },
+        {
+          "claim_id": "c-3",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "nct:NCT03535740",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects trial status, phase, population, and enrollment."
+        },
+        {
+          "claim_id": "c-4",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "nct:NCT03535740",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the trial's stated primary purpose and criteria."
+        }
+      ]
+    },
+    {
+      "case_id": "P6-D5",
+      "categories": [
+        "insufficient_evidence"
+      ],
+      "query": "What is the recommended pediatric dosing schedule for brigatinib?",
+      "n_evidence": 1,
+      "rendered_text": "The provided evidence does not contain information regarding the recommended pediatric dosing schedule for brigatinib.",
+      "abstained": true,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 11979.395151138306,
+      "factual_claim_count": 0,
+      "supported_count": 0,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": null,
+      "claim_citation_coverage": null,
+      "eval_llm_calls": 0,
+      "eval_latency_ms": 0.029802322387695312,
+      "claim_judgments": []
+    },
+    {
+      "case_id": "P6-D6",
+      "categories": [
+        "zero_evidence"
+      ],
+      "query": "What compounds inhibit the fictional target XYZ-9000?",
+      "n_evidence": 0,
+      "rendered_text": "Available evidence is insufficient to support a conclusion for this question.",
+      "abstained": true,
+      "conflict_detected": false,
+      "gen_llm_calls": 0,
+      "gen_latency_ms": 0.018596649169921875,
+      "factual_claim_count": 0,
+      "supported_count": 0,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": null,
+      "claim_citation_coverage": null,
+      "eval_llm_calls": 0,
+      "eval_latency_ms": 0.0095367431640625,
+      "claim_judgments": []
+    },
+    {
+      "case_id": "P6-D7",
+      "categories": [
+        "conflicting_or_varying_evidence",
+        "missing_optional_metadata"
+      ],
+      "query": "What is the clinical development landscape for melanoma therapies recorded in ChEMBL?",
+      "n_evidence": 3,
+      "rendered_text": "ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 4.0.[1] ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 3.0.[2] ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 1.0.[3] The clinical development landscape for melanoma therapies in ChEMBL spans early-stage (Phase 1) to approved (Phase 4) clinical trials.[1][2][3]",
+      "abstained": false,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 12731.686115264893,
+      "factual_claim_count": 3,
+      "supported_count": 3,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0,
+      "eval_llm_calls": 3,
+      "eval_latency_ms": 35430.86361885071,
+      "claim_judgments": [
+        {
+          "claim_id": "c-0",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "chembl:CHEMBL1789844",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the max_phase field in the evidence."
+        },
+        {
+          "claim_id": "c-1",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "chembl:CHEMBL428647",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the max_phase field in the evidence."
+        },
+        {
+          "claim_id": "c-2",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "chembl:CHEMBL2105704",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Claim accurately reflects the max_phase field in the evidence."
+        }
+      ]
+    },
+    {
+      "case_id": "P6-D8",
+      "categories": [
+        "numeric_claim"
+      ],
+      "query": "What is the maximum clinical trial phase reached by imatinib?",
+      "n_evidence": 1,
+      "rendered_text": "The maximum clinical trial phase reached by imatinib is Phase 4.[1]",
+      "abstained": false,
+      "conflict_detected": false,
+      "gen_llm_calls": 1,
+      "gen_latency_ms": 12011.484861373901,
+      "factual_claim_count": 1,
+      "supported_count": 1,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0,
+      "eval_llm_calls": 1,
+      "eval_latency_ms": 12063.08889389038,
+      "claim_judgments": [
+        {
+          "claim_id": "c-0",
+          "support_label": "supported",
+          "citation_relations": [
+            {
+              "evidence_id": "chembl:CHEMBL941",
+              "relation": "supports"
+            }
+          ],
+          "reason_code": "Evidence explicitly states max_phase 4.0"
+        }
+      ]
+    }
+  ]
+}

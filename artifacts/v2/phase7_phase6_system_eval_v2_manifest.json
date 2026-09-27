@@ -1,0 +1,76 @@
+{
+  "manifest_name": "phase7_phase6_system_eval_v2_manifest",
+  "purpose": "Hardening-pass expansion of the frozen Phase-6 generator's system-evaluation set (Known Issue 8/9), using real Phase-5 Evidence never used in Phase-6's own benchmark/held-out/supplement or in the original 8-case Phase-7 system evaluation.",
+  "frozen_before_generation": true,
+  "cases": [
+    {
+      "case_id": "P7SYS2-Q1",
+      "query": "What is known about the brigatinib trial NCT01449461?",
+      "evidence_ids": [
+        "nct:NCT01449461",
+        "nct:NCT01449461",
+        "nct:NCT01449461"
+      ],
+      "source_category": "clinical_trials"
+    },
+    {
+      "case_id": "P7SYS2-Q2",
+      "query": "What is known about the brigatinib post-authorization safety study NCT04887519?",
+      "evidence_ids": [
+        "nct:NCT04887519",
+        "nct:NCT04887519"
+      ],
+      "source_category": "clinical_trials"
+    },
+    {
+      "case_id": "P7SYS2-Q3",
+      "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+      "evidence_ids": [
+        "pubmed:31109722:chunk:1",
+        "pubmed:42134157:chunk:0"
+      ],
+      "source_category": "pubmed"
+    },
+    {
+      "case_id": "P7SYS2-Q4",
+      "query": "How is brigatinib dosed, and what did the ALTA-1L trial find?",
+      "evidence_ids": [
+        "pubmed:30638036",
+        "pubmed:36038416"
+      ],
+      "source_category": "pubmed"
+    },
+    {
+      "case_id": "P7SYS2-Q5",
+      "query": "What is osimertinib's development phase and molecule type?",
+      "evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "source_category": "chembl"
+    },
+    {
+      "case_id": "P7SYS2-Q6",
+      "query": "What indication and development phase does CHEMBL1201438 have?",
+      "evidence_ids": [
+        "chembl:CHEMBL1201438"
+      ],
+      "source_category": "chembl"
+    },
+    {
+      "case_id": "P7SYS2-Q7",
+      "query": "What is known about the brigatinib trial NCT01449461 and its FDA approval history?",
+      "evidence_ids": [
+        "nct:NCT01449461",
+        "nct:NCT01449461",
+        "pubmed:31109722:chunk:1"
+      ],
+      "source_category": "multi_source"
+    },
+    {
+      "case_id": "P7SYS2-Q8",
+      "query": "What is the recommended dosage of vorinostat for pediatric acute lymphoblastic leukemia?",
+      "evidence_ids": [],
+      "source_category": "n_a_abstention"
+    }
+  ]
+}

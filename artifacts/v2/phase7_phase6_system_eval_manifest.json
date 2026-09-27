@@ -1,0 +1,11 @@
+{
+  "manifest_name": "phase7_phase6_system_eval_manifest",
+  "created": "2026-09-27",
+  "purpose": "A separate answer-level evaluation set for measuring the FROZEN Phase-6 generator's semantic grounding quality via the validated Phase-7 evaluator. Distinct from: (a) Phase-6's own held-out (artifacts/v2/phase6_heldout_results.json, preserved untouched, never reused here), (b) the Phase-6 held-out supplement (P6-SUPP-01), and (c) Phase-10's final held-out (untouched).",
+  "case_selection": "8 real cases reused from Phase-6's already-frozen development/validation benchmark (artifacts/v2/phase6_benchmark_manifest.json case_ids below) - real queries + real Evidence[] built from real Phase-5 source records. Phase-6's held-out split (P6-H1/H2/H3) was deliberately excluded from this selection.",
+  "case_ids_reused": ["P6-D1", "P6-D2", "P6-D3", "P6-D4", "P6-D5", "P6-D6", "P6-D7", "P6-D8"],
+  "source_coverage": {"pubmed": "P6-D1", "clinical_trials": "P6-D2", "chembl": "P6-D3", "multi_source": "P6-D4", "insufficient_evidence": "P6-D5", "zero_evidence": "P6-D6", "conflict_or_varying": "P6-D7", "numeric_claim": "P6-D8"},
+  "generation_policy": "Each answer generated EXACTLY ONCE using the frozen Phase-6 architecture (candidate_b_structured, Cerebras qwen-3.8-27b, unchanged prompt/schema/citation-compiler/validation code since Phase-6's freeze) under normal provider retry policy. No Phase-6 tuning occurred based on Phase-7 evaluator output.",
+  "frozen_generator_config_reference": "artifacts/v2/phase6_frozen_config.json (config_version 1) - unchanged",
+  "status": "FROZEN - case selection fixed before any answer was generated for this evaluation."
+}

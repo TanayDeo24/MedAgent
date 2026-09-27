@@ -1,0 +1,19 @@
+{
+  "contract_name": "phase7_grounding_evaluation_contract",
+  "contract_version": "1.0.0",
+  "created": "2026-09-27",
+  "doc": "docs/v2/PHASE7_GROUNDING_EVALUATION_CONTRACT.md",
+  "two_systems": {"system_a": "the evaluator, validated against frozen gold", "system_b": "the frozen Phase-6 generator, measured only after system A is validated"},
+  "evaluator_input_isolation": ["claim_text", "claim_type", "cited_evidence_objects", "original_query_optional"],
+  "evaluator_forbidden_inputs": ["generator_system_prompt", "generator_reasoning", "candidate_identity", "expected_pass_fail", "benchmark_gold_labels", "other_evaluator_outputs"],
+  "support_label_taxonomy": ["SUPPORTED", "PARTIALLY_SUPPORTED", "UNSUPPORTED", "CONTRADICTED"],
+  "citation_relation_taxonomy": ["SUPPORTS", "PARTIAL_SUPPORT", "IRRELEVANT", "CONTRADICTS"],
+  "numeric_policy": "deterministic exact-value comparison against structured Evidence fields first; mismatch = automatic CONTRADICTED; unstructured prose falls to semantic judge",
+  "multi_evidence_policy": "gold specifies required_evidence_groups; claim support label reflects whether union of SUPPORTS/PARTIAL_SUPPORT citations covers every required fact; extra irrelevant citations flagged separately, do not fail the claim",
+  "answer_level_fully_grounded_rule": "no FACTUAL claim UNSUPPORTED or CONTRADICTED; every FACTUAL claim has >=1 SUPPORTS/PARTIAL_SUPPORT citation; no fabricated source/reference; PARTIALLY_SUPPORTED claims count as NOT fully grounded at answer level",
+  "citation_precision_definition": "(citations judged SUPPORTS or PARTIAL_SUPPORT) / (total citations across FACTUAL claims) - PARTIAL_SUPPORT counts as correct",
+  "citation_coverage_definition": "(FACTUAL claims with >=1 SUPPORTS/PARTIAL_SUPPORT citation) / (total FACTUAL claims) - 'citation recall' against a larger universe is never reported, no defensible denominator exists",
+  "chain_of_thought_storage": false,
+  "same_model_caveat": "Phase-6 generator and selected Phase-7 evaluator both use Cerebras qwen-3.8-27b; documented everywhere as 'a separate evaluation path validated against independently frozen gold', never 'cross-model independent validation'",
+  "non_goals": ["follow-up retrieval", "autonomous refinement", "production latency optimization", "Phase-10 held-out", "conversational UX", "deployment", "insertion into production graph"]
+}

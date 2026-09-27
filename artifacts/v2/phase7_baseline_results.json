@@ -1,0 +1,8 @@
+{
+  "baseline_name": "candidate_a_deterministic",
+  "created": "2026-09-27",
+  "description": "Candidate A - the deterministic baseline evaluator (numeric exact-match + lexical word-overlap only, no LLM call). Represents 'what Phase-6's existing structural checks could already tell us' extended with a naive numeric/lexical layer.",
+  "n_dev_validation": 27,
+  "accuracy": 0.2593,
+  "limitation_demonstrated": "Cannot detect paraphrase, overclaiming/qualification loss, or non-numeric contradiction - only catches cases with a clean numeric mismatch or near-total lexical overlap. Confirms the exact gap documented in docs/v2/PHASE7_INITIAL_GROUNDING_AUDIT.md."
+}

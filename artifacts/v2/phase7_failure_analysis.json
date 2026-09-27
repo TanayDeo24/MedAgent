@@ -1,0 +1,80 @@
+{
+  "analysis_name": "phase7_failure_analysis",
+  "created": "2026-09-27",
+  "taxonomy_used": [
+    "FALSE_SUPPORTED",
+    "FALSE_UNSUPPORTED",
+    "FALSE_PARTIAL",
+    "MISSED_CONTRADICTION",
+    "FALSE_CONTRADICTION",
+    "IRRELEVANT_CITATION_MARKED_SUPPORT",
+    "SUPPORTING_CITATION_MARKED_IRRELEVANT",
+    "NUMERIC_MISMATCH_MISSED",
+    "WRONG_ENTITY_MATCH",
+    "WRONG_SOURCE_ATTRIBUTION",
+    "INCOMPLETE_MULTI_EVIDENCE_SUPPORT",
+    "OVERLY_STRICT_PARAPHRASE",
+    "OVERLY_LENIENT_PARAPHRASE",
+    "SCHEMA_FAILURE",
+    "PROVIDER_ERROR",
+    "AMBIGUOUS_GOLD",
+    "GOLD_DEFECT"
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "category": "FALSE_CONTRADICTION",
+      "root_cause": "REAL, IN-SCOPE EVALUATOR DEFECT: Candidate B's initial prompt (v1) allowed the judge to use outside biomedical/regulatory domain knowledge to infer a CONTRADICTED label when a claim added an overclaiming detail (e.g. 'fully validated brigatinib as a curative therapy' attached to a Phase-2-only claim) that the Evidence simply never addressed at all - the Evidence contains no efficacy/approval statement to actually conflict with. The correct label per contract Section 3 is PARTIALLY_SUPPORTED (an unsupported addition), not CONTRADICTED (which requires the Evidence to explicitly state the opposing fact).",
+      "cases_affected": [
+        "P7-F1-P (round 1)",
+        "P7-F3-P (round 1)"
+      ],
+      "detection": "development-split run, round 1 (22 cases, 20/22 passed)",
+      "fix": "grounding_eval/judge.py's _SYSTEM_PROMPT was extended with an explicit CRITICAL DISTINCTION section and a concrete example, telling the judge CONTRADICTED requires the Evidence's own stated content to be the source of conflict, never an inference from outside domain knowledge the Evidence does not contain.",
+      "regression_check": "development split rerun after the fix: 22/22 (up from 20/22); validation split (fresh cases, never touched during the fix): 5/5.",
+      "status": "FIXED, verified on fresh re-run"
+    },
+    {
+      "id": "F2",
+      "category": "NUMERIC_MISMATCH_MISSED / WRONG_ENTITY_MATCH (Candidate C only, not selected)",
+      "root_cause": "Candidate C's deterministic numeric precheck (grounding_eval/deterministic.py) used a naive digit-sequence regex that matched digits embedded inside alphanumeric identifiers (e.g. '03535740' inside 'NCT03535740', '1269' inside mutation code 'G1269A') and treated them as claimed numeric facts, causing false CONTRADICTED overrides on claims that were actually correct.",
+      "cases_affected": [
+        "P7-F3-S/P/U",
+        "P7-M1",
+        "P7-F4-S/P/U",
+        "P7-F5-S/P/U",
+        "P7-M3 (Candidate C round 1, 11/22)"
+      ],
+      "detection": "Candidate C dev-split run, round 1",
+      "fix": "Tightened the regex to require non-alphanumeric boundaries on both sides (grounding_eval/deterministic.py::_NUM_RE), so digits embedded in identifiers/mutation codes are no longer extracted as claimed numeric facts.",
+      "regression_check": "Candidate C round 2: 16/22 (up from 11/22) - still below Candidate B's 22/22.",
+      "residual_defect_not_further_fixed": "The regex's symmetric letter-boundary requirement also excludes digits glued to letters on the EVIDENCE side (e.g. 'PHASE2' with no space), so the evidence-side numeric pool misses that value even when the claim states it correctly with a space ('Phase 2'), causing further false CONTRADICTED overrides (P7-F3-S/P, P7-M1, P7-F5-S/P/U remained wrong in round 2). NOT further fixed because Candidate C is not the selected architecture - Candidate B alone already meets every predeclared threshold, so no engineering effort was spent perfecting a candidate that will not be used.",
+      "status": "PARTIALLY FIXED, Candidate C not selected regardless"
+    },
+    {
+      "id": "F3",
+      "category": "NUMERIC_MISMATCH_MISSED (test-driven, Candidate A/C shared utility)",
+      "root_cause": "grounding_eval.deterministic._numbers_in compared raw regex-matched strings, so a claim stating \"4\" and Evidence stating \"4.0\" (same real value, different string formatting) were treated as a mismatch.",
+      "cases_affected": [
+        "found via tests/test_grounding_eval_deterministic.py::test_valid_numeric_match, not a benchmark case"
+      ],
+      "detection": "offline test suite (Step 48), written after candidate selection",
+      "fix": "normalize extracted numeric tokens to their float value before set comparison",
+      "regression_check": "all 7 grounding_eval_deterministic tests pass; does not affect Candidate B (selected) at all, since Candidate B never calls this function",
+      "status": "FIXED - does not change the frozen candidate selection decision (Candidate B remains selected regardless)"
+    }
+  ],
+  "gold_defects_found": "NONE - no gold-authoring defect was found in the Phase-7 claim-level benchmark (all 36 cases' gold labels were confirmed correct by direct re-inspection during failure triage above; both real failures traced to evaluator code, not gold).",
+  "overall_hard_gate_status": {
+    "unknown_evidence_id_in_evaluation_output": 0,
+    "fabricated_evidence_id": 0,
+    "fabricated_source_id": 0,
+    "fabricated_source_url": 0,
+    "secret_leaks": 0,
+    "unserializable_evaluation": 0,
+    "uncaught_evaluator_schema_failure": 0,
+    "gold_label_leak_into_evaluator_input": 0,
+    "held_out_gold_used_during_tuning": 0,
+    "silent_evaluator_failure_treated_as_pass": 0
+  }
+}

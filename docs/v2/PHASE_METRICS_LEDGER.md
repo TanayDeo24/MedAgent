@@ -690,3 +690,145 @@ results.
 - Any claim that Phase 6 ran a nonzero-Evidence real end-to-end pipeline
   in this cloud session — it did not (CTL-009); only a zero-Evidence
   real-graph run and a mocked-Evidence unit-level pipeline were verified.
+
+## Phase 7: Grounding + Citation Evaluation
+
+Two systems measured separately, never blended:
+
+### System A — the evaluator itself
+
+Final architecture: `grounding_eval/pipeline.py` (Candidate B, structured
+semantic judge) — one Cerebras `qwen-3.8-27b` strict-JSON-schema call per
+claim. Validated against 36 independently-authored, Evidence-backed gold
+claim/citation labels (22 dev, 5 validation, 9 held-out), built from real
+Phase-5 Evidence, grouped by underlying fact-family to prevent
+supported/negated-twin leakage across splits.
+
+| Metric | Dev+Validation (27) | Held-out (9, run once) |
+|---|---|---|
+| Accuracy | 100% | 100% |
+| Macro-F1 | 1.0 | 1.0 |
+| Unsupported detection recall | 1.0 | 1.0 |
+| Contradiction detection recall | 1.0 | 1.0 |
+| Schema-valid rate | 100% | 100% |
+| Hard gates | 10/10 | 10/10 |
+
+All predeclared thresholds (macro-F1 ≥0.90, unsupported/contradicted
+recall ≥0.95, schema-valid 100%) exceeded, not lowered after seeing
+results. Baseline (Candidate A, deterministic-only): 7/27 = 26% —
+confirms the exact structural-vs-semantic gap
+`docs/v2/PHASE7_INITIAL_GROUNDING_AUDIT.md` documented. Candidate C
+(hybrid) not selected — a real, measured defect (asymmetric numeric
+extraction between free prose and compact enum-style Evidence fields)
+made it worse than Candidate B alone (16/22 vs. 22/22 dev).
+
+**Same-model caveat:** the evaluator and the Phase-6 generator both use
+Cerebras `qwen-3.8-27b`. This is a *separate evaluation path validated
+against independently frozen gold*, never described as cross-model
+independent validation (see CTL-011).
+
+**Real evaluator defect found and fixed:** the judge's initial prompt
+used outside biomedical/regulatory knowledge to call CONTRADICTED instead
+of PARTIALLY_SUPPORTED when Evidence simply didn't address an overclaimed
+detail. Fixed with an explicit prompt clarification. Dev: 20/22 → 22/22.
+Full account: `artifacts/v2/phase7_failure_analysis.json`.
+
+### System B — the frozen Phase-6 generator, measured by the validated evaluator
+
+Measured on a fresh 8-case system-evaluation set (real queries/Evidence
+reused from Phase-6's own dev/validation split, never its held-out;
+answers generated once under the unchanged frozen Phase-6 architecture):
+
+| Metric | Result | n |
+|---|---|---|
+| Claim support rate | 100% | 16 factual claims |
+| Unsupported claim rate | 0% | 16 |
+| Contradiction rate | 0% | 16 |
+| Citation precision | 1.0 | 6 non-abstained answers |
+| Claim citation coverage | 1.0 | 16 |
+| Answer-level fully-grounded rate | 100% | 8 answers |
+| Abstention grounding correctness | 2/2 | zero/insufficient-Evidence cases |
+| Conflict grounding correctness | 1/1 | melanoma-phase-variation case |
+
+**No Phase-6 defect was discovered.** A real, positive result — but on a
+modest sample (16 claims across 8 answers); not claimed as proof of zero
+hallucinations at any larger scale (see resume-safe claims below).
+
+### NOT resume-safe / explicitly non-comparable
+
+- Any claim that Phase-7's grounding metrics apply beyond the measured
+  n=16 claims / n=8 answers — this is a small, real sample, not a
+  large-scale hallucination benchmark.
+- Any claim describing the evaluator as cross-model independent
+  validation — it shares a model family with the generator (CTL-011).
+- Any evaluator token/cost figure — not measured this session (CTL-012).
+- Any claim that citation recall (vs. a larger evidence universe) was
+  measured — only claim citation coverage and citation-set sufficiency
+  are reported, per contract Section 8's explicit no-recall rule.
+
+## Phase 7 Hardening Pass Addendum (same phase, follow-up session)
+
+A follow-up directive required resolving every avoidable Phase-7 caveat.
+Full audit: `docs/v2/PHASE7_HARDENING_AUDIT.md`. The original Phase 7
+section above is preserved unmodified; this addendum reports ADDITIONAL
+results, never replacing the originals.
+
+**Benchmark:** 36 -> 68 total claim-level cases (32 new, from 9 previously-
+unused real Phase-5 records). Combined split: development 39, validation 8,
+original held-out 9 (untouched), fresh held-out supplement 12 (new).
+Combined label distribution: supported 26, partially_supported 13,
+unsupported 11, contradicted 18. Combined source-evidence counts:
+clinical_trials 28, pubmed 16, chembl 16, multi_source 5.
+
+**System A (evaluator quality), Candidate B - unchanged, additive results:**
+
+| Metric | New cases (this pass) | Combined with original |
+|---|---|---|
+| Dev+validation accuracy | 20/20 = 100% (1 gold defect found+fixed pre-freeze) | 47/47 = 100% |
+| Fresh held-out supplement accuracy | 10/12 = 83.3% (both misses = gold defects on audit, not evaluator defects - see manual audit v2) | reported separately, never blended with original 9/9 |
+| Original held-out (untouched) | - | 9/9 = 100% (unchanged) |
+
+**Candidate A v1 vs v2 (deterministic baseline), on the new 32 harder cases:**
+v1 15/32 (46.9%) vs v2 18/32 (56.2%) - genuine improvement from adding
+entity-attribution + structured categorical-field checks; still far below
+Candidate B, as expected of any deterministic-only approach.
+
+**Candidate C numeric defect:** fixed (identifier masking + field-name-aware
+phase normalization replaces the old boundary-regex approach, which was
+asymmetric and missed evidence-side "PHASE2"-style glued values). Verified
+via 11 new regression tests in `tests/test_grounding_eval_deterministic.py`.
+
+**System B (Phase-6 generator grounding), expanded system evaluation:**
+
+| Metric | Original (8 answers) | New (8 answers, this pass) | Combined |
+|---|---|---|---|
+| Answers with factual claims | 8 | 7 (1 correctly abstained) | 15 + 1 abstention = 16 total |
+| Factual claims | 16 | 24 | 40 |
+| Supported | 16 (100%) | 24 (100%) | 40 (100%) |
+| Fully-grounded answers | 8/8 | 7/7 | 15/15 |
+
+No Phase-6 defect found in either pass. One harness bug (NOT Phase-6, NOT
+Candidate B) was found and fixed mid-pass - see
+`artifacts/v2/phase7_phase6_system_evaluation_v2.json`.
+
+**CTL-012 (token/cost measurement): CLOSED.** Real measured tokens/cost now
+in `artifacts/v2/phase7_performance_v2.json` (e.g. a real single call:
+902 prompt / 83 completion tokens, $0.000427). Latency decomposed:
+provider-call mean ~664ms vs rate-limit-wait mean ~10,974ms (previously
+conflated into one "11.1s" figure).
+
+**CTL-011 (independent evaluator): remains OPEN.** Actively re-tested this
+session: no second LLM provider credential exists; `huggingface.co` is
+explicitly denied by egress policy (confirmed via the proxy's own status
+endpoint, not asserted from memory). A genuinely independent Candidate D
+could not be built here - recorded as a real environment blocker.
+
+**Resolution status:** 12/17 hardening issues fully resolved with real
+measured evidence; 3/17 partially resolved with disclosed, reasoned
+shortfalls (multi-source count 5 vs target >=6, unsupported-label count 11
+vs target >=12, system-eval answers 16 vs target >=20 - none force-padded
+with low-quality cases); 2/17 (independent evaluator and the system-eval
+re-evaluation depending on it) remain genuinely blocked by this cloud
+environment. **Phase 7 is not closed by this pass** - it remains open
+specifically on the independent-evaluator requirement, per the governing
+directive's own rule against re-closing with the same-model caveat.

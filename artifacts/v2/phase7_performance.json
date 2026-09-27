@@ -1,0 +1,23 @@
+{
+  "performance_name": "phase7_performance",
+  "created": "2026-09-27",
+  "note": "Evaluator latency here is OFFLINE DIAGNOSTIC HARNESS latency, never reported as production user-facing latency (contract Section 11/directive Step 46-47) - the evaluator is never inserted into the production LangGraph.",
+  "evaluator_benchmark": {
+    "n": 36,
+    "mean_ms": 11101.7,
+    "p50_ms": 12016.5,
+    "p90_ms": 12162.0,
+    "p95_ms": 12197.8,
+    "max_ms": 12316.0,
+    "total_llm_calls": 36,
+    "mean_calls_per_case": 1.0
+  },
+  "system_evaluation_cost": {
+    "generator_llm_calls": 7,
+    "generator_mean_latency_ms": 9283.4,
+    "evaluator_llm_calls_for_system_eval": 16,
+    "note_generator_cost": "generator cost/latency already reported in artifacts/v2/phase6_generation_performance.json - not duplicated here"
+  },
+  "caveat_rate_limit_dominated": "Cerebras Free Trial tier is 5 RPM (capacity=1) - the same rate-limit bucket used by Phase 2/6. Most per-call wall time is the rate-limiter's enforced wait, not true model inference time.",
+  "tokens_and_cost": "NOT MEASURED this session - grounding_eval/judge.py::_invoke_judge does not currently parse/return the Cerebras response usage block (an oversight, not a defect in judgment quality). Token/cost figures are therefore honestly reported as NOT MEASURED rather than estimated or fabricated. Accepted limitation, does not affect any Phase-7 hard gate or accuracy metric."
+}

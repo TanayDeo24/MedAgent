@@ -1,0 +1,470 @@
+{
+  "benchmark_name": "phase7_grounding_evaluation_benchmark",
+  "benchmark_version": "1.0.0",
+  "created": "2026-09-27",
+  "methodology": "36 claim-level cases built from real Phase-5 Evidence (via evidence/adapters.py against real captured raw records, reused from the Phase-5/Phase-6 Evidence pool). Two complementary categories per contract Step 8: natural claims paraphrasing real Evidence content, and controlled deterministic mutations (wrong numeral, wrong entity, added unsupported qualifier, negated fact) with independently-authored, pre-frozen gold. Gold labels authored BEFORE any evaluator candidate ran, from direct inspection of the real Evidence content (never from candidate output).",
+  "scale_caveat": "36 cases is smaller than the suggested 60-case target - a first Phase-7 benchmark, not claimed as equivalent statistical power. The real-Evidence pool available in this session (reused from Phase-5/6's already-captured records) supported this scale cleanly; documented honestly rather than padding with lower-quality synthetic cases.",
+  "split_sizes": {
+    "development": 22,
+    "validation": 5,
+    "phase7_heldout": 9
+  },
+  "total_cases": 36,
+  "support_label_distribution": {
+    "supported": 10,
+    "partially_supported": 10,
+    "unsupported": 8,
+    "contradicted": 8
+  },
+  "source_distribution": {
+    "clinical_trials": 19,
+    "pubmed": 8,
+    "chembl": 8,
+    "multi_source": 1
+  },
+  "mutation_categories": [
+    "wrong_numeral",
+    "wrong_entity_id",
+    "negated_fact",
+    "added_unsupported_qualifier",
+    "added_unsupported_scope",
+    "irrelevant_extra_citation"
+  ],
+  "numeric_subset_case_ids": [
+    "P7-F6-S",
+    "P7-F6-P",
+    "P7-F6-U",
+    "P7-F6-C",
+    "P7-M4",
+    "P7-F3-C",
+    "P7-F5-S",
+    "P7-F5-C"
+  ],
+  "multi_evidence_subset_case_ids": [
+    "P7-M1",
+    "P7-M2",
+    "P7-M3"
+  ],
+  "grouping_policy": "grouped by 'family' (same underlying real fact and its SUPPORTED/PARTIALLY_SUPPORTED/UNSUPPORTED/CONTRADICTED variants) - a family is never split across dev/validation/held-out, preventing a supported claim and its trivial negated twin from leaking across splits.",
+  "leakage_checks": "confirmed: no family appears in more than one split (10 families, each fully contained in exactly one split)",
+  "phase10_heldout_untouched": true,
+  "cases": [
+    {
+      "case_id": "P7-F1-S",
+      "family": "F1_brig_mechanism",
+      "split": "development",
+      "claim_text": "Brigatinib is active against various ALK resistance mutations, including G1269A, C1156Y, I1171S/T, and V1180L.",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F1-P",
+      "family": "F1_brig_mechanism",
+      "split": "development",
+      "claim_text": "Brigatinib is active against ALK resistance mutations and is the standard first-line therapy for all NSCLC patients regardless of biomarker status.",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F1-U",
+      "family": "F1_brig_mechanism",
+      "split": "development",
+      "claim_text": "Brigatinib causes significant weight gain in most treated patients.",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F1-C",
+      "family": "F1_brig_mechanism",
+      "split": "development",
+      "claim_text": "Brigatinib shows no activity against any ALK resistance mutations.",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F2-S",
+      "family": "F2_brig_pfs",
+      "split": "development",
+      "claim_text": "As a first-line treatment for ALK-positive advanced NSCLC, brigatinib demonstrates superior progression-free survival compared to chemotherapy or crizotinib.",
+      "evidence_ids": [
+        "pubmed:39368244:chunk:0"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F2-P",
+      "family": "F2_brig_pfs",
+      "split": "development",
+      "claim_text": "Brigatinib shows superior first-line PFS over crizotinib, and this finding eliminates the need for any further clinical trials in this population.",
+      "evidence_ids": [
+        "pubmed:39368244:chunk:0"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F2-U",
+      "family": "F2_brig_pfs",
+      "split": "development",
+      "claim_text": "Brigatinib's first-line PFS benefit was specifically replicated in a Japanese-only patient cohort.",
+      "evidence_ids": [
+        "pubmed:39368244:chunk:0"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F2-C",
+      "family": "F2_brig_pfs",
+      "split": "development",
+      "claim_text": "Brigatinib performs worse than chemotherapy as a first-line treatment for ALK-positive NSCLC.",
+      "evidence_ids": [
+        "pubmed:39368244:chunk:0"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F3-S",
+      "family": "F3_brig_trial_phase",
+      "split": "development",
+      "claim_text": "The brigatinib trial NCT03535740 is a Phase 2 study.",
+      "evidence_ids": [
+        "nct:NCT03535740"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F3-P",
+      "family": "F3_brig_trial_phase",
+      "split": "development",
+      "claim_text": "The brigatinib trial NCT03535740 is a Phase 2 study that has fully validated brigatinib as a curative therapy.",
+      "evidence_ids": [
+        "nct:NCT03535740"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F3-U",
+      "family": "F3_brig_trial_phase",
+      "split": "development",
+      "claim_text": "The brigatinib trial NCT03535740 was conducted exclusively at sites in Europe.",
+      "evidence_ids": [
+        "nct:NCT03535740"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F3-C",
+      "family": "F3_brig_trial_phase",
+      "split": "development",
+      "claim_text": "The brigatinib trial NCT03535740 is a Phase 4 trial.",
+      "evidence_ids": [
+        "nct:NCT03535740"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-M1",
+      "family": "F3_brig_trial_phase",
+      "split": "development",
+      "claim_text": "The brigatinib trial NCT03535740 is a completed Phase 2 study.",
+      "evidence_ids": [
+        "nct:NCT03535740",
+        "nct:NCT03535740"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": [
+        [
+          "nct:NCT03535740"
+        ],
+        [
+          "nct:NCT03535740"
+        ]
+      ]
+    },
+    {
+      "case_id": "P7-F4-S",
+      "family": "F4_imatinib_id",
+      "split": "development",
+      "claim_text": "Imatinib's ChEMBL identifier is CHEMBL941.",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F4-P",
+      "family": "F4_imatinib_id",
+      "split": "development",
+      "claim_text": "Imatinib's ChEMBL identifier is CHEMBL941, making it the most effective compound of its structural class.",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F4-U",
+      "family": "F4_imatinib_id",
+      "split": "development",
+      "claim_text": "Imatinib is primarily metabolized by CYP3A4 liver enzymes.",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F4-C",
+      "family": "F4_imatinib_id",
+      "split": "development",
+      "claim_text": "Imatinib's ChEMBL identifier is CHEMBL025.",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F5-S",
+      "family": "F5_melanoma_phase",
+      "split": "development",
+      "claim_text": "The melanoma indication record CHEMBL1789844 has reached clinical development Phase 4.",
+      "evidence_ids": [
+        "chembl:CHEMBL1789844"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F5-P",
+      "family": "F5_melanoma_phase",
+      "split": "development",
+      "claim_text": "The melanoma indication record CHEMBL1789844 has reached Phase 4 and is now considered an obsolete treatment.",
+      "evidence_ids": [
+        "chembl:CHEMBL1789844"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F5-U",
+      "family": "F5_melanoma_phase",
+      "split": "development",
+      "claim_text": "The melanoma indication record CHEMBL1789844 is associated with a published 5-year survival rate of 40%.",
+      "evidence_ids": [
+        "chembl:CHEMBL1789844"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F5-C",
+      "family": "F5_melanoma_phase",
+      "split": "development",
+      "claim_text": "The melanoma indication record CHEMBL2105704 has reached clinical development Phase 4.",
+      "evidence_ids": [
+        "chembl:CHEMBL2105704"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-M3",
+      "family": "F9_imatinib_multi",
+      "split": "development",
+      "claim_text": "Imatinib (CHEMBL941) is a small molecule that inhibits EGFR.",
+      "evidence_ids": [
+        "chembl:CHEMBL941",
+        "pubmed:29119148:chunk:1"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F6-S",
+      "family": "F6_teb_enrollment",
+      "split": "validation",
+      "claim_text": "The tebentafusp study NCT05549297 enrolls 540 participants.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F6-P",
+      "family": "F6_teb_enrollment",
+      "split": "validation",
+      "claim_text": "The tebentafusp study NCT05549297 enrolls 540 participants, primarily at sites in the United States.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F6-U",
+      "family": "F6_teb_enrollment",
+      "split": "validation",
+      "claim_text": "The tebentafusp study NCT05549297's primary endpoint is overall survival at 5 years.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F6-C",
+      "family": "F6_teb_enrollment",
+      "split": "validation",
+      "claim_text": "The tebentafusp study NCT05549297 enrolls 50 participants.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-M4",
+      "family": "F6_teb_enrollment",
+      "split": "validation",
+      "claim_text": "The tebentafusp study enrolls 540 participants and is conducted in outer space research facilities.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F7-S",
+      "family": "F7_teb_status",
+      "split": "phase7_heldout",
+      "claim_text": "The tebentafusp trial NCT05549297 has recruiting status.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F7-P",
+      "family": "F7_teb_status",
+      "split": "phase7_heldout",
+      "claim_text": "The tebentafusp trial NCT05549297 is recruiting and has already demonstrated a definitive survival benefit.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F7-U",
+      "family": "F7_teb_status",
+      "split": "phase7_heldout",
+      "claim_text": "The tebentafusp trial NCT05549297 excludes patients over 65 years of age.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F7-C",
+      "family": "F7_teb_status",
+      "split": "phase7_heldout",
+      "claim_text": "The tebentafusp trial NCT05549297 has completed recruitment.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F8-S",
+      "family": "F8_teb_sponsor",
+      "split": "phase7_heldout",
+      "claim_text": "The sponsor of the tebentafusp trial NCT05549297 is Immunocore Ltd.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F8-P",
+      "family": "F8_teb_sponsor",
+      "split": "phase7_heldout",
+      "claim_text": "Immunocore Ltd sponsors the tebentafusp trial, a company solely focused on melanoma research.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "partially_supported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F8-U",
+      "family": "F8_teb_sponsor",
+      "split": "phase7_heldout",
+      "claim_text": "Immunocore Ltd is headquartered in the United Kingdom.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "unsupported",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-F8-C",
+      "family": "F8_teb_sponsor",
+      "split": "phase7_heldout",
+      "claim_text": "The sponsor of the tebentafusp trial NCT05549297 is Ariad Pharmaceuticals.",
+      "evidence_ids": [
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "contradicted",
+      "required_evidence_groups": null
+    },
+    {
+      "case_id": "P7-M2",
+      "family": "F10_teb_multi",
+      "split": "phase7_heldout",
+      "claim_text": "The tebentafusp trial is a Phase 3, recruiting study sponsored by Immunocore Ltd.",
+      "evidence_ids": [
+        "nct:NCT05549297",
+        "nct:NCT05549297",
+        "nct:NCT05549297"
+      ],
+      "gold_support_label": "supported",
+      "required_evidence_groups": [
+        [
+          "nct:NCT05549297"
+        ],
+        [
+          "nct:NCT05549297"
+        ],
+        [
+          "nct:NCT05549297"
+        ]
+      ]
+    }
+  ]
+}

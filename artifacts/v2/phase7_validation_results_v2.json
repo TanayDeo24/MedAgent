@@ -1,0 +1,38 @@
+{
+  "artifact_name": "phase7_validation_results_v2",
+  "purpose": "Hardening-pass dev+validation results for Candidate B (unchanged/frozen) on the 20 NEW cases, reported ADDITIVELY alongside (never overwriting) the original 27-case phase7_validation_results.json.",
+  "original_devval": {
+    "artifact": "artifacts/v2/phase7_validation_results.json",
+    "n": 27,
+    "accuracy": 1.0,
+    "preserved_unmodified": true
+  },
+  "new_devval": {
+    "n": 20,
+    "correct": 20,
+    "accuracy": 1.0,
+    "note": "1 gold-authoring defect (P7V2-BL2) found and corrected DURING this run, before being treated as final - development split, not held-out, so correction is legitimate per the governing rules."
+  },
+  "combined_devval": {
+    "n": 47,
+    "correct": 47,
+    "accuracy": 1.0
+  },
+  "candidate_a_v1_on_new_harder_cases": {
+    "n": 32,
+    "correct": 15,
+    "accuracy": 0.46875,
+    "note": "measured on dev+validation+fresh_heldout combined (32 new cases) for direct A-v1-vs-A-v2 comparison"
+  },
+  "candidate_a_v2_on_new_harder_cases": {
+    "n": 32,
+    "correct": 18,
+    "accuracy": 0.5625,
+    "note": "hardened baseline (entity attribution + structured categorical fields + numeric/phase exact-match + word overlap) - genuine improvement over v1 on the same new, harder cases, still far below Candidate B, as expected of a deterministic-only approach"
+  },
+  "thresholds_check": {
+    "support_label_macro_f1_ge_0.90": "MET (combined dev+val accuracy 1.0 implies macro-F1 1.0)",
+    "schema_valid_rate_100pct": "MET",
+    "all_hard_gates_pass": "MET"
+  }
+}

@@ -1,13 +1,14 @@
 {
-  "ledger_version": "1.2.0",
-  "generated_at": "2026-09-25",
+  "ledger_version": "1.3.0",
+  "generated_at": "2026-09-27",
   "purpose": "Authoritative, artifact-traced before/after metric record for resume/report use. Every value recomputed directly from raw source artifacts at ledger-freeze time, not copied from prior prose.",
   "phases_recorded": [
     "phase_2_biomedical_nlu",
     "phase_3_tool_orchestration",
     "phase_4_heterogeneous_retrieval",
     "phase_5_evidence_provenance",
-    "phase_6_grounded_generation"
+    "phase_6_grounded_generation",
+    "phase_7_grounding_evaluation"
   ],
   "phase_4_heterogeneous_retrieval": {
     "final_winner": {
@@ -810,6 +811,243 @@
       "result": "PASS - 4/4 required facts (100%), 0 forbidden content, 0 invalid/unknown Evidence IDs, 10/10 hard gates, 0 code changes before or after",
       "original_heldout_modified": false,
       "combined_reporting_rule": "Original held-out (2/3 required-fact coverage, 1 invalid-gold miss) and supplement (1/1 pass) are reported SEPARATELY, never combined into a single misleading ratio."
+    }
+  },
+  "phase_7_grounding_evaluation": {
+    "final_winner": {
+      "architecture": "candidate_b_semantic_judge (grounding_eval/judge.py)",
+      "frozen_config_path": "artifacts/v2/phase7_frozen_evaluator_config.json",
+      "provider": "Cerebras",
+      "model": "qwen-3.8-27b",
+      "same_model_as_generator_caveat": "The evaluator (Candidate B) and Phase-6's frozen generator both call Cerebras qwen-3.8-27b. Evaluator accuracy is validated against independently-authored gold labels the model never saw during generation, but this is NOT cross-model/cross-provider independent validation. See CTL-011.",
+      "not_wired_into_production_graph": "grounding_eval package is never imported by agent/graph.py or agent/nodes.py - verified by tests/test_grounding_eval_pipeline.py::test_evaluator_not_in_production_graph"
+    },
+    "benchmark": {
+      "manifest": "artifacts/v2/phase7_benchmark_manifest.json",
+      "total_cases": 36,
+      "development": 22,
+      "validation": 5,
+      "phase7_heldout": 9,
+      "note": "Deliberately smaller scale than the suggested ~60 claim-level target - documented limitation, consistent with the Phase-6 precedent of transparently reporting a smaller-than-ideal first benchmark rather than inflating it."
+    },
+    "metrics": [
+      {
+        "metric": "system_a_evaluator_dev_validation_accuracy",
+        "value": "27/27 = 100%",
+        "n": 27,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Evaluator Quality metric - do not blend with System B (generator) metrics",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_a_evaluator_dev_validation_macro_f1",
+        "value": 1.0,
+        "n": 27,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Evaluator Quality metric",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_a_evaluator_heldout_accuracy",
+        "value": "9/9 = 100%",
+        "n": 9,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "held-out run exactly once, after evaluator freeze; no held-out-driven tuning occurred",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_a_evaluator_heldout_macro_f1",
+        "value": 1.0,
+        "n": 9,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "system_a_unsupported_contradicted_detection_recall",
+        "value": "1.0 (both dev+validation and held-out)",
+        "n": 36,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "predeclared threshold >=0.95, met",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_a_citation_relation_macro_f1",
+        "value": 1.0,
+        "n": 36,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "predeclared threshold >=0.90, met",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_a_schema_valid_rate",
+        "value": "100%",
+        "n": 36,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_claim_support_rate",
+        "value": "16/16 = 100%",
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Generator Grounding metric - measured by the validated Candidate B evaluator against the frozen Phase-6 generator; small sample (8 answers, 16 claims), not a statistical guarantee",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_partially_supported_rate",
+        "value": "0/16 = 0%",
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Generator Grounding metric",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_unsupported_claim_rate",
+        "value": "0/16 = 0%",
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Generator Grounding metric",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_contradiction_rate",
+        "value": "0/16 = 0%",
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Generator Grounding metric",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_citation_precision_mean",
+        "value": 1.0,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "PARTIAL_SUPPORT counted as correct for precision purposes per contract; citation recall is explicitly never reported",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_claim_citation_coverage_mean",
+        "value": 1.0,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "Generator Grounding metric",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_answer_level_fully_grounded_rate",
+        "value": "8/8 = 100%",
+        "n": 8,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "fully_grounded requires zero UNSUPPORTED and zero CONTRADICTED claims (PARTIALLY_SUPPORTED also fails this bar per contract)",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_abstention_grounding_correctness",
+        "value": "2/2",
+        "n": 2,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "small sample within the 8-answer system evaluation set",
+        "resume_safe": true
+      },
+      {
+        "metric": "system_b_conflict_grounding_correctness",
+        "value": "1/1",
+        "n": 1,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "small sample within the 8-answer system evaluation set",
+        "resume_safe": true
+      },
+      {
+        "metric": "evaluator_baseline_candidate_a_accuracy",
+        "value": "7/27 = 26%",
+        "n": 27,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "deliberately weak deterministic baseline, documented limitation not a defect - see docs/v2/PHASE7_INITIAL_GROUNDING_AUDIT.md",
+        "resume_safe": true
+      },
+      {
+        "metric": "mean_evaluator_call_latency_ms",
+        "value": 11101.7,
+        "n": 36,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "rate-limit (5RPM) dominated, not true model inference time - mirrors Phase 2 and Phase 6's identical Cerebras measurement caveat",
+        "resume_safe": true
+      }
+    ],
+    "hard_safety_gates": {
+      "count": 10,
+      "passed": 10,
+      "failed": 0,
+      "source": "docs/v2/PHASE7_GATE_PLAN.md Section on hard gates, verified in docs/v2/PHASE7_FINAL_GATE_AUDIT.md"
+    },
+    "real_defect_found_and_fixed": "grounding_eval/judge.py's _SYSTEM_PROMPT (Candidate B, v1) allowed the judge to infer CONTRADICTED from outside domain knowledge when a claim added an overclaiming detail the Evidence never addressed at all; correct label per contract is PARTIALLY_SUPPORTED. Dev round 1: 20/22. Fixed by adding an explicit CRITICAL DISTINCTION section to the prompt. Dev/validation after fix: 27/27. See artifacts/v2/phase7_failure_analysis.json finding F1. (A second, non-blocking finding F2 in the NOT-SELECTED Candidate C's numeric regex, and a test-driven finding F3 in a shared deterministic utility unused by the selected Candidate B, are also documented in the same artifact.)",
+    "candidate_comparison": {
+      "artifact": "artifacts/v2/phase7_evaluator_candidate_comparison.json",
+      "selected": "candidate_b_semantic_judge",
+      "candidate_a_deterministic": "7/27 = 26% (baseline, not selected - too weak on paraphrase/overclaiming)",
+      "candidate_c_hybrid": "16/22 after partial fix (not selected - numeric regex defect on identifier-embedded digits, Candidate B alone already met every threshold)",
+      "candidate_d_independent_model": "NOT BUILT - no distinct-provider evaluator available in this cloud session, see CTL-011"
+    },
+    "cloud_deferred_verification": [
+      "CTL-011 (genuinely independent / distinct-provider evaluator validation - non-blocking, same-model caveat documented in artifacts/v2/phase7_frozen_evaluator_config.json)",
+      "CTL-012 (Phase-7 evaluator token/cost measurement gap - grounding_eval/judge.py::_invoke_judge does not currently parse the Cerebras usage block)"
+    ],
+    "resume_unsafe_claims": [
+      "Any claim that the evaluator is a cross-model or cross-provider independent judge - it is the same model family (Cerebras qwen-3.8-27b) as the Phase-6 generator, see CTL-011",
+      "Any claim of citation RECALL - only citation precision and claim-citation coverage are reported per contract Section on citation metrics",
+      "Any claim that Phase 7's 100% System-B grounding result generalizes beyond the 8-answer/16-claim system evaluation sample - it is a real, positive result but on a modest, explicitly-scoped sample",
+      "Any evaluator token/cost figure - not measured this session (CTL-012)",
+      "Any claim that Phase 7 reopened or modified Phase 6 - no Phase-6 defect was found, Phase-6 remains frozen and untouched"
+    ],
+    "hardening_pass_addendum": {
+      "audit_doc": "docs/v2/PHASE7_HARDENING_AUDIT.md",
+      "issues_fully_resolved": 12,
+      "issues_partially_resolved_with_disclosed_shortfall": 3,
+      "issues_blocked_by_environment": 2,
+      "benchmark_expansion": {
+        "original_total": 36,
+        "new_total": 68,
+        "added": 32,
+        "artifact": "artifacts/v2/phase7_benchmark_expansion_manifest.json"
+      },
+      "evaluator_devval_v2": {
+        "n": 20,
+        "correct": 20,
+        "accuracy": 1.0,
+        "combined_with_original": {
+          "n": 47,
+          "correct": 47,
+          "accuracy": 1.0
+        }
+      },
+      "fresh_heldout_supplement": {
+        "n": 12,
+        "correct": 10,
+        "accuracy": 0.8333333333333334,
+        "misses_root_caused_to": "gold-authoring defects (not evaluator defects) - see artifacts/v2/phase7_manual_audit_v2.json",
+        "artifact": "artifacts/v2/phase7_heldout_supplement_results.json"
+      },
+      "candidate_a_v2_hardened_baseline": {
+        "artifact": "artifacts/v2/phase7_validation_results_v2.json",
+        "v1_accuracy_on_new_cases": 0.46875,
+        "v2_accuracy_on_new_cases": 0.5625
+      },
+      "system_eval_v2": {
+        "new_answers": 8,
+        "new_answers_with_claims": 7,
+        "new_claims": 24,
+        "new_supported": 24,
+        "combined_answers": 16,
+        "combined_claims": 40,
+        "combined_supported": 40,
+        "artifact": "artifacts/v2/phase7_phase6_system_evaluation_v2.json",
+        "harness_bug_found_and_fixed": true
+      },
+      "ctl_012_status": "CLOSED",
+      "ctl_011_status": "OPEN - actively reconfirmed environment blocker (no 2nd provider credential; huggingface.co denied by egress policy)",
+      "phase_7_closure_status": "NOT CLOSED - remains open on the independent-evaluator requirement per the governing directive's own rule"
     }
   }
 }

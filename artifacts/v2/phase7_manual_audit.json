@@ -1,0 +1,59 @@
+{
+  "audit_name": "phase7_manual_audit",
+  "created": "2026-09-27",
+  "purpose": "Bounded sanity-check reading of actual claim/Evidence pairs against the evaluator's judgment - NOT a replacement for the held-out metrics, a supplementary confirmation.",
+  "sample": [
+    {
+      "source": "phase7 held-out",
+      "case_id": "P7-F7-P",
+      "claim_text": "The tebentafusp trial NCT05549297 is recruiting and has already demonstrated a definitive survival benefit.",
+      "evidence_content": "RECRUITING (trial_status field)",
+      "gold": "partially_supported",
+      "evaluator_predicted": "partially_supported",
+      "manual_read": "Evidence confirms 'recruiting' but says nothing about survival benefit at all - the added claim is an unsupported addition, not a stated contradiction (the trial hasn't reported outcomes yet per its RECRUITING status, but the Evidence doesn't explicitly say 'no survival benefit shown'). Agree with evaluator.",
+      "agreement": true
+    },
+    {
+      "source": "phase7 held-out",
+      "case_id": "P7-M2",
+      "claim_text": "The tebentafusp trial is a Phase 3, recruiting study sponsored by Immunocore Ltd.",
+      "evidence_content": "PHASE3 (trial_phase) + RECRUITING (trial_status) + 'Immunocore Ltd' (sponsor field), 3 separate Evidence records",
+      "gold": "supported",
+      "evaluator_predicted": "supported",
+      "manual_read": "All three sub-facts verified individually present and correct in their respective Evidence records. Multi-Evidence sufficiency correctly recognized. Agree with evaluator.",
+      "agreement": true
+    },
+    {
+      "source": "phase6 system evaluation",
+      "case_id": "P6-D7 / c-0",
+      "claim_text": "ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 4.0.",
+      "evidence_content": "max_phase field = '4.0' on the CHEMBL1789844 indication record",
+      "evaluator_predicted": "supported",
+      "manual_read": "Direct exact match against the real, structured max_phase field. Agree with evaluator.",
+      "agreement": true
+    },
+    {
+      "source": "phase6 system evaluation",
+      "case_id": "P6-D4 / c-3",
+      "claim_text": "(trial status/phase/population claim referencing NCT03535740)",
+      "evidence_content": "COMPLETED / PHASE2 / ALK-positive Advanced NSCLC fields",
+      "evaluator_predicted": "supported",
+      "manual_read": "Verified against the same real trial record used throughout this phase's benchmark - all sub-facts check out. Agree with evaluator.",
+      "agreement": true
+    },
+    {
+      "source": "phase7 development (pre-fix)",
+      "case_id": "P7-F1-P",
+      "claim_text": "Brigatinib is active against ALK resistance mutations and is the standard first-line therapy for all NSCLC patients regardless of biomarker status.",
+      "evidence_content": "PubMed chunk describing ALK resistance mutation activity, no statement about first-line status or biomarker requirements",
+      "gold": "partially_supported",
+      "evaluator_predicted_before_fix": "contradicted",
+      "evaluator_predicted_after_fix": "partially_supported",
+      "manual_read": "The pre-fix CONTRADICTED verdict was itself the evaluator defect this manual read helped confirm during triage - the Evidence never states brigatinib is NOT for all NSCLC patients, it simply never addresses scope at all, which is an unsupported addition, not a contradiction. Post-fix judgment matches manual reading.",
+      "agreement": "disagreed pre-fix (this was the F1 defect); agrees post-fix"
+    }
+  ],
+  "sample_size": 5,
+  "agreement_rate": "5/5 post-fix (the one pre-fix disagreement was the real defect that led to the F1 prompt fix, documented in phase7_failure_analysis.json)",
+  "conclusion": "Manual reading confirms the evaluator's post-fix judgments are defensible against direct inspection of the real claim/Evidence text in every sampled case. This is a bounded sanity check, not a substitute for the formal held-out metrics (artifacts/v2/phase7_heldout_results.json)."
+}

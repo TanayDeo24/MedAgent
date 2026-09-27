@@ -1,0 +1,521 @@
+{
+  "validation_target": "grounding_eval.pipeline.evaluate_claim, architecture=candidate_b_semantic_judge (frozen, POST F1-fix)",
+  "cases_run": 27,
+  "cases_by_split": {
+    "development": 22,
+    "validation": 5
+  },
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "per_class_metrics": {
+    "supported": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "partially_supported": {
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "unsupported": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "contradicted": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "unsupported_detection_recall": 1.0,
+  "contradiction_detection_recall": 1.0,
+  "citation_judgments_produced": 29,
+  "schema_valid_rate": 1.0,
+  "provider_errors": 0,
+  "hard_gates": {
+    "unknown_evidence_id_in_evaluation_output": 0,
+    "fabricated_evidence_id": 0,
+    "fabricated_source_id": 0,
+    "fabricated_source_url": 0,
+    "secret_leaks": 0,
+    "unserializable_evaluation": 0,
+    "uncaught_evaluator_schema_failure": 0,
+    "gold_label_leak_into_evaluator_input": 0,
+    "held_out_gold_used_during_tuning": 0,
+    "silent_evaluator_failure_treated_as_pass": 0,
+    "all_gates_pass": true
+  },
+  "thresholds_check": {
+    "support_label_macro_f1": {
+      "target": ">=0.90",
+      "actual": 1.0,
+      "pass": true
+    },
+    "unsupported_contradicted_recall": {
+      "target": ">=0.95",
+      "actual": 1.0,
+      "pass": true
+    },
+    "schema_valid_rate": {
+      "target": "100%",
+      "actual": "100%",
+      "pass": true
+    }
+  },
+  "per_case_results": [
+    {
+      "case_id": "P7-F1-S",
+      "family": "F1_brig_mechanism",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 0.684,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:29119148:chunk:1",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F1-P",
+      "family": "F1_brig_mechanism",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 12.162,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:29119148:chunk:1",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F1-U",
+      "family": "F1_brig_mechanism",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 11.889,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:29119148:chunk:1",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F1-C",
+      "family": "F1_brig_mechanism",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.027,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:29119148:chunk:1",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F2-S",
+      "family": "F2_brig_pfs",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 12.018,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:39368244:chunk:0",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F2-P",
+      "family": "F2_brig_pfs",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 12.077,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:39368244:chunk:0",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F2-U",
+      "family": "F2_brig_pfs",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 12.245,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:39368244:chunk:0",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F2-C",
+      "family": "F2_brig_pfs",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 11.864,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "pubmed:39368244:chunk:0",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F3-S",
+      "family": "F3_brig_trial_phase",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 12.106,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT03535740",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F3-P",
+      "family": "F3_brig_trial_phase",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 11.937,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT03535740",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F3-U",
+      "family": "F3_brig_trial_phase",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 11.978,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT03535740",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F3-C",
+      "family": "F3_brig_trial_phase",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.134,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT03535740",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-M1",
+      "family": "F3_brig_trial_phase",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 12.058,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT03535740",
+          "relation": "supports"
+        },
+        {
+          "evidence_id": "nct:NCT03535740",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F4-S",
+      "family": "F4_imatinib_id",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 11.977,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL941",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F4-P",
+      "family": "F4_imatinib_id",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 12.154,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL941",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F4-U",
+      "family": "F4_imatinib_id",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 12.001,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL941",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F4-C",
+      "family": "F4_imatinib_id",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.013,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL941",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F5-S",
+      "family": "F5_melanoma_phase",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 12.148,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL1789844",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F5-P",
+      "family": "F5_melanoma_phase",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 11.836,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL1789844",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F5-U",
+      "family": "F5_melanoma_phase",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 12.093,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL1789844",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F5-C",
+      "family": "F5_melanoma_phase",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.316,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL2105704",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-M3",
+      "family": "F9_imatinib_multi",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 11.891,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "chembl:CHEMBL941",
+          "relation": "partial_support"
+        },
+        {
+          "evidence_id": "pubmed:29119148:chunk:1",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F6-S",
+      "family": "F6_teb_enrollment",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 0.632,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F6-P",
+      "family": "F6_teb_enrollment",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 11.994,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F6-U",
+      "family": "F6_teb_enrollment",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 12.096,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F6-C",
+      "family": "F6_teb_enrollment",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.162,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-M4",
+      "family": "F6_teb_enrollment",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 12.04,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    }
+  ]
+}

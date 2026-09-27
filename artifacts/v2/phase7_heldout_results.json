@@ -1,0 +1,221 @@
+{
+  "run_type": "ONE-TIME, FINAL - frozen evaluator (config_version 1), run exactly once against phase7_heldout split",
+  "run_date": "2026-09-27",
+  "evaluator_frozen_before_run": true,
+  "n": 9,
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "per_class_metrics": {
+    "supported": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "partially_supported": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "unsupported": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "contradicted": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "unsupported_detection_recall": 1.0,
+  "contradiction_detection_recall": 1.0,
+  "schema_valid_rate": 1.0,
+  "provider_failures": 0,
+  "hard_gate_failures": 0,
+  "defects_found": "NONE",
+  "held_out_reused_after_fix": false,
+  "supplement_needed": false,
+  "thresholds_check": {
+    "support_label_macro_f1": {
+      "target": ">=0.90",
+      "actual": 1.0,
+      "pass": true
+    },
+    "unsupported_contradicted_recall": {
+      "target": ">=0.95",
+      "actual": 1.0,
+      "pass": true
+    },
+    "schema_valid_rate": {
+      "target": "100%",
+      "actual": "100%",
+      "pass": true
+    }
+  },
+  "per_case_results": [
+    {
+      "case_id": "P7-F7-S",
+      "family": "F7_teb_status",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 4.552,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F7-P",
+      "family": "F7_teb_status",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 8.253,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F7-U",
+      "family": "F7_teb_status",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 11.923,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F7-C",
+      "family": "F7_teb_status",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.009,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F8-S",
+      "family": "F8_teb_sponsor",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 12.015,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F8-P",
+      "family": "F8_teb_sponsor",
+      "gold": "partially_supported",
+      "error": null,
+      "elapsed_s": 12.008,
+      "predicted": "partially_supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "partial_support"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F8-U",
+      "family": "F8_teb_sponsor",
+      "gold": "unsupported",
+      "error": null,
+      "elapsed_s": 12.039,
+      "predicted": "unsupported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "irrelevant"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-F8-C",
+      "family": "F8_teb_sponsor",
+      "gold": "contradicted",
+      "error": null,
+      "elapsed_s": 12.148,
+      "predicted": "contradicted",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "contradicts"
+        }
+      ],
+      "llm_calls": 1
+    },
+    {
+      "case_id": "P7-M2",
+      "family": "F10_teb_multi",
+      "gold": "supported",
+      "error": null,
+      "elapsed_s": 12.182,
+      "predicted": "supported",
+      "correct": true,
+      "citation_relations": [
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "supports"
+        },
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "supports"
+        },
+        {
+          "evidence_id": "nct:NCT05549297",
+          "relation": "supports"
+        }
+      ],
+      "llm_calls": 1
+    }
+  ]
+}

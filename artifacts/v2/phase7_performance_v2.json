@@ -1,0 +1,54 @@
+{
+  "artifact_name": "phase7_performance_v2",
+  "purpose": "Hardening-pass performance measurement (Known Issues 13/14): real token/cost accounting (CTL-012 closure) and latency decomposition (rate-limit wait vs provider call vs parsing) for the selected Candidate B evaluator, aggregated across this session's new dev+validation (20 calls), fresh held-out supplement (12 calls), and system-eval-v2 (24 claim judgments) real Cerebras calls.",
+  "n_calls_measured": 56,
+  "rate_limit_wait_ms": {
+    "n": 56,
+    "mean": 10974.261954125028,
+    "p50": 11422.834142000056,
+    "p90": 11524.076531999981,
+    "p95": 11527.502062999702,
+    "max": 11535.745366000356
+  },
+  "provider_call_ms": {
+    "n": 56,
+    "mean": 664.0922431606872,
+    "p50": 642.28121799988,
+    "p90": 767.656242999692,
+    "p95": 965.1384950000192,
+    "max": 1086.8447469999865
+  },
+  "parsing_validation_ms": {
+    "n": 56,
+    "mean": 0.053918089301013036,
+    "p50": 0.04889999991064542,
+    "p90": 0.07151999989218893,
+    "p95": 0.07884500018917606,
+    "max": 0.09156199985227431
+  },
+  "end_to_end_ms": {
+    "n": 56,
+    "mean": 11638.408115375016,
+    "p50": 12040.807469000129,
+    "p90": 12200.003053999808,
+    "p95": 12287.518523000017,
+    "max": 12508.33418100001
+  },
+  "tokens": {
+    "total_prompt_tokens": 66483,
+    "total_completion_tokens": 6624,
+    "total_tokens": 73107,
+    "mean_prompt_tokens_per_call": 1187.1964285714287,
+    "mean_completion_tokens_per_call": 118.28571428571429
+  },
+  "cost": {
+    "pricing_source": "https://inference-docs.cerebras.ai/support/pricing",
+    "pricing_checked_date": "2026-09-27",
+    "usd_per_1m_input_tokens": 0.4,
+    "usd_per_1m_output_tokens": 0.8,
+    "total_cost_usd_this_measurement": 0.0318924,
+    "mean_cost_usd_per_call": 0.0005695071428571429
+  },
+  "note_on_previous_phase7_performance_json": "artifacts/v2/phase7_performance.json (original 36-case benchmark run) predates this instrumentation and is preserved unmodified with tokens/cost honestly marked NOT MEASURED, per CTL-012's original status. This v2 artifact is the first real token/cost/latency-decomposition measurement, not a retroactive edit of the original.",
+  "caveat": "rate_limit_wait_ms is now measured and reported SEPARATELY from provider_call_ms - it dominates end-to-end latency (5 RPM Cerebras Free Trial bucket) but is no longer conflated with real model/network latency in any reported figure."
+}

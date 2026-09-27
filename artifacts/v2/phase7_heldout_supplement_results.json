@@ -1,0 +1,347 @@
+{
+  "artifact_name": "phase7_heldout_supplement_results",
+  "purpose": "Fresh, previously-unseen 12-case held-out supplement for the (unchanged) selected Candidate B evaluator, run exactly once, blind, after the evaluator was already frozen - additive to (never replacing) the original 9-case phase7_heldout_results.json.",
+  "evaluator": "candidate_b_semantic_judge (frozen config artifacts/v2/phase7_frozen_evaluator_config.json - UNCHANGED this session, so this supplement was not strictly required by the hardening directive's fresh-held-out rule, but was run anyway for confirmatory evidence at the larger, better-balanced benchmark scale)",
+  "n": 12,
+  "correct": 10,
+  "raw_accuracy": "10/12 = 83.3%",
+  "misses": [
+    "P7V2-BT3-U",
+    "P7V2-MI4-S"
+  ],
+  "root_cause_of_misses": "BOTH misses (P7V2-BT3-U, P7V2-MI4-S) were root-caused via manual audit (artifacts/v2/phase7_manual_audit_v2.json) to GOLD-AUTHORING defects in this session's own newly-authored material, not to Candidate B evaluator defects: in both cases the evaluator's prediction was, on inspection of the FULL Evidence content/metadata, MORE contract-compliant than the original gold label. Per the 'gold is frozen once used as held-out' rule, these two gold labels were NOT corrected in place - the raw 10/12 score stands as-run, exactly like Phase 6's P6-H2 precedent (an invalid-gold miss reported honestly rather than hidden or silently patched).",
+  "raw_accuracy_after_gold_audit_reclassification": "12/12 IF the 2 audited gold defects were corrected - NOT claimed as the official held-out score; reported here only as audit context, never blended with the frozen 10/12 result.",
+  "hard_gates": "10/10 pass (no unknown/fabricated Evidence or source IDs, no secret leaks, no schema failures, no silent failures)",
+  "defects_found_in_evaluator_itself": "NONE",
+  "held_out_reused_after_gold_audit": false,
+  "results": [
+    {
+      "case_id": "P7V2-BT3-S",
+      "gold": "supported",
+      "pred": "supported",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 727.0202750000863,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 0.010878000011871336,
+        "provider_call_ms": 725.7185930000105,
+        "parsing_validation_ms": 0.05829199994877854,
+        "end_to_end_ms": 725.7877629999712,
+        "prompt_tokens": 1071,
+        "completion_tokens": 100,
+        "total_tokens": 1171,
+        "cost_usd": 0.0005084
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "nct:NCT04887519",
+          "relation": "supports"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-BT3-U",
+      "gold": "unsupported",
+      "pred": "contradicted",
+      "correct": false,
+      "error": null,
+      "elapsed_ms": 12046.20728000009,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11322.328039000013,
+        "provider_call_ms": 722.6706679998642,
+        "parsing_validation_ms": 0.04847500008509087,
+        "end_to_end_ms": 12045.047181999962,
+        "prompt_tokens": 1062,
+        "completion_tokens": 153,
+        "total_tokens": 1215,
+        "cost_usd": 0.0005472000000000001
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "nct:NCT04887519",
+          "relation": "contradicts"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-BT3-C",
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 11922.17951800012,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11323.463269000058,
+        "provider_call_ms": 597.3771080000461,
+        "parsing_validation_ms": 0.050775999852703535,
+        "end_to_end_ms": 11920.891152999957,
+        "prompt_tokens": 1055,
+        "completion_tokens": 128,
+        "total_tokens": 1183,
+        "cost_usd": 0.0005244
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "nct:NCT04887519",
+          "relation": "contradicts"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-OS-S",
+      "gold": "supported",
+      "pred": "supported",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 12099.920824000037,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11422.834142000056,
+        "provider_call_ms": 675.8478940000714,
+        "parsing_validation_ms": 0.08574699995733681,
+        "end_to_end_ms": 12098.767783000085,
+        "prompt_tokens": 926,
+        "completion_tokens": 104,
+        "total_tokens": 1030,
+        "cost_usd": 0.0004536
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL3353410",
+          "relation": "supports"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-OS-C1",
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 12509.784043000082,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11421.442453000054,
+        "provider_call_ms": 1086.8447469999865,
+        "parsing_validation_ms": 0.04698099996858218,
+        "end_to_end_ms": 12508.33418100001,
+        "prompt_tokens": 917,
+        "completion_tokens": 136,
+        "total_tokens": 1053,
+        "cost_usd": 0.0004756
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL3353410",
+          "relation": "contradicts"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-OS-C2",
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 11479.588592000027,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 10921.39298699999,
+        "provider_call_ms": 556.903721000026,
+        "parsing_validation_ms": 0.04889999991064542,
+        "end_to_end_ms": 11478.345607999927,
+        "prompt_tokens": 920,
+        "completion_tokens": 137,
+        "total_tokens": 1057,
+        "cost_usd": 0.0004776
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL3353410",
+          "relation": "contradicts"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-OSR-S",
+      "gold": "supported",
+      "pred": "supported",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 12153.423096000097,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11526.059811000096,
+        "provider_call_ms": 626.101664999851,
+        "parsing_validation_ms": 0.046327000063683954,
+        "end_to_end_ms": 12152.20780300001,
+        "prompt_tokens": 920,
+        "completion_tokens": 94,
+        "total_tokens": 1014,
+        "cost_usd": 0.0004432
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL3353410",
+          "relation": "supports"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-OSR-C",
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 12010.838983999975,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11428.513200999987,
+        "provider_call_ms": 580.413789999966,
+        "parsing_validation_ms": 0.06799400011914258,
+        "end_to_end_ms": 12008.994985000072,
+        "prompt_tokens": 920,
+        "completion_tokens": 120,
+        "total_tokens": 1040,
+        "cost_usd": 0.000464
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL3353410",
+          "relation": "contradicts"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-MI4-S",
+      "gold": "supported",
+      "pred": "partially_supported",
+      "correct": false,
+      "error": null,
+      "elapsed_ms": 12139.719196999977,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11421.242613000004,
+        "provider_call_ms": 717.2278810000989,
+        "parsing_validation_ms": 0.04335799985710764,
+        "end_to_end_ms": 12138.51385199996,
+        "prompt_tokens": 918,
+        "completion_tokens": 120,
+        "total_tokens": 1038,
+        "cost_usd": 0.00046320000000000004
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL1201438",
+          "relation": "partial_support"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-MI4-P",
+      "gold": "partially_supported",
+      "pred": "partially_supported",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 11940.015122999966,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11322.932223999942,
+        "provider_call_ms": 615.7460619999711,
+        "parsing_validation_ms": 0.07456299999830662,
+        "end_to_end_ms": 11938.752848999911,
+        "prompt_tokens": 921,
+        "completion_tokens": 117,
+        "total_tokens": 1038,
+        "cost_usd": 0.00046200000000000006
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL1201438",
+          "relation": "partial_support"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-ASR-S",
+      "gold": "supported",
+      "pred": "supported",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 11997.902961999898,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11423.173459000054,
+        "provider_call_ms": 573.3975180000925,
+        "parsing_validation_ms": 0.04361199989943998,
+        "end_to_end_ms": 11996.614589000046,
+        "prompt_tokens": 906,
+        "completion_tokens": 94,
+        "total_tokens": 1000,
+        "cost_usd": 0.0004376
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL25",
+          "relation": "supports"
+        }
+      ]
+    },
+    {
+      "case_id": "P7V2-MS4-S",
+      "gold": "supported",
+      "pred": "supported",
+      "correct": true,
+      "error": null,
+      "elapsed_ms": 12073.256441000012,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11425.298006000048,
+        "provider_call_ms": 646.701751999899,
+        "parsing_validation_ms": 0.04609200004779268,
+        "end_to_end_ms": 12072.045849999995,
+        "prompt_tokens": 974,
+        "completion_tokens": 161,
+        "total_tokens": 1135,
+        "cost_usd": 0.0005184000000000001
+      },
+      "citation_judgments": [
+        {
+          "evidence_id": "chembl:CHEMBL3353410",
+          "relation": "supports"
+        },
+        {
+          "evidence_id": "chembl:CHEMBL25",
+          "relation": "irrelevant"
+        }
+      ]
+    }
+  ]
+}

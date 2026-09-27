@@ -281,3 +281,134 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   resume-safe phrasing is: original held-out 2/3 (one invalid-gold miss,
   zero fabrication), fresh independent supplement 1/1 - reported
   separately, never combined into a single ratio.
+
+## Resume-safe claims (Phase 7)
+
+- Built a separate, independently-validated grounding/citation evaluation
+  harness (`grounding_eval/`) that measures SEMANTIC support of claim text
+  against cited Evidence content - not merely whether a citation resolves
+  to a real Evidence ID (that was Phase 6's, purely structural, scope).
+- The selected evaluator (Candidate B, semantic judge) was validated
+  against independently-authored gold labels **before** being used to
+  measure the frozen Phase-6 generator: 27/27 (100%) on development +
+  validation, 9/9 (100%) on a held-out split run exactly once after the
+  evaluator was frozen. Macro-F1 = 1.0 on both.
+- Unsupported/contradicted-claim detection recall = 1.0 and citation-
+  relation macro-F1 = 1.0 on both splits, both exceeding the predeclared
+  thresholds (>=0.95 and >=0.90 respectively).
+- Found and fixed one real evaluator defect (the judge could infer
+  CONTRADICTED from outside domain knowledge instead of the Evidence's own
+  stated content) via genuine development-split iteration - dev pass rate
+  20/22 -> 22/22 after the fix, validation 5/5 (fresh cases, untouched
+  during the fix).
+- Using the validated evaluator, measured the frozen Phase-6 generator on
+  a real, separate system-evaluation set (8 answers / 16 factual claims,
+  explicitly excluding Phase-6's own held-out): 100% claim support rate,
+  0% unsupported, 0% contradicted, citation precision 1.0, claim-citation
+  coverage 1.0, 8/8 (100%) answer-level fully-grounded. No Phase-6
+  production defect was found.
+- Kept evaluator-quality metrics (System A) and generator-grounding
+  metrics (System B) strictly separate in code, artifacts, and docs at
+  every step - never blended into a single number.
+- Zero hard-gate violations across all 10 predeclared hard safety gates
+  (unknown/fabricated Evidence or source IDs, secret leaks, unserializable
+  evaluations, uncaught schema failures, gold leakage into evaluator
+  input, held-out reuse during tuning, silent failures treated as pass) -
+  verified across dev+validation, held-out, and the system evaluation run.
+- Verified by an explicit test (`test_evaluator_not_in_production_graph`)
+  that `grounding_eval` is never imported by the production LangGraph
+  (`agent/graph.py`) - the evaluator remains an offline measurement tool,
+  never a production dependency.
+
+## Not resume-safe (Phase 7)
+
+- **Any claim that the evaluator is a cross-model or cross-provider
+  independent judge.** Candidate B and the Phase-6 generator both call
+  the same model (Cerebras `qwen-3.8-27b`). Evaluator accuracy is real
+  and validated against gold the model never saw during generation, but
+  this is same-model-family validation, not independent/adversarial
+  validation - see CTL-011 in `docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md`.
+- **Any claim of citation RECALL.** Only citation precision and claim-
+  citation coverage are reported, per the Phase-7 evaluation contract;
+  citation recall is explicitly never computed or reported.
+- **Any claim that the 100% System-B grounding result generalizes beyond
+  the 8-answer/16-claim system evaluation sample.** It is a real, honest,
+  positive result on that sample - not a statistical guarantee at scale,
+  and explicitly not force-inflated to a larger benchmark.
+- **Any evaluator token/cost figure.** `grounding_eval/judge.py`'s
+  `_invoke_judge` does not currently parse the Cerebras `usage` block -
+  not measured this session, see CTL-012.
+- **Any claim that Phase 7 reopened, modified, or re-froze Phase 6.** No
+  Phase-6 defect was discovered; Phase 6's frozen checkpoint
+  (`a4b3ae332d6bab41d99b1041015fb662b35c8025`) remains completely
+  untouched.
+- **Any evaluator-quality number (accuracy, macro-F1, recall) presented
+  as if it were a generator-grounding number, or vice versa.** The two
+  are measured on different case sets, for different purposes, and must
+  always be reported under their own System A / System B label.
+- **Any claim that Candidate C (hybrid) or Candidate D (independent
+  model) is production-ready or was fully debugged.** Candidate C's
+  residual numeric-regex defect (evidence-side digits glued to letters,
+  e.g. "PHASE2") was left unfixed since Candidate C was not selected;
+  Candidate D was never built at all (CTL-011).
+
+## Resume-safe claims (Phase 7 hardening pass addendum)
+
+- Expanded the Phase-7 claim-level benchmark from 36 to 68 real cases (32
+  new, from 9 previously-unused real Phase-5 records), improving label
+  balance (all 4 support labels now have double-digit representation,
+  11-26 cases each) and source balance (pubmed/clinical_trials/chembl each
+  now >=16 evidence references) without manufacturing low-quality cases.
+- Candidate B (the selected, unchanged evaluator) scored 47/47 (100%) on
+  combined development+validation (27 original + 20 new cases, including
+  one case whose gold label was itself found defective and corrected
+  before use).
+- Hardened Candidate A into a genuine v2 baseline (entity attribution +
+  structured categorical-field exact match + fixed numeric/phase
+  comparison), measurably improving 46.9% -> 56.2% on the new, harder
+  cases, while preserving v1's original historical measurement unmodified.
+- Fixed Candidate C's residual numeric-regex defect (evidence-side
+  letter-glued values like "PHASE2" were previously invisible to the
+  numeric check) via identifier-masking + field-name-aware phase-token
+  normalization, with 11 new regression tests.
+- Expanded the frozen Phase-6 system-semantic-grounding evaluation from 8
+  to 16 real answers (16 to 40 real factual claims), all still 100%
+  supported, 0% unsupported/contradicted - no Phase-6 defect found at the
+  larger scale either.
+- Closed CTL-012: evaluator token/cost are now genuinely measured (real
+  Cerebras `usage` data), and latency is now decomposed into rate-limit
+  wait vs. real provider-call time vs. parsing time, rather than reported
+  as one rate-limit-dominated figure.
+- Ran a fresh, previously-unseen 12-case held-out supplement (not strictly
+  required since the evaluator itself did not change, but run anyway):
+  10/12 raw, with both misses root-caused via manual audit to gold-
+  authoring defects in the newly-authored material (not evaluator
+  defects) - reported as-run, per the frozen-held-out-gold rule, exactly
+  like Phase 6's precedent.
+- Found and transparently documented three real defects this pass: two
+  gold-authoring mistakes in newly-authored cases (one fixed pre-freeze,
+  two left in the frozen fresh-held-out record and reported honestly) and
+  one evaluation-harness bug (a scratch-script evidence-dictionary
+  collision, unrelated to any frozen Phase-6 or Phase-7 code) - found and
+  fixed before being used in any reported system-eval number.
+
+## Not resume-safe (Phase 7 hardening pass addendum)
+
+- **Any claim that CTL-011 (a genuinely independent, distinct-provider
+  evaluator) was resolved.** It was actively re-tested this session (not
+  re-asserted from memory) and confirmed still blocked: no second LLM
+  provider credential exists, and `huggingface.co` is explicitly denied by
+  this environment's egress policy. Candidate D was NOT built. CTL-011
+  remains OPEN.
+- **Any claim that Phase 7 is now closed.** Per the hardening directive's
+  own rule, Phase 7 remains open specifically on the independent-evaluator
+  requirement - every other resolvable caveat was resolved, but this one
+  requirement cannot be satisfied inside this cloud environment.
+- **Any claim that the multi-source claim count (5), unsupported-label
+  count (11), or system-eval answer count (16) met their respective
+  aspirational targets (>=6, >=12, >=20).** All three are honest, reasoned
+  shortfalls, disclosed in `docs/v2/PHASE7_HARDENING_AUDIT.md`, not force-
+  padded to hit a number.
+- **Any claim that the fresh 12-case held-out supplement scored a clean
+  100%.** It scored 10/12 as-run; the 2 misses were root-caused to gold
+  defects, not silently corrected into a "12/12" figure anywhere.

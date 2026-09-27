@@ -1,0 +1,148 @@
+{
+  "artifact_name": "phase7_phase6_system_evaluation_v2",
+  "purpose": "Hardening-pass expansion (Known Issue 8/9) of the frozen Phase-6 generator's semantic-grounding system evaluation, using the validated Candidate B evaluator on 8 NEW real answer cases (never used in Phase-6's benchmark/held-out/supplement, nor in the original 8-answer Phase-7 system evaluation).",
+  "manifest": "artifacts/v2/phase7_phase6_system_eval_v2_manifest.json",
+  "generator": {
+    "architecture": "candidate_b_structured",
+    "model": "qwen-3.8-27b",
+    "frozen": true,
+    "generated_exactly_once": true
+  },
+  "evaluator": {
+    "architecture": "candidate_b_semantic_judge",
+    "same_model_as_generator_caveat": true
+  },
+  "total_answer_cases": 8,
+  "answers_with_factual_claims": 7,
+  "answers_abstained": 1,
+  "abstention_correctness": "1/1 - the single zero-Evidence query (P7SYS2-Q8) correctly abstained with no factual claims",
+  "total_factual_claims": 24,
+  "supported_claims": 24,
+  "partially_supported_claims": 0,
+  "unsupported_claims": 0,
+  "contradicted_claims": 0,
+  "claim_support_rate": 1.0,
+  "answer_level_fully_grounded_rate": "7/7",
+  "source_breakdown": {
+    "clinical_trials": {
+      "answers": 2,
+      "claims": 7,
+      "supported": 7
+    },
+    "pubmed": {
+      "answers": 2,
+      "claims": 8,
+      "supported": 8
+    },
+    "chembl": {
+      "answers": 2,
+      "claims": 4,
+      "supported": 4
+    },
+    "multi_source": {
+      "answers": 1,
+      "claims": 5,
+      "supported": 5
+    }
+  },
+  "harness_bug_found_and_fixed": "The FIRST evaluation run of P7SYS2-Q5 (osimertinib) spuriously showed 2/2 unsupported claims. Root-caused to a bug in this session's OWN scratch evaluation harness (NOT Phase 6, NOT the Candidate B evaluator): a flat global evidence-id-keyed dict silently let a same-evidence_id 'osimertinib_resolve' Evidence object (from a different real ChEMBL adapter call) overwrite the correct 'osimertinib_info' Evidence object, since ChEMBL evidence_ids are keyed by chembl_id alone. Fixed by scoping the evidence lookup to exactly the Evidence objects each query's generation call actually used. Re-run confirmed 2/2 supported. Documented transparently in docs/v2/PHASE7_HARDENING_AUDIT.md rather than silently corrected.",
+  "case_level_detail": [
+    {
+      "case_id": "P7SYS2-Q1",
+      "source_category": "clinical_trials",
+      "abstained": false,
+      "factual_claim_count": 4,
+      "supported_count": 4,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q2",
+      "source_category": "clinical_trials",
+      "abstained": false,
+      "factual_claim_count": 3,
+      "supported_count": 3,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q3",
+      "source_category": "pubmed",
+      "abstained": false,
+      "factual_claim_count": 4,
+      "supported_count": 4,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q4",
+      "source_category": "pubmed",
+      "abstained": false,
+      "factual_claim_count": 4,
+      "supported_count": 4,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q5",
+      "source_category": "chembl",
+      "abstained": false,
+      "factual_claim_count": 2,
+      "supported_count": 2,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q6",
+      "source_category": "chembl",
+      "abstained": false,
+      "factual_claim_count": 2,
+      "supported_count": 2,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q7",
+      "source_category": "multi_source",
+      "abstained": false,
+      "factual_claim_count": 5,
+      "supported_count": 5,
+      "partially_supported_count": 0,
+      "unsupported_count": 0,
+      "contradicted_count": 0,
+      "fully_grounded": true,
+      "citation_precision": 1.0,
+      "claim_citation_coverage": 1.0
+    },
+    {
+      "case_id": "P7SYS2-Q8",
+      "source_category": "n_a_abstention",
+      "abstained": true,
+      "note": "correctly abstained on zero-evidence query"
+    }
+  ]
+}

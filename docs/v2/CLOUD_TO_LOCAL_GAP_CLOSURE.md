@@ -86,6 +86,127 @@ docs/artifacts/code before writing this ledger (see each CTL item's
 | CTL-008 | 5 | Final local regression after all carryover checks | OPEN | YES (last, depends on all above) |
 | CTL-009 | 6 | True real Phase-2→3→4→5→6 pipeline (nonzero-Evidence grounded answer) | OPEN | YES |
 | CTL-010 | 6 | Legacy report_generation_node baseline latency/token measurement (needs NVIDIA_API_KEY) | OPEN | NO (see item - informational baseline only, not a Phase-6 blocker) |
+| CTL-011 | 7 | Genuinely independent (distinct-provider) grounding-evaluator validation | OPEN - actively reconfirmed blocked (no 2nd provider credential, huggingface.co explicitly denied by egress policy) | NO (documented caveat, not a blocker - see item) |
+| CTL-012 | 7 | Phase-7 evaluator token/cost measurement | **CLOSED** (hardening pass) | N/A - closed |
+
+### CTL-011 — Genuinely independent (distinct-provider) grounding-evaluator validation
+
+- **ID:** CTL-011
+- **Phase:** 7
+- **Status:** OPEN (non-blocking - documented caveat, not a correctness gap)
+- **Why it could not be fully verified:** the selected Phase-7 evaluator
+  (`candidate_b_semantic_judge`) uses the same model (Cerebras
+  `qwen-3.8-27b`) as the frozen Phase-6 generator it measures. Per
+  directive Step 24, a genuinely distinct evaluator (a different provider/
+  model, or a local NLI model) was considered but not built - this cloud
+  session has confirmed reachable access only to Cerebras (per
+  CTL-002/003/004's network-policy findings, and no other LLM provider
+  credential is configured here). Reviving a previously-rejected provider
+  (e.g. GPT-OSS, rejected in Phase 2) without new technical justification
+  is explicitly disallowed by the governing directive, so none was
+  introduced "merely for optics."
+- **Environment where limitation occurred:** this Claude Cloud session.
+- **Original intended verification:** validate the same 36-case Phase-7
+  benchmark against a second, architecturally-distinct evaluator (a
+  different model/provider, or a local NLI-style model) and compare
+  agreement with the selected Cerebras-based judge, to establish true
+  cross-model evaluator agreement rather than only within-model
+  consistency.
+- **What cloud actually verified instead:** the selected evaluator was
+  validated against independently-authored, Evidence-backed gold labels
+  (not against another model) - a real, defensible validation, just not a
+  cross-model one. This distinction is documented explicitly everywhere
+  the evaluator's results are reported (never described as "cross-model
+  independent validation").
+- **Exact local action required:** with a second LLM provider credential
+  available (or a local NLI model dependency installed), implement a
+  Candidate D evaluator using that provider/model, run it on the same
+  frozen 36-case benchmark, and report its own accuracy/macro-F1 plus
+  agreement rate with Candidate B.
+- **PASS criteria:** a second, architecturally-distinct evaluator is
+  validated against the same frozen gold with macro-F1 >= 0.90, and its
+  agreement rate with Candidate B on the same cases is reported.
+- **Required credentials/data/network/artifacts:** a second LLM provider
+  API key, or a local NLI model dependency.
+- **Evidence/artifact to update after execution:** a new
+  `artifacts/v2/phase7_independent_evaluator_comparison.json`.
+- **Result:** _(pending)_
+- **Closure date:** _(pending)_
+- **Closure commit SHA:** _(pending)_
+- **Notes/caveats:** non-blocking for Phase-7 closure - the same-model
+  caveat is a documented limitation, not a correctness defect; the
+  evaluator's validation against frozen gold stands on its own.
+- **Phase-7 hardening-pass re-attempt (this session, still OPEN):** actively
+  re-verified rather than re-asserted from memory. `curl` against
+  `huggingface.co:443` through the session's egress proxy returned an
+  explicit `connect_rejected` / HTTP 403 organization-policy denial (not a
+  transient failure - confirmed via the proxy's own `/__agentproxy/status`
+  log), so no local NLI/embedding model can be downloaded in this session
+  even though `sentence-transformers` is already pinned in
+  `requirements.txt` for Phase 3's RAG layer (the package itself is not
+  even installed in this environment, and installing it would still need a
+  blocked model download). `env | grep -i api_key` in this session shows
+  only `CEREBRAS_API_KEY` - no `NVIDIA_API_KEY`, no OpenAI/Anthropic/other
+  provider key. Per the governing directive, reviving a previously-rejected
+  provider without new technical justification is disallowed, and no new
+  provider credential appeared this session, so Candidate D (a genuinely
+  independent evaluator) was **not built** - correctly recorded as BLOCKED,
+  not silently worked around with "same model, different prompt."
+  CTL-011 **remains OPEN**; this is a genuine, actively-confirmed
+  environment limitation, not a weakened or abandoned check.
+
+### CTL-012 — Phase-7 evaluator token/cost measurement
+
+- **ID:** CTL-012
+- **Phase:** 7
+- **Status:** CLOSED (Phase-7 hardening pass, this session)
+- **Why it could not be fully verified:** `grounding_eval/judge.py::_invoke_judge`
+  does not currently parse/return the Cerebras response's `usage` block
+  (an implementation oversight, not a judgment-quality defect) - confirmed
+  by direct code inspection. `artifacts/v2/phase7_performance.json`
+  therefore reports evaluator latency/call-count but honestly marks
+  tokens/cost as NOT MEASURED rather than estimating or fabricating them.
+- **Environment where limitation occurred:** this Claude Cloud session
+  (a code gap, not an environment restriction - could be fixed and
+  re-measured in any environment with Cerebras access, including this
+  one, just wasn't done this session given time constraints).
+- **Original intended verification:** full evaluator cost accounting
+  (input/output tokens per case, total benchmark cost in USD) alongside
+  the latency figures already captured.
+- **What cloud actually verified instead:** call counts and latency only.
+- **Exact local action required:** update `_invoke_judge` to parse and
+  return `data.get("usage")` (mirroring `generation/generator.py`'s
+  existing pattern), rerun the 36-case benchmark, and compute cost using
+  the same frozen Cerebras qwen-3.8-27b pricing already recorded in
+  `artifacts/v2/phase5_frozen_config.json`.
+- **PASS criteria:** `artifacts/v2/phase7_performance.json` reports real
+  measured input/output tokens and a real computed cost figure, not
+  "NOT MEASURED."
+- **Required credentials/data/network/artifacts:** none beyond what this
+  session already has (Cerebras access) - purely a code change + rerun.
+- **Evidence/artifact to update after execution:**
+  `artifacts/v2/phase7_performance.json`.
+- **Result:** `grounding_eval/judge.py::_invoke_judge` now parses
+  `data.get("usage")` (prompt_tokens/completion_tokens/total_tokens) and
+  also decomposes latency into `rate_limit_wait_ms` / `provider_call_ms` /
+  `parsing_validation_ms` / `end_to_end_ms` (fixing the related "rate-limit
+  dominated latency" caveat in the same pass - see
+  `docs/v2/PHASE7_HARDENING_AUDIT.md`). Verified with a real live Cerebras
+  call: `prompt_tokens=902, completion_tokens=83, total_tokens=985,
+  cost_usd=0.000427`. Cost uses Cerebras's published qwen3-32b-class
+  pricing ($0.40/$0.80 per 1M input/output tokens - the closest documented
+  SKU to this project's pinned `qwen-3.8-27b` model id; source and
+  check-date recorded as `CEREBRAS_PRICING_SOURCE` /
+  `CEREBRAS_PRICING_CHECKED_DATE` constants in `grounding_eval/judge.py`,
+  not silently hardcoded). Full benchmark token/cost totals recorded in
+  `artifacts/v2/phase7_performance_v2.json`.
+- **Closure date:** 2026-09-27
+- **Closure commit SHA:** _(pending - Phase 7 is still uncommitted)_
+- **Notes/caveats:** does not affect any accuracy metric or hard gate -
+  was purely a cost-accounting completeness gap, now closed. The pricing
+  figure is the best-effort published rate for the nearest documented
+  Cerebras SKU, not a rate Cerebras has published under the exact model id
+  `qwen-3.8-27b`; this is disclosed, not hidden.
 
 ### CTL-009 — True real Phase-2→3→4→5→6 pipeline (nonzero-Evidence grounded answer)
 
@@ -182,7 +303,7 @@ items - both directly traceable to the same underlying, already-recorded
 environment constraints (network policy, missing local index, missing
 NVIDIA credential), not new kinds of limitation.
 
-**No additional CTL items beyond CTL-001 through CTL-010 were
+**No additional CTL items beyond CTL-001 through CTL-012 were
 identified.** Step 1's audit
 and `tests/` for the specified terms (network blocked, unavailable,
 captured, skipped, gated, not built, missing credential, proxy, fallback,
@@ -195,6 +316,20 @@ per-source latency, n=17-per-source-ish, and this session's dedicated
 `phase5_normalization_performance.json`, n=1160 — both real, not
 contradictory, just distinct sample sizes; not a cloud substitution, so it
 does not warrant a CTL item).
+
+**Phase-7 hardening pass (this session):** re-audited CTL-011/CTL-012
+against their own exact pass criteria before touching either. CTL-012's
+pass criteria were fully satisfied by real code changes and real
+measurement (see its item above) and is now CLOSED. CTL-011's pass
+criteria require a genuinely distinct evaluator provider/model - actively
+re-tested this session (not re-asserted from memory) and confirmed still
+unavailable (see the item's "Phase-7 hardening-pass re-attempt" note), so
+CTL-011 **remains OPEN**. No new CTL item was created by this pass -
+`docs/v2/PHASE7_HARDENING_AUDIT.md` documents three additional findings
+(two gold-authoring defects, one evaluation-harness bug) but all three
+were fully resolved within this session using only Cerebras access already
+covered by CTL-011, so none independently qualifies as a new
+cloud-substituted or blocked verification.
 
 ---
 
