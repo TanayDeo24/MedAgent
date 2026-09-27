@@ -1,0 +1,96 @@
+{
+  "purpose": "Phase 2 latency-closure Step 3: plan written BEFORE running latency-fix candidates, per the resume directive's requirement to avoid unbounded tweaking. Extends artifacts/v2/nlu_closure_experiment_plan.json (which covers the quality-closure round) with the latency-specific families.",
+  "baseline": {
+    "architecture": "candidate_b_structured",
+    "p50_ms": 19150.11,
+    "p95_ms": 66982.66,
+    "source": "artifacts/v2/nlu_latency_baseline.json"
+  },
+  "latency_acceptance_bar": {
+    "existing_frozen_threshold_check": "V2_PHASE_GATES.md / PRODUCT_CONTRACT.md were checked for a frozen numeric NLU-stage latency threshold - none exists; the only latency language in nlu_frozen_config.json's own gate is qualitative ('P50 well under 10s for an interactive stage').",
+    "bar_set_this_round": "P50 <= 8000ms (8s) AND P95 <= 20000ms (20s) for the NLU stage alone.",
+    "justification": [
+      "This stage runs BEFORE retrieval/tool research in the pipeline (query_analysis_node precedes planning_node and all tool calls) - its latency is pure user-facing wait time added on top of everything that follows, not overlapped with other work.",
+      "The product is meant to be interactive (PRODUCT_CONTRACT.md framing of MedAgent as a research assistant a user converses with), not a batch/offline system.",
+      "Later phases (retrieval, tool orchestration, generation) will add their own latency on top of whatever this stage costs - an NLU stage that already costs 19-67s leaves an unacceptably small budget for everything after it.",
+      "8s/20s is a real, material reduction target (not a token 19.2s->17.8s change) while still being realistic given this endpoint is a large reasoning-tuned model under a free-tier rate limit with observed 503 overload - not a sub-2s target that would require a fundamentally different (unavailable) model."
+    ]
+  },
+  "dev_set": "evaluation/v2/nlu_benchmark_v1.json split=dev (n=45), benchmark_version 1.1.0. Consumed test split (n=105) and Phase-10 data are explicitly NOT used for any candidate in this plan.",
+  "quality_metrics_required_per_candidate": [
+    "entity_prf (micro, and per-type via entity_prf_by_type)",
+    "normalization accuracy_at_1, coverage (n_normalizable_gold), fabricated_id_count",
+    "intent accuracy, macro_f1, confusion_matrix",
+    "constraint_prf (overall) and constraint_prf_by_field",
+    "ambiguity handling: I_ambiguous class recall/F1 from the confusion matrix",
+    "schema_parse_success_rate, schema_parse_failures"
+  ],
+  "performance_metrics_required_per_candidate": [
+    "latency_ms p50/p90/p95/max/mean",
+    "llm_calls_per_question",
+    "token_accounting (input/output/total, mean/median/p95)"
+  ],
+  "candidate_families": {
+    "A_same_provider_reasoning_control": {
+      "description": "Genuine reasoning-effort/token controls on the SAME NVIDIA endpoint/model, not an invented parameter.",
+      "investigated": "langchain_nvidia_ai_endpoints.ChatNVIDIA._get_payload supports a structural `thinking_mode` kwarg (bool) that prepends a 'detailed thinking on/off' system message - NOT a prompt-text convention like the closure round's rejected '/no_think' prefix, a real SDK-level parameter. However nvidia/nemotron-3-super-120b-a12b is NOT present in the SDK's MODEL_TABLE (supports_thinking is only declared for a small enumerated set of other models) and the SDK itself warns 'type is unknown and inference may fail' for this model.",
+      "live_test_result": "thinking_mode=False tested twice against the real STRUCTURED_EXTRACTION_PROMPT: run 1 was SLOWER than default (34.2s vs 21.5s) with comparable reasoning-length output tokens (1714 vs 1959); the system-message convention is not honored reliably by this specific model, consistent with the closure round's earlier finding that a similar prompt-text suppression trick 'worked once, failed once.'",
+      "decision": "REJECTED for family A alone - not a safe, reliable, production-worthy reasoning-length control for this specific model on this endpoint. Not pursued further as a standalone fix; genuinely attempted (not skipped for convenience), documented honestly.",
+      "candidate_count": 1
+    },
+    "B_different_provider": {
+      "description": "A genuinely different LLM provider or a different, faster model actually available and callable.",
+      "environment_check_this_round": ".env re-verified: exactly 3 keys (LOG_FILE, LOG_LEVEL, NVIDIA_API_KEY) - no OpenAI/Anthropic/Cohere/Groq/Together/etc. credentials exist. `pip list`-equivalent check of installed provider SDKs re-confirmed: only langchain-nvidia-ai-endpoints is installed among provider SDKs.",
+      "decision": "BLOCKED on missing credentials/SDKs, exactly as the prior closure round found for smaller-model alternatives on this same endpoint (item 12: 10 candidate models tried, all 410/404). Recorded as a hard external blocker per this task's own allowance ('If no alternate credentials/provider are available: record that fact. Do not block the rest of the architectural experiments'). NOT attempted further - no credentials exist to attempt it with.",
+      "candidate_count": 0
+    },
+    "C_decomposed_architecture": {
+      "description": "Split the single monolithic Candidate B call into two focused, single-purpose calls: one entity-extraction-only call (keeps the EXHAUSTIVE ENTITY SCAN + target-default-typing rules that earned Candidate B's 0.901 entity F1), one intent+constraint+ambiguity-only call (keeps B_VS_G_RULE, DI_VS_E_RULE, I_ambiguous mapping).",
+      "hypothesis_and_evidence": "A live 8-example component-profiling test this round showed a simplified single-purpose entity prompt at ~3.4s/~1.1K reasoning chars and a simplified single-purpose intent+constraint prompt at ~5.6s/~2.0K reasoning chars, against Candidate B's single combined prompt at 11-31s/3.1-9.3K reasoning chars per call. Reasoning length scales with prompt task-breadth, not a fixed per-call tax (see nlu_latency_baseline.json's reasoning_token_correlation). Two focused calls in parallel wall-clock terms could plausibly beat one broad call even at 2x the round-trip count.",
+      "implementation": "nlu/extractor.py::extract_candidate_c (architecture key candidate_c_decomposed), added this round. Same bounded 1-retry-then-NLU_FAILURE recovery as Candidate B on EACH of its two calls. Same deterministic normalization module, unchanged.",
+      "candidate_count": 1,
+      "status": "IMPLEMENTED AND EVALUATED - see gate_results below"
+    },
+    "D_deterministic_extraction": {
+      "description": "Fields extractable without any LLM call at all.",
+      "already_deterministic_pre_this_round": "Trial phase/status canonicalization (nlu/normalization.py::canonicalize_trial_phase/canonicalize_trial_status) - Phase 2 closure item 7, unchanged.",
+      "assessed_this_round": [
+        {"field": "geography", "finding": "Benchmark dev/test gold geography values are free-text phrases ('in the United States', 'European trials', 'multi-national') with no fixed enum in ConstraintSet or the taxonomy; a regex/gazetteer approach would need a maintained place-name list and still could not resolve every phrasing (e.g. 'trials outside Asia') deterministically without materially more scope than this round's time budget allows. NOT implemented - documented as a candidate for a future round, not attempted."},
+        {"field": "temporal/age/population/outcomes/study_type", "finding": "All are free-text spans in the gold benchmark (e.g. 'published in the last 5 years', 'adults over 65', 'randomized controlled trial') that require genuine language understanding to detect presence/boundaries, not just canonicalize a known vocabulary the way trial_phases/trial_statuses do (a small closed enum). NOT a deterministic-extraction candidate this round for the same reason as geography."},
+        {"field": "known abbreviation/gene/compound aliases", "finding": "Already handled deterministically post-extraction by nlu/normalization.py's DISEASE_TABLE/GENE_TABLE/COMPOUND_TABLE lookup (unchanged this round) - this is normalization of an LLM-identified surface form, not a substitute for entity detection itself; entity SPAN detection (deciding that 'EGFR' or 'the mTOR pathway' is a mention at all, in arbitrary free text) is not something a fixed lookup table can do without knowing where to look, which is exactly the recall problem a dictionary-only pass would reintroduce (see nlu_frozen_config.json's hybrid_architecture_considered_and_rejected note and item 13's biomedical_extraction_assessment, both from the prior round, still valid)."}
+      ],
+      "decision": "No new deterministic-extraction fields identified this round beyond what item 7 already covers. Family D contributes no new candidate.",
+      "candidate_count": 0
+    }
+  },
+  "max_experiment_count": 6,
+  "experiments_actually_run": [
+    "candidate_a_baseline on dev (re-run for a same-session comparable number, since the last A dev run predates several closure-round prompt/taxonomy fixes)",
+    "candidate_b_structured on dev (re-used from nlu_closure_entitytype_b_dev.json - already the freshest same-prompt-version run; not re-run a 5th time for a config that generates no new information)",
+    "candidate_c_decomposed on dev (new)"
+  ],
+  "selection_rule": "Pareto-style per the resume directive: a candidate is INELIGIBLE if it materially regresses any essential NLU capability (entity F1 drop >2pt vs whichever of A/B is currently better, fabricated_id_count>0, any intent class showing new >=80% systematic misclassification, any constraint field with support>=5 dropping to F1<0.3, schema_parse_success_rate materially worse). Among ELIGIBLE candidates, prefer (in order): (1) meets the latency acceptance bar above, (2) lower P50/P95, (3) simpler architecture / fewer model calls, (4) stronger schema reliability, (5) lower token/cost burden, (6) lower provider dependency.",
+  "rejection_rules": "A candidate that improves latency but fails the ineligibility check above is rejected regardless of its latency number - no exception, per the task's own non-negotiable rule that latency cannot be optimized at the cost of quality/reliability.",
+  "candidate_c_result_and_decision": {
+    "source": "artifacts/v2/nlu_latency_candidate_c_dev.json, dev split n=45, live run",
+    "quality_summary": {
+      "entity_f1_micro": "0.887 (vs B's 0.901, vs A's 0.889 - within the 2pt tolerance, not itself disqualifying)",
+      "target_type_f1": "0.979 (recall 0.958) - BETTER than B's 0.919",
+      "normalization_accuracy_at_1": "0.971 (vs B's 0.952), fabricated_id_count 0 - PASS",
+      "intent_accuracy_macro_f1": "0.756 / 0.742 (comparable to B's 0.733/0.740)",
+      "schema_parse_success_rate": "1.0 (vs B's 0.911) - BETTER",
+      "constraint_f1_micro": "0.539 (vs B's 0.800) - MATERIAL REGRESSION",
+      "constraint_by_field_regression": "population F1 collapsed to 0.114 (precision 0.074, 25 false positives against support=8) - BELOW the pre-committed 0.3 disqualification threshold for support>=5. age/study_type/outcomes show new FP-only noise (0 F1 each, support=0, same class of noise B already had but slightly worse). The decomposed intent/constraint prompt over-extracts constraint values when it no longer has entity context sitting in the same completion.",
+      "intent_confusion_regression": "B_clinical_trial_landscape: 7/8 gold-B examples misclassified as G_constraint_heavy, 1/8 as A_literature_evidence - i.e. 0/8 correct, 87.5% single-directional B->G confusion. This is the SAME systematic confusion pattern that was root-caused and fixed in the original closure pass (100% G->B in the reverse direction) - it has re-appeared in the reverse direction in the decomposed intent-only prompt, most likely because the model no longer has the full query's entity list in the same completion when applying B_VS_G_RULE's constraint-dimension count."
+    },
+    "latency_summary": {
+      "p50_ms": "22598.3 (WORSE than B's 19150.1)",
+      "p95_ms": "39222.4 (BETTER than B's 66982.7, a 41% tail reduction)",
+      "llm_calls_per_question": 2.02,
+      "finding": "Not a clean win even ignoring quality: P50 got worse (2 focused calls' combined latency exceeded 1 broad call's median in this live run, contradicting the smaller 8-example component-profiling estimate from nlu_latency_baseline.json - likely because this dev run's B_VS_G_RULE-heavy intent prompt triggered longer reasoning than the profiling sample's simpler prompts did) while P95 improved substantially (shorter, more bounded worst-case reasoning per call). Mixed result, not a material overall latency win."
+    },
+    "eligibility_check": "INELIGIBLE - fails 2 independent ineligibility criteria from this plan's selection_rule: (1) constraint field 'population' (support=8 >= 5) has F1 0.114 < 0.3; (2) B_clinical_trial_landscape shows 87.5% single-directional systematic misclassification (>=80% threshold), reintroducing exactly the class of defect this project spent a prior closure round fixing.",
+    "decision": "REJECTED. Per this plan's own pre-committed rejection_rules, a candidate that regresses quality is rejected regardless of any latency benefit - and in this case the latency benefit itself is not even clearly positive (P50 worse). NOT iterated further (e.g. a 'fix the intent prompt and re-run' v2 of Candidate C) in this round: doing so would be exactly the unbounded, plan-violating tweaking this experiment plan was written to prevent (the plan fixed 3 experiments - A reuse, B reuse, C new - before any candidate was run, and does not authorize an open-ended C-v2/v3/v4 iteration loop). A future round may revisit a corrected decomposed prompt (tighter B_VS_G_RULE phrasing with an explicit worked example, and a 'do not extract unless the exact phrase is present' rule for population/age/study_type/outcomes) as a fresh, separately-planned experiment.",
+    "conclusion": "candidate_b_structured remains the frozen architecture. The latency gate is NOT resolved this round. Family C (decomposition) was the most promising hypothesis per the profiling data and was genuinely, fairly implemented and tested - but the live full-dev-split result did not replicate the small-sample profiling estimate and introduced real quality regressions, so it is correctly not adopted. This is an honest negative result, not a skipped or abandoned experiment."
+  }
+}

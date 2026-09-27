@@ -1,0 +1,116 @@
+{
+  "scope": "Phase 2 CLOSURE final error analysis. Primary source: artifacts/v2/nlu_closure_entitytype_b_dev.json (FINAL/FROZEN dev-split rerun, Candidate B post-closure-fixes, n=45). Secondary/historical source (read-only, NOT re-scored or tuned against): artifacts/v2/nlu_test_split_results.json (the original, now-consumed 105-example test-split run, pre-closure-fixes) - included ONLY to document what the pre-closure state looked like, per item 20's instruction to show history, not as live evidence for the frozen architecture.",
+  "systemic_issues_found_and_resolved_this_closure_pass": [
+    {
+      "issue": "100% G_constraint_heavy -> B_clinical_trial_landscape intent confusion",
+      "example_ids_pre_fix": ["nlu_v1_0113", "nlu_v1_0116", "nlu_v1_0114", "nlu_v1_0117", "nlu_v1_0118", "nlu_v1_0108", "nlu_v1_0120"],
+      "expected": "G_constraint_heavy",
+      "predicted_pre_fix": "B_clinical_trial_landscape",
+      "responsible_component": "nlu/extractor.py prompt (missing B-vs-G disambiguation rule) + nlu/taxonomy.py (rule existed only as an unwritten authoring convention)",
+      "severity": "high",
+      "classification": "systemic (100% of class, both splits) - RESOLVED",
+      "fix": "nlu/taxonomy.py::B_VS_G_RULE + prompt injection",
+      "post_fix_evidence": "G recall 8/8 (1.0) on both clean dev reruns (run 2 and run 3, artifacts/v2/nlu_closure_entitytype_b_dev_run2_entityfixed.json and nlu_closure_entitytype_b_dev.json)"
+    },
+    {
+      "issue": "H_insufficient_evidence never predicted (0/15 across all splits)",
+      "example_ids": ["nlu_v1_0123", "nlu_v1_0130", "nlu_v1_0132", "nlu_v1_0134", "nlu_v1_0127", "nlu_v1_0131", "nlu_v1_0133", "nlu_v1_0125", "nlu_v1_0121", "nlu_v1_0135", "nlu_v1_0126", "nlu_v1_0129", "nlu_v1_0122", "nlu_v1_0128", "nlu_v1_0124"],
+      "expected": "H_insufficient_evidence (v1.0.0 gold)",
+      "predicted": "N/A - structurally undeterminable from query text alone, per PRODUCT_CONTRACT.md's own definition of H",
+      "responsible_component": "nlu/taxonomy.py (H was in the query-time IntentClass enum when it is actually a post-retrieval evidence-state judgment)",
+      "severity": "high",
+      "classification": "systemic (100% of class) - RESOLVED (by taxonomy/schema/benchmark redesign, not by making the model predict it)",
+      "fix": "H removed from query-time IntentClass; nlu_benchmark_v1.0.0 -> v1.1.0 relabels these 15 examples to their query-time surface class"
+    },
+    {
+      "issue": "target-default entity-typing regression (self-introduced this closure pass, caught and fixed within the same round)",
+      "example_ids": "all target-type entities in the run1-preentityfix dev rerun",
+      "expected": "entity_type=target (matches this benchmark's gold convention and nlu/normalization.py's unified GENE_TABLE)",
+      "predicted": "entity_type=gene or protein for ~6 of ~20 target mentions",
+      "responsible_component": "nlu/extractor.py prompt (semantic_roles instructions added without a default-type rule, causing the model to split target mentions across gene/protein/target instead of consistently using target)",
+      "severity": "high (entity F1 dropped from 0.837 projected to 0.699 measured in run 1)",
+      "classification": "systemic, self-introduced and self-resolved within this closure round",
+      "fix": "explicit target-default rule added to the entity_type prompt instructions",
+      "post_fix_evidence": "0 type_confusions in both clean reruns (run 2, run 3)"
+    },
+    {
+      "issue": "I_ambiguous never correctly predicted (0/5 dev, all predicted A_literature_evidence)",
+      "example_ids": ["nlu_v1_0140", "nlu_v1_0149", "nlu_v1_0136", "nlu_v1_0148", "nlu_v1_0139"],
+      "expected": "I_ambiguous",
+      "predicted_pre_fix": "A_literature_evidence (5/5)",
+      "responsible_component": "nlu/extractor.py prompt - the ambiguity rule told the model to set ambiguity.is_ambiguous=true but never said to also set intent=I_ambiguous, so the model classified the query by its surface topic instead",
+      "severity": "high",
+      "classification": "systemic (100% of class) - found and RESOLVED within this closure round (not part of the original reopen directive's explicit list, discovered via the item-3/6 diagnostic rerun)",
+      "fix": "prompt rule made explicit: ambiguity.is_ambiguous=true must co-occur with intent=[\"I_ambiguous\"]",
+      "post_fix_evidence": "I_ambiguous recall 4/5 (0.8), F1 0.889 in the final rerun (nlu_v1_0140 still missed - see open issues below)"
+    }
+  ],
+  "open_issues_remaining_at_closure": [
+    {
+      "issue": "Target-type entity recall gap, concentrated in \"[TARGET] inhibitors\" trailing clauses of long constraint-heavy queries",
+      "example_ids": ["nlu_v1_0107", "nlu_v1_0111", "nlu_v1_0112", "nlu_v1_0110", "nlu_v1_0109", "nlu_v1_0106", "nlu_v1_0048", "nlu_v1_0132", "nlu_v1_0134", "nlu_v1_0136"],
+      "expected": "target entity present (e.g. KRAS, HER2, BTK, JAK2, BRAF, PD-1, EGFR)",
+      "predicted": "target entity dropped entirely (not misclassified - simply missing)",
+      "responsible_component": "nlu/extractor.py's LLM extraction (Candidate B) - the model appears to deprioritize a trailing \"using X inhibitors\" mention when the sentence is already dense with phase/status/population constraints",
+      "severity": "medium-high AS ORIGINALLY DIAGNOSED (pre-fix) - was the dominant remaining driver of the entity F1 gap vs. the Candidate A baseline (target F1 0.72-0.80 vs A's 0.96)",
+      "classification": "STALE ENTRY, CORRECTED during the latency-closure round's hidden-debt review: this entry was written against dev reruns 2-3 (pre exhaustive-entity-scan fix) and was never updated after run 4 (the FINAL/FROZEN prompt - the same run this file's own top-level `scope` field names as its primary source) resolved it. Run 4 achieved target-type F1 0.919 (recall 0.85, up from 0.58-0.67) and overall entity F1 0.901, per artifacts/v2/nlu_frozen_config.json's dev_rerun_history and docs/v2/PHASE2_CLOSURE_REPORT.md sections 6 and 20. The 'candidate fix for a future round' this entry originally proposed (extract entities in a pass independent of constraint density) IS the EXHAUSTIVE ENTITY SCAN prompt rule that was in fact applied and verified in the same closure pass - this file's open-issues list just was never synced back to reflect it. RESOLVED as of run 4, NOT open.",
+      "not_a_type_confusion": "confirmed via entity_prf_by_type's type_confusions field (empty in both clean reruns) - these are missing spans, not mislabeled ones"
+    },
+    {
+      "issue": "population constraint field weaker than phase/status",
+      "example_ids": "aggregate only (support=8, F1 0.5-0.667 across clean reruns)",
+      "expected": "population constraint values (e.g. 'pediatric patients', 'elderly patients')",
+      "predicted": "partial - some population phrases extracted with different wording/boundary than gold (e.g. 'elderly' vs 'elderly patients')",
+      "responsible_component": "nlu/extractor.py's constraint extraction - population is free text (unlike phase/status which now canonicalize), so wording variance isn't normalized",
+      "severity": "medium (support is small, n=8, so this is not yet a confident systemic conclusion)",
+      "classification": "isolated/inconclusive at this sample size - flagged for closer attention with more data, not confirmed broken (constraint_prf_by_field's formatting_mismatches metric shows 0-4 events, meaning most of this is not simple surface-form mismatch, it's a real boundary/recall issue)",
+      "fixed_this_pass": false
+    },
+    {
+      "issue": "E_multi_hop_research vs D_cross_source_synthesis residual confusion",
+      "example_ids": ["nlu_v1_0098 or nlu_v1_0099 (2 of 4 E examples predicted as D in the final rerun)"],
+      "expected": "E_multi_hop_research",
+      "predicted": "D_cross_source_synthesis",
+      "responsible_component": "nlu/taxonomy.py::DI_VS_E_RULE - this rule EXISTED before this closure pass and WAS injected into the prompt this round (previously it was defined but never actually given to the model, a related-but-separate bug from B/G's), but a 50% confusion rate remains post-injection",
+      "severity": "medium (n=4, 50% recall - not yet a 100%-systemic failure by the item-18 gate definition, but worth watching)",
+      "classification": "isolated at n=4, not confirmed systemic - candidate next step: audit whether the model correctly identifies the causal-chain dependency DI_VS_E_RULE describes, similar to the B/G audit done this round",
+      "fixed_this_pass": false
+    },
+    {
+      "issue": "intervention-type false positives (entity_type=intervention predicted 4-5 times, gold never uses this type)",
+      "example_ids": "aggregate (support=0 in entity_prf_by_type for both clean reruns)",
+      "expected": "entity_type=compound (gold convention) or no entity at all",
+      "predicted": "entity_type=intervention",
+      "responsible_component": "nlu/extractor.py prompt - compound vs intervention boundary is not disambiguated the way target's default rule now is",
+      "severity": "low (pure precision noise, does not affect recall of real entities; intervention/compound share the same ChEMBL normalization table so downstream normalization is unaffected)",
+      "classification": "isolated/minor, not fixed this pass - same category of fix as the target-default rule would resolve it (a compound-default rule), left as a documented next step",
+      "fixed_this_pass": false
+    },
+    {
+      "issue": "Latency not improved",
+      "example_ids": "N/A - aggregate metric",
+      "expected": "P50 well under 10s for an interactive stage (item 18 gate)",
+      "predicted": "P50 14.5-16.6s / P95 50.6-61.9s across clean dev reruns",
+      "responsible_component": "nlu/extractor.py::extract_candidate_b - single large-schema LLM call, no latency-specific optimization attempted this closure pass (item 11 not executed)",
+      "severity": "high (explicit item-18 gate failure)",
+      "classification": "systemic, unresolved, honestly reported as open - not confused with a code regression: comparable to the pre-closure 15.9s/51.7s baseline, partly confounded by this session's observed NVIDIA API overload (frequent 503s/retries logged), not isolated from genuine model/schema latency this round",
+      "fixed_this_pass": false
+    }
+  ],
+  "historical_pre_closure_findings_from_consumed_test_split_not_rescored": {
+    "note": "From artifacts/v2/nlu_test_split_results.json (105 examples, Candidate B pre-closure-fixes). Included for historical completeness per item 21's history requirement. This data is READ, not RE-RUN or tuned against - the 105-example split stays consumed.",
+    "g_to_b_confusion": "7/7 (100%) - consistent with the dev-split finding, now resolved by the same fix",
+    "h_never_predicted": "0/15 (across dev+test) - now resolved by taxonomy redesign",
+    "empty_response_failures": "3/105 (2 genuinely empty response.content, 1 mid-generation JSON truncation) - now addressed by the bounded-retry fix in extract_candidate_b (item 9); not re-verified against the test split (would require reusing consumed test data for tuning, which is disallowed)",
+    "constraint_f1_pre_closure": 0.453,
+    "entity_f1_pre_closure": 0.745
+  },
+  "no_systemic_high_severity_failure_remaining_check": "PARTIALLY CLEAR: G/B confusion, H, target-typing regression, and I_ambiguous (all previously systemic/100%-class failures) are resolved and verified. The target-entity-recall pattern that a stale copy of this file listed as still-open was RESOLVED as of run 4 (see the corrected entry above) - it is not a remaining systemic issue. ONE systemic issue remains open and unresolved on the FROZEN architecture (candidate_b_structured, unchanged this round): latency (P50 19.2s / P95 67.0s, well above the 8s/20s bar this round defined - see artifacts/v2/nlu_latency_experiment_plan.json). Per docs/v2/PHASE2_FINAL_GATE_AUDIT.md (the authoritative, current gate list), Phase 2 CANNOT be declared fully closed while latency remains open.",
+  "latency_closure_round_addendum": {
+    "date": "this round, resumed from tanay_checkpoint.md",
+    "work_done": "Full component-level latency profiling (artifacts/v2/nlu_latency_baseline.json) confirmed the root cause precisely: >99.99% of latency is LLM request time, and within that, reasoning-chain length (response.additional_kwargs['reasoning_content']) correlates with observed latency and scales with prompt task-breadth. A decomposed two-call architecture (candidate_c_decomposed, Family C - the most promising hypothesis per the profiling data) was implemented in full (preserving every quality-critical prompt rule from Candidate B) and evaluated live on the complete 45-example dev split - not just a small profiling sample.",
+    "result": "Candidate C REJECTED. It reintroduced a systemic B_clinical_trial_landscape->G_constraint_heavy intent confusion (7/8, 87.5%, the same class of defect fixed earlier this project) and collapsed the 'population' constraint field to F1 0.114 (below the 0.3/support>=5 disqualification threshold this round pre-committed to). Its latency result was also not a clean win (P50 actually 3.4s WORSE than the frozen architecture; only P95 improved). Full detail: artifacts/v2/nlu_latency_experiment_plan.json's candidate_c_result_and_decision.",
+    "families_a_b_d": "Family A (same-provider reasoning control): a genuine SDK-level 'thinking_mode' parameter was found and live-tested (not the prior round's prompt-text trick) but proved unreliable for this specific model - rejected on the same honest basis as the prior round's '/no_think' finding. Family B (different provider): reconfirmed hard-blocked, no alternate credentials exist in .env, no alternate provider SDK installed. Family D (deterministic extraction): no new fields beyond the already-deterministic trial phase/status qualify - remaining constraint fields are free-text spans requiring genuine language understanding.",
+    "conclusion": "Latency remains OPEN. This is an honest, disciplined negative result following a genuine, full-scale (not toy-sample) test of the most promising architectural hypothesis available given this project's real constraints (single reasoning-tuned model, no alternate provider, free-tier rate limits). Phase 2 stays open on this one gate, exactly as the prior closure round left it - now with one additional architecture fairly tried and fairly rejected, not merely re-asserted without new evidence."
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "purpose": "Predeclared 8-case pilot for candidate_g_cerebras_qwen (Cerebras qwen-3.8-27b, reasoning_effort='none', strict JSON Schema, UNMODIFIED active-control STRUCTURED_EXTRACTION_PROMPT), written and committed to disk BEFORE any qualifying/quality Cerebras API call for this candidate is made (the single reasoning-control smoke test in nlu_cerebras_qwen_frozen_config.json used a synthetic non-benchmark query and predates this plan being locked, per Step 8/Step 9 ordering).",
+  "benchmark_source": "evaluation/v2/nlu_benchmark_v1.json 'dev' split (45 examples) ONLY.",
+  "prompt_used": "STRUCTURED_EXTRACTION_PROMPT (unmodified active control) -- explicitly NOT CEREBRAS_INTENT_CLARIFIED_PROMPT (the GPT-OSS-only experimental revision).",
+  "case_selection_rationale": "All 8 query_ids are NEW dev-split items, disjoint from both prior Cerebras GPT-OSS pilots (round 2's nlu_cerebras_gptoss_pilot_plan.json and round 3's nlu_cerebras_intent_revision_pilot_plan.json) on query_id, exact query_text, and template_group -- verified programmatically, see overlap_verification below. Selected to cover every category the task requires: simple entity extraction, constraint-heavy trial question, multi-entity/multi-hop question, cross-source question, ambiguous case, gene/protein/target semantic-role ambiguity, class B, class G, PLUS (within the same 8 slots, since several categories naturally co-occur): a true A_literature_evidence case (slot 1), two non-A intents from the categories most susceptible to generic-A collapse in the prior GPT-OSS rounds -- E_multi_hop_research and D_cross_source_synthesis (slots 3 and 4, the exact two classes GPT-OSS collapsed to A on), a multi-hop/specific-research-operation case (slot 3), and a case with multiple possible entity roles (slot 6, HER2/ERBB2 -- simultaneously gene/protein/target).",
+  "known_limitation": "No example in the 45-item dev split is a true 'ambiguous ABBREVIATION' case (same limitation documented in both prior Cerebras pilots and the local-Qwen-1.5B pilot). Closest available I_ambiguous proxy used: nlu_v1_0139 ('Is this drug safe?' -- missing disease/drug-identity referent), a DIFFERENT proxy item than either prior pilot used (round 2 used nlu_v1_0136, round 3 used nlu_v1_0140), disclosed here rather than silently reinterpreting the category.",
+  "pilot_cases": [
+    {
+      "slot": "simple_entity_extraction / true_A_literature_evidence_case",
+      "query_id": "nlu_v1_0007",
+      "query_text": "What does published research say about JAK2 inhibition in multiple myeloma?",
+      "gold_intent": ["A_literature_evidence"],
+      "gold_entities": [
+        {"surface": "JAK2", "type": "target", "canonical_id": "HGNC:6192"},
+        {"surface": "multiple myeloma", "type": "disease", "canonical_id": "MeSH:D009101"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["pubmed"],
+      "template_group": "tmplA::JAK2::multiple myeloma"
+    },
+    {
+      "slot": "constraint_heavy_trial_question",
+      "query_id": "nlu_v1_0107",
+      "query_text": "Find completed Phase 2 trials in pediatric patients with melanoma using KRAS inhibitors",
+      "gold_intent": ["G_constraint_heavy"],
+      "gold_entities": [
+        {"surface": "KRAS", "type": "target", "canonical_id": "HGNC:6407"},
+        {"surface": "melanoma", "type": "disease", "canonical_id": "MeSH:D008545"}
+      ],
+      "gold_constraints": [
+        {"field": "trial_phases", "value": "PHASE2"},
+        {"field": "trial_statuses", "value": "COMPLETED"},
+        {"field": "population", "value": "pediatric patients"}
+      ],
+      "gold_required_sources": ["clinicaltrials"],
+      "template_group": "tmplG::KRAS::melanoma::2::completed::pediatric patients"
+    },
+    {
+      "slot": "multi_entity_question / multi_hop_specific_research_operation / non_A_susceptible_1",
+      "query_id": "nlu_v1_0099",
+      "query_text": "Starting from compounds that inhibit EGFR, which ones progressed to trials in non-small cell lung cancer and what do published studies report on their outcomes?",
+      "gold_intent": ["E_multi_hop_research"],
+      "gold_entities": [
+        {"surface": "EGFR", "type": "target", "canonical_id": "HGNC:3236"},
+        {"surface": "non-small cell lung cancer", "type": "disease", "canonical_id": "MeSH:D002289"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["chembl", "clinicaltrials", "pubmed"],
+      "template_group": "tmplE2::EGFR::non-small cell lung cancer",
+      "note": "This exact class (E_multi_hop_research) was one of the 2 classes GPT-OSS round-2 collapsed to A_literature_evidence on -- included deliberately as a stress case for the same failure mode, on fresh query material."
+    },
+    {
+      "slot": "cross_source_question / non_A_susceptible_2",
+      "query_id": "nlu_v1_0067",
+      "query_text": "Is metformin supported by both peer-reviewed literature and an active clinical trial for multiple myeloma?",
+      "gold_intent": ["D_cross_source_synthesis"],
+      "gold_entities": [
+        {"surface": "metformin", "type": "compound", "canonical_id": "ChEMBL:CHEMBL1431"},
+        {"surface": "multiple myeloma", "type": "disease", "canonical_id": "MeSH:D009101"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["pubmed", "clinicaltrials"],
+      "template_group": "tmplD3::metformin::multiple myeloma"
+    },
+    {
+      "slot": "ambiguous_case (abbreviation-proxy, see known_limitation)",
+      "query_id": "nlu_v1_0139",
+      "query_text": "Is this drug safe?",
+      "gold_intent": ["I_ambiguous"],
+      "gold_entities": [],
+      "gold_constraints": [],
+      "gold_required_sources": [],
+      "template_group": "tmplI::e38edfc9",
+      "gold_ambiguity": {"is_ambiguous": true}
+    },
+    {
+      "slot": "gene_protein_target_semantic_role_ambiguity / multiple_possible_entity_roles",
+      "query_id": "nlu_v1_0036",
+      "query_text": "Which compounds target HER2 and what activity is reported?",
+      "gold_intent": ["C_compound_target"],
+      "gold_entities": [
+        {"surface": "HER2", "type": "target", "canonical_id": "HGNC:3430", "note": "HER2/ERBB2 is simultaneously gene, protein, and drug target -- gold benchmark scores type as 'target' but semantic_roles has no gold annotation in this benchmark version (documented Phase 2 closure limitation), so semantic_roles is scored representation-only, same treatment as every prior candidate including the active Nemotron control."}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["chembl", "pubmed"],
+      "template_group": "tmplC::HER2"
+    },
+    {
+      "slot": "class_B",
+      "query_id": "nlu_v1_0016",
+      "query_text": "What Phase 1 trials are evaluating erlotinib in non-small cell lung cancer?",
+      "gold_intent": ["B_clinical_trial_landscape"],
+      "gold_entities": [
+        {"surface": "erlotinib", "type": "compound", "canonical_id": "ChEMBL:CHEMBL553"},
+        {"surface": "non-small cell lung cancer", "type": "disease", "canonical_id": "MeSH:D002289"}
+      ],
+      "gold_constraints": [{"field": "trial_phases", "value": "PHASE1"}],
+      "gold_required_sources": ["clinicaltrials"],
+      "template_group": "tmplB::erlotinib::non-small cell lung cancer::1"
+    },
+    {
+      "slot": "class_G (second, distinct instance from slot 2, per prior rounds' 2-independent-G-checks convention)",
+      "query_id": "nlu_v1_0109",
+      "query_text": "Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors",
+      "gold_intent": ["G_constraint_heavy"],
+      "gold_entities": [
+        {"surface": "PD-1", "type": "target", "canonical_id": "HGNC:8760"},
+        {"surface": "breast cancer", "type": "disease", "canonical_id": "MeSH:D001943"}
+      ],
+      "gold_constraints": [
+        {"field": "trial_phases", "value": "PHASE1"},
+        {"field": "trial_statuses", "value": "RECRUITING"},
+        {"field": "population", "value": "adults"}
+      ],
+      "gold_required_sources": ["clinicaltrials"],
+      "template_group": "tmplG::PD-1::breast cancer::1::recruiting::adults"
+    }
+  ],
+  "overlap_verification": {
+    "method": "Programmatic (venv/bin/python, ad hoc, not persisted as project code) comparison of query_id, query_text, and template_group across: this plan's 8 cases, GPT-OSS round-2 pilot (nlu_cerebras_gptoss_pilot_plan.json), GPT-OSS round-3 pilot (nlu_cerebras_intent_revision_pilot_plan.json), and the full 105-example consumed test split.",
+    "query_id_overlap_with_gptoss_pilot_1": 0,
+    "query_id_overlap_with_gptoss_pilot_2": 0,
+    "query_id_overlap_with_consumed_test_split": 0,
+    "template_group_overlap_with_gptoss_pilot_1_or_2": 0,
+    "phase_10_touched": false,
+    "phase_10_data_exists": false,
+    "result": "PASS -- zero overlap on every dimension checked."
+  },
+  "rate_limit_discipline": "5 RPM Free Trial cap; extractor's utils.rate_limiter.wait_for_rate_limit throttle wait will be recorded and reported SEPARATELY from true model latency, exactly as corrected in the GPT-OSS round-2 methodology note (do not repeat the throttle-as-latency measurement mistake).",
+  "predeclared_pass_gate_reference": "Steps 15-21 of the task instruction (structural / entities / intent / constraints / ambiguity / latency gates) -- not restated in full here, applied verbatim at analysis time.",
+  "zero_semantic_tuning_commitment": "No prompt, taxonomy, entity rule, constraint rule, or ambiguity rule will be changed based on this pilot's results, per Step 10. If systemic quality defects appear, candidate_g_cerebras_qwen is rejected, full stop."
+}

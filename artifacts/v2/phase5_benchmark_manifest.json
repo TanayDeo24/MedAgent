@@ -1,0 +1,3209 @@
+{
+  "benchmark_name": "phase5_evidence_benchmark",
+  "benchmark_version": "1.0.0",
+  "created": "2026-09-25",
+  "seed": 20260925,
+  "seed_note": "Fixed seed (today's date) used to shuffle group_keys before greedy case-count-aware split assignment, same discipline as artifacts/v2/phase4_benchmark_manifest.json.",
+  "purpose": "Phase 5 evidence-transformation correctness benchmark. Tests whether evidence/adapters.py correctly normalizes REAL source records into typed Evidence objects per docs/v2/PHASE5_EVIDENCE_CONTRACT.md -- a different question from Phase 4's retrieval-quality benchmark.",
+  "methodology_notes": [
+    "All raw records were fetched via REAL calls: retrieval/retriever.py::retrieve() (local embedding+rerank inference, no cost) for PubMed RAG; tools/pubmed_tool.py (real NCBI E-utilities HTTP calls, existing PUBMED_RATE_LIMIT respected) for PubMed live; tools/clinical_trials_tool.py (real clinicaltrials.gov v2 API HTTP calls) for ClinicalTrials; tools/chembl_tool.py (real EBI ChEMBL API HTTP calls) for ChEMBL, across all 4 operations. No mocking anywhere. No LLM (Cerebras/NVIDIA) calls were made -- Phase 5 adapters are model-free per the contract.",
+    "5 of the 6 PubMed-RAG queries and both PubMed-live query topics were reused as SOURCE QUERY TEXT from artifacts/v2/phase4_benchmark_manifest.json's development/validation cases (e.g. the brigatinib/ALK NSCLC query from case PM-EXACT-01, the CD22 CAR-T query from PM-EXACT-02) purely to obtain real, on-topic records to fetch -- this is NOT a reuse of Phase 4's spent test data itself (no Phase-4 gold relevance judgments, retrieval-quality scores, or held-out split are consumed here). Phase 5 gold labels measure a structurally different property (does the adapter faithfully transform the record into Evidence, not whether the record was the 'right' one to retrieve). Phase-4's own phase4_heldout split was NOT touched.",
+    "PubMed live intentionally includes 5 real PMIDs (1-5, fetched via get_paper_details) that are old enough that PubMed's own record has no <AbstractText> element -- the real API response triggers tools/pubmed_tool.py's own 'No abstract available' placeholder substitution. These exercise the placeholder-rejection path against genuine API responses, not a synthetic mock.",
+    "ChEMBL resolve_compound_name deliberately includes a fabricated compound name ('Zorblatinix-9X', real no_match), two real brand names ('Tagrisso' -> real ambiguous_match across salt forms, 'Keytruda' -> real exact_synonym), a real ChEMBL-ID passthrough (CHEMBL941), a misspelling ('asprin' -> real fuzzy match), and clean preferred-name matches (osimertinib, aspirin) -- all live API responses, not mocked.",
+    "One real ChEMBL search_by_target record (EGFR search) returned pref_name=null and max_phase=null directly from the live API (not the tool's own placeholder string) -- a genuine edge case distinct from the documented 'No name'/'N/A' placeholder-as-data risk, kept in the benchmark as-is.",
+    "ChEMBL search_by_indication('lung cancer') returned 0 real results (a genuine empty-result case from the live mesh_heading__icontains substring match, not simulated)."
+  ],
+  "protected_data_not_touched": "Phase-2's consumed test split, Phase-3's spent held-out, and Phase-4's phase4_heldout split (artifacts/v2/phase4_benchmark_manifest.json) were not read as data sources for gold labels here -- only Phase-4's development/validation case QUERY TEXT was reused to source fresh real records, per task instructions. No Phase-10 (does not exist).",
+  "gold_label_process": "Each case's gold expected Evidence output was computed by an independent re-implementation of docs/v2/PHASE5_EVIDENCE_CONTRACT.md's rules (evidence_id scheme Section 3, source URL Section 8, evidence_type taxonomy Section 6, placeholder-skip policy per the audit), authored by inspecting the actual raw record returned by the real API/local-retrieval call -- not by running evidence/adapters.py and copying its output, and not LLM-predicted post-hoc.",
+  "grouping_method": "group_key is the record's canonical source id (pubmed:<pmid>, nct:<nct_id>, chembl:<chembl_id>) so the same underlying record can never appear split across development/validation/phase5_heldout even when it produces multiple Evidence records (e.g. ClinicalTrials field-level records) or appears via multiple chunks (PubMed RAG). Distinct group_keys were shuffled with the fixed seed above then greedily assigned to whichever split was furthest below its 60/20/20 case-count target.",
+  "split_sizes": {
+    "development": 43,
+    "validation": 15,
+    "phase5_heldout": 14
+  },
+  "total_cases": 72,
+  "source_coverage_case_counts": {
+    "development": {
+      "pubmed_rag": 16,
+      "pubmed_live": 10,
+      "clinical_trials": 6,
+      "chembl_search_by_target": 4,
+      "chembl_get_drug_info": 1,
+      "chembl_search_by_indication": 3,
+      "chembl_resolve_compound_name": 3
+    },
+    "phase5_heldout": {
+      "pubmed_rag": 3,
+      "pubmed_live": 3,
+      "clinical_trials": 4,
+      "chembl_search_by_target": 1,
+      "chembl_get_drug_info": 1,
+      "chembl_search_by_indication": 1,
+      "chembl_resolve_compound_name": 1
+    },
+    "validation": {
+      "pubmed_rag": 1,
+      "pubmed_live": 4,
+      "clinical_trials": 5,
+      "chembl_search_by_indication": 1,
+      "chembl_resolve_compound_name": 4
+    }
+  },
+  "case_format_fields": [
+    "case_id",
+    "source_path",
+    "group_key",
+    "split",
+    "raw_record",
+    "gold"
+  ],
+  "cases": [
+    {
+      "case_id": "RAG-29119148-1",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:29119148",
+      "raw_record": {
+        "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+        "pmid": "29119148",
+        "title": "Brigatinib for the treatment of ALK-positive advanced non-small cell lung cancer patients.",
+        "text": "cancer (NSCLC) harboring ALK translocation. Brigatinib was found to be very active against different ALK resistance mutations that mediate acquired resistance biology processes, particularly G1269A ALK C1156Y, I1171S/T, V1180L and others. Different clinical trials evaluated the activity of brigatinib in crizotinib-resistant patients, confirming high activity with durable response not only in parenchymal disease, but also in intracranial disease. Nowadays, brigatinib is under evaluation in different clinical trials exploring TKI-naive patients in the first-line setting. On the basis of its significant activity results, brigatinib received approval by the FDA for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib.",
+        "score": 6.694873332977295,
+        "journal": "Drugs of today (Barcelona, Spain : 1998)",
+        "year": "2017",
+        "pub_date": "2017-Aug",
+        "doi": "10.1358/dot.2017.53.8.2676119",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/29119148/",
+        "chunk_index": 1,
+        "num_chunks": 2,
+        "chunk_id": "29119148_1"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:29119148:chunk:1"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/29119148/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 1,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-39368244-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:39368244",
+      "raw_record": {
+        "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+        "pmid": "39368244",
+        "title": "Systematic review and network meta-analysis of lorlatinib with comparison to other anaplastic lymphoma kinase (ALK) tyrosine kinase inhibitors (TKIs) as first-line treatment for ALK-positive advanced non-smallcell lung cancer (NSCLC).",
+        "text": "Next-generation anaplastic lymphoma kinase (ALK) tyrosine kinase inhibitors (TKIs) (alectinib, brigatinib, and lorlatinib) demonstrate superior progression-free survival (PFS) over chemotherapy or crizotinib as first-line (1L) treatment of ALK-positive advanced non-smallcell lung cancer (NSCLC). BACKGROUND: Next-generation anaplastic lymphoma kinase (ALK) tyrosine kinase inhibitors (TKIs) (alectinib, brigatinib, and lorlatinib) demonstrate superior progression-free survival (PFS) over chemotherapy or crizotinib as first-line (1L) treatment of ALK-positive advanced non-smallcell lung cancer (NSCLC). METHODS: We conducted network meta-analyses (NMAs) comparing the relative efficacy of lorlatinib with other ALK TKIs in this indication. Evidence identified from a systematic literature review and subsequent updates formed the basis of our evidence. The primary analysis investigated PFS by independent review committee (IRC) in the intent-to-treat (ITT) population. Secondary outcomes included PFS among subgroups, intracranial time to progression (IC TTP), adverse events, and discontinuation due to adverse events. For each of the outcomes, Bayesian proportional hazards NMAs estimated the relative treatment effects. Additionally, we compared the design and results of eight published NMAs conducted for 1L ALK + advanced NSCLC to date. RESULTS: We formed a network of 10 trials, allowing",
+        "score": 5.819476127624512,
+        "journal": "Lung cancer (Amsterdam, Netherlands)",
+        "year": "2024",
+        "pub_date": "2024-Nov",
+        "doi": "10.1016/j.lungcan.2024.107968",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/39368244/",
+        "chunk_index": 0,
+        "num_chunks": 2,
+        "chunk_id": "39368244_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:39368244:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/39368244/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-31109722-1",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:31109722",
+      "raw_record": {
+        "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+        "pmid": "31109722",
+        "title": "Brigatinib: New-generation ALK inhibitor for nonsmall cell lung cancer.",
+        "text": "Lung cancer, specifically nonsmall cell lung cancer (NSCLC) is the leading cause of death around the world. First-line therapies for metastatic NSCLC such as crizotinib, a tyrosine kinase inhibitor (TKI), have developed resistance due to a rearrangement of the anaplastic lymphoma kinase (ALK) gene. Brigatinib, approved in May 2016, is an ALK inhibitor specifically indicated for ALK-positive metastatic NSCLC in patients who have progressed on or resistant to crizotinib therapy. In several clinical trials, brigatinib has exhibited significant improvement in progression-free survival in patients that have experienced resistance to crizotinib therapy. The optimal dose of brigatinib was found to be 180 mg once daily and demonstrated greater efficacy as compared to its 90 mg once daily dose. Brigatinib was also found to be well tolerated. Although more studies are needed, the current data from these studies indicate brigatinib may be the most favorable therapeutic approach to treat NSCLC ALK-positive patients.",
+        "score": 5.541053295135498,
+        "journal": "Current problems in cancer",
+        "year": "2019",
+        "pub_date": "2019-Dec",
+        "doi": "10.1016/j.currproblcancer.2019.03.005",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/31109722/",
+        "chunk_index": 1,
+        "num_chunks": 2,
+        "chunk_id": "31109722_1"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:31109722:chunk:1"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/31109722/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 1,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-42134157-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:42134157",
+      "raw_record": {
+        "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+        "pmid": "42134157",
+        "title": "Comparative effectiveness of first-line targeted therapies in ALK-positive non-small cell lung cancer: real-world evidence of tyrosine kinase inhibitors.",
+        "text": "To estimate the comparative effectiveness of first-line (1 L) anaplastic lymphoma kinase (ALK) tyrosine kinase inhibitors (TKIs) in ALK-positive non-small cell lung cancer (NSCLC) in the United States. OBJECTIVE: To estimate the comparative effectiveness of first-line (1 L) anaplastic lymphoma kinase (ALK) tyrosine kinase inhibitors (TKIs) in ALK-positive non-small cell lung cancer (NSCLC) in the United States. METHODS: We conducted a retrospective cohort study using Optum's de-identified Clinformatics\u00ae Data Mart Database (2016-2024). Patients with lung cancer ICD-10 codes and pharmacy claims for ALK TKIs were eligible if aged \u2265 18 years, continuously enrolled \u2265 6 months before initiation, and treated after each drug's FDA approval. Outcomes included time-to-next (targeted) treatment or death (TTNTD) and overall survival (OS). Propensity scores were constructed for pairwise comparisons and applied using overlap weighting (OW) as the primary specification and inverse probability of treatment weighting (IPTW) as alternative specification. RESULTS: Among 940 patients initiating 1 L therapy (crizotinib n = 449, alectinib n = 417, brigatinib n = 30, ceritinib n = 8, lorlatinib n = 36), alectinib had the longest reached median TTNTD (33.5",
+        "score": 5.378537178039551,
+        "journal": "Lung cancer (Amsterdam, Netherlands)",
+        "year": "2026",
+        "pub_date": "2026-Jul",
+        "doi": "10.1016/j.lungcan.2026.109451",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/42134157/",
+        "chunk_index": 0,
+        "num_chunks": 2,
+        "chunk_id": "42134157_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:42134157:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/42134157/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-40306957-1",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:40306957",
+      "raw_record": {
+        "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia?",
+        "pmid": "40306957",
+        "title": "CD22 CAR-T cells secreting CD19 T-cell engagers for improved control of B-cell acute lymphoblastic leukemia progression.",
+        "text": "CAR-T cell therapies simultaneously targeting CD19 and CD22 have been developed and validated both preclinically and clinically. METHODS: We have generated the first dual-targeting strategy for B-cell malignancies based on CD22 CAR-T cells secreting an anti-CD19 TCE antibody (CAR-STAb-T) and conducted a comprehensive preclinical characterization comparing its therapeutic potential in B-ALL with that of previously validated dual-targeting CD19/CD22 tandem CAR cells (TanCAR-T cells) and co-administration of two single-targeting CD19 and CD22 CAR-T cells (pooled CAR-T cells). RESULTS: We demonstrate that CAR-STAb-T cells efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios. Furthermore, when antigen loss was replicated in a heterogeneous B-ALL cell model, CAR-STAb T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape. In vivo, CAR-STAb-T cells also controlled leukemia progression more efficiently than dual-targeting CAR-T cells in patient-derived xenograft mouse models under T cell-limiting conditions. CONCLUSIONS: CD22 CAR-T cells secreting CD19 T-cell engagers show an enhanced control of B-ALL progression",
+        "score": 9.372270584106445,
+        "journal": "Journal for immunotherapy of cancer",
+        "year": "2025",
+        "pub_date": "2025-Apr-30",
+        "doi": "10.1136/jitc-2024-009048",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/40306957/",
+        "chunk_index": 1,
+        "num_chunks": 3,
+        "chunk_id": "40306957_1"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/40306957/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 1,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-34290048-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:34290048",
+      "raw_record": {
+        "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia?",
+        "pmid": "34290048",
+        "title": "CD19/CD22 Dual-Targeted CAR T-cell Therapy for Relapsed/Refractory Aggressive B-cell Lymphoma: A Safety and Efficacy Study.",
+        "text": "Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in patients with relapsed/refractory aggressive B-cell lymphoma. Twenty-four patients were screened, and 16 were found eligible for the study. CAR T-cell-associated toxicities were recorded. Responses, overall survival (OS), and progression-free survival (PFS) were assessed. Of the 16 eligible patients, 14 (87.5%) achieved objective response and 10 (62.5%) achieved complete response (CR). The 2-year OS and PFS rates were 77.3% and 40.2%, respectively. Achieving CR ( Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in",
+        "score": 3.5731072425842285,
+        "journal": "Cancer immunology research",
+        "year": "2021",
+        "pub_date": "2021-Sep",
+        "doi": "10.1158/2326-6066.CIR-20-0675",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/34290048/",
+        "chunk_index": 0,
+        "num_chunks": 2,
+        "chunk_id": "34290048_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/34290048/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-40074511-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:40074511",
+      "raw_record": {
+        "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia?",
+        "pmid": "40074511",
+        "title": "CARs for lymphoma.",
+        "text": "Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL). CD19-targeting CAR-T cell therapy is approved for treatment in Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma. CAR-T cells demonstrate robust and durable responses even in heavily pretreated patients. Clinicians should monitor for Cytokine Release Syndrome (CRS) and Immune Effector Cell Neurotoxicity Syndrome (ICANS), as well as cytopenias, infection, and secondary malignancies. Ongoing questions remain in improving manufacturing efficacy, sequencing CAR-T cells amongst other therapies including bi-specific antibodies (BiTEs), and predicting optimal responders. In addition, novel CARs are being developed with alternative targets or that secrete activating cytokines (i.e. \"armored CARs\"). CAR-T cells represent an effective lymphoma therapy and should be considered for eligible patients. Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL). CD19-targeting CAR-T cell therapy is approved for treatment in Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma. CAR-T cells demonstrate robust and durable responses even in heavily pretreated patients.",
+        "score": 2.6816091537475586,
+        "journal": "Best practice & research. Clinical haematology",
+        "year": "2024",
+        "pub_date": "2024-Dec",
+        "doi": "10.1016/j.beha.2025.101601",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/40074511/",
+        "chunk_index": 0,
+        "num_chunks": 2,
+        "chunk_id": "40074511_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:40074511:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/40074511/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-24365143-1",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:24365143",
+      "raw_record": {
+        "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia?",
+        "pmid": "24365143",
+        "title": "Clinical immunotherapy of B-cell malignancy using CD19-targeted CAR T-cells.",
+        "text": "CD19 molecule is ubiquitously expressed throughout all stages of B-cell differentiation, but is not found on haemopoietic stem cells. Since most B-cell leukaemias and lymphomas retain CD19 expression, it represents an excellent target for immunotherapy of these malignant disorders. Over the past 10 years, compelling pre-clinical evidence has accrued to indicate that expression of a CD19-targeted chimeric antigen receptor (CAR) in peripheral blood T-cells exerts therapeutic efficacy in diverse models of B-cell malignancy. Building on this, clinical studies are ongoing in several centres in which autologous CD19-specific CAR T-cells are undergoing evaluation in patients with acute and chronic B-cell leukaemia and refractory lymphoma. Early data have generated considerable excitement, providing grounds to speculate that CAR-based immunotherapy will radically alter existing management paradigms in B-cell malignancy. The focus of this mini-review is to evaluate these emerging clinical data and to speculate on clinical prospects for this new therapeutic modality.",
+        "score": 1.9855310916900635,
+        "journal": "Current gene therapy",
+        "year": "2014",
+        "pub_date": "2014-Feb",
+        "doi": "10.2174/1566523213666131223130554",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/24365143/",
+        "chunk_index": 1,
+        "num_chunks": 2,
+        "chunk_id": "24365143_1"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:24365143:chunk:1"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/24365143/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 1,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "RAG-31564718-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:31564718",
+      "raw_record": {
+        "query": "osimertinib EGFR mutation resistance mechanisms",
+        "pmid": "31564718",
+        "title": "Resistance mechanisms to osimertinib in EGFR-mutated non-small cell lung cancer.",
+        "text": "Osimertinib is an irreversible, third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor that is highly selective for EGFR-activating mutations as well as the EGFR T790M mutation in patients with advanced non-small cell lung cancer (NSCLC) with EGFR oncogene addiction. Despite the documented efficacy of osimertinib in first- and second-line settings, patients inevitably develop resistance, with no further clear-cut therapeutic options to date other than chemotherapy and locally ablative therapy for selected individuals. On account of the high degree of tumour heterogeneity and adaptive cellular signalling pathways in NSCLC, the acquired osimertinib resistance is highly heterogeneous, encompassing EGFR-dependent as well as EGFR-independent mechanisms. Furthermore, data from repeat plasma genotyping analyses have highlighted differences in the frequency and preponderance of resistance mechanisms when osimertinib is administered in a front-line versus second-line setting, underlying the discrepancies in selection pressure and clonal evolution. This review summarises the molecular mechanisms of resistance to osimertinib in patients with advanced EGFR-mutated NSCLC, including MET/HER2 amplification, activation of the RAS-mitogen-activated protein kinase (MAPK) or RAS-phosphatidylinositol 3-kinase (PI3K) pathways, novel fusion events and histological/phenotypic transformation, as well as",
+        "score": 9.493316650390625,
+        "journal": "British journal of cancer",
+        "year": "2019",
+        "pub_date": "2019-Oct",
+        "doi": "10.1038/s41416-019-0573-8",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/31564718/",
+        "chunk_index": 0,
+        "num_chunks": 3,
+        "chunk_id": "31564718_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:31564718:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/31564718/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-35943592-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:35943592",
+      "raw_record": {
+        "query": "osimertinib EGFR mutation resistance mechanisms",
+        "pmid": "35943592",
+        "title": "L718Q/V mutation in exon 18 of EGFR mediates resistance to osimertinib: clinical features and treatment.",
+        "text": "Osimertinib, a mutant-specific third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor (TKI), is emerging as the preferred first-line of treatment for EGFR-mutant lung cancer. However, osimertinib resistance inevitably develops among patients treated with the drug. The modal resistance mechanisms of osimertinib include the occurrence of epithelial transition factor (c-MET) amplification and C797S mutation, whereas rare mutations are presented as case reports. Recently, the L718Q/V mutation in exon 18 of EGFR has been reported to contribute to one of the possible mechanisms of resistance. The clinical features and subsequent treatment strategies for this mutation require further research. This study retrospectively enrolled NSCLC patients with the L718Q/V mutation from 2017 to 2021 at the Cancer Hospital of the University of the Chinese Academy of Sciences (Zhejiang Cancer Hospital), as well as additional patients with the same mutation from PubMed literature, to summarize the clinical features of the mutation. The association between the detection of L718Q/V and resistance to osimertinib, as well as impacts on the therapeutic process and outcome, was analyzed. We included a total of two patients diagnosed at Zhejiang",
+        "score": 8.863924026489258,
+        "journal": "Discover oncology",
+        "year": "2022",
+        "pub_date": "2022-Aug-09",
+        "doi": "10.1007/s12672-022-00537-7",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/35943592/",
+        "chunk_index": 0,
+        "num_chunks": 5,
+        "chunk_id": "35943592_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:35943592:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/35943592/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 5,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-36728908-4",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:36728908",
+      "raw_record": {
+        "query": "osimertinib EGFR mutation resistance mechanisms",
+        "pmid": "36728908",
+        "title": "Acquired EML4-ALK fusion and EGFR C797S in cis mutation as resistance mechanisms to osimertinib in a non-small cell lung cancer patient with EGFR L858R/T790M.",
+        "text": "but critical resistance mechanism to osimertinib, and C797S mutation in cis may be an underlying mechanism of acquired resistance mutation in double TKIs therapy. Furthermore, molecular detection and rebiopsy play important roles in the selection of therapeutic strategies when the disease progresses.",
+        "score": 8.482126235961914,
+        "journal": "Anti-cancer drugs",
+        "year": "2023",
+        "pub_date": "2023-Nov-01",
+        "doi": "10.1097/CAD.0000000000001489",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/36728908/",
+        "chunk_index": 4,
+        "num_chunks": 5,
+        "chunk_id": "36728908_4"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:36728908:chunk:4"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/36728908/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 4,
+        "expected_num_chunks": 5,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-35883645-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:35883645",
+      "raw_record": {
+        "query": "osimertinib EGFR mutation resistance mechanisms",
+        "pmid": "35883645",
+        "title": "Diverse Mechanisms of Resistance against Osimertinib, a Third-Generation EGFR-TKI, in Lung Adenocarcinoma Cells with an ",
+        "text": "Osimertinib, a third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor (TKI), is used as a first-line treatment for patients with EGFR-mutant non-small cell lung cancer (NSCLC). However, the mechanisms underlying its anticancer activity, particularly the subsequent development of acquired resistance, are unclear. Herein, we investigated the mechanisms underlying the development of osimertinib resistance by treating NSCLC PC-9 cells (harboring an EGFR-activating mutation) with osimertinib, thereby developing five resistant cell lines, i.e., AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14. The amplification of wild-type  Osimertinib, a third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor (TKI), is used as a first-line treatment for patients with EGFR-mutant non-small cell lung cancer (NSCLC). However, the mechanisms underlying its anticancer activity, particularly the subsequent development of acquired resistance, are unclear. Herein, we investigated the mechanisms underlying the development of osimertinib resistance by treating NSCLC PC-9 cells (harboring an EGFR-activating mutation) with osimertinib, thereby developing five resistant cell lines, i.e., AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14. The amplification of wild-type ",
+        "score": 8.479652404785156,
+        "journal": "Cells",
+        "year": "2022",
+        "pub_date": "2022-Jul-14",
+        "doi": "10.3390/cells11142201",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/35883645/",
+        "chunk_index": 0,
+        "num_chunks": 1,
+        "chunk_id": "35883645_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:35883645:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/35883645/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 1,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-33686894-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:33686894",
+      "raw_record": {
+        "query": "pembrolizumab immune checkpoint inhibitor melanoma",
+        "pmid": "33686894",
+        "title": "Emerging PD-1/PD-L1 antagonists for the treatment of malignant melanoma.",
+        "text": "Increased understanding of the interactive mechanisms between tumors and the immune system led to the development of immune checkpoint inhibitors, which have revolutioned the treatment of metastatic melanoma and subsequently many other tumors. In 2014, nivolumab and pembrolizumab, two checkpoint inhibitors binding to PD-1, were approved for the treatment of metastatic melanoma. Since then, a plethora of new molecules have enriched the armamentarium against melanoma. INTRODUCTION: Increased understanding of the interactive mechanisms between tumors and the immune system led to the development of immune checkpoint inhibitors, which have revolutioned the treatment of metastatic melanoma and subsequently many other tumors. In 2014, nivolumab and pembrolizumab, two checkpoint inhibitors binding to PD-1, were approved for the treatment of metastatic melanoma. Since then, a plethora of new molecules have enriched the armamentarium against melanoma. AREAS COVERED: This review summarizes the last updates about treatment with nivolumab and pembrolizumab, data on other PD-1/PDL-1 agents such as spartalizumab and atezolizumab and emerging compounds, new combinations with NKTR-214, anti LAG-3, anti IDO-1 and TVEC, new checkpoint inhibitors (e.g. TIM-3 or TIGIT) and other new molecules for",
+        "score": 7.671685218811035,
+        "journal": "Expert opinion on emerging drugs",
+        "year": "2021",
+        "pub_date": "2021-Jun",
+        "doi": "10.1080/14728214.2021.1901884",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/33686894/",
+        "chunk_index": 0,
+        "num_chunks": 2,
+        "chunk_id": "33686894_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:33686894:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/33686894/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 2,
+        "expected_call_id_none": true
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "RAG-30231333-2",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:30231333",
+      "raw_record": {
+        "query": "pembrolizumab immune checkpoint inhibitor melanoma",
+        "pmid": "30231333",
+        "title": "Combination Immunotherapy Development in Melanoma.",
+        "text": "inhibitors in the treatment of BRAF-mutant melanomas. For the treatment of advanced disease, approvals were obtained for the immune checkpoint inhibitors ipilimumab (2011), nivolumab (2014), pembrolizumab (2014), the combination ipilimumab plus nivolumab (2015), and the oncolytic virus vaccine laherparepvec (2015). The combination dabrafenib plus trametinib for BRAF-mutant melanoma was approved in 2014, with similar success for other BRAF plus MEK inhibitor combinations. Because of its unique therapeutic index (high efficacy and low toxicity) anti-PD-1 agents (nivolumab and pembrolizumab) have now been placed at the center of practically all combination therapy development strategies in melanoma. Anti-PD-1 agents are the central molecule for combinations with a great variety of other immunotherapeutics such as immune checkpoint inhibitors, agonists, IDO inhibitors, macrophage polarizing agents, monoclonal antibodies, vaccines, targeted agents, chemotherapeutics, radiation therapy, and even microbiome modulators.",
+        "score": 7.197229385375977,
+        "journal": "American Society of Clinical Oncology educational book. American Society of Clinical Oncology. Annual Meeting",
+        "year": "2018",
+        "pub_date": "2018-May-23",
+        "doi": "10.1200/EDBK_201131",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/30231333/",
+        "chunk_index": 2,
+        "num_chunks": 3,
+        "chunk_id": "30231333_2"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:30231333:chunk:2"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/30231333/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 2,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-30604292-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:30604292",
+      "raw_record": {
+        "query": "pembrolizumab immune checkpoint inhibitor melanoma",
+        "pmid": "30604292",
+        "title": "Immune Checkpoint Inhibitors in the Treatment of Gastroesophageal Cancer.",
+        "text": "Immune checkpoint blockade has revolutionised the treatment of multiple cancers including melanoma, non-small cell lung cancer, urothelial and renal cell cancers. For patients with chemorefractory gastroesophageal cancer, treatment with anti-PD-1 therapy results in modest benefits in overall survival; nivolumab and pembrolizumab have been licenced in Japan and the USA, respectively, for this indication. However, initial enthusiasm has been tempered by the results of several large negative trials; immune checkpoint blockade is not superior to chemotherapy in the second-line setting or beyond in unselected or low PD-L1-expressing patients. Microsatellite instability is uncommon in patients with metastatic gastric cancer; however, it is associated with response rates of more than 50% and long-term survival benefit. Combining anti-PD-1 with cytotoxic chemotherapy and targeted therapies also shows promise to extend the benefit of immune checkpoint blockade to a larger proportion of gastroesophageal cancer patients. In this review we discuss recently reported and ongoing clinical research in immunotherapy for gastroesophageal cancer, and consider molecular biology associated with sensitivity and resistance to immune checkpoint blockade in gastroesophageal cancer patients. Immune checkpoint blockade has revolutionised the treatment of",
+        "score": 6.932812690734863,
+        "journal": "Drugs",
+        "year": "2019",
+        "pub_date": "2019-Jan",
+        "doi": "10.1007/s40265-018-1032-1",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/30604292/",
+        "chunk_index": 0,
+        "num_chunks": 3,
+        "chunk_id": "30604292_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:30604292:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/30604292/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-29470725-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:29470725",
+      "raw_record": {
+        "query": "pembrolizumab immune checkpoint inhibitor melanoma",
+        "pmid": "29470725",
+        "title": "Recent advances in therapeutic strategies for unresectable or metastatic melanoma and real-world data in Japan.",
+        "text": "New therapeutic strategies including immunotherapy and selective molecular target inhibitors have brought about a new era in the treatment of patients with advanced melanoma. In Japan, the immune checkpoint inhibitors ipilimumab, nivolumab and pembrolizumab, the BRAF inhibitor (BRAFi) vemurafenib, dabrafenib and MEK inhibitor (MEKi) trametinib have been available for the treatment of unresectable and metastatic melanoma. The BRAFi + MEKi combination shows high response rates (60-70%) and rapid response induction associated with symptom control, with a progression-free survival of 12 months. Nivolumab and pembrolizumab offer moderate response rates (30-40%) and long survival (3- to 5-year survival: 30-50%). In Japan, treatment options for the first-line setting frequently include nivolumab or pembrolizumab monotherapy and BRAFi + MEKi combinations (for patients with BRAF-mutant melanoma). Ipilimumab is included in the second-line setting, and the nivolumab + ipilimumab combination has not been approved yet in Japan. Although these medications have demonstrated impressive efficacy, the clinical trials and real-world data have shown that the clinical benefit is not fully satisfactory. We have to carefully manage a new class of adverse events due to these medicines. Moreover,",
+        "score": 6.583850383758545,
+        "journal": "International journal of clinical oncology",
+        "year": "2019",
+        "pub_date": "2019-Dec",
+        "doi": "10.1007/s10147-018-1246-y",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/29470725/",
+        "chunk_index": 0,
+        "num_chunks": 3,
+        "chunk_id": "29470725_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:29470725:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/29470725/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-40196933-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:40196933",
+      "raw_record": {
+        "query": "tirzepatide GLP-1 receptor agonist weight loss",
+        "pmid": "40196933",
+        "title": "Real-world evidence on the utilization, clinical and comparative effectiveness, and adverse effects of newer GLP-1RA-based weight-loss therapies.",
+        "text": "Glucagon-like peptide-1 receptor agonists (GLP-1RAs) have emerged as key agents for weight management, based on their marked efficacy as observed in randomized controlled trials. While still limited, real-world studies on GLP-1RA use in populations with obesity are increasingly available. This narrative review discusses contemporary real-world evidence demonstrating the utilization, clinical and comparative effectiveness, and adverse effects of the currently approved GLP-1RA-based weight-loss therapies, that is, liraglutide, semaglutide and tirzepatide. The observed weight reduction in clinical practice overall tends to be lower than in randomized controlled trials; however, outcomes approach those seen in trials when focusing on highly adherent patients. Real-world studies demonstrate high discontinuation rates of GLP-1RAs (20%-50%) within the first year, and the use of much lower doses than those evaluated in clinical trials. Evidence from observational studies within type 2 diabetes or obesity populations suggests frequent gastrointestinal disturbances in GLP-1RA users, as also observed in trials, but no clear increase in risks of severe events like pancreatitis or pancreatic cancer, thyroid disorders, or depression and self-harm. Further evidence is needed to understand possible real-world associations of GLP-1RAs with",
+        "score": 7.885002136230469,
+        "journal": "Diabetes, obesity & metabolism",
+        "year": "2025",
+        "pub_date": "2025-Apr",
+        "doi": "10.1111/dom.16364",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/40196933/",
+        "chunk_index": 0,
+        "num_chunks": 9,
+        "chunk_id": "40196933_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:40196933:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/40196933/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 9,
+        "expected_call_id_none": true
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "RAG-36375235-1",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:36375235",
+      "raw_record": {
+        "query": "tirzepatide GLP-1 receptor agonist weight loss",
+        "pmid": "36375235",
+        "title": "Tirzepatide: A novel, first-in-class, dual GIP/GLP-1 receptor agonist.",
+        "text": "and weight loss. However, the positioning of tirzepatide in the treatment algorithm will ultimately be dependent on the results of the cardiovascular outcomes trial (CVOT) or other outcome-based trials. Tirzepatide is effective for treating type 2 diabetes by lowering glycated hemoglobin and contributing to significant weight loss. The objective of this article is to review the efficacy and safety of tirzepatide and discuss its potential role in the treatment of type 2 diabetes. Tirzepatide is a novel once-weekly dual GIP and GLP-1 receptor agonist which has been studied in the SURPASS clinical trials in doses of 5 mg, 10 mg, and 15 mg. Tirzepatide phase III clinical trials, SURPASS-1 through SURPASS-5, demonstrate that this medication is safe and effective in treating type 2 diabetes both with and without a variety of background medications versus placebo, semaglutide, insulin degludec, and insulin glargine in different patient populations. Most adverse events were gastrointestinal in nature, with a relatively low withdrawal rate in the active treatment arms. It seems likely that tirzepatide will be recommended as a preferred option in the American Diabetes Association",
+        "score": 7.82861328125,
+        "journal": "Journal of diabetes and its complications",
+        "year": "2022",
+        "pub_date": "2022-Dec",
+        "doi": "10.1016/j.jdiacomp.2022.108332",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/36375235/",
+        "chunk_index": 1,
+        "num_chunks": 3,
+        "chunk_id": "36375235_1"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:36375235:chunk:1"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/36375235/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 1,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "RAG-34003802-0",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:34003802",
+      "raw_record": {
+        "query": "tirzepatide GLP-1 receptor agonist weight loss",
+        "pmid": "34003802",
+        "title": "GIPR agonism mediates weight-independent insulin sensitization by tirzepatide in obese mice.",
+        "text": "Tirzepatide (LY3298176), a dual GIP and GLP-1 receptor (GLP-1R) agonist, delivered superior glycemic control and weight loss compared with GLP-1R agonism in patients with type 2 diabetes. However, the mechanism by which tirzepatide improves efficacy and how GIP receptor (GIPR) agonism contributes is not fully understood. Here, we show that tirzepatide is an effective insulin sensitizer, improving insulin sensitivity in obese mice to a greater extent than GLP-1R agonism. To determine whether GIPR agonism contributes, we compared the effect of tirzepatide in obese WT and Glp-1r-null mice. In the absence of GLP-1R-induced weight loss, tirzepatide improved insulin sensitivity by enhancing glucose disposal in white adipose tissue (WAT). In support of this, a long-acting GIPR agonist (LAGIPRA) was found to enhance insulin sensitivity by augmenting glucose disposal in WAT. Interestingly, the effect of tirzepatide and LAGIPRA on insulin sensitivity was associated with reduced branched-chain amino acids (BCAAs) and ketoacids in the circulation. Insulin sensitization was associated with upregulation of genes associated with the catabolism of glucose, lipid, and BCAAs in brown adipose tissue. Together, our studies show that tirzepatide improved insulin",
+        "score": 7.4831223487854,
+        "journal": "The Journal of clinical investigation",
+        "year": "2021",
+        "pub_date": "2021-Jun-15",
+        "doi": "10.1172/JCI146353",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/34003802/",
+        "chunk_index": 0,
+        "num_chunks": 3,
+        "chunk_id": "34003802_0"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:34003802:chunk:0"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/34003802/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 0,
+        "expected_num_chunks": 3,
+        "expected_call_id_none": true
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "RAG-39344838-2",
+      "source_path": "pubmed_rag",
+      "group_key": "pubmed:39344838",
+      "raw_record": {
+        "query": "tirzepatide GLP-1 receptor agonist weight loss",
+        "pmid": "39344838",
+        "title": "Glucagon-like peptide-1 receptor agonist-based agents and weight loss composition: Filling the gaps.",
+        "text": "fat stores. Higher amounts of weight loss (achieved with metabolic bariatric surgery) result in greater reductions in FFM. Our aim was to assess the impact that GLP-1RA-based treatments have on FFM. We analysed studies that reported changes in FFM with the following agents: exenatide, liraglutide, semaglutide, and the dual incretin receptor agonist tirzepatide. We performed an analysis of various weight loss interventions to provide a reference for expected changes in FFM. We evaluated studies using dual-energy X-ray absorptiometry (DXA) for measuring FFM (a crude surrogate for skeletal muscle). In evaluating the composition of weight loss, the percentage lost as fat-free mass (%FFML) was equal to \u0394FFM/total weight change. The %FFML using GLP-1RA-based agents was between 20% and 40%. In the 28 clinical trials evaluated, the proportion of FFM loss was highly variable, but the majority reported %FFML exceeding 25%. Our review was limited to small substudies and the use of DXA, which does not measure skeletal muscle mass directly. Since FFM contains a variable amount of muscle (approximately 55%), this indirect measure may explain the heterogeneity in the data. Assessing",
+        "score": 7.279452800750732,
+        "journal": "Diabetes, obesity & metabolism",
+        "year": "2024",
+        "pub_date": "2024-Dec",
+        "doi": "10.1111/dom.15913",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/39344838/",
+        "chunk_index": 2,
+        "num_chunks": 4,
+        "chunk_id": "39344838_2"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:39344838:chunk:2"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/39344838/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_content_verbatim_field": "text",
+        "expected_skip": false,
+        "expected_chunk_index": 2,
+        "expected_num_chunks": 4,
+        "expected_call_id_none": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-30280657",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:30280657",
+      "raw_record": {
+        "pmid": "30280657",
+        "title": "Brigatinib versus Crizotinib in ALK-Positive Non-Small-Cell Lung Cancer.",
+        "abstract": "Brigatinib, a next-generation anaplastic lymphoma kinase (ALK) inhibitor, has robust efficacy in patients with ALK-positive non-small-cell lung cancer (NSCLC) that is refractory to crizotinib. The efficacy of brigatinib, as compared with crizotinib, in patients with advanced ALK-positive NSCLC who have not previously received an ALK inhibitor is unclear. BACKGROUND: Brigatinib, a next-generation anaplastic lymphoma kinase (ALK) inhibitor, has robust efficacy in patients with ALK-positive non-small-cell lung cancer (NSCLC) that is refractory to crizotinib. The efficacy of brigatinib, as compared with crizotinib, in patients with advanced ALK-positive NSCLC who have not previously received an ALK inhibitor is unclear. METHODS: In an open-label, phase 3 trial, we randomly assigned, in a 1:1 ratio, patients with advanced ALK-positive NSCLC who had not previously received ALK inhibitors to receive brigatinib at a dose of 180 mg once daily (with a 7-day lead-in period at 90 mg) or crizotinib at a dose of 250 mg twice daily. The primary end point was progression-free survival as assessed by blinded independent central review. Secondary end points included the objective response rate and intracranial response. The first interim analysis was planned when approximately 50% of 198 expected events of disease progression or death had occurred. RESULTS: A total of 275 patients underwent randomization; 137 were assigned to brigatinib and 138 to crizotinib. At the first interim analysis (99 events), the median follow-up was 11.0 months in the brigatinib group and 9.3 months in the crizotinib group. The rate of progression-free survival was higher with brigatinib than with crizotinib (estimated 12-month progression-free survival, 67% [95% confidence interval {CI}, 56 to 75] vs. 43% [95% CI, 32 to 53]; hazard ratio for disease progression or death, 0.49 [95% CI, 0.33 to 0.74]; P<0.001 by the log-rank test). The confirmed objective response rate was 71% (95% CI, 62 to 78) with brigatinib and 60% (95% CI, 51 to 68) with crizotinib; the confirmed rate of intracranial response among patients with measurable lesions was 78% (95% CI, 52 to 94) and 29% (95% CI, 11 to 52), respectively. No new safety concerns were noted. CONCLUSIONS: Among patients with ALK-positive NSCLC who had not previously received an ALK inhibitor, progression-free survival was significantly longer among patients who received brigatinib than among those who received crizotinib. (Funded by Ariad Pharmaceuticals; ALTA-1L ClinicalTrials.gov number, NCT02737501 .).",
+        "authors": [
+          "D Ross Camidge",
+          "Hye Ryun Kim",
+          "Myung-Ju Ahn",
+          "James Chih-Hsin Yang",
+          "Ji-Youn Han",
+          "Jong-Seok Lee",
+          "Maximilian J Hochmair",
+          "Jacky Yu-Chung Li",
+          "Gee-Chen Chang",
+          "Ki Hyeong Lee",
+          "Cesare Gridelli",
+          "Angelo Delmonte",
+          "Rosario Garcia Campelo",
+          "Dong-Wan Kim",
+          "Alessandra Bearz",
+          "Frank Griesinger",
+          "Alessandro Morabito",
+          "Enriqueta Felip",
+          "Raffaele Califano",
+          "Sharmistha Ghosh",
+          "Alexander Spira",
+          "Scott N Gettinger",
+          "Marcello Tiseo",
+          "Neeraj Gupta",
+          "Jeff Haney",
+          "David Kerstein",
+          "Sanjay Popat"
+        ],
+        "pub_date": "2018-Nov-22",
+        "year": "2018",
+        "journal": "The New England journal of medicine",
+        "doi": "10.1056/NEJMoa1810171",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/30280657/",
+        "_query": "brigatinib ALK non-small cell lung cancer"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:30280657"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/30280657/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-30638036",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:30638036",
+      "raw_record": {
+        "pmid": "30638036",
+        "title": "Brigatinib: Novel ALK Inhibitor for Non-Small-Cell Lung Cancer.",
+        "abstract": "We review here the pharmacology, pharmacokinetics, efficacy, safety, dosage and administration, potential drug-drug interactions and place in therapy of brigatinib for abnormal anaplastic lymphoma kinase (ALK) specific non-small-cell lung cancer (NSCLC). OBJECTIVE: We review here the pharmacology, pharmacokinetics, efficacy, safety, dosage and administration, potential drug-drug interactions and place in therapy of brigatinib for abnormal anaplastic lymphoma kinase (ALK) specific non-small-cell lung cancer (NSCLC). DATA SOURCES: A literature search using PubMed was conducted using the terms brigatinib and ALK positive NSCLC from January 2013 to November 2018. STUDY SELECTION AND DATA EXTRACTION: All English-language articles evaluating brigatinib were analyzed for this review. DATA SYNTHESIS: Brigatinib was granted approval for the treatment of patients with metastatic ALK+ NSCLC who have progressed on or are intolerant to crizotinib. It is administered at a dose of 90 mg orally once daily for the first 7 days then, if tolerated, increased to a dose of 180 mg orally once daily. Common adverse effects include nausea, fatigue, diarrhea, increased creatine phosphokinase levels, headache, dyspnea, and hypertension. Serious treatment-emergent adverse effects were pulmonary related. Relevance to Patient Care and Clinical Practice: This article discusses the clinical trials that led to the accelerated approval of brigatinib for its ability to overcome crizotinib-resistant mutations and for its increased central nervous system penetration properties. CONCLUSION: Brigatinib was granted accelerated approval for the treatment of patients with metastatic ALK+ NSCLC who have progressed on or are intolerant to crizotinib. In a subset of NSCLC patients, brigatinib increases survival for approximately 1 year; however, side effects were detected.",
+        "authors": [
+          "Sara A Spencer",
+          "Angela C Riley",
+          "Adia Matthew",
+          "Anthony J Di Pasqua"
+        ],
+        "pub_date": "2019-Jun",
+        "year": "2019",
+        "journal": "The Annals of pharmacotherapy",
+        "doi": "10.1177/1060028018824578",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/30638036/",
+        "_query": "brigatinib ALK non-small cell lung cancer"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:30638036"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/30638036/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "LIVE-36038416",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:36038416",
+      "raw_record": {
+        "pmid": "36038416",
+        "title": "Efficacy and Safety of Brigatinib Compared With Crizotinib in Asian vs. Non-Asian Patients With Locally Advanced or Metastatic ALK-Inhibitor-Naive ALK+ Non-Small Cell Lung Cancer: Final Results From the Phase III ALTA-1L Study.",
+        "abstract": "Brigatinib is a next-generation anaplastic lymphoma kinase (ALK) inhibitor with demonstrated efficacy in locally advanced and metastatic non-small cell lung cancer (NSCLC) in crizotinib-refractory and ALK inhibitor-naive settings. This analysis assessed brigatinib in Asian vs. non-Asian patients from the first-line ALTA-1L trial. BACKGROUND: Brigatinib is a next-generation anaplastic lymphoma kinase (ALK) inhibitor with demonstrated efficacy in locally advanced and metastatic non-small cell lung cancer (NSCLC) in crizotinib-refractory and ALK inhibitor-naive settings. This analysis assessed brigatinib in Asian vs. non-Asian patients from the first-line ALTA-1L trial. PATIENTS AND METHODS: This was a subgroup analysis from the phase III ALTA-1L trial of brigatinib vs. crizotinib in ALK inhibitor-naive ALK+ NSCLC. The primary endpoint was progression-free survival (PFS) as assessed by blinded independent review committee (BIRC). Secondary endpoints included confirmed objective response rate (ORR) and overall survival (OS) in the overall population and BIRC-assessed intracranial ORR and PFS in patients with brain metastases. RESULTS: Of the 275 randomized patients, 108 were Asian. Brigatinib showed consistent superiority in BIRC-assessed PFS vs. crizotinib in Asian (hazard ratio [HR]: 0.35 [95% CI: 0.20-0.59]; log-rank P\u00a0=\u00a0.0001; median 24.0 vs. 11.1 months) and non-Asian (HR: 0.56 [95% CI: 0.38-0.84]; log-rank P\u00a0=\u00a0.0041; median 24.7 vs. 9.4 months) patients. Results were consistent with investigator-assessed PFS and BIRC-assessed intracranial PFS. Brigatinib was well tolerated. Toxicity profiles and dose modification rates were similar between Asian and non-Asian patients. CONCLUSION: Efficacy with brigatinib was consistently better than with crizotinib in Asian and non-Asian patients with locally advanced or metastatic ALK inhibitor-naive ALK-+ NSCLC. There were no clinically notable differences in overall safety in Asian vs. non-Asian patients.",
+        "authors": [
+          "Myung J Ahn",
+          "Hye R Kim",
+          "James C H Yang",
+          "Ji-Yu Han",
+          "Jacky Yu-Chung Li",
+          "Maximilian J Hochmair",
+          "Gee-Chen Chang",
+          "Angelo Delmonte",
+          "Ki H Lee",
+          "Rosario G Campelo",
+          "Cesare Gridelli",
+          "Alexander I Spira",
+          "Raffaele Califano",
+          "Frank Griesinger",
+          "Sharmistha Ghosh",
+          "Enriqueta Felip",
+          "Dong-Wan Kim",
+          "Yuyin Liu",
+          "Pingkuan Zhang",
+          "Sanjay Popat",
+          "D Ross Camidge"
+        ],
+        "pub_date": "2022-Dec",
+        "year": "2022",
+        "journal": "Clinical lung cancer",
+        "doi": "10.1016/j.cllc.2022.07.008",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/36038416/",
+        "_query": "brigatinib ALK non-small cell lung cancer"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:36038416"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/36038416/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "LIVE-29862230",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:29862230",
+      "raw_record": {
+        "pmid": "29862230",
+        "title": "Treating ALK-positive non-small cell lung cancer.",
+        "abstract": "Targeting genomic alterations, such as epidermal growth factor receptor (EGFR) mutations and anaplastic lymphoma kinase (ALK) gene rearrangements, have radically changed the treatment of patients with non-small cell lung cancer (NSCLC). In the case of ALK-rearranged gene, subsequent rapid development of effective genotype-directed therapies with ALK tyrosine kinase inhibitors (TKIs) triggered major advances in the personalized molecularly based approach of NSCLC. Crizotinib was the first-in-class ALK TKI with proven superiority over standard platinum-based chemotherapy for the 1st-line therapy of ALK-rearranged NSCLC patients. However, the acquired resistance to crizotinib and its diminished efficacy to the central nervous system (CNS) relapse led to the development of several novel ALK inhibitors, more potent and with different selectivity compared to crizotinib. To date, four ALK TKIs, crizotinib, ceritinib, alectinib and brigatinib have received approval from the Food and Drug Administration (FDA) and/or the European Medicines Agency (EMA) and even more agents are currently under investigation for the treatment of ALK-rearranged NSCLC. However, the optimal frontline approach and the exact sequence of ALK inhibitors are still under consideration. Recently announced results of phase III trials recognized higher efficacy of alectinib compared to crizotinib in first-line setting, even in patients with CNS involvement. In this review, we will discuss the current knowledge regarding the biology of the ALK-positive NSCLC, the available therapeutic inhibitors and we will focus on the raised issues from their use in clinical practise. Targeting genomic alterations, such as epidermal growth factor receptor (EGFR) mutations and anaplastic lymphoma kinase (ALK) gene rearrangements, have radically changed the treatment of patients with non-small cell lung cancer (NSCLC). In the case of ALK-rearranged gene, subsequent rapid development of effective genotype-directed therapies with ALK tyrosine kinase inhibitors (TKIs) triggered major advances in the personalized molecularly based approach of NSCLC. Crizotinib was the first-in-class ALK TKI with proven superiority over standard platinum-based chemotherapy for the 1st-line therapy of ALK-rearranged NSCLC patients. However, the acquired resistance to crizotinib and its diminished efficacy to the central nervous system (CNS) relapse led to the development of several novel ALK inhibitors, more potent and with different selectivity compared to crizotinib. To date, four ALK TKIs, crizotinib, ceritinib, alectinib and brigatinib have received approval from the Food and Drug Administration (FDA) and/or the European Medicines Agency (EMA) and even more agents are currently under investigation for the treatment of ALK-rearranged NSCLC. However, the optimal frontline approach and the exact sequence of ALK inhibitors are still under consideration. Recently announced results of phase III trials recognized higher efficacy of alectinib compared to crizotinib in first-line setting, even in patients with CNS involvement. In this review, we will discuss the current knowledge regarding the biology of the ALK-positive NSCLC, the available therapeutic inhibitors and we will focus on the raised issues from their use in clinical practise.",
+        "authors": [
+          "Dimitrios C Ziogas",
+          "Anna Tsiara",
+          "Georgios Tsironis",
+          "Maria Lykka",
+          "Michalis Liontos",
+          "Aristotelis Bamias",
+          "Meletios-Athanasios Dimopoulos"
+        ],
+        "pub_date": "2018-Apr",
+        "year": "2018",
+        "journal": "Annals of translational medicine",
+        "doi": "10.21037/atm.2017.11.34",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/29862230/",
+        "_query": "brigatinib ALK non-small cell lung cancer"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:29862230"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/29862230/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-31564718",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:31564718",
+      "raw_record": {
+        "pmid": "31564718",
+        "title": "Resistance mechanisms to osimertinib in EGFR-mutated non-small cell lung cancer.",
+        "abstract": "Osimertinib is an irreversible, third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor that is highly selective for EGFR-activating mutations as well as the EGFR T790M mutation in patients with advanced non-small cell lung cancer (NSCLC) with EGFR oncogene addiction. Despite the documented efficacy of osimertinib in first- and second-line settings, patients inevitably develop resistance, with no further clear-cut therapeutic options to date other than chemotherapy and locally ablative therapy for selected individuals. On account of the high degree of tumour heterogeneity and adaptive cellular signalling pathways in NSCLC, the acquired osimertinib resistance is highly heterogeneous, encompassing EGFR-dependent as well as EGFR-independent mechanisms. Furthermore, data from repeat plasma genotyping analyses have highlighted differences in the frequency and preponderance of resistance mechanisms when osimertinib is administered in a front-line versus second-line setting, underlying the discrepancies in selection pressure and clonal evolution. This review summarises the molecular mechanisms of resistance to osimertinib in patients with advanced EGFR-mutated NSCLC, including MET/HER2 amplification, activation of the RAS-mitogen-activated protein kinase (MAPK) or RAS-phosphatidylinositol 3-kinase (PI3K) pathways, novel fusion events and histological/phenotypic transformation, as well as discussing the current evidence regarding potential new approaches to counteract osimertinib resistance. Osimertinib is an irreversible, third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor that is highly selective for EGFR-activating mutations as well as the EGFR T790M mutation in patients with advanced non-small cell lung cancer (NSCLC) with EGFR oncogene addiction. Despite the documented efficacy of osimertinib in first- and second-line settings, patients inevitably develop resistance, with no further clear-cut therapeutic options to date other than chemotherapy and locally ablative therapy for selected individuals. On account of the high degree of tumour heterogeneity and adaptive cellular signalling pathways in NSCLC, the acquired osimertinib resistance is highly heterogeneous, encompassing EGFR-dependent as well as EGFR-independent mechanisms. Furthermore, data from repeat plasma genotyping analyses have highlighted differences in the frequency and preponderance of resistance mechanisms when osimertinib is administered in a front-line versus second-line setting, underlying the discrepancies in selection pressure and clonal evolution. This review summarises the molecular mechanisms of resistance to osimertinib in patients with advanced EGFR-mutated NSCLC, including MET/HER2 amplification, activation of the RAS-mitogen-activated protein kinase (MAPK) or RAS-phosphatidylinositol 3-kinase (PI3K) pathways, novel fusion events and histological/phenotypic transformation, as well as discussing the current evidence regarding potential new approaches to counteract osimertinib resistance.",
+        "authors": [
+          "Alessandro Leonetti",
+          "Sugandhi Sharma",
+          "Roberta Minari",
+          "Paola Perego",
+          "Elisa Giovannetti",
+          "Marcello Tiseo"
+        ],
+        "pub_date": "2019-Oct",
+        "year": "2019",
+        "journal": "British journal of cancer",
+        "doi": "10.1038/s41416-019-0573-8",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/31564718/",
+        "_query": "osimertinib EGFR resistance"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:31564718"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/31564718/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-36482474",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:36482474",
+      "raw_record": {
+        "pmid": "36482474",
+        "title": "Therapeutic strategies for EGFR-mutated non-small cell lung cancer patients with osimertinib resistance.",
+        "abstract": "Epidermal growth factor receptor tyrosine kinase inhibitors (EGFR-TKIs) are the preferential options for advanced non-small cell lung cancer (NSCLC) patients harboring EGFR mutations. Osimertinib is a potent irreversible third-generation EGFR-TKI targeting EGFR mutations but has little effect on wild-type EGFR. In view of its remarkable efficacy and manageable safety, osimertinib was recommended as the standard first-line treatment for advanced or metastatic NSCLC patients with EGFR mutations. However, as the other EGFR-TKIs, osimertinib will inevitably develop acquired resistance, which limits its efficacy on the treatment of EGFR-mutated NSCLC patients. The etiology of triggering osimertinib resistance is complex including EGFR-dependent and EGFR-independent pathways, and different therapeutic strategies for the NSCLC patients with osimertinib resistance have been developed. Herein, we comprehensively summarized the resistance mechanisms of osimertinib and discuss in detail the potential therapeutic strategies for EGFR-mutated NSCLC patients suffering osimertinib resistance for the sake of the improvement of survival and further achievement of precise medicine. Epidermal growth factor receptor tyrosine kinase inhibitors (EGFR-TKIs) are the preferential options for advanced non-small cell lung cancer (NSCLC) patients harboring EGFR mutations. Osimertinib is a potent irreversible third-generation EGFR-TKI targeting EGFR mutations but has little effect on wild-type EGFR. In view of its remarkable efficacy and manageable safety, osimertinib was recommended as the standard first-line treatment for advanced or metastatic NSCLC patients with EGFR mutations. However, as the other EGFR-TKIs, osimertinib will inevitably develop acquired resistance, which limits its efficacy on the treatment of EGFR-mutated NSCLC patients. The etiology of triggering osimertinib resistance is complex including EGFR-dependent and EGFR-independent pathways, and different therapeutic strategies for the NSCLC patients with osimertinib resistance have been developed. Herein, we comprehensively summarized the resistance mechanisms of osimertinib and discuss in detail the potential therapeutic strategies for EGFR-mutated NSCLC patients suffering osimertinib resistance for the sake of the improvement of survival and further achievement of precise medicine.",
+        "authors": [
+          "Kai Fu",
+          "Fachao Xie",
+          "Fang Wang",
+          "Liwu Fu"
+        ],
+        "pub_date": "2022-Dec-08",
+        "year": "2022",
+        "journal": "Journal of hematology & oncology",
+        "doi": "10.1186/s13045-022-01391-4",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/36482474/",
+        "_query": "osimertinib EGFR resistance"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:36482474"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/36482474/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-37093192",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:37093192",
+      "raw_record": {
+        "pmid": "37093192",
+        "title": "Tackling Osimertinib Resistance in EGFR-Mutant Non-Small Cell Lung Cancer.",
+        "abstract": "The current landscape of targeted therapies directed against oncogenic driver alterations in non-small cell lung cancer (NSCLC) is expanding. Patients with EGFR-mutant NSCLC can derive significant benefit from EGFR tyrosine kinase inhibitor (TKI) therapy, including the third-generation EGFR TKI osimertinib. However, invariably, all patients will experience disease progression with this therapy mainly due to the adaptation of cancer cells through primary or secondary molecular mechanisms of resistance. The comprehension and access to tissue and cell-free DNA next-generation sequencing have fueled the development of innovative therapeutic strategies to prevent and overcome resistance to osimertinib in the clinical setting. Herein, we review the biological and clinical implications of molecular mechanisms of osimertinib resistance and the ongoing development of therapeutic strategies to overcome or prevent resistance. The current landscape of targeted therapies directed against oncogenic driver alterations in non-small cell lung cancer (NSCLC) is expanding. Patients with EGFR-mutant NSCLC can derive significant benefit from EGFR tyrosine kinase inhibitor (TKI) therapy, including the third-generation EGFR TKI osimertinib. However, invariably, all patients will experience disease progression with this therapy mainly due to the adaptation of cancer cells through primary or secondary molecular mechanisms of resistance. The comprehension and access to tissue and cell-free DNA next-generation sequencing have fueled the development of innovative therapeutic strategies to prevent and overcome resistance to osimertinib in the clinical setting. Herein, we review the biological and clinical implications of molecular mechanisms of osimertinib resistance and the ongoing development of therapeutic strategies to overcome or prevent resistance.",
+        "authors": [
+          "Juan Bautista Blaquier",
+          "Sandra Ortiz-Cuaran",
+          "Biagio Ricciuti",
+          "Laura Mezquita",
+          "Andr\u00e9s Felipe Cardona",
+          "Gonzalo Recondo"
+        ],
+        "pub_date": "2023-Sep-15",
+        "year": "2023",
+        "journal": "Clinical cancer research : an official journal of the American Association for Cancer Research",
+        "doi": "10.1158/1078-0432.CCR-22-1912",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/37093192/",
+        "_query": "osimertinib EGFR resistance"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:37093192"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/37093192/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "LIVE-36849494",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:36849494",
+      "raw_record": {
+        "pmid": "36849494",
+        "title": "Candidate mechanisms of acquired resistance to first-line osimertinib in EGFR-mutated advanced non-small cell lung cancer.",
+        "abstract": "Osimertinib, an epidermal growth factor receptor tyrosine kinase inhibitor (EGFR-TKI), potently and selectively inhibits EGFR-TKI-sensitizing and EGFR T790M resistance mutations. In the Phase III FLAURA study (NCT02296125), first-line osimertinib improved outcomes vs comparator EGFR-TKIs in EGFRm advanced non-small cell lung cancer. This analysis identifies acquired resistance mechanisms to first-line osimertinib. Next-generation sequencing assesses circulating-tumor DNA from paired plasma samples (baseline and disease progression/treatment discontinuation) in patients with baseline EGFRm. No EGFR T790M-mediated acquired resistance are observed; most frequent resistance mechanisms are MET amplification (n\u2009=\u200917; 16%) and EGFR C797S mutations (n\u2009=\u20097; 6%). Future research investigating non-genetic acquired resistance mechanisms is warranted. Osimertinib, an epidermal growth factor receptor tyrosine kinase inhibitor (EGFR-TKI), potently and selectively inhibits EGFR-TKI-sensitizing and EGFR T790M resistance mutations. In the Phase III FLAURA study (NCT02296125), first-line osimertinib improved outcomes vs comparator EGFR-TKIs in EGFRm advanced non-small cell lung cancer. This analysis identifies acquired resistance mechanisms to first-line osimertinib. Next-generation sequencing assesses circulating-tumor DNA from paired plasma samples (baseline and disease progression/treatment discontinuation) in patients with baseline EGFRm. No EGFR T790M-mediated acquired resistance are observed; most frequent resistance mechanisms are MET amplification (n\u2009=\u200917; 16%) and EGFR C797S mutations (n\u2009=\u20097; 6%). Future research investigating non-genetic acquired resistance mechanisms is warranted.",
+        "authors": [
+          "Juliann Chmielecki",
+          "Jhanelle E Gray",
+          "Ying Cheng",
+          "Yuichiro Ohe",
+          "Fumio Imamura",
+          "Byoung Chul Cho",
+          "Meng-Chih Lin",
+          "Margarita Majem",
+          "Riyaz Shah",
+          "Yuri Rukazenkov",
+          "Alexander Todd",
+          "Aleksandra Markovets",
+          "J Carl Barrett",
+          "Ryan J Hartmaier",
+          "Suresh S Ramalingam"
+        ],
+        "pub_date": "2023-Feb-27",
+        "year": "2023",
+        "journal": "Nature communications",
+        "doi": "10.1038/s41467-023-35961-y",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/36849494/",
+        "_query": "osimertinib EGFR resistance"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:36849494"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/36849494/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "LIVE-25891173",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:25891173",
+      "raw_record": {
+        "pmid": "25891173",
+        "title": "Pembrolizumab versus Ipilimumab in Advanced Melanoma.",
+        "abstract": "The immune checkpoint inhibitor ipilimumab is the standard-of-care treatment for patients with advanced melanoma. Pembrolizumab inhibits the programmed cell death 1 (PD-1) immune checkpoint and has antitumor activity in patients with advanced melanoma. BACKGROUND: The immune checkpoint inhibitor ipilimumab is the standard-of-care treatment for patients with advanced melanoma. Pembrolizumab inhibits the programmed cell death 1 (PD-1) immune checkpoint and has antitumor activity in patients with advanced melanoma. METHODS: In this randomized, controlled, phase 3 study, we assigned 834 patients with advanced melanoma in a 1:1:1 ratio to receive pembrolizumab (at a dose of 10 mg per kilogram of body weight) every 2 weeks or every 3 weeks or four doses of ipilimumab (at 3 mg per kilogram) every 3 weeks. Primary end points were progression-free and overall survival. RESULTS: The estimated 6-month progression-free-survival rates were 47.3% for pembrolizumab every 2 weeks, 46.4% for pembrolizumab every 3 weeks, and 26.5% for ipilimumab (hazard ratio for disease progression, 0.58; P<0.001 for both pembrolizumab regimens versus ipilimumab; 95% confidence intervals [CIs], 0.46 to 0.72 and 0.47 to 0.72, respectively). Estimated 12-month survival rates were 74.1%, 68.4%, and 58.2%, respectively (hazard ratio for death for pembrolizumab every 2 weeks, 0.63; 95% CI, 0.47 to 0.83; P=0.0005; hazard ratio for pembrolizumab every 3 weeks, 0.69; 95% CI, 0.52 to 0.90; P=0.0036). The response rate was improved with pembrolizumab administered every 2 weeks (33.7%) and every 3 weeks (32.9%), as compared with ipilimumab (11.9%) (P<0.001 for both comparisons). Responses were ongoing in 89.4%, 96.7%, and 87.9% of patients, respectively, after a median follow-up of 7.9 months. Efficacy was similar in the two pembrolizumab groups. Rates of treatment-related adverse events of grade 3 to 5 severity were lower in the pembrolizumab groups (13.3% and 10.1%) than in the ipilimumab group (19.9%). CONCLUSIONS: The anti-PD-1 antibody pembrolizumab prolonged progression-free survival and overall survival and had less high-grade toxicity than did ipilimumab in patients with advanced melanoma. (Funded by Merck Sharp & Dohme; KEYNOTE-006 ClinicalTrials.gov number, NCT01866319.).",
+        "authors": [
+          "Caroline Robert",
+          "Jacob Schachter",
+          "Georgina V Long",
+          "Ana Arance",
+          "Jean Jacques Grob",
+          "Laurent Mortier",
+          "Adil Daud",
+          "Matteo S Carlino",
+          "Catriona McNeil",
+          "Michal Lotem",
+          "James Larkin",
+          "Paul Lorigan",
+          "Bart Neyns",
+          "Christian U Blank",
+          "Omid Hamid",
+          "Christine Mateus",
+          "Ronnie Shapira-Frommer",
+          "Michele Kosh",
+          "Honghong Zhou",
+          "Nageatte Ibrahim",
+          "Scot Ebbinghaus",
+          "Antoni Ribas"
+        ],
+        "pub_date": "2015-Jun-25",
+        "year": "2015",
+        "journal": "The New England journal of medicine",
+        "doi": "10.1056/NEJMoa1503093",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/25891173/",
+        "_query": "pembrolizumab melanoma checkpoint inhibitor"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:25891173"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/25891173/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-39288737",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:39288737",
+      "raw_record": {
+        "pmid": "39288737",
+        "title": "Seven-year analysis of adjuvant pembrolizumab versus placebo in stage III melanoma in the EORTC1325 / KEYNOTE-054 trial.",
+        "abstract": "In the previously reported primary analyses of this phase 3 trial, 12 months of adjuvant pembrolizumab resulted in significantly longer recurrence-free survival (RFS) and distant metastasis-free survival (DMFS) than placebo in patients with resected high risk stage III melanoma. Stability of these benefits when the median follow-up was 3.5 and 5 years was published. Here we report results with a longer follow-up. UNLABELLED: In the previously reported primary analyses of this phase 3 trial, 12 months of adjuvant pembrolizumab resulted in significantly longer recurrence-free survival (RFS) and distant metastasis-free survival (DMFS) than placebo in patients with resected high risk stage III melanoma. Stability of these benefits when the median follow-up was 3.5 and 5 years was published. Here we report results with a longer follow-up. METHODS: We randomized 1019 patients to receive pembrolizumab 200\u00a0mg or placebo, intravenously every 3 weeks for a total of 18 doses. RFS in the overall population and in the subgroup of patients with melanoma positive for the PD-1 ligand (PD-L1) were co-primary endpoints. DMFS in these two populations was a secondary and progression/recurrence-free survival 2 (PRFS2) an exploratory endpoint. RESULTS: The median follow-up was 6.9 years. In the overall intention-to-treat population, RFS was longer in the pembrolizumab group than in the placebo group (HR 0.63, 95\u00a0% CI 0.53 to 0.74). RFS at 7 years was 50\u00a0% (95\u00a0% CI 46\u00a0% to 55\u00a0%) in the pembrolizumab and 36\u00a0% (95\u00a0% CI 32\u00a0% to 41\u00a0%) in the placebo group. Positive effects were present both for loco-regional recurrences and distant metastases, and across substages IIIA-IIIB-IIIC, and PD-L1 positive and PD-L1 negative as well as for BRAF mutant and BRAF wild type populations. DMFS was longer in the pembrolizumab group than in the placebo group (HR 0.64, 95\u00a0% CI 0.54 to 0.76). DMFS at 7 years was 54\u00a0% (95\u00a0% CI 50\u00a0% to 59\u00a0%) in the pembrolizumab and 42\u00a0% (95\u00a0% CI 37\u00a0% to 46\u00a0%) in the placebo group. PRFS2 was longer in the pembrolizumab group than in the placebo group (HR 0.69, 95\u00a0% CI 0.57 to 0.84). PRFS2 at 7 years was 61\u00a0% (95\u00a0% CI 57\u00a0% to 66\u00a0%) in the pembrolizumab and 53\u00a0% (95\u00a0% CI 49\u00a0% to 57\u00a0%) in the placebo group. CONCLUSIONS: The 7-year analysis of adjuvant therapy with pembrolizumab demonstrated a sustained improvement in the long-term RFS, DMFS and PRFS2 compared with placebo in patients with resected stage III melanoma.",
+        "authors": [
+          "Alexander Mm Eggermont",
+          "Michal Kicinski",
+          "Christian U Blank",
+          "Mario Mandala",
+          "Georgina V Long",
+          "Victoria Atkinson",
+          "St\u00e9phane Dalle",
+          "Andrew Haydon",
+          "Andrey Meshcheryakov",
+          "Adnan Khattak",
+          "Matteo S Carlino",
+          "Shahneen Sandhu",
+          "James Larkin",
+          "Susana Puig",
+          "Paolo A Ascierto",
+          "Piotr Rutkowski",
+          "Dirk Schadendorf",
+          "Marye Boers-Sonderen",
+          "Anna Maria Di Giacomo",
+          "Alfonsus Jm van den Eertwegh",
+          "Jean-Jacques Grob",
+          "Ralf Gutzmer",
+          "Rahima Jamal",
+          "Alexander C J van Akkooi",
+          "Paul Lorigan",
+          "Dmitri Grebennik",
+          "Clemens Kreplere",
+          "Sandrine Marreaud",
+          "Stefan Suciu",
+          "Caroline Robert"
+        ],
+        "pub_date": "2024-Nov",
+        "year": "2024",
+        "journal": "European journal of cancer (Oxford, England : 1990)",
+        "doi": "10.1016/j.ejca.2024.114327",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/39288737/",
+        "_query": "pembrolizumab melanoma checkpoint inhibitor"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:39288737"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/39288737/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-35867951",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:35867951",
+      "raw_record": {
+        "pmid": "35867951",
+        "title": "Phase II LEAP-004 Study of Lenvatinib Plus Pembrolizumab for Melanoma With Confirmed Progression on a Programmed Cell Death Protein-1 or Programmed Death Ligand 1 Inhibitor Given as Monotherapy or in Combination.",
+        "abstract": "Effective treatments are needed for melanoma that progresses on inhibitors of programmed cell death protein-1 (PD-1) or its ligand (PD-L1). We conducted the phase II LEAP-004 study to evaluate the combination of the multikinase inhibitor lenvatinib and the PD-1 inhibitor pembrolizumab in this population (ClinicalTrials.gov identifier: NCT03776136). PURPOSE: Effective treatments are needed for melanoma that progresses on inhibitors of programmed cell death protein-1 (PD-1) or its ligand (PD-L1). We conducted the phase II LEAP-004 study to evaluate the combination of the multikinase inhibitor lenvatinib and the PD-1 inhibitor pembrolizumab in this population (ClinicalTrials.gov identifier: NCT03776136). METHODS: Eligible patients with unresectable stage III-IV melanoma with confirmed progressive disease (PD) within 12 weeks of the last dose of a PD-1/L1 inhibitor given alone or with other therapies, including cytotoxic T-cell lymphocyte-associated antigen 4 (CTLA-4) inhibitors, received lenvatinib 20 mg orally once daily plus \u2264 35 doses of pembrolizumab 200 mg intravenously once every 3 weeks until PD or unacceptable toxicity. The primary end point was objective response rate (ORR) per RECIST, version 1.1, by independent central review. RESULTS: A total of 103 patients were enrolled and treated. The median study follow-up was 15.3 months. ORR in the total population was 21.4% (95% CI, 13.9 to 30.5), with three (2.9%) complete responses and 19 (18.4%) partial responses. The median duration of response was 8.3 months (range, 3.2-15.9+). ORR was 33.3% in the 30 patients with PD on prior anti-PD-1 plus anti-CTLA-4 therapy. The median progression-free survival and overall survival in the total population were 4.2 months (95% CI, 3.8 to 7.1) and 14.0 months (95% CI, 10.8 to not reached), respectively. Grade 3-5 treatment-related adverse events occurred in 47 (45.6%) patients, most commonly hypertension (21.4%); one patient died from a treatment-related event (decreased platelet count). CONCLUSION: Lenvatinib plus pembrolizumab provides clinically meaningful, durable responses in patients with advanced melanoma with confirmed PD on prior PD-1/L1 inhibitor-based therapy, including those with PD on anti-PD-1 plus anti-CTLA-4 therapy. The safety profile was as expected. These data support lenvatinib plus pembrolizumab as a potential regimen for this population of high unmet need.",
+        "authors": [
+          "Ana Arance",
+          "Luis de la Cruz-Merino",
+          "Teresa M Petrella",
+          "Rahima Jamal",
+          "Lars Ny",
+          "Ana Carneiro",
+          "Alfonso Berrocal",
+          "Ivan M\u00e1rquez-Rodas",
+          "Anna Spreafico",
+          "Victoria Atkinson",
+          "Fernanda Costa Svedman",
+          "Andrew Mant",
+          "Muhammad A Khattak",
+          "Catalin Mihalcioiu",
+          "Sekwon Jang",
+          "C Lance Cowey",
+          "Alan D Smith",
+          "Natalyn Hawk",
+          "Ke Chen",
+          "Scott J Diede",
+          "Clemens Krepler",
+          "Georgina V Long"
+        ],
+        "pub_date": "2023-Jan-01",
+        "year": "2023",
+        "journal": "Journal of clinical oncology : official journal of the American Society of Clinical Oncology",
+        "doi": "10.1200/JCO.22.00221",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/35867951/",
+        "_query": "pembrolizumab melanoma checkpoint inhibitor"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:35867951"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/35867951/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "LIVE-26558876",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:26558876",
+      "raw_record": {
+        "pmid": "26558876",
+        "title": "CTLA-4 and PD-1 Pathways: Similarities, Differences, and Implications of Their Inhibition.",
+        "abstract": "The cytotoxic T-lymphocyte-associated antigen 4 (CTLA-4) and programmed death 1 (PD-1) immune checkpoints are negative regulators of T-cell immune function. Inhibition of these targets, resulting in increased activation of the immune system, has led to new immunotherapies for melanoma, non-small cell lung cancer, and other cancers. Ipilimumab, an inhibitor of CTLA-4, is approved for the treatment of advanced or unresectable melanoma. Nivolumab and pembrolizumab, both PD-1 inhibitors, are approved to treat patients with advanced or metastatic melanoma and patients with metastatic, refractory non-small cell lung cancer. In addition the combination of ipilimumab and nivolumab has been approved in patients with BRAF WT metastatic or unresectable melanoma. The roles of CTLA-4 and PD-1 in inhibiting immune responses, including antitumor responses, are largely distinct. CTLA-4 is thought to regulate T-cell proliferation early in an immune response, primarily in lymph nodes, whereas PD-1 suppresses T cells later in an immune response, primarily in peripheral tissues. The clinical profiles of immuno-oncology agents inhibiting these 2 checkpoints may vary based on their mechanistic differences. This article provides an overview of the CTLA-4 and PD-1 pathways and implications of their inhibition in cancer therapy. The cytotoxic T-lymphocyte-associated antigen 4 (CTLA-4) and programmed death 1 (PD-1) immune checkpoints are negative regulators of T-cell immune function. Inhibition of these targets, resulting in increased activation of the immune system, has led to new immunotherapies for melanoma, non-small cell lung cancer, and other cancers. Ipilimumab, an inhibitor of CTLA-4, is approved for the treatment of advanced or unresectable melanoma. Nivolumab and pembrolizumab, both PD-1 inhibitors, are approved to treat patients with advanced or metastatic melanoma and patients with metastatic, refractory non-small cell lung cancer. In addition the combination of ipilimumab and nivolumab has been approved in patients with BRAF WT metastatic or unresectable melanoma. The roles of CTLA-4 and PD-1 in inhibiting immune responses, including antitumor responses, are largely distinct. CTLA-4 is thought to regulate T-cell proliferation early in an immune response, primarily in lymph nodes, whereas PD-1 suppresses T cells later in an immune response, primarily in peripheral tissues. The clinical profiles of immuno-oncology agents inhibiting these 2 checkpoints may vary based on their mechanistic differences. This article provides an overview of the CTLA-4 and PD-1 pathways and implications of their inhibition in cancer therapy.",
+        "authors": [
+          "Elizabeth I Buchbinder",
+          "Anupam Desai"
+        ],
+        "pub_date": "2016-Feb",
+        "year": "2016",
+        "journal": "American journal of clinical oncology",
+        "doi": "10.1097/COC.0000000000000239",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/26558876/",
+        "_query": "pembrolizumab melanoma checkpoint inhibitor"
+      },
+      "gold": {
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "pubmed:26558876"
+        ],
+        "expected_source_url": "https://pubmed.ncbi.nlm.nih.gov/26558876/",
+        "expected_evidence_types": [
+          "text_passage"
+        ],
+        "expected_content_nonempty": true,
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-1",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:1",
+      "raw_record": {
+        "pmid": "1",
+        "title": "Formate assay in body fluids: application in methanol poisoning.",
+        "abstract": "No abstract available",
+        "authors": [
+          "A B Makar",
+          "K E McMartin",
+          "M Palese",
+          "T R Tephly"
+        ],
+        "pub_date": "1975-Jun",
+        "year": "1975",
+        "journal": "Biochemical medicine",
+        "doi": "10.1016/0006-2944(75)90147-7",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/1/",
+        "_query": "get_paper_details:1"
+      },
+      "gold": {
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_content_nonempty": false,
+        "expected_skip": true,
+        "expected_skip_reason": "placeholder_abstract"
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "LIVE-2",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:2",
+      "raw_record": {
+        "pmid": "2",
+        "title": "Delineation of the intimate details of the backbone conformation of pyridine nucleotide coenzymes in aqueous solution.",
+        "abstract": "No abstract available",
+        "authors": [
+          "K S Bose",
+          "R H Sarma"
+        ],
+        "pub_date": "1975-Oct-27",
+        "year": "1975",
+        "journal": "Biochemical and biophysical research communications",
+        "doi": "10.1016/0006-291x(75)90482-9",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/2/",
+        "_query": "get_paper_details:2"
+      },
+      "gold": {
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_content_nonempty": false,
+        "expected_skip": true,
+        "expected_skip_reason": "placeholder_abstract"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-3",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:3",
+      "raw_record": {
+        "pmid": "3",
+        "title": "Metal substitutions incarbonic anhydrase: a halide ion probe study.",
+        "abstract": "No abstract available",
+        "authors": [
+          "R J Smith",
+          "R G Bryant"
+        ],
+        "pub_date": "1975-Oct-27",
+        "year": "1975",
+        "journal": "Biochemical and biophysical research communications",
+        "doi": "10.1016/0006-291x(75)90498-2",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/3/",
+        "_query": "get_paper_details:3"
+      },
+      "gold": {
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_content_nonempty": false,
+        "expected_skip": true,
+        "expected_skip_reason": "placeholder_abstract"
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "LIVE-4",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:4",
+      "raw_record": {
+        "pmid": "4",
+        "title": "Effect of chloroquine on cultured fibroblasts: release of lysosomal hydrolases and inhibition of their uptake.",
+        "abstract": "No abstract available",
+        "authors": [
+          "U N Wiesmann",
+          "S DiDonato",
+          "N N Herschkowitz"
+        ],
+        "pub_date": "1975-Oct-27",
+        "year": "1975",
+        "journal": "Biochemical and biophysical research communications",
+        "doi": "10.1016/0006-291x(75)90506-9",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/4/",
+        "_query": "get_paper_details:4"
+      },
+      "gold": {
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_content_nonempty": false,
+        "expected_skip": true,
+        "expected_skip_reason": "placeholder_abstract"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "LIVE-5",
+      "source_path": "pubmed_live",
+      "group_key": "pubmed:5",
+      "raw_record": {
+        "pmid": "5",
+        "title": "Atomic models for the polypeptide backbones of myohemerythrin and hemerythrin.",
+        "abstract": "No abstract available",
+        "authors": [
+          "W A Hendrickson",
+          "K B Ward"
+        ],
+        "pub_date": "1975-Oct-27",
+        "year": "1975",
+        "journal": "Biochemical and biophysical research communications",
+        "doi": "10.1016/0006-291x(75)90508-2",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/5/",
+        "_query": "get_paper_details:5"
+      },
+      "gold": {
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_content_nonempty": false,
+        "expected_skip": true,
+        "expected_skip_reason": "placeholder_abstract"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT03535740",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT03535740",
+      "raw_record": {
+        "nct_id": "NCT03535740",
+        "title": "Brigatinib in Patients With Anaplastic Lymphoma Kinase-Positive (ALK+), Advanced Non-Small-Cell Lung Cancer (NSCLC) Progressed on Alectinib or Ceritinib",
+        "status": "COMPLETED",
+        "phase": "PHASE2",
+        "conditions": [
+          "ALK-positive Advanced NSCLC"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Brigatinib",
+            "description": "Brigatinib Tablets"
+          }
+        ],
+        "sponsor": "Ariad Pharmaceuticals",
+        "locations": [
+          "University of California Irvine Health Chao Family Comprehensive Cancer Center, Orange, United States",
+          "The Oncology Institute of Hope and Innovation, Whittier, United States",
+          "USOR - Rocky Mountain Cancer Centers - Pueblo, Pueblo, United States",
+          "Florida Hospital Medical Group, Orlando, United States",
+          "Barbara Ann Karmanos Cancer Institute, Detroit, United States",
+          "Washington University School of Medicine, St Louis, United States",
+          "Levine Cancer Institute - Southpark, Charlotte, United States",
+          "Providence Portland Medical Center, Portland, United States",
+          "Sarah Cannon Research Institute, Nashville, United States",
+          "USOR - Virginia Cancer Specialists - Fairfax Office, Fairfax, United States"
+        ],
+        "enrollment": 103,
+        "start_date": "2019-01-31",
+        "completion_date": "2024-08-21",
+        "brief_summary": "The primary purpose of this study is to determine the efficacy of brigatinib by confirmed objective response rate (ORR) by response evaluation criteria in solid tumors (Response Evaluation Criteria in Solid Tumors \\[RECIST\\]), in participants with ALK+ locally advanced or metastatic NSCLC whose disease has progressed on therapy with alectinib or ceritinib.",
+        "url": "https://clinicaltrials.gov/study/NCT03535740",
+        "_query": "{'condition': 'non-small cell lung cancer', 'intervention': 'brigatinib', 'status': 'COMPLETED', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 9,
+        "expected_evidence_ids": [
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740",
+          "nct:NCT03535740"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT03535740",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-NCT01449461",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT01449461",
+      "raw_record": {
+        "nct_id": "NCT01449461",
+        "title": "A Phase 1/2 Study of the Safety, Tolerability, Pharmacokinetics and Preliminary Anti-Tumor Activity of the Oral ALK/EGFR Inhibitor AP26113",
+        "status": "COMPLETED",
+        "phase": "PHASE1, PHASE2",
+        "conditions": [
+          "Lymphoma, Large-Cell, Anaplastic",
+          "Carcinoma, Non-Small-Cell Lung"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Brigatinib",
+            "description": "Brigatinib tablets and capsules."
+          }
+        ],
+        "sponsor": "Ariad Pharmaceuticals",
+        "locations": [],
+        "enrollment": 137,
+        "start_date": "2011-09-20",
+        "completion_date": "2020-02-18",
+        "brief_summary": "The purpose of this study is 2-fold: initially, in the dose escalation phase, the goal is to determine the safety profile of orally administered brigatinib, including: the maximum tolerated dose (MTD), dose limiting toxicities (DLTs), recommended phase 2 dose (RP2D), and pharmacokinetic (PK) profile. Then, once the RP2D is established, an expansion phase will assess the preliminary anti-tumor activity of brigatinib, both in non-small cell lung cancer (NSCLC) with ALK gene rearrangement (includin",
+        "url": "https://clinicaltrials.gov/study/NCT01449461",
+        "_query": "{'condition': 'non-small cell lung cancer', 'intervention': 'brigatinib', 'status': 'COMPLETED', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 9,
+        "expected_evidence_ids": [
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461",
+          "nct:NCT01449461"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT01449461",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": true
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-NCT04887519",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT04887519",
+      "raw_record": {
+        "nct_id": "NCT04887519",
+        "title": "Post Authorization Study to Monitor Efficacy, Effectiveness and Safety of Brigatinib (Alunbrig\u00ae) in Anaplastic Lymphoma Kinase (ALK) Positive Metastatic Non Small Cell Lung Cancer (NSCLC) in Argentina",
+        "status": "COMPLETED",
+        "phase": "N/A",
+        "conditions": [
+          "Carcinoma, Non-Small-Cell Lung",
+          "Anaplastic Lymphoma Kinase"
+        ],
+        "interventions": [
+          {
+            "type": "OTHER",
+            "name": "No Intervention",
+            "description": "This is a non-interventional study."
+          }
+        ],
+        "sponsor": "Takeda",
+        "locations": [
+          "IC Projects, Buenos Aires, Argentina"
+        ],
+        "enrollment": 39,
+        "start_date": "2020-12-30",
+        "completion_date": "2023-03-31",
+        "brief_summary": "The aims of the study are to assess the safety profile of brigatinib and the clinical response rates in adults with Anaplastic Lymphoma Kinase (ALK)-Positive Metastatic Non Small Cell Lung Cancer (NSCLC). Treatment with brigatinib and follow-up will be according to routine clinical practice.\n\nStudy doctors will review the participants' medical records at the start of the study, then at 12 and 24 weeks after treatment starts.",
+        "url": "https://clinicaltrials.gov/study/NCT04887519",
+        "_query": "{'condition': 'non-small cell lung cancer', 'intervention': 'brigatinib', 'status': 'COMPLETED', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 8,
+        "expected_evidence_ids": [
+          "nct:NCT04887519",
+          "nct:NCT04887519",
+          "nct:NCT04887519",
+          "nct:NCT04887519",
+          "nct:NCT04887519",
+          "nct:NCT04887519",
+          "nct:NCT04887519",
+          "nct:NCT04887519"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT04887519",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-NCT03389399",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT03389399",
+      "raw_record": {
+        "nct_id": "NCT03389399",
+        "title": "Pulmonary Physiology and Systemic Inflammatory Signature Investigations in Early Onset Pulmonary Events Associated With Brigatinib Use in Non-Small Cell Lung Cancer and Other Diseases",
+        "status": "COMPLETED",
+        "phase": "N/A",
+        "conditions": [
+          "Non-Small Cell Lung Cancer"
+        ],
+        "interventions": [],
+        "sponsor": "University of Colorado, Denver",
+        "locations": [
+          "University of Colorado Denver, Aurora, United States",
+          "University of Pittsburgh Cancer Institute, Pittsburgh, United States",
+          "Vanderbilt-Ingram Cancer Center, Nashville, United States",
+          "UT Southwestern Harold C Simmons Comprehensive Cancer Center, Dallas, United States",
+          "Princess Margaret Cancer Centre, Toronto, Canada"
+        ],
+        "enrollment": 18,
+        "start_date": "2018-02-22",
+        "completion_date": "2021-10-01",
+        "brief_summary": "To estimate the incidence of Early Onset Pulmonary Events (EOPEs), defined as the proportion of participants with a peak reduction in DLCO of 20% or greater after commencing brigatinib at 90mg QD.",
+        "url": "https://clinicaltrials.gov/study/NCT03389399",
+        "_query": "{'condition': 'non-small cell lung cancer', 'intervention': 'brigatinib', 'status': 'COMPLETED', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 7,
+        "expected_evidence_ids": [
+          "nct:NCT03389399",
+          "nct:NCT03389399",
+          "nct:NCT03389399",
+          "nct:NCT03389399",
+          "nct:NCT03389399",
+          "nct:NCT03389399",
+          "nct:NCT03389399"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT03389399",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CT-NCT03420742",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT03420742",
+      "raw_record": {
+        "nct_id": "NCT03420742",
+        "title": "A Phase 1 Drug-Drug Interaction Study Between Brigatinib and the CYP3A Substrate Midazolam in Patients With ALK-Positive or ROS1-Positive Solid Tumors",
+        "status": "COMPLETED",
+        "phase": "PHASE1",
+        "conditions": [
+          "Carcinoma, Advanced ALK+ or ROS1+Non-Small-Cell Lung, Neoplasm, Advanced ALK+ or ROS1+Solid Tumors"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Midazolam",
+            "description": "Midazolam syrup."
+          },
+          {
+            "type": "DRUG",
+            "name": "Brigatinib",
+            "description": "Brigatinib tablets."
+          }
+        ],
+        "sponsor": "Takeda",
+        "locations": [
+          "Hopital de la Timone, Marseille, France",
+          "Groupe Hospitalier Bichat-Claude Bernard - Hopital Bichat, Paris, France",
+          "Centro di Riferimento Oncologico di Aviano, Aviano, Italy",
+          "Policlinico Sant'Orsola Malpighi, Bologna, Italy",
+          "Ospedale San Raffaele, Milan, Italy",
+          "Istituto Europeo di Oncologia, Milan, Italy",
+          "Azienda Ospedaliero Universitaria di Parma, Parma, Italy",
+          "Ospedale Santa Maria delle Croci, Ravenna, Italy",
+          "Netherlands Cancer Institute, Amsterdam, Netherlands",
+          "Hospital Universitario Dexeus, Barcelona, Spain"
+        ],
+        "enrollment": 24,
+        "start_date": "2019-06-26",
+        "completion_date": "2021-04-29",
+        "brief_summary": "The purpose of this study is to characterize the effect of repeat-dose administration of brigatinib 180 milligram (mg) once daily (QD) on the single-dose pharmacokinetics (PK) of midazolam.",
+        "url": "https://clinicaltrials.gov/study/NCT03420742",
+        "_query": "{'condition': 'non-small cell lung cancer', 'intervention': 'brigatinib', 'status': 'COMPLETED', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 10,
+        "expected_evidence_ids": [
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742",
+          "nct:NCT03420742"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT03420742",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CT-NCT07130032",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT07130032",
+      "raw_record": {
+        "nct_id": "NCT07130032",
+        "title": "A Trial To Compare Efficacy And Safety Of Anti-PD-1/PD-L1 Antibodies In Combination With Bevacizumab And Metronomic Cyclophosphamide In Patients With Non-Small Cell Lung Cancer And Cutaneous Melanoma Previously Treated With Immune Checkpoint Blockade",
+        "status": "RECRUITING",
+        "phase": "PHASE2",
+        "conditions": [
+          "Metastatic Non-small Cell Lung Cancer (NSCLC)",
+          "Metastatic Cutaneous Melanoma"
+        ],
+        "interventions": [
+          {
+            "type": "COMBINATION_PRODUCT",
+            "name": "reICB regimen (NSCLC)",
+            "description": "* ICI (one of the following): Atezolizumab 1200 mg every 3 weeks/Nivolumab 240 mg every 2 weeks/Pembrolizumab 200 mg every 3 weeks\n* Cyclophosphamide 50 mg PO daily\n* Bevacizumab 7.5 mg/kg every 3 weeks"
+          },
+          {
+            "type": "COMBINATION_PRODUCT",
+            "name": "reICB regimen (melanoma)",
+            "description": "* ICI (one of the following): Nivolumab 240 mg every 2 weeks/Pembrolizumab 200 mg every 3 weeks\n* Cyclophosphamide 50 mg PO daily\n* Bevacizumab 7.5 mg/kg every 3 weeks"
+          }
+        ],
+        "sponsor": "EuroCityClinic LLC",
+        "locations": [
+          "EuroCityClinic LLC, Saint Petersburg, Russia"
+        ],
+        "enrollment": 90,
+        "start_date": "2025-08-14",
+        "completion_date": "2027-12",
+        "brief_summary": "This study will evaluate efficacy and safety of anti-PD-1/PD-L1 antibodies combined with bevacizumab and metronomic cyclophosphamide in patients with metastatic non-small cell lung cancer (NSCLC) and cutaneous melanoma previously treated with immune checkpoint blockade (ICB). The hypotheses of this study are that a combination of ICB, cyclophosphamide, and bevacizumab prolongs progression-free survival and overall survival, and also increases rates of objective responses and disease control.",
+        "url": "https://clinicaltrials.gov/study/NCT07130032",
+        "_query": "{'condition': 'melanoma', 'intervention': 'pembrolizumab', 'status': 'RECRUITING', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 10,
+        "expected_evidence_ids": [
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032",
+          "nct:NCT07130032"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT07130032",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT07565285",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT07565285",
+      "raw_record": {
+        "nct_id": "NCT07565285",
+        "title": "A Phase 2 Study to Investigate the Activity of Neoadjuvant PRTX007 Combined With Pembrolizumab in Participants With Stage III Melanoma (INFLECTION-003)",
+        "status": "RECRUITING",
+        "phase": "PHASE2",
+        "conditions": [
+          "Melanoma Stage III"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "PRTX007",
+            "description": "PRTX007 is an orally administered prodrug of PRX034, a Toll-like receptor 7 (TLR7) agonist designed to activate innate and adaptive immune responses.\n\nNEOADJUVANT REGIMEN\n\n* 600 mg orally once daily (safety run-in participants) or\n* 750 mg orally once daily (subsequent participants)\n* Administered 3 days on, 4 days off (7-day cycle)\n* Total of 9 cycles (9 weeks)\n\nADJUVANT REGIMEN (IF NO MPR)\n\n* 750 mg orally once daily\n* Administered 3 days on, 4 days off\n* Total of 12 cycles (12 weeks)"
+          },
+          {
+            "type": "DRUG",
+            "name": "Pembrolizumab",
+            "description": "Pembrolizumab is a programmed cell death protein-1 (PD-1) blocking antibody administered by intravenous infusion\n\nNEOADJUVANT REGIMEN\n\n* 200 mg IV every 3 weeks (Q3W)\n* Total of 3 cycles (9 weeks)\n\nADJUVANT REGIMEN\n\n* 400 mg IV every 6 weeks (Q6W) for 7 cycles OR\n* 200 mg IV every 3 weeks (Q3W) for 14 cycles\n* Total duration: approximately 42 weeks"
+          }
+        ],
+        "sponsor": "Primmune Therapeutics, Inc.",
+        "locations": [
+          "Calvary Mater Newcastle, Waratah, Australia",
+          "Cairns And Hinterland Hospital And Health Service, Cairns, Australia",
+          "Gallipoli Medical Research, Greenslopes, Australia",
+          "Princess Alexandra Hospital, Woolloongabba, Australia",
+          "Peter MacCallum Cancer Centre, Melbourne, Australia",
+          "One Clinical Research Pty Ltd, Nedlands, Australia",
+          "Sir Charles Gairdner Hospital, Nedlands, Australia"
+        ],
+        "enrollment": 48,
+        "start_date": "2026-07-01",
+        "completion_date": "2029-06",
+        "brief_summary": "This Phase 2, multi-center, single-arm study evaluates the safety, tolerability, and activity of neoadjuvant PRTX007 in combination with pembrolizumab in participants with resectable Stage III melanoma. Neoadjuvant immunotherapy has demonstrated improved clinical outcomes compared with adjuvant-only approaches, but there remains a need to enhance pathologic response rates without significant added toxicity.\n\nParticipants will receive oral PRTX007, a Toll-like receptor 7 (TLR7) agonist prodrug, a",
+        "url": "https://clinicaltrials.gov/study/NCT07565285",
+        "_query": "{'condition': 'melanoma', 'intervention': 'pembrolizumab', 'status': 'RECRUITING', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 10,
+        "expected_evidence_ids": [
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285",
+          "nct:NCT07565285"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT07565285",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT05970497",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT05970497",
+      "raw_record": {
+        "nct_id": "NCT05970497",
+        "title": "A Phase 1/2, Open-Label, Multi-Center, Dose Escalation and Expansion Study of KB707 in Subjects With Locally Advanced or Metastatic Solid Tumor Malignancies",
+        "status": "RECRUITING",
+        "phase": "PHASE1, PHASE2",
+        "conditions": [
+          "Cancer",
+          "Melanoma Stage III",
+          "Melanoma Stage IV",
+          "Cutaneous Melanoma"
+        ],
+        "interventions": [
+          {
+            "type": "BIOLOGICAL",
+            "name": "KB707",
+            "description": "Genetically modified herpes simplex type 1 virus"
+          },
+          {
+            "type": "DRUG",
+            "name": "Opdualag",
+            "description": "Dual immunotherapy (PD-1 and LAG-3 immune checkpoint inhibitors)"
+          },
+          {
+            "type": "DRUG",
+            "name": "KEYTRUDA \u00ae( Pembrolizumab)",
+            "description": "Immunotherapy (PD-1 immune checkpoint inhibitor)"
+          }
+        ],
+        "sponsor": "Krystal Biotech, Inc.",
+        "locations": [
+          "UCLA Health, Los Angeles, United States",
+          "Mission Dermatology Center, Rancho Santa Margarita, United States",
+          "BRCR Global, Weston, United States",
+          "IU Simon Comprehensive Cancer Center, Indianapolis, United States",
+          "Henry Ford Cancer Institute, Detroit, United States",
+          "University of Nebraska Medical Center, Omaha, United States",
+          "Morristown Medical Center / Atlantic Health System, Morristown, United States",
+          "Weill Cornell Medicine-New York-Presbyterian Hospital, New York, United States",
+          "Gabrail Cancer Center Research, Canton, United States",
+          "Cleveland Clinic, Cleveland, United States"
+        ],
+        "enrollment": 240,
+        "start_date": "2023-10-31",
+        "completion_date": "2027-07",
+        "brief_summary": "KB707-01 is a Phase 1/2, open-label, multicenter, dose escalation and expansion study. The study will evaluate the safety and tolerability of KB707 in adults with locally advanced or metastatic solid tumors who have progressed on standard of care therapy, cannot tolerate standard of care therapy, refused standard of care therapy, or for whom there is no standard of care therapy as well as the safety, tolerability, preliminary efficacy, and immunologic effect of KB707 administered in combination ",
+        "url": "https://clinicaltrials.gov/study/NCT05970497",
+        "_query": "{'condition': 'melanoma', 'intervention': 'pembrolizumab', 'status': 'RECRUITING', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 11,
+        "expected_evidence_ids": [
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497",
+          "nct:NCT05970497"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT05970497",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": true
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CT-NCT05549297",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT05549297",
+      "raw_record": {
+        "nct_id": "NCT05549297",
+        "title": "Phase 2/3 Randomized Study of Tebentafusp as Monotherapy and in Combination With Pembrolizumab Versus Investigator's Choice in HLA-A*02:01-positive Participants With Previously Treated Advanced Melanoma (TEBE-AM)",
+        "status": "RECRUITING",
+        "phase": "PHASE3",
+        "conditions": [
+          "Advanced Melanoma"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Tebentafusp",
+            "description": "Soluble gp100-specific T cell receptor with anti-CD3 scFV"
+          },
+          {
+            "type": "DRUG",
+            "name": "Tebentafusp with Pembrolizumab",
+            "description": "Soluble gp100-specific T cell receptor with anti-CD3 scFV in combination with pembrolizumab"
+          },
+          {
+            "type": "DRUG",
+            "name": "Investigators Choice",
+            "description": "Investigators choice of therapy"
+          }
+        ],
+        "sponsor": "Immunocore Ltd",
+        "locations": [
+          "Mayo Clinic Arizona, Phoenix, United States",
+          "Mayo Clinic Florida, Jacksonville, United States",
+          "Orlando Health Cancer Institute, Orlando, United States",
+          "Winship Cancer Institute of Emory University, Atlanta, United States",
+          "University of Kansas Cancer Center - Westwood, Westwood, United States",
+          "St Elizabeth Healthcare (St Elizabeth Medical Center), Edgewood, United States",
+          "St Elizabeth Healthcare (St Elizabeth Medical, Edgewood, United States",
+          "Massachusetts General Hospital, Boston, United States",
+          "Beth Israel Deaconess Medical Center (BIDMC), Boston, United States",
+          "Dana Farber Cancer Institute, Boston, United States"
+        ],
+        "enrollment": 540,
+        "start_date": "2022-12-19",
+        "completion_date": "2028-07",
+        "brief_summary": "The purpose of this study is to evaluate the efficacy and safety of tebentafusp-based regimens, including tebentafusp monotherapy and in combination with anti-PD1 vs investigator choice (including clinical trials of investigational agents, salvage therapy per local standard of care \\[SoC\\], best supportive care \\[BSC\\] on protocol survivor follow up) in patients with advanced non-ocular melanoma.",
+        "url": "https://clinicaltrials.gov/study/NCT05549297",
+        "_query": "{'condition': 'melanoma', 'intervention': 'pembrolizumab', 'status': 'RECRUITING', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 11,
+        "expected_evidence_ids": [
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297",
+          "nct:NCT05549297"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT05549297",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT07287917",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT07287917",
+      "raw_record": {
+        "nct_id": "NCT07287917",
+        "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+        "status": "RECRUITING",
+        "phase": "PHASE1, PHASE2",
+        "conditions": [
+          "Melanoma (Skin Cancer)",
+          "HER2-low Hormone Receptor Positive Breast Cancer"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "AMXT 1501 Dicaprate",
+            "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+          },
+          {
+            "type": "DRUG",
+            "name": "DFMO",
+            "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+          },
+          {
+            "type": "DRUG",
+            "name": "Fulvestrant",
+            "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+          },
+          {
+            "type": "DRUG",
+            "name": "Capivasertib",
+            "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+          },
+          {
+            "type": "DRUG",
+            "name": "Pembrolizumab",
+            "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+          }
+        ],
+        "sponsor": "Aminex Therapeutics, Inc.",
+        "locations": [
+          "University of Arizona, Tucson, United States",
+          "University of California-San Diego, La Jolla, United States",
+          "START Los Angeles, Los Angeles, United States",
+          "University of California-San Fransisco, San Francisco, United States",
+          "Skin Cancer Institute, Englewood, United States",
+          "University of Kansas Hospital-Cancer Center, Fairway, United States",
+          "Wayne State University - Barbara Ann Karmanos Cancer Institute, Detroit, United States",
+          "Minnesota Oncology-Sarah Cannon Research Institute, Maple Grove, United States",
+          "START Cancer Research New York-Long Island, Lake Success, United States",
+          "University of Cincinnati Medical Center, Cincinnati, United States"
+        ],
+        "enrollment": 92,
+        "start_date": "2026-01-26",
+        "completion_date": "2028-12-29",
+        "brief_summary": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c",
+        "url": "https://clinicaltrials.gov/study/NCT07287917",
+        "_query": "{'condition': 'melanoma', 'intervention': 'pembrolizumab', 'status': 'RECRUITING', 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 13,
+        "expected_evidence_ids": [
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917",
+          "nct:NCT07287917"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT07287917",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": true
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT06897475",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT06897475",
+      "raw_record": {
+        "nct_id": "NCT06897475",
+        "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+        "status": "RECRUITING",
+        "phase": "PHASE2",
+        "conditions": [
+          "Type 2 Diabetes"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "LY3457263",
+            "description": "Administered SC"
+          },
+          {
+            "type": "DRUG",
+            "name": "Placebo",
+            "description": "Administered SC"
+          }
+        ],
+        "sponsor": "Eli Lilly and Company",
+        "locations": [
+          "Helios Clinical Research - Phoenix, Phoenix, United States",
+          "Wolverine Clinical Trials, Santa Ana, United States",
+          "Renstar Medical Research, Ocala, United States",
+          "Oviedo Medical Research, Oviedo, United States",
+          "Balanced Life Health Care Solutions/SKYCRNG, Lawrenceville, United States",
+          "Physicians Research Associates, Lawrenceville, United States",
+          "Rophe Adult and Pediatric Medicine/SKYCRNG, Union City, United States",
+          "North Georgia Clinical Research, Woodstock, United States",
+          "Elite Clinical Trials, Rexburg, United States",
+          "Investigators Research Group, Brownsburg, United States"
+        ],
+        "enrollment": 200,
+        "start_date": "2025-03-28",
+        "completion_date": "2027-06",
+        "brief_summary": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+        "url": "https://clinicaltrials.gov/study/NCT06897475",
+        "_query": "{'condition': 'type 2 diabetes', 'intervention': 'tirzepatide', 'status': None, 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 10,
+        "expected_evidence_ids": [
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475",
+          "nct:NCT06897475"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT06897475",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT04537923",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT04537923",
+      "raw_record": {
+        "nct_id": "NCT04537923",
+        "title": "A Randomized, Phase 3, Open-label Trial Comparing the Effect of the Addition of Tirzepatide Once Weekly Versus Insulin Lispro (U100) Three Times Daily in Participants With Type 2 Diabetes Inadequately Controlled on Insulin Glargine (U100) With or Without Metformin (SURPASS-6)",
+        "status": "COMPLETED",
+        "phase": "PHASE3",
+        "conditions": [
+          "Type 2 Diabetes"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "Tirzepatide",
+            "description": "Administered SC"
+          },
+          {
+            "type": "DRUG",
+            "name": "Insulin Lispro (U100)",
+            "description": "Administered SC"
+          }
+        ],
+        "sponsor": "Eli Lilly and Company",
+        "locations": [
+          "Syed Research Consultants Llc, Sheffield, United States",
+          "Valley Research, Fresno, United States",
+          "National Research Institute - Huntington Park, Huntington Park, United States",
+          "National Research Institute - Huntington Park, Los Angeles, United States",
+          "Valley Clinical Trials, Inc., Northridge, United States",
+          "National Research Institute - Huntington Park, Panorama City, United States",
+          "National Research Institute (NRI) - Santa Ana, Santa Ana, United States",
+          "Encompass Clinical Research, Spring Valley, United States",
+          "University Clinical Investigators, Inc., Tustin, United States",
+          "University of Colorado, Aurora, United States"
+        ],
+        "enrollment": 1428,
+        "start_date": "2020-10-19",
+        "completion_date": "2022-11-01",
+        "brief_summary": "The purpose of this study is to compare the safety and efficacy of the study drug tirzepatide to insulin lispro (U100) three times a day in participants with type 2 diabetes that are already on insulin glargine (U100), with or without metformin.",
+        "url": "https://clinicaltrials.gov/study/NCT04537923",
+        "_query": "{'condition': 'type 2 diabetes', 'intervention': 'tirzepatide', 'status': None, 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 10,
+        "expected_evidence_ids": [
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923",
+          "nct:NCT04537923"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT04537923",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CT-NCT06937203",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT06937203",
+      "raw_record": {
+        "nct_id": "NCT06937203",
+        "title": "A Phase 1/2A Dose-Escalating Study to Evaluate the Safety, Tolerability, Pharmacokinetics, and Pharmacodynamics of ARO-ALK7 in Adult Volunteers With Obesity With and Without Type 2 Diabetes Mellitus",
+        "status": "RECRUITING",
+        "phase": "PHASE1, PHASE2",
+        "conditions": [
+          "Obesity",
+          "Diabetes Mellitus, Type 2"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "ARO-ALK7",
+            "description": "Subcutaneous (SC) injection"
+          },
+          {
+            "type": "DRUG",
+            "name": "Placebo",
+            "description": "calculated volume to match active treatment by SC injection"
+          }
+        ],
+        "sponsor": "Arrowhead Pharmaceuticals",
+        "locations": [
+          "Research Site 8, Morayfield, Australia",
+          "Research Site 7, Nedlands, Australia",
+          "Research Site 5, Grafton, New Zealand",
+          "Research Site 6, Papatoetoe, New Zealand",
+          "Research Site 3, Takapuna, New Zealand",
+          "Research Site 1, Auckland, New Zealand",
+          "Research Site 2, Christchurch, New Zealand",
+          "Research Site 4, Rotorua, New Zealand"
+        ],
+        "enrollment": 150,
+        "start_date": "2025-05-09",
+        "completion_date": "2027-02",
+        "brief_summary": "This is a Phase 1/2a double-blind dose-escalating study to evaluate the safety, tolerability, pharmacokinetics (PK), and pharmacodynamics (PD) of single and multiple doses of ARO-ALK7 in adult participants with obesity without Type 2 Diabetes Mellitus (T2DM) (Part 1), and the safety, tolerability, and PD of multiple doses of ARO-ALK7 in adult participants with obesity with and without T2DM, either as monotherapy or in combination with tirzepatide (Part 2).",
+        "url": "https://clinicaltrials.gov/study/NCT06937203",
+        "_query": "{'condition': 'type 2 diabetes', 'intervention': 'tirzepatide', 'status': None, 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 10,
+        "expected_evidence_ids": [
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203",
+          "nct:NCT06937203"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT06937203",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CT-NCT07677865",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT07677865",
+      "raw_record": {
+        "nct_id": "NCT07677865",
+        "title": "GLP-1 Receptor Agonists Prevent Alzheimer's Disease Onset, Not Progression: Resolving the Real-World-Randomised Trial Paradox Across Five Continents",
+        "status": "COMPLETED",
+        "phase": "N/A",
+        "conditions": [
+          "Alzheimer Disease",
+          "Diabetes Mellitus Type 2",
+          "Obesity & Overweight"
+        ],
+        "interventions": [
+          {
+            "type": "DRUG",
+            "name": "GLP-1 Receptor Agonists",
+            "description": "like semaglutide\u3001tirzepatide\u3001liraglutide\uff0cetc."
+          },
+          {
+            "type": "DRUG",
+            "name": "DPP-4 Inhibitors",
+            "description": "Sitagliptin,Saxagliptin,Vildagliptin,Linagliptin,Alogliptin etc."
+          }
+        ],
+        "sponsor": "West China Hospital",
+        "locations": [
+          "West China Hospital of Sichuan University, Chengdu, China"
+        ],
+        "enrollment": 213891,
+        "start_date": "2007-01-01",
+        "completion_date": "2026-06-24",
+        "brief_summary": "Background: Seven large real-world cohort studies (N \\> 4 million) have consistently reported that glucagon-like peptide-1 receptor agonists (GLP-1RAs) are associated with a 19-54% lower incidence of Alzheimer's disease (AD). However, in November 2025, the phase 3 EVOKE and EVOKE+ trials of oral semaglutide in 3,808 patients with biomarker-confirmed early-stage AD failed to slow clinical progression. This paradox between real-world evidence (RWE) and randomised evidence has not been systematical",
+        "url": "https://clinicaltrials.gov/study/NCT07677865",
+        "_query": "{'condition': 'type 2 diabetes', 'intervention': 'tirzepatide', 'status': None, 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 9,
+        "expected_evidence_ids": [
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865",
+          "nct:NCT07677865"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT07677865",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": true
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-NCT06657209",
+      "source_path": "clinical_trials",
+      "group_key": "nct:NCT06657209",
+      "raw_record": {
+        "nct_id": "NCT06657209",
+        "title": "Normal-weight Diabetes: Adipocyte-directed Therapy With Pioglitazone or Tirzepatide",
+        "status": "RECRUITING",
+        "phase": "PHASE4",
+        "conditions": [
+          "Diabetes Mellitus, Type 2",
+          "Diabetes",
+          "Type 2 Diabetes",
+          "Pre Diabetes"
+        ],
+        "interventions": [
+          {
+            "type": "PROCEDURE",
+            "name": "Insulin resistance testing",
+            "description": "Steady state Plasma Glucose test"
+          },
+          {
+            "type": "PROCEDURE",
+            "name": "OGTT",
+            "description": "Will collect 5 blood draws during the test to measure insulin secretion"
+          },
+          {
+            "type": "PROCEDURE",
+            "name": "Fat biopsy",
+            "description": "Needle biopsy to gather a sample of abdominal subcutaneous fat"
+          },
+          {
+            "type": "RADIATION",
+            "name": "DXA scan",
+            "description": "Whole body DXA scan"
+          },
+          {
+            "type": "PROCEDURE",
+            "name": "MRI",
+            "description": "Abdominal MRI"
+          },
+          {
+            "type": "PROCEDURE",
+            "name": "1H-MRS",
+            "description": "Spectroscopy of the abdominal region"
+          },
+          {
+            "type": "DRUG",
+            "name": "Tirzepatide",
+            "description": "16 weeks started at 2.5mg/week and increased to 5mg/week dose"
+          },
+          {
+            "type": "DRUG",
+            "name": "Pioglitazone",
+            "description": "16 weeks at a 45mg/day dose"
+          }
+        ],
+        "sponsor": "Stanford University",
+        "locations": [
+          "Stanford University, Palo Alto, United States",
+          "Stanford University, Clinical and Translational Research Unit (CTRU), Stanford, United States"
+        ],
+        "enrollment": 104,
+        "start_date": "2025-01-13",
+        "completion_date": "2027-12-15",
+        "brief_summary": "This study is to investigate how adipocyte (fat cell) function and fat distribution differ between individuals with normal-weight type 2 diabetes (NWD), those with overweight type 2 diabetes (OWD), and normal-weight controls without diabetes (NWC). The study will assess whether adipocyte-directed therapies, specifically pioglitazone and tirzepatide, can improve insulin resistance, adipocyte function, and fat distribution in individuals with NWD. By analyzing the biological mechanisms underlying ",
+        "url": "https://clinicaltrials.gov/study/NCT06657209",
+        "_query": "{'condition': 'type 2 diabetes', 'intervention': 'tirzepatide', 'status': None, 'max_results': 5}"
+      },
+      "gold": {
+        "expected_evidence_count": 16,
+        "expected_evidence_ids": [
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209",
+          "nct:NCT06657209"
+        ],
+        "expected_source_url": "https://clinicaltrials.gov/study/NCT06657209",
+        "expected_evidence_types_multiset": [
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_field",
+          "trial_phase",
+          "trial_status"
+        ],
+        "expected_skip": false,
+        "brief_summary_truncated": true
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-search_by_target-CHEMBL6329",
+      "source_path": "chembl_search_by_target",
+      "group_key": "chembl:CHEMBL6329",
+      "raw_record": {
+        "chembl_id": "CHEMBL6329",
+        "name": null,
+        "molecule_type": "Small molecule",
+        "molecular_weight": "341.75",
+        "alogp": "2.11",
+        "development_phase": "Unknown",
+        "max_phase": null,
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL6329/",
+        "_query": "EGFR"
+      },
+      "gold": {
+        "chembl_operation": "search_by_target",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL6329/",
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_real_content_moa_and_name_both_placeholder_or_absent"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-search_by_target-CHEMBL6328",
+      "source_path": "chembl_search_by_target",
+      "group_key": "chembl:CHEMBL6328",
+      "raw_record": {
+        "chembl_id": "CHEMBL6328",
+        "name": null,
+        "molecule_type": "Small molecule",
+        "molecular_weight": "332.32",
+        "alogp": "1.33",
+        "development_phase": "Unknown",
+        "max_phase": null,
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL6328/",
+        "_query": "EGFR"
+      },
+      "gold": {
+        "chembl_operation": "search_by_target",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL6328/",
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_real_content_moa_and_name_both_placeholder_or_absent"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-search_by_target-CHEMBL265667",
+      "source_path": "chembl_search_by_target",
+      "group_key": "chembl:CHEMBL265667",
+      "raw_record": {
+        "chembl_id": "CHEMBL265667",
+        "name": null,
+        "molecule_type": "Small molecule",
+        "molecular_weight": "357.80",
+        "alogp": "2.27",
+        "development_phase": "Unknown",
+        "max_phase": null,
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL265667/",
+        "_query": "EGFR"
+      },
+      "gold": {
+        "chembl_operation": "search_by_target",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL265667/",
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_real_content_moa_and_name_both_placeholder_or_absent"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-search_by_target-CHEMBL6362",
+      "source_path": "chembl_search_by_target",
+      "group_key": "chembl:CHEMBL6362",
+      "raw_record": {
+        "chembl_id": "CHEMBL6362",
+        "name": null,
+        "molecule_type": "Small molecule",
+        "molecular_weight": "307.31",
+        "alogp": "1.46",
+        "development_phase": "Unknown",
+        "max_phase": null,
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL6362/",
+        "_query": "EGFR"
+      },
+      "gold": {
+        "chembl_operation": "search_by_target",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL6362/",
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_real_content_moa_and_name_both_placeholder_or_absent"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-search_by_target-CHEMBL267864",
+      "source_path": "chembl_search_by_target",
+      "group_key": "chembl:CHEMBL267864",
+      "raw_record": {
+        "chembl_id": "CHEMBL267864",
+        "name": null,
+        "molecule_type": "Small molecule",
+        "molecular_weight": "341.75",
+        "alogp": "2.11",
+        "development_phase": "Unknown",
+        "max_phase": null,
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL267864/",
+        "_query": "EGFR"
+      },
+      "gold": {
+        "chembl_operation": "search_by_target",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL267864/",
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_real_content_moa_and_name_both_placeholder_or_absent"
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CHEMBL-get_drug_info-CHEMBL941",
+      "source_path": "chembl_get_drug_info",
+      "group_key": "chembl:CHEMBL941",
+      "raw_record": {
+        "chembl_id": "CHEMBL941",
+        "name": "IMATINIB",
+        "molecule_type": "Small molecule",
+        "molecular_weight": "493.62",
+        "alogp": "4.59",
+        "development_phase": "Unknown",
+        "max_phase": "4.0",
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL941/",
+        "_query": "CHEMBL941"
+      },
+      "gold": {
+        "chembl_operation": "get_drug_info",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL941"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL941/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-get_drug_info-CHEMBL3353410",
+      "source_path": "chembl_get_drug_info",
+      "group_key": "chembl:CHEMBL3353410",
+      "raw_record": {
+        "chembl_id": "CHEMBL3353410",
+        "name": "OSIMERTINIB",
+        "molecule_type": "Small molecule",
+        "molecular_weight": "499.62",
+        "alogp": "4.51",
+        "development_phase": "Unknown",
+        "max_phase": "4.0",
+        "mechanism_of_action": "Not available",
+        "mechanisms": [],
+        "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL3353410/",
+        "_query": "CHEMBL3353410"
+      },
+      "gold": {
+        "chembl_operation": "get_drug_info",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL3353410"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL3353410/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CHEMBL-search_by_indication-CHEMBL1201438",
+      "source_path": "chembl_search_by_indication",
+      "group_key": "chembl:CHEMBL1201438",
+      "raw_record": {
+        "chembl_id": "CHEMBL1201438",
+        "drug_name": "",
+        "indication": "Melanoma",
+        "max_phase": "4.0",
+        "efo_term": "metastatic melanoma",
+        "_query": "melanoma"
+      },
+      "gold": {
+        "chembl_operation": "search_by_indication",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL1201438"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1201438/",
+        "expected_evidence_types": [
+          "indication"
+        ],
+        "expected_skip": false
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-search_by_indication-CHEMBL467",
+      "source_path": "chembl_search_by_indication",
+      "group_key": "chembl:CHEMBL467",
+      "raw_record": {
+        "chembl_id": "CHEMBL467",
+        "drug_name": "",
+        "indication": "Melanoma",
+        "max_phase": "4.0",
+        "efo_term": "melanoma",
+        "_query": "melanoma"
+      },
+      "gold": {
+        "chembl_operation": "search_by_indication",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL467"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL467/",
+        "expected_evidence_types": [
+          "indication"
+        ],
+        "expected_skip": false
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CHEMBL-search_by_indication-CHEMBL1789844",
+      "source_path": "chembl_search_by_indication",
+      "group_key": "chembl:CHEMBL1789844",
+      "raw_record": {
+        "chembl_id": "CHEMBL1789844",
+        "drug_name": "",
+        "indication": "Melanoma",
+        "max_phase": "4.0",
+        "efo_term": "melanoma",
+        "_query": "melanoma"
+      },
+      "gold": {
+        "chembl_operation": "search_by_indication",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL1789844"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1789844/",
+        "expected_evidence_types": [
+          "indication"
+        ],
+        "expected_skip": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-search_by_indication-CHEMBL2105704",
+      "source_path": "chembl_search_by_indication",
+      "group_key": "chembl:CHEMBL2105704",
+      "raw_record": {
+        "chembl_id": "CHEMBL2105704",
+        "drug_name": "",
+        "indication": "Melanoma",
+        "max_phase": "1.0",
+        "efo_term": "metastatic melanoma",
+        "_query": "melanoma"
+      },
+      "gold": {
+        "chembl_operation": "search_by_indication",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL2105704"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL2105704/",
+        "expected_evidence_types": [
+          "indication"
+        ],
+        "expected_skip": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-search_by_indication-CHEMBL428647",
+      "source_path": "chembl_search_by_indication",
+      "group_key": "chembl:CHEMBL428647",
+      "raw_record": {
+        "chembl_id": "CHEMBL428647",
+        "drug_name": "",
+        "indication": "Melanoma",
+        "max_phase": "3.0",
+        "efo_term": "melanoma",
+        "_query": "melanoma"
+      },
+      "gold": {
+        "chembl_operation": "search_by_indication",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL428647"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL428647/",
+        "expected_evidence_types": [
+          "indication"
+        ],
+        "expected_skip": false
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-resolve-osimertinib",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "chembl:CHEMBL3353410",
+      "raw_record": {
+        "input_name": "osimertinib",
+        "normalized_name": "osimertinib",
+        "matched_name": "OSIMERTINIB",
+        "chembl_id": "CHEMBL3353410",
+        "preferred_name": "OSIMERTINIB",
+        "match_type": "exact_preferred_name",
+        "candidates": []
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "exact_preferred_name",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL3353410"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL3353410/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "phase5_heldout"
+    },
+    {
+      "case_id": "CHEMBL-resolve-Tagrisso",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "resolve_input:Tagrisso",
+      "raw_record": {
+        "input_name": "Tagrisso",
+        "normalized_name": "Tagrisso",
+        "matched_name": null,
+        "chembl_id": null,
+        "preferred_name": null,
+        "match_type": "ambiguous_match",
+        "candidates": [
+          {
+            "chembl_id": "CHEMBL3353410",
+            "preferred_name": "OSIMERTINIB"
+          },
+          {
+            "chembl_id": "CHEMBL3545063",
+            "preferred_name": "OSIMERTINIB MESYLATE"
+          }
+        ]
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "ambiguous_match",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_match_or_ambiguous"
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-resolve-CHEMBL941",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "chembl:CHEMBL941",
+      "raw_record": {
+        "input_name": "CHEMBL941",
+        "normalized_name": "CHEMBL941",
+        "matched_name": "IMATINIB",
+        "chembl_id": "CHEMBL941",
+        "preferred_name": "IMATINIB",
+        "match_type": "exact_id_passthrough",
+        "candidates": []
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "exact_id_passthrough",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL941"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL941/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-resolve-Zorblatinix-9X",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "resolve_input:Zorblatinix-9X",
+      "raw_record": {
+        "input_name": "Zorblatinix-9X",
+        "normalized_name": "Zorblatinix-9X",
+        "matched_name": null,
+        "chembl_id": null,
+        "preferred_name": null,
+        "match_type": "no_match",
+        "candidates": []
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "no_match",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_match_or_ambiguous"
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-resolve-aspirin",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "chembl:CHEMBL25",
+      "raw_record": {
+        "input_name": "aspirin",
+        "normalized_name": "aspirin",
+        "matched_name": "ASPIRIN",
+        "chembl_id": "CHEMBL25",
+        "preferred_name": "ASPIRIN",
+        "match_type": "exact_preferred_name",
+        "candidates": []
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "exact_preferred_name",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL25"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL25/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-resolve-asprin",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "chembl:CHEMBL25",
+      "raw_record": {
+        "input_name": "asprin",
+        "normalized_name": "asprin",
+        "matched_name": "ASPIRIN",
+        "chembl_id": "CHEMBL25",
+        "preferred_name": "ASPIRIN",
+        "match_type": "fuzzy",
+        "candidates": []
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "fuzzy",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL25"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL25/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-resolve-Keytruda",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "chembl:CHEMBL3137343",
+      "raw_record": {
+        "input_name": "Keytruda",
+        "normalized_name": "Keytruda",
+        "matched_name": "Keytruda",
+        "chembl_id": "CHEMBL3137343",
+        "preferred_name": "PEMBROLIZUMAB",
+        "match_type": "exact_synonym",
+        "candidates": []
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "exact_synonym",
+        "expected_evidence_count": 1,
+        "expected_evidence_ids": [
+          "chembl:CHEMBL3137343"
+        ],
+        "expected_source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL3137343/",
+        "expected_evidence_types": [
+          "compound_identity"
+        ],
+        "expected_skip": false,
+        "expected_skip_reason": null
+      },
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-resolve-Gleevec",
+      "source_path": "chembl_resolve_compound_name",
+      "group_key": "resolve_input:Gleevec",
+      "raw_record": {
+        "input_name": "Gleevec",
+        "normalized_name": "Gleevec",
+        "matched_name": null,
+        "chembl_id": null,
+        "preferred_name": null,
+        "match_type": "ambiguous_match",
+        "candidates": [
+          {
+            "chembl_id": "CHEMBL941",
+            "preferred_name": "IMATINIB"
+          },
+          {
+            "chembl_id": "CHEMBL1642",
+            "preferred_name": "IMATINIB MESYLATE"
+          }
+        ]
+      },
+      "gold": {
+        "chembl_operation": "resolve_compound_name",
+        "match_type": "ambiguous_match",
+        "expected_evidence_count": 0,
+        "expected_evidence_ids": [],
+        "expected_source_url": null,
+        "expected_evidence_types": [],
+        "expected_skip": true,
+        "expected_skip_reason": "no_match_or_ambiguous"
+      },
+      "split": "development"
+    }
+  ]
+}

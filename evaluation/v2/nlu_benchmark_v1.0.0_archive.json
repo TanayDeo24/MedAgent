@@ -1,0 +1,4385 @@
+{
+  "benchmark_name": "nlu_benchmark",
+  "version": "1.0.0",
+  "creation_date": "2026-09-23",
+  "schema_version": "2.0.0",
+  "annotation_methodology_ref": "docs/v2/BENCHMARK_PLAN.md#a-nlu-benchmark",
+  "split_seed": 20260923,
+  "split_sizes": {
+    "dev": 45,
+    "test": 105,
+    "total": 150
+  },
+  "label_definition_ref": "docs/v2/EVALUATION_CONTRACT.md#1-query-understanding-nlu-metrics",
+  "provenance": "150 queries generated in this Phase 2 session. 105 queries (classes A-G) were built from 24 deterministic templates parameterized over a curated, live-API-verified entity list (8 diseases via NLM MeSH lookup, 8 genes/targets via HGNC rest.genenames.org, 8 compounds via ChEMBL's own REST API - all verified during this session, IDs recorded in nlu/normalization.py) - gold intent/entities/constraints/required_sources are the template's own substitution parameters, not an LLM opinion. 30 queries (classes H, I) were hand-authored directly by the agent acting as the session's human reviewer (per explicit task instruction, since no other human reviewer was available), with labels assigned by direct reading of each query's text, not by asking an LLM for the correct label. No query in this benchmark had its gold label produced by asking an LLM 'what is the correct label' and accepting the answer - this is a hard requirement per BENCHMARK_PLAN.md 3.",
+  "known_limitations": [
+    "Single-annotator (the agent, acting as reviewer) - no second independent human annotator or adjudication pass was available in this session; BENCHMARK_PLAN.md calls for >=1 reviewer minimum, which is met, but inter-annotator agreement could not be computed.",
+    "Template-generated examples (105/150) are lexically homogeneous within a template family - real user queries will have more surface-form variety than 24 fixed templates capture; this is a known ceiling-effect risk on extraction metrics, flagged for a future benchmark revision.",
+    "Entity normalization gold labels are limited to the 24 curated entities (8 disease/8 gene/8 compound) in nlu/normalization.py's tables - normalization accuracy on this benchmark does not generalize to entities outside that table.",
+    "Class boundary D vs E and B vs G were assigned using the fixed rule in nlu/taxonomy.py (DI_VS_E_RULE) applied by the agent during template design, not validated by a second annotator.",
+    "n=15-23 per class is enough for a first F1 estimate per BENCHMARK_PLAN.md's own stated expectation, not for a tight confidence interval - reported explicitly per class, not just in aggregate."
+  ],
+  "dev": [
+    {
+      "query_id": "nlu_v1_0107",
+      "query_text": "Find completed Phase 2 trials in pediatric patients with melanoma using KRAS inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::KRAS::melanoma::2::completed::pediatric patients",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0123",
+      "query_text": "What Phase 3 trial data supports using metformin as a treatment for progeria?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::830cf1c1",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0018",
+      "query_text": "What Phase 3 trials are evaluating sotorasib in type 2 diabetes?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::sotorasib::type 2 diabetes::3",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0111",
+      "query_text": "Find active, not recruiting Phase 3 trials in elderly patients with Alzheimer's disease using HER2 inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::HER2::Alzheimer's disease::3::active, not recruiting::elderly patients",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0130",
+      "query_text": "Is vemurafenib approved anywhere in the world for treating tooth decay?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::f31cd13d",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0048",
+      "query_text": "Which BTK inhibitors have both published evidence and active trials in type 2 diabetes?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::BTK::type 2 diabetes",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0119",
+      "query_text": "Find active, not recruiting trials for pembrolizumab in elderly patients",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::pembrolizumab::active, not recruiting::elderly patients",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0013",
+      "query_text": "What evidence supports PD-1 as a therapeutic target in breast cancer?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::PD-1::breast cancer",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0084",
+      "query_text": "By what biochemical pathway does adagrasib inhibit mTOR signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        },
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::adagrasib::mTOR",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0080",
+      "query_text": "How does vemurafenib work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::vemurafenib",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0055",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for melanoma?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::melanoma",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0140",
+      "query_text": "What's new in cancer research?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::2bef4a96",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0083",
+      "query_text": "How does metformin work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::metformin",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0112",
+      "query_text": "Find recruiting Phase 1 trials in adults with multiple myeloma using JAK2 inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::JAK2::multiple myeloma::1::recruiting::adults",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0110",
+      "query_text": "Find completed Phase 2 trials in pediatric patients with rheumatoid arthritis using BRAF inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::BRAF::rheumatoid arthritis::2::completed::pediatric patients",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "query_text": "Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::PD-1::breast cancer::1::recruiting::adults",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0149",
+      "query_text": "Compare the two approved drugs for the disease.",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::aa2365f8",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0071",
+      "query_text": "What is the mechanism of action of sotorasib against BTK?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::sotorasib::BTK",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0100",
+      "query_text": "Starting from compounds that inhibit KRAS, which ones progressed to trials in melanoma and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::KRAS::melanoma",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0002",
+      "query_text": "What does published research say about KRAS inhibition in melanoma?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::KRAS::melanoma",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "query_text": "Is metformin supported by both peer-reviewed literature and an active clinical trial for multiple myeloma?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::metformin::multiple myeloma",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "query_text": "Which compounds target HER2 and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::HER2",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0106",
+      "query_text": "Find recruiting Phase 1 trials in adults with non-small cell lung cancer using EGFR inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::EGFR::non-small cell lung cancer::1::recruiting::adults",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0017",
+      "query_text": "What Phase 2 trials are evaluating osimertinib in melanoma?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::osimertinib::melanoma::2",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0085",
+      "query_text": "By what biochemical pathway does metformin inhibit JAK2 signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::metformin::JAK2",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0091",
+      "query_text": "Which compounds targeting EGFR have entered trials for non-small cell lung cancer, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::EGFR::non-small cell lung cancer",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0060",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for multiple myeloma?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::multiple myeloma",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0132",
+      "query_text": "Does published research show JAK2 inhibition is effective for hair regrowth?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::0e644999",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0134",
+      "query_text": "Are there recruiting trials studying BTK inhibitors for treating the flu?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::e4106bbc",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0064",
+      "query_text": "Is vemurafenib supported by both peer-reviewed literature and an active clinical trial for breast cancer?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::vemurafenib::breast cancer",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0098",
+      "query_text": "Which compounds targeting mTOR have entered trials for psoriasis, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::mTOR::psoriasis",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0136",
+      "query_text": "Tell me about KRAS inhibitors.",
+      "intent_class": "I_ambiguous",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::fcfff0cf",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0115",
+      "query_text": "Find completed trials for osimertinib in pediatric patients",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::osimertinib::completed::pediatric patients",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0007",
+      "query_text": "What does published research say about JAK2 inhibition in multiple myeloma?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::JAK2::multiple myeloma",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0148",
+      "query_text": "What does the literature say about the treatment?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::a7274b68",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "query_text": "Starting from compounds that inhibit EGFR, which ones progressed to trials in non-small cell lung cancer and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::EGFR::non-small cell lung cancer",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0022",
+      "query_text": "What Phase 1 trials are evaluating metformin in multiple myeloma?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::metformin::multiple myeloma::1",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0016",
+      "query_text": "What Phase 1 trials are evaluating erlotinib in non-small cell lung cancer?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::erlotinib::non-small cell lung cancer::1",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0031",
+      "query_text": "Which compounds target EGFR and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::EGFR",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0019",
+      "query_text": "What Phase 1 trials are evaluating vemurafenib in breast cancer?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::vemurafenib::breast cancer::1",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0063",
+      "query_text": "Is sotorasib supported by both peer-reviewed literature and an active clinical trial for type 2 diabetes?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::sotorasib::type 2 diabetes",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0073",
+      "query_text": "What is the mechanism of action of ibrutinib against BRAF?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        },
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::ibrutinib::BRAF",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0025",
+      "query_text": "Are there completed trials studying metformin for multiple myeloma?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::metformin::multiple myeloma::completed",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0139",
+      "query_text": "Is this drug safe?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::e38edfc9",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "dev"
+    },
+    {
+      "query_id": "nlu_v1_0012",
+      "query_text": "What evidence supports BRAF as a therapeutic target in rheumatoid arthritis?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::BRAF::rheumatoid arthritis",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "dev"
+    }
+  ],
+  "test": [
+    {
+      "query_id": "nlu_v1_0113",
+      "query_text": "Find completed Phase 2 trials in pediatric patients with psoriasis using mTOR inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::mTOR::psoriasis::2::completed::pediatric patients",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0015",
+      "query_text": "What evidence supports KRAS as a therapeutic target in melanoma?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::KRAS::melanoma",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0038",
+      "query_text": "Which compounds target mTOR and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::mTOR",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0059",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for Alzheimer's disease?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::Alzheimer's disease",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0116",
+      "query_text": "Find active, not recruiting trials for sotorasib in elderly patients",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::sotorasib::active, not recruiting::elderly patients",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0011",
+      "query_text": "What evidence supports HER2 as a therapeutic target in Alzheimer's disease?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::HER2::Alzheimer's disease",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0058",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for rheumatoid arthritis?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::rheumatoid arthritis",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0072",
+      "query_text": "What is the mechanism of action of vemurafenib against PD-1?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::vemurafenib::PD-1",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0040",
+      "query_text": "What is known about the bioactivity of compounds acting on KRAS?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::KRAS",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0150",
+      "query_text": "What's the mechanism?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::6798c81f",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0087",
+      "query_text": "By what biochemical pathway does ibrutinib inhibit BRAF signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        },
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::ibrutinib::BRAF",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0147",
+      "query_text": "Tell me about recent trials.",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::2f4dffcd",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0145",
+      "query_text": "Are there any good options for my condition?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::c0179c33",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0074",
+      "query_text": "What is the mechanism of action of pembrolizumab against HER2?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        },
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::pembrolizumab::HER2",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0065",
+      "query_text": "Is ibrutinib supported by both peer-reviewed literature and an active clinical trial for rheumatoid arthritis?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::ibrutinib::rheumatoid arthritis",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0027",
+      "query_text": "Are there recruiting trials studying ibrutinib for rheumatoid arthritis?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::ibrutinib::rheumatoid arthritis::recruiting",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0114",
+      "query_text": "Find recruiting trials for erlotinib in adults",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::erlotinib::recruiting::adults",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0057",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for breast cancer?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::breast cancer",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0070",
+      "query_text": "What is the mechanism of action of osimertinib against KRAS?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        },
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::osimertinib::KRAS",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0050",
+      "query_text": "Which BRAF inhibitors have both published evidence and active trials in rheumatoid arthritis?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::BRAF::rheumatoid arthritis",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0127",
+      "query_text": "What published literature supports pembrolizumab as a treatment for the common cold?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::75cb9fe5",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0021",
+      "query_text": "What Phase 3 trials are evaluating pembrolizumab in Alzheimer's disease?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::pembrolizumab::Alzheimer's disease::3",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0042",
+      "query_text": "What is known about the bioactivity of compounds acting on PD-1?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::PD-1",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0049",
+      "query_text": "Which PD-1 inhibitors have both published evidence and active trials in breast cancer?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::PD-1::breast cancer",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0035",
+      "query_text": "Which compounds target BRAF and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::BRAF",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0010",
+      "query_text": "What evidence supports JAK2 as a therapeutic target in multiple myeloma?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::JAK2::multiple myeloma",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0037",
+      "query_text": "Which compounds target JAK2 and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::JAK2",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0144",
+      "query_text": "What about BRAF?",
+      "intent_class": "I_ambiguous",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::829d175f",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0062",
+      "query_text": "Is osimertinib supported by both peer-reviewed literature and an active clinical trial for melanoma?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::osimertinib::melanoma",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0103",
+      "query_text": "Starting from compounds that inhibit BRAF, which ones progressed to trials in rheumatoid arthritis and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::BRAF::rheumatoid arthritis",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0101",
+      "query_text": "Starting from compounds that inhibit BTK, which ones progressed to trials in type 2 diabetes and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::BTK::type 2 diabetes",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0138",
+      "query_text": "What trials are recruiting for RA patients?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::58a6cce8",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0076",
+      "query_text": "What is the mechanism of action of adagrasib against mTOR?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        },
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::adagrasib::mTOR",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0006",
+      "query_text": "What does published research say about HER2 inhibition in Alzheimer's disease?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::HER2::Alzheimer's disease",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0029",
+      "query_text": "Are there active, not recruiting trials studying sotorasib for type 2 diabetes?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::sotorasib::type 2 diabetes::active, not recruiting",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0056",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for type 2 diabetes?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::type 2 diabetes",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0097",
+      "query_text": "Which compounds targeting JAK2 have entered trials for multiple myeloma, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::JAK2::multiple myeloma",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0043",
+      "query_text": "What is known about the bioactivity of compounds acting on BRAF?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::BRAF",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0039",
+      "query_text": "What is known about the bioactivity of compounds acting on EGFR?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::EGFR",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0095",
+      "query_text": "Which compounds targeting BRAF have entered trials for rheumatoid arthritis, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::BRAF::rheumatoid arthritis",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0096",
+      "query_text": "Which compounds targeting HER2 have entered trials for Alzheimer's disease, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::HER2::Alzheimer's disease",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0041",
+      "query_text": "What is known about the bioactivity of compounds acting on BTK?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::BTK",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0142",
+      "query_text": "What treatments are available for autoimmune disease?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::07d7961e",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0141",
+      "query_text": "Tell me about EGFR.",
+      "intent_class": "I_ambiguous",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::77fc0ef2",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0001",
+      "query_text": "What does published research say about EGFR inhibition in non-small cell lung cancer?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::EGFR::non-small cell lung cancer",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0131",
+      "query_text": "What trials have investigated 'Compound QQ-000' for any indication?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::1bb7d302",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0117",
+      "query_text": "Find recruiting trials for vemurafenib in adults",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::vemurafenib::recruiting::adults",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0118",
+      "query_text": "Find completed trials for ibrutinib in pediatric patients",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::ibrutinib::completed::pediatric patients",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0077",
+      "query_text": "How does erlotinib work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::erlotinib",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0133",
+      "query_text": "What is the reported bioactivity of the non-existent compound 'Placebolex-9'?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "chembl"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::bd18816a",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0125",
+      "query_text": "What ChEMBL bioactivity data exists for the compound 'Zenithrocaine'?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "chembl"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::1015aa05",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0023",
+      "query_text": "What Phase 2 trials are evaluating adagrasib in psoriasis?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::adagrasib::psoriasis::2",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0078",
+      "query_text": "How does osimertinib work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::osimertinib",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0088",
+      "query_text": "By what biochemical pathway does vemurafenib inhibit PD-1 signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::vemurafenib::PD-1",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0030",
+      "query_text": "Are there recruiting trials studying osimertinib for melanoma?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::osimertinib::melanoma::recruiting",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0045",
+      "query_text": "What is known about the bioactivity of compounds acting on JAK2?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::JAK2",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0121",
+      "query_text": "What clinical trials exist for compound XR-9917-alpha in treating Kleinberg-Farsi syndrome?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::ba734ff2",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0089",
+      "query_text": "By what biochemical pathway does sotorasib inhibit BTK signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::sotorasib::BTK",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0069",
+      "query_text": "What is the mechanism of action of erlotinib against EGFR?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB"
+        },
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::erlotinib::EGFR",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0075",
+      "query_text": "What is the mechanism of action of metformin against JAK2?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF::metformin::JAK2",
+      "provenance_note": "template F: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0034",
+      "query_text": "Which compounds target PD-1 and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::PD-1",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0047",
+      "query_text": "Which KRAS inhibitors have both published evidence and active trials in melanoma?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::KRAS::melanoma",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0052",
+      "query_text": "Which JAK2 inhibitors have both published evidence and active trials in multiple myeloma?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::JAK2::multiple myeloma",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0033",
+      "query_text": "Which compounds target BTK and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::BTK",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0004",
+      "query_text": "What does published research say about PD-1 inhibition in breast cancer?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::PD-1::breast cancer",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0044",
+      "query_text": "What is known about the bioactivity of compounds acting on HER2?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC2::HER2",
+      "provenance_note": "template C2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0135",
+      "query_text": "What published evidence links HER2 status to improved eyesight?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::97e09603",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0026",
+      "query_text": "Are there active, not recruiting trials studying pembrolizumab for Alzheimer's disease?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::pembrolizumab::Alzheimer's disease::active, not recruiting",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0093",
+      "query_text": "Which compounds targeting BTK have entered trials for type 2 diabetes, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::BTK::type 2 diabetes",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0146",
+      "query_text": "What trials exist for the drug?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::2fab364f",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0126",
+      "query_text": "Are there any completed Phase 4 trials proving osimertinib cures baldness?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE4"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::1e867092",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0105",
+      "query_text": "Starting from compounds that inhibit JAK2, which ones progressed to trials in multiple myeloma and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::JAK2::multiple myeloma",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0032",
+      "query_text": "Which compounds target KRAS and what activity is reported?",
+      "intent_class": "C_compound_target",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplC::KRAS",
+      "provenance_note": "template C: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0053",
+      "query_text": "Which mTOR inhibitors have both published evidence and active trials in psoriasis?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::mTOR::psoriasis",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0054",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for non-small cell lung cancer?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD2::non-small cell lung cancer",
+      "provenance_note": "template D2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0108",
+      "query_text": "Find active, not recruiting Phase 3 trials in elderly patients with type 2 diabetes using BTK inhibitors",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG::BTK::type 2 diabetes::3::active, not recruiting::elderly patients",
+      "provenance_note": "template G: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0094",
+      "query_text": "Which compounds targeting PD-1 have entered trials for breast cancer, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::PD-1::breast cancer",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0092",
+      "query_text": "Which compounds targeting KRAS have entered trials for melanoma, and what published efficacy evidence exists?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE::KRAS::melanoma",
+      "provenance_note": "template E: gold entities/intent/sources are the template's own substituted parameters; D-vs-E rule applied - ChEMBL result causally required before the ClinicalTrials/PubMed hops can be formed",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0104",
+      "query_text": "Starting from compounds that inhibit HER2, which ones progressed to trials in Alzheimer's disease and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::HER2::Alzheimer's disease",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0020",
+      "query_text": "What Phase 2 trials are evaluating ibrutinib in rheumatoid arthritis?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB::ibrutinib::rheumatoid arthritis::2",
+      "provenance_note": "template B: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0129",
+      "query_text": "What clinical evidence exists for using adagrasib to treat seasonal allergies?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::03e21441",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0090",
+      "query_text": "By what biochemical pathway does osimertinib inhibit KRAS signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        },
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::osimertinib::KRAS",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0014",
+      "query_text": "What evidence supports BTK as a therapeutic target in type 2 diabetes?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::BTK::type 2 diabetes",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0082",
+      "query_text": "How does pembrolizumab work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::pembrolizumab",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0137",
+      "query_text": "What are the treatment options for MS?",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::af3a65c9",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0005",
+      "query_text": "What does published research say about BRAF inhibition in rheumatoid arthritis?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::BRAF::rheumatoid arthritis",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0066",
+      "query_text": "Is pembrolizumab supported by both peer-reviewed literature and an active clinical trial for Alzheimer's disease?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::pembrolizumab::Alzheimer's disease",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0081",
+      "query_text": "How does ibrutinib work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::ibrutinib",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0024",
+      "query_text": "Are there recruiting trials studying adagrasib for psoriasis?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::adagrasib::psoriasis::recruiting",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0028",
+      "query_text": "Are there completed trials studying vemurafenib for breast cancer?",
+      "intent_class": "B_clinical_trial_landscape",
+      "entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplB2::vemurafenib::breast cancer::completed",
+      "provenance_note": "template B2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0122",
+      "query_text": "Is there published evidence that vitamin C injections cure stage 4 glioblastoma?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::1cdc5bfe",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0008",
+      "query_text": "What does published research say about mTOR inhibition in psoriasis?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::mTOR::psoriasis",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0143",
+      "query_text": "Find compounds for the target.",
+      "intent_class": "I_ambiguous",
+      "entities": [],
+      "constraints": [],
+      "required_sources": [
+        "chembl"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplI::3b1bd7d7",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - each is genuinely underspecified (missing disease/target/drug/population context needed to answer, or a known-ambiguous abbreviation such as 'MS'/'RA' deliberately not resolved), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0061",
+      "query_text": "Is erlotinib supported by both peer-reviewed literature and an active clinical trial for non-small cell lung cancer?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::erlotinib::non-small cell lung cancer",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0128",
+      "query_text": "Does sotorasib have documented activity against a target called 'FICTIONALKINASE1'?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::d483ada3",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0003",
+      "query_text": "What does published research say about BTK inhibition in type 2 diabetes?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "easy",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA::BTK::type 2 diabetes",
+      "provenance_note": "template A: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0009",
+      "query_text": "What evidence supports mTOR as a therapeutic target in psoriasis?",
+      "intent_class": "A_literature_evidence",
+      "entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplA2::mTOR::psoriasis",
+      "provenance_note": "template A2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0068",
+      "query_text": "Is adagrasib supported by both peer-reviewed literature and an active clinical trial for psoriasis?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD3::adagrasib::psoriasis",
+      "provenance_note": "template D3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0124",
+      "query_text": "Has ibrutinib been studied for treating the common cold?",
+      "intent_class": "H_insufficient_evidence",
+      "entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "ambiguous",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplH::61e9d80d",
+      "provenance_note": "hand-authored by the agent (acting as human reviewer this session); label assigned by direct reading of the query text - constructed to name a real-sounding but genuinely evidence-deficient combination (fictional compound/disease/indication pairing), not derived by asking an LLM what the label should be",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0120",
+      "query_text": "Find recruiting trials for metformin in adults",
+      "intent_class": "G_constraint_heavy",
+      "entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "required_sources": [
+        "clinicaltrials"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplG2::metformin::recruiting::adults",
+      "provenance_note": "template G2: gold entities/intent/constraints/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0046",
+      "query_text": "Which EGFR inhibitors have both published evidence and active trials in non-small cell lung cancer?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::EGFR::non-small cell lung cancer",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0086",
+      "query_text": "By what biochemical pathway does pembrolizumab inhibit HER2 signaling?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        },
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF3::pembrolizumab::HER2",
+      "provenance_note": "template F3: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0102",
+      "query_text": "Starting from compounds that inhibit PD-1, which ones progressed to trials in breast cancer and what do published studies report on their outcomes?",
+      "intent_class": "E_multi_hop_research",
+      "entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "chembl",
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "difficulty": "hard",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplE2::PD-1::breast cancer",
+      "provenance_note": "template E2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0051",
+      "query_text": "Which HER2 inhibitors have both published evidence and active trials in Alzheimer's disease?",
+      "intent_class": "D_cross_source_synthesis",
+      "entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplD::HER2::Alzheimer's disease",
+      "provenance_note": "template D: gold entities/intent/constraints/sources are the template's own substituted parameters; D-vs-E rule (nlu/taxonomy.py DI_VS_E_RULE) applied: sources here are independent parallel lookups, no causal chaining",
+      "split": "test"
+    },
+    {
+      "query_id": "nlu_v1_0079",
+      "query_text": "How does sotorasib work at the molecular level?",
+      "intent_class": "F_mechanism",
+      "entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        }
+      ],
+      "constraints": [],
+      "required_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "difficulty": "medium",
+      "annotator_id": "agent_session_2026-09-23",
+      "adjudicator_id": "agent_session_2026-09-23",
+      "adjudication_notes": "single-annotator template-generated or hand-authored; gold labels are deterministic template parameters, not LLM opinion",
+      "template_group": "tmplF2::sotorasib",
+      "provenance_note": "template F2: gold entities/intent/sources are the template's own substituted parameters",
+      "split": "test"
+    }
+  ]
+}

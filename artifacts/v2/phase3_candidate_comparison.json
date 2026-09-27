@@ -1,0 +1,101 @@
+{
+  "comparison_version": "1.0.0",
+  "generated_at": "2026-09-24",
+  "benchmark_splits_used": ["development", "validation"],
+  "n_cases": 59,
+  "phase3_heldout_touched": false,
+  "source_files": {
+    "candidate_a": "artifacts/v2/phase3_baseline_results.json",
+    "candidate_b": "artifacts/v2/phase3_candidate_b_results.json",
+    "candidate_c": "artifacts/v2/phase3_candidate_c_results.json"
+  },
+  "hard_safety_gates_section3": {
+    "candidate_a": {
+      "unregistered_tool_execution": 0,
+      "arbitrary_callable_execution": 0,
+      "arbitrary_url_execution": 0,
+      "schema_invalid_call_reaching_executor": 28,
+      "secret_in_trace": 0,
+      "call_without_call_id": 107,
+      "unknown_tool_silent_fallback": 0,
+      "gates_passed": 5,
+      "gates_failed": 2,
+      "result": "DISQUALIFIED - fails schema_invalid_call_reaching_executor (must be 0, measured 28) and call_without_call_id (must be 0, measured 107)"
+    },
+    "candidate_b": {
+      "unregistered_tool_execution": 0,
+      "arbitrary_callable_execution": 0,
+      "arbitrary_url_execution": 0,
+      "schema_invalid_call_reaching_executor": 0,
+      "secret_in_trace": 0,
+      "call_without_call_id": 0,
+      "unknown_tool_silent_fallback": 0,
+      "gates_passed": 7,
+      "gates_failed": 0,
+      "result": "PASSES ALL 7 HARD GATES"
+    },
+    "candidate_c": {
+      "unregistered_tool_execution": 0,
+      "arbitrary_callable_execution": 0,
+      "arbitrary_url_execution": 0,
+      "schema_invalid_call_reaching_executor": 0,
+      "secret_in_trace": 0,
+      "call_without_call_id": 0,
+      "unknown_tool_silent_fallback": 0,
+      "gates_passed": 7,
+      "gates_failed": 0,
+      "result": "PASSES ALL 7 HARD GATES"
+    }
+  },
+  "quality_metrics_comparison": {
+    "source_routing_f1": {"a": 0.759, "b": 0.9322, "c": 1.0},
+    "source_routing_f1_caveat": "Candidate A and B were both scored from raw original_query text through their own real, imperfect selection mechanism - directly comparable to each other. Candidate C's 1.0 was scored from a hand-authored requested_evidence_types field written consistent with its own gold label, and is NOT directly comparable to A or B - see docs/v2/PHASE3_CANDIDATE_C_MEASUREMENT.md Section 0. Treat C's number as evidence its deterministic mapping logic is internally correct, not as evidence of equivalent real-world routing quality.",
+    "exact_source_set_match": {"a": 0.576, "b": 0.932, "c": 1.0},
+    "chembl_required_source_miss_rate": {"a": 0.0526, "b": 0.0, "c": 0.0},
+    "pubmed_required_source_miss_rate": {"a": 0.0, "b": 0.0417, "c": 0.0},
+    "clinical_trials_required_source_miss_rate": {"a": 0.0, "b": 0.0, "c": 0.0},
+    "parameter_schema_valid_rate_of_calls_reaching_execution": {"a": 0.738, "b": 1.0, "c": 1.0},
+    "unregistered_tool_generation_rate": {"a": 0.0, "b": 0.0, "c": "N/A - not LLM-generated, deterministically compiled"},
+    "abstention_correctness": {"a": "0/6", "b": "3/6", "c": "6/6 (caveated - see source_routing_f1_caveat, same input-construction issue applies to ambiguity signal)"},
+    "multi_source_all_required_success_rate": {"a": 1.0, "b": 1.0, "c": 1.0},
+    "pubmed_query_concept_coverage": {"a": "not measured", "b": 0.8515, "c": "not measured (flagged as a gap - see PHASE3_CANDIDATE_C_MEASUREMENT.md Section 0)"},
+    "model_calls_per_case": {"a": 2.81, "b": 1.0, "c": 0.0},
+    "measured_cost_for_this_59_case_run": {"a": "not tracked (NVIDIA billing not itemized per-run)", "b": "$0.091977", "c": "$0.00 (no LLM calls)"},
+    "total_latency_mean_ms_per_case": {"a": "~23447 (planning 9066.7 + tool_execution 14380.2)", "b": "792.1 (Cerebras call) + tool execution (see candidate_b results)", "c": "0 planning + tool execution only (no LLM call)"}
+  },
+  "quality_gates_section4_evaluation": {
+    "gate1_exact_match_no_regression_vs_a": {
+      "threshold": ">= 0.576 (Candidate A's own measured rate)",
+      "b": "0.932 - PASS",
+      "c": "1.0 - PASS (numerically, but see caveat - not treated as strong evidence given the circularity issue)"
+    },
+    "gate2_per_source_miss_no_systematic_failure": {
+      "threshold": "no candidate may show a systematic (near-total) per-source miss even if aggregate looks good",
+      "b": "max per-source miss 0.0417 (pubmed, 1/24 cases) - not systematic, PASS",
+      "c": "0.0 all sources - PASS (caveated)"
+    },
+    "gate3_schema_invalid_never_executes": {
+      "threshold": "0 schema-invalid calls reaching execution (restates Section-3 hard gate)",
+      "b": "0 - PASS",
+      "c": "0 - PASS"
+    },
+    "gate4_no_unrecovered_failure_regression": {
+      "threshold": "no new unrecovered failure category vs Candidate A",
+      "b": "PASS - all rejections are pre-execution registry/schema rejections, not unrecovered execution failures; real execution failures (e.g. clinical_trials phase-filter HTTP 400s) match a pre-existing defect already present in Candidate A's own run",
+      "c": "PASS - same defect class observed, not a Candidate C regression"
+    },
+    "gate5_multi_source_no_regression": {
+      "threshold": ">= Candidate A's 1.0 all-required-sources-success rate",
+      "b": "1.0 - PASS",
+      "c": "1.0 - PASS"
+    }
+  },
+  "priority_order_analysis": {
+    "note": "Per directive Step 30, priority order for winner selection is: 1) execution safety, 2) semantic correctness, 3) reliability, 4) failure attribution, 5) performance/cost. Composite scoring is explicitly disallowed.",
+    "1_execution_safety": "B and C tie - both pass all 7 hard gates. A is disqualified outright.",
+    "2_semantic_correctness": "B's F1 0.932 is honest, end-to-end, trustworthy evidence (raw query text -> real model decision, same measurement basis as the disqualified A). C's F1 1.0 is not trustworthy as an independent semantic-correctness signal because its source-selection input was constructed consistent with its own gold label - this is a genuine, disclosed measurement-validity gap, not a disqualification of the architecture itself. On defensible evidence, B is the stronger-demonstrated candidate for this dimension.",
+    "3_reliability": "Comparable between B and C - both show the same pre-existing clinical_trials phase-filter defect (not attributable to either candidate's own logic), both show clean execution/retry behavior otherwise.",
+    "4_failure_attribution": "Comparable - both route through orchestration/registry.py's typed ToolErrorCategory taxonomy.",
+    "5_performance_cost": "C is cheaper and faster (0 model calls, 0 cost) than B ($0.092 for 59 cases, ~792ms mean added latency). This is a real, legitimate architectural advantage of C's deterministic design - but per the priority order, performance/cost is explicitly ranked below semantic correctness and does not override the unresolved measurement-validity gap on C's central quality claim."
+  }
+}

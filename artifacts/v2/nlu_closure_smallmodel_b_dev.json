@@ -1,0 +1,579 @@
+{
+  "architecture": "candidate_b_structured",
+  "split": "dev",
+  "benchmark_version": "1.1.0",
+  "benchmark_name": "nlu_benchmark",
+  "n_examples": 45,
+  "schema_parse_success_rate": 0.0,
+  "schema_parse_failures": [
+    {
+      "query_id": "nlu_v1_0107",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0123",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0018",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0111",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0130",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0048",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0119",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0013",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0084",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0080",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0055",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0140",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0083",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0112",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0110",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0149",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0071",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0100",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0002",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0106",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0017",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0085",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0091",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0060",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0132",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0134",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0064",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0098",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0136",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0115",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0007",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0148",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0022",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0016",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0031",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0019",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0063",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0073",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0025",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0139",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    },
+    {
+      "query_id": "nlu_v1_0012",
+      "error": "NLU_FAILURE: exhausted 2 attempt(s), last error: LLM call failed: [410] Gone\nThe model 'nvidia/llama-3.1-nemotron-nano-8b-v1' has reached its end of life on 2026-08-26T09:00:00Z and is no longer available."
+    }
+  ],
+  "entity_prf": {
+    "note": "not_supported_by_architecture_or_no_valid_extractions",
+    "n": 0
+  },
+  "entity_prf_by_type": {
+    "note": "not_supported_by_architecture_or_no_valid_extractions"
+  },
+  "normalization": {
+    "n_normalizable_gold": 0,
+    "correct": 0,
+    "accuracy_at_1": null,
+    "fabricated_id_count": 0
+  },
+  "intent": {
+    "n": 45,
+    "accuracy": 0.0,
+    "macro_f1": 0.0,
+    "per_class": {
+      "A_literature_evidence": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 5
+      },
+      "B_clinical_trial_landscape": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 8
+      },
+      "C_compound_target": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 3
+      },
+      "D_cross_source_synthesis": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 6
+      },
+      "E_multi_hop_research": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      },
+      "F_mechanism": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 6
+      },
+      "G_constraint_heavy": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 8
+      },
+      "I_ambiguous": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 5
+      }
+    }
+  },
+  "intent_confusion_matrix": {
+    "G_constraint_heavy": {
+      "NONE_PREDICTED": 8
+    },
+    "B_clinical_trial_landscape": {
+      "NONE_PREDICTED": 8
+    },
+    "C_compound_target": {
+      "NONE_PREDICTED": 3
+    },
+    "D_cross_source_synthesis": {
+      "NONE_PREDICTED": 6
+    },
+    "A_literature_evidence": {
+      "NONE_PREDICTED": 5
+    },
+    "F_mechanism": {
+      "NONE_PREDICTED": 6
+    },
+    "I_ambiguous": {
+      "NONE_PREDICTED": 5
+    },
+    "E_multi_hop_research": {
+      "NONE_PREDICTED": 4
+    }
+  },
+  "constraint_prf": {
+    "note": "not_supported_by_architecture_or_no_valid_extractions",
+    "n": 0
+  },
+  "constraint_prf_by_field": {
+    "note": "not_supported_by_architecture_or_no_valid_extractions"
+  },
+  "source_set_prf": {
+    "note": "not_supported_by_architecture_or_no_valid_extractions",
+    "n": 0
+  },
+  "latency_ms": {
+    "p50": 3583.6751461029053,
+    "p95": 3620.2532529830933,
+    "mean": 3543.669658237033,
+    "n": 45
+  },
+  "llm_calls_per_question": 2.0,
+  "token_accounting": {
+    "n_with_usage_metadata": 0,
+    "n_examples": 45,
+    "note": "Provider (langchain_nvidia_ai_endpoints ChatNVIDIA response.usage_metadata) returned no usage metadata for any example in this run - no token counts measured. Not estimated."
+  },
+  "per_example_results": [
+    {
+      "query_id": "nlu_v1_0107",
+      "schema_valid": false,
+      "latency_ms": 1866.2059307098389,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0123",
+      "schema_valid": false,
+      "latency_ms": 3620.9850311279297,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0018",
+      "schema_valid": false,
+      "latency_ms": 3607.877016067505,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0111",
+      "schema_valid": false,
+      "latency_ms": 3628.1092166900635,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0130",
+      "schema_valid": false,
+      "latency_ms": 3616.5969371795654,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0048",
+      "schema_valid": false,
+      "latency_ms": 3600.770950317383,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0119",
+      "schema_valid": false,
+      "latency_ms": 3565.8748149871826,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0013",
+      "schema_valid": false,
+      "latency_ms": 3572.3869800567627,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0084",
+      "schema_valid": false,
+      "latency_ms": 3566.2128925323486,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0080",
+      "schema_valid": false,
+      "latency_ms": 3593.271017074585,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0055",
+      "schema_valid": false,
+      "latency_ms": 3599.3969440460205,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0140",
+      "schema_valid": false,
+      "latency_ms": 3584.9132537841797,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0083",
+      "schema_valid": false,
+      "latency_ms": 3573.5011100769043,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0112",
+      "schema_valid": false,
+      "latency_ms": 3543.168067932129,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0110",
+      "schema_valid": false,
+      "latency_ms": 3561.0599517822266,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "schema_valid": false,
+      "latency_ms": 3566.5228366851807,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0149",
+      "schema_valid": false,
+      "latency_ms": 3545.4726219177246,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0071",
+      "schema_valid": false,
+      "latency_ms": 3574.1801261901855,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0100",
+      "schema_valid": false,
+      "latency_ms": 3618.5457706451416,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0002",
+      "schema_valid": false,
+      "latency_ms": 3576.3328075408936,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "schema_valid": false,
+      "latency_ms": 3574.403762817383,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "schema_valid": false,
+      "latency_ms": 3590.1172161102295,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0106",
+      "schema_valid": false,
+      "latency_ms": 3583.6751461029053,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0017",
+      "schema_valid": false,
+      "latency_ms": 3583.247661590576,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0085",
+      "schema_valid": false,
+      "latency_ms": 3609.3270778656006,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0091",
+      "schema_valid": false,
+      "latency_ms": 3584.4264030456543,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0060",
+      "schema_valid": false,
+      "latency_ms": 3591.326951980591,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0132",
+      "schema_valid": false,
+      "latency_ms": 3596.8270301818848,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0134",
+      "schema_valid": false,
+      "latency_ms": 3551.5289306640625,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0064",
+      "schema_valid": false,
+      "latency_ms": 3612.7302646636963,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0098",
+      "schema_valid": false,
+      "latency_ms": 3554.487943649292,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0136",
+      "schema_valid": false,
+      "latency_ms": 3554.9261569976807,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0115",
+      "schema_valid": false,
+      "latency_ms": 3579.284906387329,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0007",
+      "schema_valid": false,
+      "latency_ms": 3615.847110748291,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0148",
+      "schema_valid": false,
+      "latency_ms": 3586.545944213867,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "schema_valid": false,
+      "latency_ms": 3576.969861984253,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0022",
+      "schema_valid": false,
+      "latency_ms": 3601.267099380493,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0016",
+      "schema_valid": false,
+      "latency_ms": 3534.6601009368896,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0031",
+      "schema_valid": false,
+      "latency_ms": 3584.7201347351074,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0019",
+      "schema_valid": false,
+      "latency_ms": 3503.4780502319336,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0063",
+      "schema_valid": false,
+      "latency_ms": 3616.426944732666,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0073",
+      "schema_valid": false,
+      "latency_ms": 3533.3712100982666,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0025",
+      "schema_valid": false,
+      "latency_ms": 3582.9241275787354,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0139",
+      "schema_valid": false,
+      "latency_ms": 3593.3210849761963,
+      "token_usage": null
+    },
+    {
+      "query_id": "nlu_v1_0012",
+      "schema_valid": false,
+      "latency_ms": 3587.90922164917,
+      "token_usage": null
+    }
+  ]
+}

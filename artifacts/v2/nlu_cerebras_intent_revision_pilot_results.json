@@ -1,0 +1,132 @@
+{
+  "phase": "2_cerebras_intent_clarification_review",
+  "candidate": "candidate_f_cerebras_gptoss with the frozen intent-clarification revision (CEREBRAS_INTENT_CLARIFIED_PROMPT, prompt version cerebras_intent_clarified_v1)",
+  "status": "PILOT COMPLETED - REJECTED at hard rejection gate (recurrence of generic-A-collapse pattern + entity-typing regression + an additional unrelated intent error). Full dev NOT run.",
+  "run_date": "2026-09-24",
+  "pilot_plan_ref": "artifacts/v2/nlu_cerebras_intent_revision_pilot_plan.json",
+  "frozen_revision_ref": "artifacts/v2/nlu_cerebras_intent_revision_frozen.json",
+  "cases_planned": 8,
+  "cases_run": 8,
+  "cases_schema_valid": 8,
+  "cases_parse_success": 8,
+  "cases_needing_retry": 0,
+  "semantically_empty_despite_valid_schema": 0,
+  "run_discipline": "Each of the 8 predeclared cases was submitted exactly once through extract_candidate_f_cerebras_gptoss (production entry point, now using the frozen CEREBRAS_INTENT_CLARIFIED_PROMPT). No semantic retries were performed; no output was inspected and used to revise the prompt (the prompt was frozen in nlu_cerebras_intent_revision_frozen.json before this run). A separate, purely infrastructure/timing diagnostic HTTP pass (identical request bodies, same frozen prompt) was run afterward ONLY to correct the known 5-RPM self-throttle latency-measurement artifact from the prior round - it did not alter or re-score any semantic result below.",
+  "semantics_by_case": [
+    {
+      "query_id": "nlu_v1_0002", "category": "simple entity question",
+      "intent_correct": true, "predicted_intent": ["A_literature_evidence"], "gold_intent": ["A_literature_evidence"],
+      "entities_correct": "2/2 (type+canonical_id exact match: KRAS/target/HGNC:6407, melanoma/disease/MeSH:D008545)", "fabricated_ids": 0,
+      "constraints_correct": "n/a (gold empty, predicted empty)", "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0111", "category": "constraint-heavy trial question",
+      "intent_correct": true, "predicted_intent": ["G_constraint_heavy"], "gold_intent": ["G_constraint_heavy"],
+      "entities_correct": "1/2 - Alzheimer's disease correct; HER2 (gold target, HGNC:3430) MISSED - model extracted the surface span 'HER2 inhibitors' typed as a single compound entity instead of splitting into HER2/target, so no gold-matching target entity was produced (canonical_id null)",
+      "entities_note": "ENTITY REGRESSION vs prior pilot: this is the same 'trailing using-X-inhibitors clause' construction the EXHAUSTIVE ENTITY SCAN prompt rule targets, and the prior pilot's structurally identical case (nlu_v1_0106, EGFR) extracted the target correctly with populated semantic_roles. Not attributable to the intent-revision (entity-extraction prompt text is byte-for-byte unchanged) - assessed as provider-side run-to-run variance, but still a real, disclosed quality regression this pilot.",
+      "fabricated_ids": 0,
+      "constraints_correct": "3/3 exact (trial_phases PHASE3, trial_statuses ACTIVE_NOT_RECRUITING, population 'elderly patients')",
+      "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0091", "category": "multi-entity question (A-confusable, literature-flavored trailing clause)",
+      "intent_correct": false, "predicted_intent": ["D_cross_source_synthesis"], "gold_intent": ["E_multi_hop_research"],
+      "note": "MISCLASSIFIED - but NOT a generic-A-collapse (the intent revision's target failure mode): predicted D, not A. This is the pre-existing, previously-documented D-vs-E fuzzy boundary (EVALUATION_CONTRACT.md known limitation) - the query requires ChEMBL results to CAUSALLY gate the ClinicalTrials/PubMed hops (gold E per DI_VS_E_RULE), but the model treated it as 3 independently-combinable sources (D). A different, unrelated failure category from the one this revision targets.",
+      "entities_correct": "2/2 (EGFR/target/HGNC:3236, non-small cell lung cancer/disease/MeSH:D002289 - both correct despite wrong intent)", "fabricated_ids": 0,
+      "constraints_correct": "n/a (gold empty)",
+      "sources_correct": "partial - predicted ['pubmed','clinicaltrials'] vs gold ['chembl','clinicaltrials','pubmed'] - chembl missed, directly downstream of the D-vs-E miss",
+      "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0055", "category": "cross-source question",
+      "intent_correct": true, "predicted_intent": ["D_cross_source_synthesis"], "gold_intent": ["D_cross_source_synthesis"],
+      "entities_correct": "1/1 (melanoma/disease/MeSH:D008545)", "fabricated_ids": 0,
+      "constraints_correct": "n/a (gold empty)", "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0140", "category": "ambiguous-abbreviation (substituted); A-confusable bare research-topic mention",
+      "intent_correct": false, "predicted_intent": ["A_literature_evidence"], "gold_intent": ["I_ambiguous"],
+      "note": "MISCLASSIFIED - COLLAPSED TO A_literature_evidence. This IS a direct recurrence of the exact generic-A-collapse category this revision was designed to fix (a bare, unscoped research-topic question defaulting to the generic literature-evidence class instead of being recognized as genuinely underspecified/I_ambiguous), on a DIFFERENT query text/entities/template_group than the prior pilot's failing case (nlu_v1_0136).",
+      "entities_correct": "0/0 gold, but 1 spurious entity predicted ('cancer'/disease, real substring, no canonical_id - not a fabricated ID, but not gold-annotated either since this query is deliberately entity-free per the benchmark's I_ambiguous template convention)",
+      "fabricated_ids": 0,
+      "constraints_correct": "n/a", "sources_correct": "n/a (gold empty, predicted ['pubmed'])",
+      "ambiguity_correct": false, "ambiguity_note": "gold_ambiguity_is_ambiguous=true; predicted is_ambiguous=false - missed the genuine ambiguity flag, same failure shape as the prior pilot's case 0136"
+    },
+    {
+      "query_id": "nlu_v1_0084", "category": "gene/protein/target semantic-role ambiguity",
+      "intent_correct": true, "predicted_intent": ["F_mechanism"], "gold_intent": ["F_mechanism"],
+      "entities_correct": "2/2 (adagrasib/compound/ChEMBL:CHEMBL4594350, mTOR/target/HGNC:3942 - both correct)", "fabricated_ids": 0,
+      "semantic_roles_note": "mTOR's semantic_roles left empty (no gold annotation exists for this field, documented pre-existing limitation; not scored as a regression)",
+      "constraints_correct": "n/a", "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0018", "category": "class B example",
+      "intent_correct": true, "predicted_intent": ["B_clinical_trial_landscape"], "gold_intent": ["B_clinical_trial_landscape"],
+      "b_vs_g_note": "correctly predicted B, not G - no B/G confusion",
+      "entities_correct": "2/2 (sotorasib/compound/ChEMBL:CHEMBL4535757, type 2 diabetes/disease/MeSH:D003924)", "fabricated_ids": 0,
+      "constraints_correct": "1/1 (trial_phases PHASE3)", "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0112", "category": "class G example",
+      "intent_correct": true, "predicted_intent": ["G_constraint_heavy"], "gold_intent": ["G_constraint_heavy"],
+      "b_vs_g_note": "correctly predicted G, not B - no B/G confusion",
+      "entities_correct": "1/2 - multiple myeloma correct; JAK2 (gold target, HGNC:6192) MISSED, same 'X inhibitors'-as-single-compound pattern as case 0111",
+      "entities_note": "second instance of the same entity-typing regression this pilot, on the same 'using X inhibitors' trailing-clause construction",
+      "fabricated_ids": 0,
+      "constraints_correct": "2/3 exact-field (trial_phases PHASE1, trial_statuses RECRUITING both exact); gold population='adults' predicted under the `age` field instead of `population` - same field-routing variance pattern seen in the prior pilot's case 0119, semantic content captured not lost",
+      "sources_correct": true, "ambiguity_correct": true
+    }
+  ],
+  "semantics_summary": {
+    "intent_accuracy": "6/8 (75%) - UNCHANGED in aggregate from the prior pilot's 6/8, but the ERROR COMPOSITION changed: 1 of 2 errors (nlu_v1_0140, I_ambiguous->A_literature_evidence) is a DIRECT RECURRENCE of the generic-A-collapse category on a fresh, non-overlapping query; the other (nlu_v1_0091, E_multi_hop_research->D_cross_source_synthesis) is a different, pre-existing D-vs-E boundary confusion, not a collapse to A.",
+    "generic_intent_collapse_finding": "PRESENT (1/8 cases collapsed to A_literature_evidence on the exact underspecified/bare-topic category the revision targeted). This is a genuine recurrence of the disqualifying pattern from the prior pilot, on entirely new pilot material (no wording/entity/template_group overlap with the prior failing case nlu_v1_0136) - it is not attributable to residual contamination from the previous round.",
+    "b_vs_g_confusion": "NONE observed (2 G-class and 1 B-class case all correctly distinguished, matching the prior pilot)",
+    "entity_extraction": "11/13 gold entity mentions correctly typed and normalized (canonical_id exact match); 2 gold target entities (HER2 HGNC:3430, JAK2 HGNC:6192) MISSED - both on the 'using X [gene/target] inhibitors' trailing-clause construction, both extracted instead as a single mistyped 'X inhibitors' compound entity with no canonical_id. This is a genuine regression from the prior pilot's 16/16; the entity-extraction prompt text is byte-for-byte unchanged between the two pilots (only the intent rule changed), so this is assessed as Cerebras-side run-to-run non-determinism on this specific construction rather than an effect of the revision, but it is real and must be reported honestly rather than minimized.",
+    "fabricated_canonical_ids": 0,
+    "constraint_extraction": "6/7 gold constraint instances exact-field-matched; 1 field-routing variance (case 0112, 'adults' under age instead of population - semantic content captured, not lost) - consistent with the prior pilot's constraint quality, no collapse",
+    "ambiguity_handling": "1 missed true-positive (case 0140, same shape as the prior pilot's missed case); 0 false positives",
+    "semantic_roles": "empty in all 8 cases this round (including the 3 gene/protein/target-ambiguous cases HER2/JAK2/mTOR) - a qualitative decline from the prior pilot, where one case (EGFR) DID show correctly populated semantic_roles; not separately gate-scored (no gold semantic_roles annotation exists, documented pre-existing limitation) but noted as a real behavioral difference",
+    "normalization": "no corruption observed - every populated canonical_id/name/system pair is correct and matches gold exactly where present; nulls only where extraction itself failed (never a fabricated value)",
+    "unsupported_field_invention": "none observed"
+  },
+  "hard_rejection_gate_assessment": {
+    "gate": "Step 14-15 - target 8/8; reject immediately on any systemic defect or an intent error correctly classified as (C) a recurrence of generic-fallback behavior",
+    "isolated_error_classification": {
+      "case_0140_I_to_A": "Classified (C) - another recurrence of generic-fallback behavior. The query is a bare, unscoped research-topic mention (structurally identical in kind, though not in wording/entities/template, to the prior pilot's failing I-class case) and the model again defaulted to A_literature_evidence rather than recognizing genuine underspecification, DESPITE the frozen revision's explicit new rule that 'this never overrides the ambiguity rule below.' The revision did not prevent this recurrence.",
+      "case_0091_E_to_D": "Classified (B)/(A)-adjacent - a genuine, pre-existing, previously-documented taxonomy fuzziness (D-vs-E boundary, EVALUATION_CONTRACT.md known limitation), not a new failure introduced by this revision and not a collapse to A. Considered in isolation this alone would not be disqualifying.",
+      "combined_assessment": "There are TWO intent errors, not one, so the task's single-isolated-error carve-out (Step 15) does not apply on its own terms. Even setting that aside, case 0140 alone (category C) is independently disqualifying per the task's explicit rule: 'if C, reject.'"
+    },
+    "engineering_judgment": "REJECT. Three independent, mutually-reinforcing findings support this: (1) the target failure mode - generic-A collapse on a genuinely ambiguous/underspecified query - recurred on entirely fresh, non-overlapping pilot material after the one allowed revision was applied, meaning the revision did not fix the problem it was designed to fix; (2) intent accuracy is unchanged in aggregate (6/8, same as before); (3) a real, disclosed entity-extraction regression (2/13 gold target entities missed on a 'using X inhibitors' construction, versus 16/16 in the prior pilot) was also observed this round, which independently fails the 'no entity regression' gate (Step 16) regardless of the intent-gate outcome. Per the task's explicit, pre-committed rule ('if the same pattern... recurs after this one revision, GPT-OSS is rejected for Phase 2, permanently, no further tuning'), no second revision is attempted and no full dev run is performed.",
+    "decision": "REJECT at pilot stage. Full dev (Step 20) NOT run - correctly skipped per the hard gate. This is FINAL for this round; GPT-OSS-120B is rejected for Phase 2 permanently."
+  },
+  "latency_gate_assessment": {
+    "control": {"p50_ms": 19150, "p95_ms": 66983, "source": "artifacts/v2/nlu_frozen_config.json"},
+    "note": "Recorded for completeness/transparency per Step 17 even though the candidate is rejected on quality first (quality has explicit priority over latency).",
+    "raw_extractor_latency_ms_INCLUDES_self_throttle_wait": {
+      "values_ms": [486.3, 12186.2, 12093.6, 11766.4, 11980.8, 12902.5, 12472.2, 10844.9],
+      "note": "NOT used for the gate decision - almost entirely the 5-RPM self-throttle token-bucket wait (utils.rate_limiter.wait_for_rate_limit), timed from before the wait, exactly the same measurement artifact documented in the prior round."
+    },
+    "diagnostic_pass_pure_network_round_trip_ms": {
+      "values_ms": [363.0, 487.5, 1426.9, 394.4, 495.7, 1028.0, 685.2, 1111.1],
+      "p50_ms": 590.45, "max_ms": 1426.9, "mean_ms": 748.98,
+      "note": "Separate diagnostic HTTP pass (identical prompts/schema/reasoning_effort as the official pilot, same frozen revision), timing requests.post() only, manually spaced >=12.5s to respect the 5 RPM cap. Higher variance than the prior round's diagnostic (max 1426.9ms vs prior round's max 608ms) but still far below any pathological-tail territory (nothing resembling the multi-second-to-tens-of-seconds reasoning-preamble blowups seen in the Nemotron control)."
+    },
+    "provider_reported_time_info_total_time_ms": {
+      "values_ms": [191.3, 286.8, 1162.0, 173.5, 241.0, 841.1, 329.8, 843.9],
+      "p50_ms": 308.3, "max_ms": 1162.0, "mean_ms": 508.7
+    },
+    "p50_reduction_vs_control_pct": "96.9% (pure round-trip P50 590.45ms vs control 19150ms)",
+    "p95_proxy_reduction_vs_control_pct": "97.9% (n=8 max 1426.9ms as a conservative P95 proxy vs control 66983ms)",
+    "gate_requirement": "P50<=~5000ms OR >=60% P50 reduction, no pathological tail; ideally P50<=5s/P95<=15s",
+    "gate_result": "Would have PASSED decisively on latency alone (~97% P50 reduction, well inside the ideal P50<=5s/P95<=15s band) - exactly as in the prior round. This does not change the REJECT decision: quality failed first and disqualifies the candidate regardless of the latency win."
+  },
+  "usage_and_cost": {
+    "official_pilot_run_cost_usd": 0.008647,
+    "latency_diagnostic_pass_cost_usd": 0.0085675,
+    "total_this_round_usd": 0.0172145,
+    "cumulative_cerebras_experiment_cost_usd": "~0.0351 (prior rounds ~0.0179 + this round ~0.0172), against the $0.50 hard cap (~7.0% of cap used across all Cerebras rounds combined)",
+    "remaining_free_trial_balance_estimate_usd": "~4.965 of the original $5.00"
+  },
+  "decision": "PILOT REJECTED at the hard rejection gate. The single allowed revision did not eliminate the generic-A-collapse pattern (it recurred on fresh material) and a real entity-typing regression was additionally observed. Per the task's pre-committed rule, GPT-OSS-120B (Cerebras, gpt-oss-120b, reasoning_effort=low) is REJECTED for Phase 2, PERMANENTLY, for this round - no further prompt revisions, no full dev run, no automatic model switch, no Phase 3.",
+  "active_runtime_after_experiment": "UNCHANGED: candidate_b_structured / nvidia/nemotron-3-super-120b-a12b remains the frozen production NLU architecture, per artifacts/v2/nlu_frozen_config.json (untouched this round). nlu/extractor.py::STRUCTURED_EXTRACTION_PROMPT (the prompt candidate_b_structured actually calls) is byte-for-byte unchanged; only the new, Cerebras-only CEREBRAS_INTENT_CLARIFIED_PROMPT constant was added and is not referenced by any production code path."
+}

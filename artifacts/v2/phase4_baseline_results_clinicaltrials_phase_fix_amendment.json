@@ -1,0 +1,124 @@
+{
+  "amendment_metadata": {
+    "purpose": "Corrects artifacts/v2/phase4_baseline_results.json's ClinicalTrials metrics for the dev+validation split now that the filter.phase API defect (docs/v2/CLINICALTRIALS_PHASE_FILTER_DEFECT_FIX.md) is fixed. This is an ADDITIVE amendment layer, not an overwrite -- artifacts/v2/phase4_baseline_results.json and docs/v2/PHASE4_BASELINE_MEASUREMENT.md are left untouched except for a dated AMENDMENT section appended to the latter, matching Phase 3's config_version_history precedent for corrections.",
+    "amended_date": "2026-09-25",
+    "amends_artifact": "artifacts/v2/phase4_baseline_results.json",
+    "amends_doc": "docs/v2/PHASE4_BASELINE_MEASUREMENT.md",
+    "defect_reference": "docs/v2/CLINICALTRIALS_PHASE_FILTER_DEFECT_FIX.md",
+    "fix_location": "tools/clinical_trials_tool.py search_trials() -- filter.phase query param (HTTP 400) replaced with AREA[Phase]<value> query.term (per the standing AREA[...] pattern for condition/intervention/sponsor/country)",
+    "methodology": "Same required-trial-recall and structured-filter-correctness metrics/definitions as the original baseline measurement (docs/v2/PHASE4_GATE_PLAN.md Section 1 taxonomy). Only the 3 dev+validation ClinicalTrials cases originally affected by the filter.phase defect were re-run -- not the full 49-case benchmark. Reran using the exact same params_used (condition/intervention/status/phase) recorded in the original per-case results, against the now-fixed ClinicalTrialsTool().search_trials(), max_results=20 (matching the original harness's observed 20-item cap on non-erroring cases), live against clinicaltrials.gov. compiled_filter_correctness verdicts are reproduced verbatim from the original per-case records because params_used is byte-identical before and after this fix (the fix only changed how the phase value is transmitted to the API, not what search_trials() is called with) -- that judgment could not have changed.",
+    "cases_identified_as_affected": [
+      "CT-PHASE-01",
+      "CT-MULTI-01",
+      "CT-MULTI-02"
+    ],
+    "identification_method": "Filtered artifacts/v2/phase4_baseline_results.json's per_case_results (19 dev+validation ClinicalTrials cases) for entries with a non-null `phase` in clinical_trials.params_used AND a non-null clinical_trials.error field. Exactly 3 matched -- the same 3 named in docs/v2/PHASE4_BASELINE_MEASUREMENT.md Section 3. All 5 multi_source (MS-*) cases sharing a phase-affected case family (MS-05, MS-06) were also checked directly: both compiled phase=null in their own clinical_trials.params_used (their harness path did not pass a phase filter through), so neither was affected by this defect and neither is included here."
+  },
+  "affected_cases": [
+    {
+      "case_id": "CT-PHASE-01",
+      "category": "clinicaltrials_phase",
+      "split": "development",
+      "query": "Which Phase 3 trials are testing lecanemab in Alzheimer's disease?",
+      "gold_ids": ["NCT04468659"],
+      "params_used": {
+        "condition": "Alzheimer's disease",
+        "intervention": "lecanemab",
+        "status": null,
+        "phase": "PHASE3"
+      },
+      "original_broken_tool_result": {
+        "success": false,
+        "error": "API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5DAlzheimer%27s+disease+AND+AREA%5BInterventionSearch%5Dlecanemab&filter.phase=PHASE3&format=json&pageSize=100",
+        "returned_ids": [],
+        "raw_count": 0,
+        "required_trial_hit": false
+      },
+      "corrected_fixed_tool_result": {
+        "success": true,
+        "error": null,
+        "returned_ids": ["NCT04468659", "NCT06530732", "NCT06384573", "NCT03887455", "NCT05269394", "NCT01760005"],
+        "raw_count": 6,
+        "required_trial_hit": true
+      },
+      "expected_structured_filters": {"phase": "PHASE3", "intervention": "lecanemab"},
+      "compiled_filter_correctness": {"phase": true, "intervention": true}
+    },
+    {
+      "case_id": "CT-MULTI-01",
+      "category": "clinicaltrials_multi_filter",
+      "split": "validation",
+      "query": "Is there an early-phase trial comparing nilotinib to imatinib in newly diagnosed chronic myeloid leukemia?",
+      "gold_ids": ["NCT03228303"],
+      "params_used": {
+        "condition": "chronic myeloid leukemia",
+        "intervention": "nilotinib",
+        "status": null,
+        "phase": "EARLY_PHASE1"
+      },
+      "original_broken_tool_result": {
+        "success": false,
+        "error": "API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Dchronic+myeloid+leukemia+AND+AREA%5BInterventionSearch%5Dnilotinib&filter.phase=EARLY_PHASE1&format=json&pageSize=100",
+        "returned_ids": [],
+        "raw_count": 0,
+        "required_trial_hit": false
+      },
+      "corrected_fixed_tool_result": {
+        "success": true,
+        "error": null,
+        "returned_ids": ["NCT03228303"],
+        "raw_count": 1,
+        "required_trial_hit": true
+      },
+      "expected_structured_filters": {"phase": "EARLY_PHASE1", "intervention": "imatinib/nilotinib", "condition": "CML"},
+      "compiled_filter_correctness": {"phase": true, "intervention": true, "condition": false}
+    },
+    {
+      "case_id": "CT-MULTI-02",
+      "category": "clinicaltrials_multi_filter",
+      "split": "development",
+      "query": "What recruiting Phase 4 trials of upadacitinib exist for rheumatoid arthritis?",
+      "gold_ids": ["NCT02714634", "NCT06687551"],
+      "params_used": {
+        "condition": "rheumatoid arthritis",
+        "intervention": "upadacitinib",
+        "status": "RECRUITING",
+        "phase": "PHASE4"
+      },
+      "original_broken_tool_result": {
+        "success": false,
+        "error": "API returned an error: 400 Client Error: Bad Request for url: https://clinicaltrials.gov/api/v2/studies?query.term=AREA%5BConditionSearch%5Drheumatoid+arthritis+AND+AREA%5BInterventionSearch%5Dupadacitinib&filter.overallStatus=RECRUITING&filter.phase=PHASE4&format=json&pageSize=100",
+        "returned_ids": [],
+        "raw_count": 0,
+        "required_trial_hit": false
+      },
+      "corrected_fixed_tool_result": {
+        "success": true,
+        "error": null,
+        "returned_ids": ["NCT02714634", "NCT06687551"],
+        "raw_count": 2,
+        "required_trial_hit": true
+      },
+      "expected_structured_filters": {"status": "RECRUITING", "phase": "PHASE4", "intervention": "upadacitinib", "condition": "rheumatoid arthritis"},
+      "compiled_filter_correctness": {"status": true, "phase": true, "intervention": true, "condition": true}
+    }
+  ],
+  "aggregate_metrics_corrected": {
+    "scope": "same 19 dev+validation ClinicalTrials cases with gold as the original baseline measurement (artifacts/v2/phase4_baseline_results.json aggregate_metrics)",
+    "clinical_trials_required_trial_recall": {
+      "original_broken_tool": "0.7368421052631579 (14/19)",
+      "corrected_fixed_tool": "0.8947368421052632 (17/19)",
+      "delta": "+3 cases (+0.1579), all 3 previously-erroring phase-filtered cases now hit their gold NCT ID"
+    },
+    "clinical_trials_structured_filter_correctness_rate": {
+      "original_broken_tool": "0.85 (16/19 checked filter instances, per original measurement's methodology)",
+      "corrected_fixed_tool": "0.85 (16/19 checked filter instances) -- UNCHANGED",
+      "note": "This metric judges whether the COMPILED param matched the case's stated filter, not whether the live API call succeeded. The 3 affected cases' params_used are byte-identical before and after the fix (only the transmission of phase to the API changed), so their compiled_filter_correctness verdicts (phase:true/intervention:true/condition:false for CT-MULTI-01, etc. -- see affected_cases above) are unchanged by this fix. The defect was purely an execution-layer bug (wrong API parameter causing a hard 400), not a query-compilation bug -- filter correctness was already being measured correctly at baseline."
+    },
+    "remaining_gap_after_fix": {
+      "cases_still_not_hitting_gold": 2,
+      "case_ids": ["CT-COND-01", "MS-06"],
+      "note": "CT-COND-01 (broad condition-only query, gold trial ranked beyond the returned window) and MS-06 (multi-source upadacitinib/Crohn's case, params_used had condition='Crohn's disease' rather than the rheumatoid-arthritis+phase filter combination that made CT-MULTI-02 pass) were NOT affected by the filter.phase defect -- both called search_trials() with phase=null originally and still do. Their misses are genuine ranking/query-formulation gaps unrelated to this fix and are correctly left as-is; not in scope for this amendment."
+    }
+  }
+}

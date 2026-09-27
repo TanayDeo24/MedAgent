@@ -1,0 +1,870 @@
+{
+  "measurement_metadata": {
+    "measured_date": "2026-09-25",
+    "scope": "The same 21 ChEMBL dev+validation cases and 7 multi_source dev+validation cases as artifacts/v2/phase4_baseline_results.json (development+validation splits only, phase4_heldout NOT touched). ",
+    "method": "8 of 21 ChEMBL cases (get_drug_info x2, search_by_target x4, search_by_indication x2) were already correctly supported and are unchanged -- their baseline per-case results are carried forward verbatim, not re-run. The 13 previously name-resolution-blocked cases (6 CHEMBL-COMPOUND-* + the ChEMBL leg of all 7 multi_source cases) were re-measured LIVE by calling the new ChEMBLTool().resolve_compound_name(name) directly against the real ChEMBL API and scoring its own chembl_id output against each case's gold_relevant_ids -- this is what every one of these 13 cases' query actually asks for (\"what is the ChEMBL identifier for X\"), so no separate downstream get_drug_info(chembl_id) call was needed to answer them; get_drug_info remains available and independently correct (as CHEMBL-EXACT-01/02 already show) for cases that need the full record, not just the ID.",
+    "cost_usd": 0,
+    "no_llm_calls": true
+  },
+  "chembl_aggregate_before": {
+    "recall@1": 0.23809523809523808,
+    "recall@5": 0.38095238095238093,
+    "recall@10": 0.38095238095238093,
+    "precision@5": 0.18095238095238095,
+    "mrr": 0.27936507936507937,
+    "hit@10": 0.38095238095238093,
+    "n_cases_with_gold": 21
+  },
+  "chembl_aggregate_after": {
+    "n_cases_with_gold": 21,
+    "recall@1": 0.8571428571428571,
+    "recall@5": 1.0,
+    "recall@10": 1.0,
+    "mrr": 0.8984126984126984,
+    "hit@10": 1.0
+  },
+  "chembl_aggregate_delta": {
+    "recall@1": 0.6190476190476191,
+    "recall@5": 0.6190476190476191,
+    "recall@10": 0.6190476190476191,
+    "mrr": 0.6190476190476191,
+    "hit@10": 0.6190476190476191
+  },
+  "per_case_detail": [
+    {
+      "case_id": "CHEMBL-EXACT-01",
+      "category": "chembl_exact_identifier",
+      "gold_ids": [
+        "CHEMBL941"
+      ],
+      "method_used": "get_drug_info",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-EXACT-02",
+      "category": "chembl_exact_identifier",
+      "gold_ids": [
+        "CHEMBL1431"
+      ],
+      "method_used": "get_drug_info",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-TARGET-01",
+      "category": "chembl_target",
+      "gold_ids": [
+        "CHEMBL4247"
+      ],
+      "method_used": "search_by_target",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-TARGET-02",
+      "category": "chembl_ambiguous",
+      "gold_ids": [
+        "CHEMBL203"
+      ],
+      "method_used": "search_by_target",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.2,
+        "found_rank": 5
+      },
+      "metrics_after": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.2,
+        "found_rank": 5
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-AMBIG-01",
+      "category": "chembl_ambiguous",
+      "gold_ids": [
+        "CHEMBL3717"
+      ],
+      "method_used": "search_by_target",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "found_rank": 3
+      },
+      "metrics_after": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "found_rank": 3
+      },
+      "changed": false
+    },
+    {
+      "case_id": "NEG-AMBIG-COMPOUND-01",
+      "category": "negative_ambiguous_entity",
+      "gold_ids": [
+        "CHEMBL3717"
+      ],
+      "method_used": "search_by_target",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "found_rank": 3
+      },
+      "metrics_after": {
+        "recall@1": 0.0,
+        "hit@1": 0.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.2,
+        "mrr": 0.3333333333333333,
+        "found_rank": 3
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-INDICATION-01",
+      "category": "chembl_indication",
+      "gold_ids": [
+        "CHEMBL2105712",
+        "CHEMBL1201583",
+        "CHEMBL601719"
+      ],
+      "method_used": "search_by_indication",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.4,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-INDICATION-02",
+      "category": "chembl_indication",
+      "gold_ids": [
+        "CHEMBL1201438",
+        "CHEMBL467",
+        "CHEMBL1789844",
+        "CHEMBL1229517"
+      ],
+      "method_used": "search_by_indication",
+      "match_type_or_note": "unaffected_by_resolve_compound_name (already-supported operation, unchanged from baseline)",
+      "metrics_before": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.6,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "precision@5": 0.6,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "changed": false
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-01",
+      "category": "chembl_compound",
+      "gold_ids": [
+        "CHEMBL3545311"
+      ],
+      "input_name_resolved": "brigatinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3545311"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.5229348329594359,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-02",
+      "category": "chembl_compound",
+      "gold_ids": [
+        "CHEMBL3353410"
+      ],
+      "input_name_resolved": "osimertinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3353410"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.11508512496948242,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-03",
+      "category": "chembl_compound",
+      "gold_ids": [
+        "CHEMBL4297839"
+      ],
+      "input_name_resolved": "tirzepatide",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL4297839"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.11070579197257757,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-04",
+      "category": "chembl_compound",
+      "gold_ids": [
+        "CHEMBL3833321"
+      ],
+      "input_name_resolved": "lecanemab",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3833321"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.11254375008866191,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-05",
+      "category": "chembl_compound",
+      "gold_ids": [
+        "CHEMBL3137343"
+      ],
+      "input_name_resolved": "pembrolizumab",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3137343"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.1339015419362113,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-06",
+      "category": "chembl_compound",
+      "gold_ids": [
+        "CHEMBL3622821"
+      ],
+      "input_name_resolved": "upadacitinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3622821"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.20236766710877419,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-01",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL3353410"
+      ],
+      "input_name_resolved": "osimertinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3353410"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.00039729196578264236,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-02",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL941"
+      ],
+      "input_name_resolved": "imatinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL941"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.20737683295737952,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-03",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL3545311"
+      ],
+      "input_name_resolved": "brigatinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3545311"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.00036437506787478924,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-04",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL4297839"
+      ],
+      "input_name_resolved": "tirzepatide",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL4297839"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.00028429203666746616,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-05",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL3833321"
+      ],
+      "input_name_resolved": "lecanemab",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3833321"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.0002507909666746855,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-06",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL3622821"
+      ],
+      "input_name_resolved": "upadacitinib",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3622821"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.00022329192142933607,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    },
+    {
+      "case_id": "MS-07",
+      "category": "multi_source_chembl_leg",
+      "gold_ids": [
+        "CHEMBL3137343"
+      ],
+      "input_name_resolved": "pembrolizumab",
+      "method_used_before": "get_drug_info_by_name (invalid -- 404, no resolution operation existed)",
+      "method_used_after": "resolve_compound_name -> chembl_id",
+      "match_type": "exact_preferred_name",
+      "returned_ids": [
+        "CHEMBL3137343"
+      ],
+      "metrics_before": {
+        "recall@1": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "mrr": 0.0,
+        "hit@10": 0.0,
+        "found_rank": null
+      },
+      "metrics_after": {
+        "recall@1": 1.0,
+        "hit@1": 1.0,
+        "recall@5": 1.0,
+        "hit@5": 1.0,
+        "recall@10": 1.0,
+        "hit@10": 1.0,
+        "mrr": 1.0,
+        "found_rank": 1
+      },
+      "latency_s": 0.0002091249916702509,
+      "changed": true,
+      "scoring_note": "Scored resolve_compound_name's own output directly against gold ChEMBL IDs (the case asks 'what is the ChEMBL identifier for X', which is exactly what resolve_compound_name answers -- no downstream get_drug_info call was needed to satisfy the case's own gold_relevant_ids)."
+    }
+  ],
+  "multi_source_coverage_before": 0.0,
+  "multi_source_coverage_after": 0.5714285714285714,
+  "multi_source_per_case_detail": [
+    {
+      "case_id": "MS-01",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "pubmed_leg_hit": true,
+      "clinical_trials_leg_hit": true,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": true,
+      "remaining_failure_reason": null
+    },
+    {
+      "case_id": "MS-02",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "pubmed_leg_hit": true,
+      "clinical_trials_leg_hit": true,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": true,
+      "remaining_failure_reason": null
+    },
+    {
+      "case_id": "MS-03",
+      "target_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "pubmed_leg_hit": true,
+      "clinical_trials_leg_hit": null,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": true,
+      "remaining_failure_reason": null
+    },
+    {
+      "case_id": "MS-04",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "pubmed_leg_hit": false,
+      "clinical_trials_leg_hit": true,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": false,
+      "remaining_failure_reason": [
+        "pubmed leg missed (pre-existing live-API date-default/NL-query gap or RAG-corpus staleness, unrelated to ChEMBL)"
+      ]
+    },
+    {
+      "case_id": "MS-05",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "pubmed_leg_hit": false,
+      "clinical_trials_leg_hit": true,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": false,
+      "remaining_failure_reason": [
+        "pubmed leg missed (pre-existing live-API date-default/NL-query gap or RAG-corpus staleness, unrelated to ChEMBL)"
+      ]
+    },
+    {
+      "case_id": "MS-06",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "pubmed_leg_hit": true,
+      "clinical_trials_leg_hit": false,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": false,
+      "remaining_failure_reason": [
+        "clinical_trials leg missed (pre-existing, documented ranking/query-formulation gap, unrelated to ChEMBL -- see PHASE4_BASELINE_MEASUREMENT.md amendment)"
+      ]
+    },
+    {
+      "case_id": "MS-07",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "pubmed_leg_hit": true,
+      "clinical_trials_leg_hit": true,
+      "chembl_leg_hit_before": false,
+      "chembl_leg_hit_after": true,
+      "all_required_sources_covered_before": false,
+      "all_required_sources_covered_after": true,
+      "remaining_failure_reason": null
+    }
+  ],
+  "remaining_known_gaps_not_addressed_by_this_work": [
+    "ChEMBL search_by_target's WRONG_ENTITY first-hit heuristic (CHEMBL-TARGET-02, CHEMBL-AMBIG-01, NEG-AMBIG-COMPOUND-01) -- resolve_compound_name does not touch search_by_target at all; those 3 cases are unchanged.",
+    "PubMed live-API date-default and NL-query relevance gap (MS-04, MS-05 pubmed legs) -- out of scope for ChEMBL resolution work.",
+    "ClinicalTrials MS-06 ranking miss (documented, unrelated to the filter.phase fix) -- out of scope for ChEMBL resolution work."
+  ]
+}

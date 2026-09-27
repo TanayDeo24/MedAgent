@@ -1,0 +1,461 @@
+{
+  "phase": "2_nvidia_fastmodel_review",
+  "candidate": "candidate_e_nvidia_fast (nvidia/nemotron-3.5-lightning-30b-a3b, chat_template_kwargs enable_thinking=False)",
+  "pilot_n": 8,
+  "pilot_results": [
+    {
+      "query_id": "nlu_v1_0013",
+      "intent_class": "A_literature_evidence",
+      "query_text": "What evidence supports PD-1 as a therapeutic target in breast cancer?",
+      "latency_ms": 4984.385013580322,
+      "schema_valid": true,
+      "pred_intent": [
+        "A_literature_evidence"
+      ],
+      "pred_entities": [
+        {
+          "type": "target",
+          "surface": "PD-1",
+          "canonical_id": "HGNC:8760",
+          "semantic_roles": []
+        },
+        {
+          "type": "disease",
+          "surface": "breast cancer",
+          "canonical_id": "MeSH:D001943",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "norm": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "pred_constraints": [],
+      "gold_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0106",
+      "intent_class": "G_constraint_heavy",
+      "query_text": "Find recruiting Phase 1 trials in adults with non-small cell lung cancer using EGFR inhibitors",
+      "latency_ms": 4916.717052459717,
+      "schema_valid": true,
+      "pred_intent": [
+        "A_literature_evidence"
+      ],
+      "pred_entities": [
+        {
+          "type": "disease",
+          "surface": "non-small cell lung cancer",
+          "canonical_id": "MeSH:D002289",
+          "semantic_roles": []
+        },
+        {
+          "type": "target",
+          "surface": "EGFR inhibitors",
+          "canonical_id": null,
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "norm": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8
+      },
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0048",
+      "intent_class": "D_cross_source_synthesis",
+      "query_text": "Which BTK inhibitors have both published evidence and active trials in type 2 diabetes?",
+      "latency_ms": 5771.136999130249,
+      "schema_valid": true,
+      "pred_intent": [
+        "A_literature_evidence"
+      ],
+      "pred_entities": [
+        {
+          "type": "target",
+          "surface": "BTK inhibitors",
+          "canonical_id": null,
+          "semantic_roles": []
+        },
+        {
+          "type": "disease",
+          "surface": "type 2 diabetes",
+          "canonical_id": "MeSH:D003924",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "norm": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "pred_constraints": [],
+      "gold_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0017",
+      "intent_class": "B_clinical_trial_landscape",
+      "query_text": "What Phase 2 trials are evaluating osimertinib in melanoma?",
+      "latency_ms": 5011.47985458374,
+      "schema_valid": true,
+      "pred_intent": [
+        "A_literature_evidence"
+      ],
+      "pred_entities": [
+        {
+          "type": "disease",
+          "surface": "melanoma",
+          "canonical_id": "MeSH:D008545",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      },
+      "norm": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0136",
+      "intent_class": "I_ambiguous",
+      "query_text": "Tell me about KRAS inhibitors.",
+      "latency_ms": 3992.9850101470947,
+      "schema_valid": true,
+      "pred_intent": [
+        "A_literature_evidence"
+      ],
+      "pred_entities": [
+        {
+          "type": "target",
+          "surface": "KRAS",
+          "canonical_id": "HGNC:6407",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "norm": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "pred_constraints": [],
+      "gold_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0071",
+      "intent_class": "F_mechanism",
+      "query_text": "What is the mechanism of action of sotorasib against BTK?",
+      "latency_ms": 16975.167989730835,
+      "schema_valid": true,
+      "pred_intent": [
+        "F_mechanism"
+      ],
+      "pred_entities": [
+        {
+          "type": "target",
+          "surface": "BTK",
+          "canonical_id": "HGNC:1133",
+          "semantic_roles": []
+        },
+        {
+          "type": "compound",
+          "surface": "sotorasib",
+          "canonical_id": "ChEMBL:CHEMBL4535757",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "norm": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "pred_constraints": [],
+      "gold_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0100",
+      "intent_class": "E_multi_hop_research",
+      "query_text": "Starting from compounds that inhibit KRAS, which ones progressed to trials in melanoma and what do published studies report on their outcomes?",
+      "latency_ms": 5009.522199630737,
+      "schema_valid": true,
+      "pred_intent": [
+        "A_literature_evidence"
+      ],
+      "pred_entities": [
+        {
+          "type": "target",
+          "surface": "KRAS",
+          "canonical_id": "HGNC:6407",
+          "semantic_roles": []
+        },
+        {
+          "type": "disease",
+          "surface": "melanoma",
+          "canonical_id": "MeSH:D008545",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "norm": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "pred_constraints": [],
+      "gold_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    },
+    {
+      "query_id": "nlu_v1_0031",
+      "intent_class": "C_compound_target",
+      "query_text": "Which compounds target EGFR and what activity is reported?",
+      "latency_ms": 3753.6630630493164,
+      "schema_valid": true,
+      "pred_intent": [
+        "C_compound_target"
+      ],
+      "pred_entities": [
+        {
+          "type": "target",
+          "surface": "EGFR",
+          "canonical_id": "HGNC:3236",
+          "semantic_roles": []
+        }
+      ],
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "norm": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "pred_constraints": [],
+      "gold_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": false
+      }
+    }
+  ],
+  "latencies_ms": [
+    4984.385013580322,
+    4916.717052459717,
+    5771.136999130249,
+    5011.47985458374,
+    3992.9850101470947,
+    16975.167989730835,
+    5009.522199630737,
+    3753.6630630493164
+  ],
+  "latency_summary": {
+    "p50_ms": 4984.385013580322,
+    "max_ms": 16975.167989730835,
+    "note": "Materially faster than control (P50 19150ms) on this pilot - one outlier (nlu_v1_0071, 16975ms) shows reasoning suppression is not 100% reliable even with the documented enable_thinking=False parameter, consistent with the wider pattern this project has repeatedly observed on NVIDIA-hosted reasoning-tuned models. Latency alone would NOT have blocked this candidate."
+  },
+  "quality_findings": {
+    "intent_systematic_collapse": "CRITICAL: 5 of 8 pilot examples (62.5%) were misclassified with predicted intent=['A_literature_evidence'] regardless of true class (true classes: G_constraint_heavy, D_cross_source_synthesis, B_clinical_trial_landscape, I_ambiguous, E_multi_hop_research all collapsed to A). Only 3/8 correct (A_literature_evidence itself, F_mechanism, C_compound_target - i.e. the classes structurally closest to the collapse target, or already-simple queries). This directly matches this round's pre-declared hard rejection criteria for systematic class confusion.",
+    "i_ambiguous_failsafe_broken": "nlu_v1_0136 (I_ambiguous gold) predicted intent=A_literature_evidence with ambiguity.is_ambiguous=False - the ambiguity fail-safe (added during the Phase 2 closure pass specifically to prevent over-confident answers to underspecified queries) did not fire on this smaller/faster model.",
+    "entity_span_boundary_regression": "Two entities extracted with an incorrect trailing span ('EGFR inhibitors', 'BTK inhibitors' as single surface_form instead of the correct entity-only span 'EGFR'/'BTK') - this breaks normalization (canonical_id=None, i.e. an abstention, not a fabrication - no fabricated IDs occurred) despite the SAME STRUCTURED_EXTRACTION_PROMPT text (with its EXHAUSTIVE ENTITY SCAN and exact-substring rules) that produces clean spans under the control model.",
+    "constraint_field_loss": "nlu_v1_0048 (D_cross_source_synthesis): the single gold constraint (trial_statuses=ACTIVE_NOT_RECRUITING) was entirely dropped (constraint_prf f1=0.0). nlu_v1_0106 (G_constraint_heavy): trial_statuses=RECRUITING dropped (constraint recall 0.667, one of three fields missed).",
+    "fabricated_id_count": 0,
+    "semantic_roles": "never populated in this pilot (0/8), including on nlu_v1_0071 (BTK) which was specifically selected to probe gene/protein/target semantic-role handling - inconclusive on this small n, but consistent with a general reduction in the model's rule-following depth without its reasoning trace"
+  },
+  "decision": "REJECT",
+  "decision_reason": "Hard quality gate failure on the pilot: systematic intent-class collapse (5/8, 62.5%, all non-A classes drove toward A_literature_evidence) plus a broken I_ambiguous fail-safe and a constraint-field loss case. This is the same class of defect (systemic intent misclassification) that originally reopened Phase 2, now reproduced by a different, faster, smaller-active-param model with reasoning disabled. Per the pre-declared rejection rule, this fails immediately - no full 45-example dev run performed (not warranted; the failure is unambiguous and semantic, not eligible for a bounded prompt-schema revision since revisions are reserved for formatting/schema-integration issues, not semantic collapse). Root cause (not verified further this round, reported as a hypothesis only): the model's active parameter count (3B active of 30B total) combined with reasoning fully disabled appears insufficient to reliably apply this taxonomy's multi-rule disambiguation logic (B_VS_G_RULE, DI_VS_E_RULE, I_ambiguous mapping) without a visible reasoning trace - the same multi-step disambiguation that candidate_b_structured's much larger, reasoning-enabled model performs correctly.",
+  "full_dev_run": false,
+  "active_runtime_after_experiment": "UNCHANGED: candidate_b_structured / nvidia/nemotron-3-super-120b-a12b remains the frozen production NLU architecture, per artifacts/v2/nlu_frozen_config.json (unmodified this round)."
+}

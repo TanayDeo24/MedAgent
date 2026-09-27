@@ -1,0 +1,75 @@
+{
+  "config_version": 2,
+  "config_version_history": [
+    {
+      "config_version": 1,
+      "frozen_at": "2026-09-25",
+      "status": "SUPERSEDED - declared OPEN after phase4_heldout run found a real defect (docs/v2/PHASE4_STATUS.md): ChEMBLTool.resolve_compound_name()'s fuzzy-match tier had no similarity threshold, so a fabricated compound name ('Zorblatinix-9X') returned a confident, real-but-unrelated ChEMBL ID (CHEMBL5875133) instead of failing safely."
+    },
+    {
+      "config_version": 2,
+      "frozen_at": "2026-09-25",
+      "status": "current",
+      "note": "Fix for the config_version 1 defect: tools/chembl_tool.py's resolve_compound_name() now gates its fuzzy tier with a difflib.SequenceMatcher-based similarity check (FUZZY_MATCH_MIN_SIMILARITY=0.6) against the top ChEMBL candidate's pref_name and synonyms, chosen after live-verifying ChEMBL's own native ES score is an uncalibrated corpus-wide Lucene score unusable as a fixed threshold (fabricated name scored higher than a genuine typo in a direct comparison). Below threshold, returns match_type='no_match'/chembl_id=None instead of a misleading id. Regression-verified against dev+validation (all 13 previously-fixed real-compound cases unaffected, ChEMBL Recall@10 still 1.0) and confirmed via a fresh, never-before-used 10-case held-out supplement (artifacts/v2/phase4_chembl_fuzzy_threshold_supplement.json): 4/4 fabricated names correctly rejected, 3/3 genuine near-miss typos still resolve, 2/2 synonym-tier sanity checks unaffected, zero misleading IDs returned. Full details: docs/v2/CHEMBL_FUZZY_MATCH_THRESHOLD_FIX.md, docs/v2/PHASE4_CHEMBL_FUZZY_THRESHOLD_SUPPLEMENT_RESULTS.md. Original phase4_heldout (12 cases) and its results were NOT re-run or touched by this fix."
+    }
+  ],
+  "phase": 4,
+  "selection_priority_applied": "docs/v2/PHASE4_GATE_PLAN.md Section 4: correctness/recall > no systematic source failure > ranking quality > multi-source coverage > latency > cost/complexity",
+  "pubmed": {
+    "selected_architecture": "local RAG hybrid pipeline (retrieval/retriever.py: FAISS dense + BM25 sparse -> RRF fusion k=60 -> cross-encoder rerank)",
+    "corpus_version": "data/corpus/abstracts.jsonl, 9000 abstracts (subsampled from 13115-abstract raw fetch, seed=42) - known reproducibility gap documented in artifacts/v2/phase4_retrieval_inventory.json integrity_issues_found, NOT fixed in Phase 4 (out of scope: corpus is stable/live-in-use, not corrupted; reproducibility script gap is a build-tooling issue, not a retrieval-quality defect)",
+    "chunking_version": "180-word chunks, 30-word overlap (data/index/index_meta.json)",
+    "embedding_model": "all-MiniLM-L6-v2, 384-dim",
+    "index_type": "FAISS IndexFlatIP",
+    "bm25": "rank_bm25 BM25Okapi, data/index/bm25.pkl",
+    "fusion": "Reciprocal Rank Fusion, k=60 (retrieval/retriever.py RRF_K)",
+    "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "top_k": 10,
+    "rejected_alternatives": {
+      "fixed_live_api_raw_query": "Recall@10 0.045 (n=22) - rejected, no better than broken baseline",
+      "fixed_live_api_plus_compiler": "Recall@10 0.136, MRR 0.059 (n=22) - rejected, RAG wins by 5.7x recall and 10x+ MRR",
+      "rag_plus_live_fusion": "not built - checked and confirmed zero unique recall contribution from live path (all 3 of its hits already hit by RAG), so fusion would add noise/duplication risk with no demonstrated benefit"
+    },
+    "query_compiler_built_but_not_selected": "retrieval/pubmed_query_compiler.py - real, tested, deterministic compiler exists for any future caller needing live-PubMed search, but is not part of the frozen primary retrieval path",
+    "supporting_artifacts": ["artifacts/v2/phase4_pubmed_candidate_plan.json", "artifacts/v2/phase4_pubmed_candidate_comparison.json", "docs/v2/PHASE4_HETEROGENEOUS_RETRIEVAL.md"]
+  },
+  "clinical_trials": {
+    "selected_architecture": "live ClinicalTrials.gov v2 API, structured filters (condition/intervention/status/phase), phase filtering via AREA[Phase]<value> query.term (fixed from invalid filter.phase parameter)",
+    "ranking": "no additional ranking layer added beyond the API's own default ordering - structured filtering already narrows results effectively (filter-correctness 0.850) and no measurement showed post-filter ranking as a bottleneck; simplest architecture that clears gates",
+    "local_index": "none - live-API-only, confirmed correct architecture per audit (no evidence a local trials index would help; trial data changes frequently, live is authoritative)",
+    "required_trial_recall_dev_validation": 0.895,
+    "structured_filter_correctness_dev_validation": 0.850,
+    "supporting_artifacts": ["docs/v2/CLINICALTRIALS_PHASE_FILTER_DEFECT_FIX.md", "artifacts/v2/phase4_baseline_results_clinicaltrials_phase_fix_amendment.json"]
+  },
+  "chembl": {
+    "selected_architecture": "live ChEMBL web services API, 4 operations: search_by_target, search_by_indication, get_drug_info, resolve_compound_name (new)",
+    "resolve_compound_name_match_types": ["exact_id_passthrough", "exact_preferred_name", "exact_synonym", "fuzzy", "ambiguous_match", "no_match"],
+    "fuzzy_match_similarity_gate": "difflib.SequenceMatcher ratio, threshold 0.6, against top candidate's pref_name + synonyms; below threshold returns no_match/chembl_id=None instead of a misleading fuzzy id (config v2 fix, see config_version_history)",
+    "no_fabricated_ids": "structurally guaranteed - resolve_compound_name never returns a chembl_id not present in a real upstream API response",
+    "no_misleading_low_confidence_ids": "guaranteed as of config v2 - the fuzzy tier rejects low-similarity matches as no_match rather than presenting a real-but-unrelated id with false confidence",
+    "recall_at_10_dev_validation": 1.0,
+    "mrr_dev_validation": 0.898,
+    "known_accepted_limitation": "search_by_target first-hit heuristic on ambiguous target names (3/21 cases) - see artifacts/v2/phase4_failure_analysis.json",
+    "supporting_artifacts": ["docs/v2/PHASE4_CHEMBL_RESOLUTION.md", "artifacts/v2/phase4_chembl_resolution_results.json"]
+  },
+  "multi_source": {
+    "fusion_method": "none required at the ranking-score level (per contract Section 5, source-local scores are not fused into one universal score) - per-source RetrievalCandidate lists returned, each tagged with source/retrieval_method/source_rank; downstream consumer (agent/nodes.py) already keeps per-tool result lists distinct, which is the correct behavior given source-local score incomparability",
+    "quotas": "none imposed - all sources selected by Phase-3 orchestration are executed and their results all retained, no source is capped/starved by a Phase-4 quota policy",
+    "coverage_dev_validation": "0.571 (4/7) measured before final architecture integration; 3 remaining misses attributed to (a) PubMed leg scored against the non-selected live-API path rather than RAG [expected to improve once integration uses the frozen RAG architecture] and (b) one ClinicalTrials ranking miss [accepted limitation]"
+  },
+  "registered_orchestration_operations": 6,
+  "orchestration_operations_list": [
+    "pubmed/search_pubmed", "clinical_trials/search_trials",
+    "chembl/search_by_target", "chembl/search_by_indication",
+    "chembl/get_drug_info", "chembl/resolve_compound_name"
+  ],
+  "benchmark_version": "artifacts/v2/phase4_benchmark_manifest.json, 61 cases (37 dev / 12 validation / 12 phase4_heldout)",
+  "validation_run_ids": [
+    "artifacts/v2/phase4_baseline_results.json",
+    "artifacts/v2/phase4_baseline_results_clinicaltrials_phase_fix_amendment.json",
+    "artifacts/v2/phase4_pubmed_candidate_comparison.json",
+    "artifacts/v2/phase4_chembl_resolution_results.json"
+  ],
+  "no_semantic_changes_after_this_freeze": true,
+  "next_step": "Run phase4_heldout split (12 cases) exactly once against this frozen configuration."
+}

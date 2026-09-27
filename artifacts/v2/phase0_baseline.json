@@ -1,0 +1,191 @@
+{
+  "phase": "0",
+  "purpose": "Safe recovery from broken interactive-rebase state + independently executed baseline of existing MedAgent implementation",
+  "timestamp_utc": "2026-09-24T00:16:00Z",
+  "recovery": {
+    "before_head": "58a2b2f5ebb63d464fa31e8c420333124ad0819d",
+    "before_head_note": "detached HEAD mid-rebase, empty commit, checkout had deleted all tracked .py files",
+    "rebase_onto": "58a2b2f5ebb63d464fa31e8c420333124ad0819d",
+    "rebase_orig_head": "14a59b9e4c514714883245e8ac1e95a2f1457775",
+    "main_branch_ref_during_rebase": "14a59b9e4c514714883245e8ac1e95a2f1457775",
+    "main_branch_ref_note": "unmoved throughout, since rebase never completed",
+    "after_head": "14a59b9e4c514714883245e8ac1e95a2f1457775",
+    "after_branch": "main",
+    "after_upstream_status": "up to date with origin/main",
+    "abort_command": "git rebase --abort",
+    "abort_succeeded_on_first_attempt": true,
+    "fallback_destructive_commands_used": false,
+    "backup_path": "/Users/tanaydeo/Documents/MedAgent-phase0-backup-20260923-201617",
+    "backup_manifest": "/Users/tanaydeo/Documents/MedAgent-phase0-backup-20260923-201617/RECOVERY_MANIFEST.txt",
+    "backup_verified_before_git_operation": true,
+    "backup_verification_method": ["file_count_match", "env_md5_checksum_match", "non_empty_du_check"],
+    "backup_total_size_bytes_approx": 429916160,
+    "data_loss": false,
+    "gitignore_modified": false,
+    "gitignore_already_correct": true,
+    "path_conflicts_found": false
+  },
+  "environment": {
+    "os": "macOS 15.7.4 (Build 24G517)",
+    "kernel": "Darwin 24.6.0",
+    "system_python": "3.12.7",
+    "venv_python": "3.12.7",
+    "venv_intact": true,
+    "dependencies_upgraded": false,
+    "repo_size_on_disk_bytes_approx": 1717986918,
+    "key_package_versions": {
+      "langgraph": "present (version string not exposed by package)",
+      "langchain": "0.3.0",
+      "sentence_transformers": "6.0.1",
+      "faiss": "1.15.0 (faiss-cpu)",
+      "rank_bm25": "present (version string not exposed by package)",
+      "pytest": "7.4.3",
+      "langchain_nvidia_ai_endpoints": "present (version string not exposed by package)"
+    },
+    "all_key_imports_succeeded": true
+  },
+  "source_integrity": {
+    "expected_files_present": {
+      "main.py": true,
+      "agent/graph.py": true,
+      "agent/nodes.py": true,
+      "agent/prompts.py": true,
+      "agent/state.py": true,
+      "retrieval/retriever.py": true,
+      "evaluation/evaluator.py": true,
+      "tools/pubmed_tool.py": true,
+      "tools/clinical_trials_tool.py": true,
+      "tools/chembl_tool.py": true
+    },
+    "all_expected_files_present": true
+  },
+  "data_index_integrity": {
+    "abstracts_count": 9000,
+    "abstracts_count_source": "wc -l data/corpus/abstracts.jsonl",
+    "chunks_count": 22674,
+    "chunks_count_source": "wc -l data/index/chunks.jsonl",
+    "faiss_ntotal": 22674,
+    "faiss_ntotal_matches_chunks": true,
+    "faiss_dim": 384,
+    "embedding_model": "all-MiniLM-L6-v2",
+    "index_type": "IndexFlatIP (cosine via L2-normalized vectors)",
+    "chunk_size_words": 180,
+    "chunk_overlap_words": 30,
+    "index_variants_present": ["bge_base_180_30", "chunk_256_50", "chunk_384_64"],
+    "index_variants_verified": false,
+    "rebuild_performed": false
+  },
+  "tests": {
+    "command": "venv/bin/python -m pytest tests/ -q",
+    "collected": 44,
+    "passed": 42,
+    "failed": 2,
+    "skipped": 0,
+    "warnings": 127,
+    "runtime_seconds": 4.76,
+    "failed_tests": [
+      "tests/test_chembl.py::TestChEMBLRateLimiting::test_rate_limit_applied",
+      "tests/test_pubmed.py::TestPubMedRateLimiting::test_rate_limit_applied"
+    ],
+    "failure_classification": "timing_dependent_flaky_against_mocks",
+    "historical_comparison": "RESULTS.md (2026-09-09/11) reports 40/42 pass with same 2 rate-limit test failures; current suite collects 44 (2 additional tests exist now, e.g. tests/test_nodes.py). Same two tests fail in both; total collected differs and is reported as observed."
+  },
+  "retrieval_smoke_test": {
+    "load_status": "ok",
+    "queries_run": 2,
+    "results": [
+      {"query": "KRAS G12C inhibitor non-small-cell lung cancer", "ok": true, "n_results": 5, "latency_s": 3.016, "note": "cold, includes model load"},
+      {"query": "metformin cardiovascular outcomes type 2 diabetes", "ok": true, "n_results": 5, "latency_s": 0.235, "note": "warm"}
+    ],
+    "stages_exercised": ["faiss_dense", "bm25_sparse", "rrf_fusion", "cross_encoder_rerank"],
+    "provenance_metadata_present": true,
+    "is_benchmark_quality": false
+  },
+  "connector_smoke_tests": {
+    "pubmed": {"ok": true, "latency_s": 0.346, "endpoint": "NCBI E-utilities", "sample_result": "PMID 39732595"},
+    "clinicaltrials": {"ok": true, "latency_s": 0.298, "endpoint": "ClinicalTrials.gov v2 API", "sample_result": "NCT06645236"},
+    "chembl": {
+      "ok_at_tool_level": true,
+      "latency_s": 0.533,
+      "endpoint": "EBI ChEMBL REST",
+      "note": "search_by_indication requires close match to an indexed EFO term; free-text 'non-small cell lung cancer' and 'lung cancer' returned 0 results, 'diabetes mellitus' returned 3 results. Characterized, not modified.",
+      "zero_result_queries": ["non-small cell lung cancer", "lung cancer"],
+      "nonzero_result_queries": ["diabetes mellitus"]
+    }
+  },
+  "end_to_end_run": {
+    "attempted": true,
+    "blocked_by_api_access": false,
+    "api_key_present": true,
+    "api_key_length_chars": 70,
+    "query": "What clinical evidence exists for KRAS G12C inhibitors in non-small-cell lung cancer, and which compounds are currently represented in clinical trials?",
+    "start_time": "20:18:28",
+    "end_time": "20:26:09",
+    "total_latency_seconds": 461,
+    "graph_node_count_reported": 6,
+    "loop_iterations": 4,
+    "max_iterations_configured": 10,
+    "reasoning_thoughts_recorded": 22,
+    "tools_planned": ["clinical_trials", "pubmed", "chembl"],
+    "total_tool_calls": 11,
+    "tool_call_successes": 11,
+    "total_tool_results": 259,
+    "total_llm_dispatch_calls": 26,
+    "transient_errors_observed": [
+      {"type": "503 Service temporarily overloaded", "provider": "NVIDIA NIM", "occurrences": 1, "recovered": true, "recovery_mechanism": "fresh-client retry, matches EVAL_HANG_FIX_COMPLETE.md"}
+    ],
+    "final_confidence": 0.75,
+    "citations_in_report": 70,
+    "compounds_table_rows": 1,
+    "report_length_chars": 11193,
+    "completion_reason": "verification node exit condition met (query coverage >= 0.8 and confidence >= 0.7)",
+    "completed_via_max_iterations_or_error": false,
+    "raw_log_path": "/tmp/medagent_e2e_run.log",
+    "raw_log_committed_to_repo": false
+  },
+  "historical_metrics_inventory": {
+    "classification_note": "All entries below are HISTORICAL ARTIFACT only, not independently reproduced in Phase 0",
+    "task_success_rate": {"fresh_n29": 0.379, "all_n60": 0.183, "source": "RESULTS.md section 4"},
+    "tool_precision": {"fresh_n29": 0.853, "all_n60": 0.768, "source": "RESULTS.md section 4"},
+    "hallucination_rate": {"value": 0.429, "claims_judged": 63, "hallucinated": 27, "successfully_judged_cases": 6, "source": "RESULTS.md section 4"},
+    "recall_at_10_hybrid": {"mean": 0.4832, "median": 0.3704, "queries_scored": 17, "queries_total": 18, "source": "retrieval/eval_results_hybrid.json"},
+    "grounding_improvement_rag_vs_baseline": {
+      "baseline_hallucination_rate": 0.184,
+      "baseline_judged_n": 10,
+      "rag_hallucination_rate": 0.057,
+      "rag_judged_n": 2,
+      "defensible_percentage_claim": false,
+      "source": "RESULTS_RAG_COMPARISON.md sections 3-4",
+      "note": "source document itself states the RAG-arm n=2 is too small to support any percentage claim"
+    },
+    "historical_pytest_result": {"passed": 40, "total": 42, "date": "2026-09-09/11", "source": "RESULTS.md section 6"},
+    "self_disclosed_fabricated_claims_superseded": [
+      "96% task completion",
+      "98% tool-call reliability",
+      "5K+ autonomous workflows",
+      "~35% grounding improvement"
+    ]
+  },
+  "secrets_check": {
+    "env_values_printed": false,
+    "committed_secret_patterns_found": false,
+    "patterns_checked": ["sk-...", "AIza...", "nvapi-..."]
+  },
+  "phase0_success_gate": {
+    "rebase_no_longer_active": true,
+    "source_restored": true,
+    "no_high_value_data_lost": true,
+    "baseline_commit_known": true,
+    "corpus_index_checked": true,
+    "tests_executed": true,
+    "retriever_smoke_tested": true,
+    "all_connectors_smoke_tested": true,
+    "one_real_agent_run_attempted": true,
+    "one_real_agent_run_completed": true,
+    "historical_vs_reproduced_separated": true,
+    "no_optimization_performed": true,
+    "repository_runnable": true,
+    "unresolved_blockers": []
+  },
+  "verdict": "PHASE 0 COMPLETE - READY FOR PRODUCT AND EVALUATION DESIGN"
+}

@@ -1,0 +1,27 @@
+{
+  "item": 12,
+  "title": "Smaller/faster model experiment - attempted, blocked by model availability, not faked",
+  "method": "Queried ChatNVIDIA.get_available_models() for candidate smaller models, then smoke-tested each with a single live extract_candidate_b(model=...) call before committing a full 45-example dev run.",
+  "models_attempted": [
+    {"model": "nvidia/llama-3.1-nemotron-nano-8b-v1", "result": "410 Gone - reached end of life 2026-08-26T09:00:00Z"},
+    {"model": "nvidia/nvidia-nemotron-nano-9b-v2", "result": "410 Gone - reached end of life 2026-08-26T09:00:00Z"},
+    {"model": "nvidia/llama-3.3-nemotron-super-49b-v1", "result": "410 Gone - reached end of life 2026-08-26T09:00:00Z"},
+    {"model": "nvidia/llama-3.1-nemotron-nano-4b-v1.1", "result": "404 Not Found"},
+    {"model": "meta/llama-3.1-8b-instruct", "result": "410 Gone - reached end of life 2026-08-26T09:00:00Z"},
+    {"model": "microsoft/phi-4-mini-instruct", "result": "410 Gone - reached end of life 2026-07-15T00:00:00Z"},
+    {"model": "meta/llama-4-scout-17b-16e-instruct", "result": "404 Not Found"},
+    {"model": "qwen/qwen2.5-7b-instruct", "result": "404 Not Found"},
+    {"model": "mistralai/mistral-small-24b-instruct", "result": "404 Not Found"},
+    {"model": "ibm/granite-3.3-8b-instruct", "result": "404 Not Found"}
+  ],
+  "first_full_run_attempted": {
+    "model": "nvidia/llama-3.1-nemotron-nano-8b-v1",
+    "n_examples": 45,
+    "schema_parse_success_rate": 0.0,
+    "result": "0/45 successful - every call failed with the same 410 Gone error. Confirms this is a genuine model-retirement, not a transient/rate-limit issue. File: artifacts/v2/nlu_closure_smallmodel_b_dev.json",
+    "latency_note": "Failed calls returned in ~3.5s (P50), which is NOT informative about a working smaller model's real latency - it's just how fast the endpoint returns a 410 error, included here only for completeness."
+  },
+  "conclusion": "SDK-reported available_models() is stale relative to what the NVIDIA build.nvidia.com endpoint actually serves as of 2026-09-24 - every smaller/faster model candidate tried (spanning nvidia/nemotron-nano variants, meta/llama-3.1-8b, microsoft/phi-4-mini, and several newer-generation 7-24B models from other vendors) is either retired (410, mostly with an explicit 2026-07/08 end-of-life date) or not reachable at this path (404). No working smaller model was found to compare against within this closure pass's time budget.",
+  "decision": "Item 12 NOT completed - genuinely attempted and honestly blocked, not skipped and not faked. Keep nvidia/nemotron-3-super-120b-a12b (the current frozen model) since it is the only one confirmed to actually work through this endpoint configuration. Latency (item 11) is addressed separately via profiling (see docs/v2/PHASE2_CLOSURE_REPORT.md's updated latency section) rather than via a model swap this round.",
+  "reopening_this_item": "A future round should verify the CURRENT live NVIDIA NIM model catalog directly (e.g. via the build.nvidia.com console or a fresh API listing call closer to when the round runs, since this list visibly goes stale within weeks) rather than trusting a cached SDK listing, before re-attempting this experiment."
+}

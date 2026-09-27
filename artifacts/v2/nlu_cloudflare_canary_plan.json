@@ -1,0 +1,94 @@
+{
+  "phase": "2 (Cloudflare neuron canary review round)",
+  "status": "STOPPED BEFORE ANY BASELINE OR INFERENCE CALL — anomaly investigation (Step 3) was dispositive",
+  "date": "2026-09-24",
+  "task_scope": "Perform exactly ONE tightly-controlled Cloudflare Workers AI inference request to empirically verify whether @cf/google/gemma-4-26b-a4b-it's actual neuron billing matches published rates, before deciding whether to resume the Phase-2 NLU pilot. Zero requests were made — the pre-request anomaly review already met the task's own 'stop and report rather than proceed' bar.",
+
+  "step0_1_repo_health": {
+    "branch": "main",
+    "head": "14a59b9e4c514714883245e8ac1e95a2f1457775",
+    "head_matches_expected": true,
+    "modified_tracked_files": ["agent/nodes.py", "config/settings.py", "tests/test_chembl.py", "tests/test_nodes.py", "tests/test_pubmed.py"],
+    "modified_files_match_expected": true,
+    "tests_before_canary": "135 passed, 0 failed, 0 skipped (venv/bin/python -m pytest tests/ -q)",
+    "verdict": "MATCHES EXPECTED STATE — proceeded to Step 2"
+  },
+
+  "step2_official_cloudflare_terms_reverified_this_session": {
+    "free_daily_neuron_allocation": {
+      "value": "10,000 Neurons per day at no charge",
+      "source": "https://developers.cloudflare.com/workers-ai/platform/pricing/ (fetched this session)"
+    },
+    "overflow_behavior_free_plan": {
+      "finding": "On the Free plan, exceeding the daily allocation causes 'further operations [to] fail with an error' — requests are rejected, there is NO automatic paid overflow on Workers Free. Paid-plan overage is a separate, opt-in state ($0.011/1000 neurons above the free allocation) that only applies to accounts that have actively upgraded to Workers Paid.",
+      "source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "caveat": "This session could NOT independently verify from inside this sandboxed environment whether the specific Cloudflare account tied to CLOUDFLARE_ACCOUNT_ID is Free-only or has Workers Paid/billing already enabled — that fact matters directly given the billing-dispute evidence in step3 below, and was not confirmable without either an account-scope API call (out of this round's authorized scope) or asking the human."
+    },
+    "gemma_4_26b_a4b_it_free_tier_eligible": true,
+    "gemma_4_26b_a4b_it_published_rates": {
+      "input_usd_per_million_tokens": 0.10,
+      "output_usd_per_million_tokens": 0.30,
+      "derived_neurons_per_input_token": 0.00909,
+      "derived_neurons_per_output_token": 0.02727,
+      "source": "https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/"
+    },
+    "reasoning_disable_mechanism": {
+      "documented": "chat_template_kwargs: {enable_thinking: false}",
+      "structural_note": "Model documentation independently confirms gemma-4-26b-a4b-it has a 'built-in thinking mode that lets the model reason step-by-step before answering' — i.e. this is a reasoning-tuned model by design, the same class of model whose chain-of-thought this project's own Nemotron work (docs/v2/PHASE2_CLOSURE_REPORT.md §13/§24) found dominates both latency AND token cost, and whose equivalent 'disable thinking' controls (Nemotron's /no_think prompt trick, and later its real thinking_mode SDK parameter) were BOTH found unreliable in this project's own live tests (worked once, failed once). No independent, live confirmation exists this session that enable_thinking:false reliably suppresses Gemma-4's reasoning trace on Workers AI — it is a documented parameter, not a verified-reliable one.",
+      "billing_relevance": "Cloudflare's own pricing material states reasoning/thinking tokens are billed as OUTPUT tokens even when not retained/shown in the final response content ('Output is billed separately from context growth because reasoning tokens are not always retained.') — this is a plausible, structurally sound mechanism for exactly the kind of large, silent overcharge multiple community reports describe (see step3)."
+    },
+    "structured_output_capability": "response_format parameter documented as supported (JSON mode); no live verification performed (no call made)."
+  },
+
+  "step3_anomaly_investigation": {
+    "no_model_call_made_this_step": true,
+    "reports_found": [
+      {
+        "title": "Potential Billing Error: Workers AI \"Gemma-4-26b-a4b-it\" cost 37x higher",
+        "url": "https://community.cloudflare.com/t/potential-billing-error-workers-ai-gemma-4-26b-a4b-it-cost-37x-higher/917868",
+        "date": "2026-04-11 (per search index)",
+        "model_referenced": "@cf/google/gemma-4-26b-a4b-it (exact match to this task's primary candidate)",
+        "product": "Workers AI (confirmed, not an unrelated Cloudflare product)",
+        "claim": "Expected ~$8 bill based on published per-token pricing, actually charged ~$292 (~37x)",
+        "cloudflare_staff_response_found": false
+      },
+      {
+        "title": "The Gemma 4 model is being priced incorrectly",
+        "url": "https://community.cloudflare.com/t/the-gemma-4-model-is-being-priced-incorrectly/916875",
+        "model_referenced": "@cf/google/gemma-4-26b-a4b-it",
+        "product": "Workers AI",
+        "cloudflare_staff_response_found": false,
+        "note": "Independent corroborating thread, filed one thread-ID earlier than the 37x report — same underlying complaint from a second reporter."
+      },
+      {
+        "title": "Workers AI billing dispute unanswered for 13 days - account cancellation threatened",
+        "url": "https://community.cloudflare.com/t/workers-ai-billing-dispute-unanswered-for-13-days-account-cancellation-threatened/922742",
+        "model_referenced": "@cf/google/gemma-4-26b-a4b-it",
+        "product": "Workers AI",
+        "claim": "Charged $2,457.90 for gemma-4-26b-a4b-it usage against a documented $0.10/M-token rate; support ticket opened ~2026-04-10 went unanswered for 13 days; account-cancellation notice threatened for 2026-04-27.",
+        "cloudflare_staff_response_found": false,
+        "note": "NEW finding this session, not present in the prior round's nlu_cloudflare_budget_plan.json — a third, independent, larger-dollar, escalating dispute, still with no confirmed staff resolution found."
+      },
+      {
+        "title": "Wrongly charged for Workers AI and nobody answering my ticket",
+        "url": "https://community.cloudflare.com/t/wrongly-charged-for-workers-ai-and-nobody-answering-my-ticket/908732",
+        "note": "A further, separate unanswered-billing-ticket thread surfaced by search; not fully triaged for model-specificity this session, listed for completeness."
+      },
+      {
+        "title": "Wrongly charged for Workers AI and Nobody Answering Support Ticket",
+        "url": "https://community.cloudflare.com/t/wrongly-charged-for-workers-ai-and-nobody-answering-support-ticket/927161",
+        "note": "Later thread-ID than the 922742 dispute above, suggesting the pattern of unresolved Workers AI billing complaints continued past that report, not resolved by it. Not fully triaged for model-specificity this session."
+      }
+    ],
+    "resolution_status": "NOT CONFIRMED RESOLVED. No Cloudflare-staff acknowledgment, explanation, or fix confirmation was found for the billing/neuron-accounting anomaly itself in any thread reachable this session (community.cloudflare.com pages returned HTTP 403 to direct fetch; content triaged via search-engine snippets only, which is a genuine limitation — full thread bodies including any staff replies were not directly read). A separate, unrelated GitHub docs issue (#29599, about missing neuron-count documentation on the model's page) IS closed, but that is a documentation-completeness issue, not the billing-accuracy issue, and must not be conflated with it.",
+    "structural_plausibility": "HIGH. Cloudflare's own pricing docs confirm reasoning/thinking tokens are billed as output tokens even when not retained in the visible response. Gemma-4-26b-a4b-it is independently documented as having 'built-in thinking mode.' A ~37x overcharge is fully consistent with a large, hidden reasoning trace being billed as output while the visible JSON answer stays small — exactly the same failure mode this project already measured directly on a different reasoning-tuned model (Nemotron: one captured case had a 9,234-character reasoning preamble; 2/8 profiled calls exhausted a 2048-token budget on reasoning alone).",
+    "classification": "CONFIRMED CURRENT ISSUE (multiple independent, escalating, dollar-denominated reports, spanning at least 2026-04 into later months by thread-ID ordering, with a structurally sound and separately-corroborated billing mechanism, and no confirmed Cloudflare resolution found). Downgraded from the prior round's own classification only in the direction of MORE evidence, not less — this session found a NEW, larger, still-unresolved dispute (922742) and a further later unresolved thread (927161) that did not exist in the prior round's budget plan.",
+    "reasoning_token_billing_involvement": "Directly implicated as the most structurally plausible root cause, not just a coincidental factor."
+  },
+
+  "step4_5_before_baseline": "NOT ATTEMPTED — see artifacts/v2/nlu_cloudflare_canary_before.json. Step 3's classification already meets the task's own hard-stop bar ('If anything is unclear or you're unsure whether an action would spend quota unexpectedly, STOP and report rather than proceeding'), so no baseline measurement, canary design, or request was pursued this round.",
+
+  "decision": "STOP before any real inference call and before establishing a usage baseline. The anomaly is classified CONFIRMED CURRENT ISSUE on stronger evidence than the prior round had (a new, larger, still-unanswered dispute plus a further unresolved later thread). Cloudflare's published neuron pricing cannot be treated as a reliable basis for this task's safety-gate arithmetic (expected_max_published_neurons * 40 < 5000) because the entire premise of that arithmetic — that real consumption tracks published per-token rates — is exactly what multiple credible, unresolved, dollar-denominated reports contradict for this specific model. Proceeding to Step 4 (baseline) or Step 9 (the one permitted request) would not reduce this risk; the risk is in the accounting itself, not in measurement precision.",
+
+  "next_action_per_step16_fail_branch": "Gemma rejected for this experiment; zero neurons spent on it. GLM-4.7-flash investigated via docs/web search only (no API call) — see artifacts/v2/nlu_cloudflare_glm_canary_plan.json. Stopping for human approval before any GLM call, per the task's explicit instruction."
+}

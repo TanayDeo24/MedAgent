@@ -1,0 +1,58 @@
+{
+  "verification_date": "2026-09-24",
+  "purpose": "Pre-inference billing-safety and capability verification for the Cerebras Phase 2 NLU-latency experiment, per the human-authorized directive. Performed BEFORE any API call to Cerebras.",
+  "sources_checked": [
+    "https://inference-docs.cerebras.ai/support/rate-limits (official Cerebras docs, fetched live 2026-09-24)",
+    "https://inference-docs.cerebras.ai/capabilities/reasoning (official Cerebras docs, fetched live 2026-09-24)",
+    "https://inference-docs.cerebras.ai/capabilities/structured-outputs (official Cerebras docs, fetched live 2026-09-24)",
+    "https://inference-docs.cerebras.ai/models/openai-oss (official Cerebras docs, fetched live 2026-09-24)",
+    "https://models.dev/models/openai/gpt-oss-120b/ (third-party model registry, cross-check for pricing only, fetched live 2026-09-24)",
+    "https://openrouter.ai/openai/gpt-oss-120b (third-party aggregator, cross-check for pricing only, listed in search results, not independently fetched)"
+  ],
+  "account_tier": "Free Trial (Cerebras replaced its previously-open free daily-token tier with a credit-and-time-bounded Free Trial as of 2026-07-21, per official rate-limits docs)",
+  "free_trial_terms": {
+    "credit_amount_usd": 5,
+    "expiration": "30 days after the credit is granted",
+    "payment_method_required": true,
+    "requires_verified_payment_method_to_activate": true,
+    "unused_credits_can_trigger_automatic_paid_charges": false,
+    "evidence": "Official docs state verbatim: 'New accounts receive $5 in free credits after adding a verified payment method. These credits expire 30 days after they're granted and can be used across all public models.' and 'There is no charge until you choose to purchase additional credits.'",
+    "what_happens_on_depletion_or_expiration": "'API and Playground access stop on the Free Trial tier until you purchase credits.' API keys/projects/settings remain intact; purchasing credits immediately reactivates access and upgrades the account to the paid Developer tier with higher rate limits.",
+    "auto_recharge_status": "Not offered/not mentioned anywhere in official docs as an automatic mechanism; access simply halts on depletion, no evidence of any auto-recharge or auto-upgrade-on-depletion behavior.",
+    "permanently_free_tier_available": false,
+    "disclosure_for_final_report": "IMPORTANT: this $5/30-day Free Trial is temporary and NOT a permanent free deployment path. If Cerebras is adopted as the production NLU provider, long-term unit economics (paid Developer-tier pricing, ongoing token cost at production query volume) is a SEPARATE decision for a later phase, not resolved by this experiment."
+  },
+  "billing_safety_conclusion": "VERIFIED SAFE (no auto-charge possible), BUT LIVE ACCOUNT STATE IS BLOCKED: official docs explicitly confirm no automatic charge beyond the $5 free credit is possible on the Free Trial tier - the API simply stops serving requests once credit is exhausted or expired, and this was independently reconfirmed live: a real inference call made against this account returned HTTP 402 Payment Required (not a charge, not an error that could bill anything) rather than silently succeeding at cost. A diagnostic GET /v1/models call (free, no cost) confirmed the API key is valid. See artifacts/v2/nlu_cerebras_gptoss_pilot_results.json for the full record - this account's $5 free credit appears not yet provisioned (docs: requires 'adding a verified payment method' first) or is already at $0/expired; no balance-check endpoint is documented to distinguish which. Net effect: proceeding is SAFE (confirmed no risk of unintended charges) but currently BLOCKED (confirmed no usable credit) - both facts independently verified, live, before/during this session's only inference attempt.",
+  "primary_model_gpt_oss_120b": {
+    "model_id": "gpt-oss-120b",
+    "public_shared_tier_availability": true,
+    "context_window": {"free_tier": 65536, "paid_tier": 131072},
+    "max_output_tokens": {"free_tier": 32768, "paid_tier": 40960},
+    "capabilities": ["structured outputs (JSON mode + strict JSON Schema via response_format)", "function calling", "reasoning (parsed/raw/hidden formats)"],
+    "reasoning_effort": {
+      "supported_values": ["low", "medium", "high"],
+      "default": "medium",
+      "supports_none_off_switch": false,
+      "verification": "Official docs state explicitly: use reasoning_effort to select low, medium, or high; default is medium. 'none' is NOT a supported value - confirms the task brief's expectation. No prompt-trick off-switch will be used; 'low' is the genuine lowest officially-supported setting and is what this experiment uses.",
+      "reasoning_tokens_billed": true,
+      "reasoning_tokens_evidence": "'Reasoning tokens count toward max_completion_tokens and the completion-token usage reported by the API' - reasoning tokens ARE part of billed output tokens and DO contribute to latency and output usage."
+    },
+    "structured_outputs_strict_mode": {
+      "supported": true,
+      "additionalProperties_false_required_every_object": true,
+      "nullable_not_supported": "OpenAPI nullable:true is not supported; nullability must be represented as a JSON Schema union (e.g. [\"string\", \"null\"]) - REQUIRED translation step for ResearchQuery's Optional fields.",
+      "enums_supported": true,
+      "schema_limits": {"max_schema_chars": 5000, "max_nesting_levels": 10, "max_object_properties": 500, "max_total_enum_values": 500}
+    },
+    "pricing_per_million_tokens_usd": {"input": 0.35, "output": 0.75, "note": "cross-verified between models.dev and OpenRouter listings for the Cerebras provider row; official cerebras.ai/pricing page did not render static pricing figures via automated fetch (client-side rendered), so this figure is a documented third-party cross-check rather than a direct official-page scrape - treated as reliable given two independent aggregators agree exactly."},
+    "rate_limits_free_trial_tier": {
+      "rpm": 5,
+      "uncached_tpm": 30000,
+      "total_tpm": 90000,
+      "tph": 1000000,
+      "tpd": 1000000,
+      "evidence": "Official rate-limits doc, Free Trial tier row for gpt-oss-120b."
+    }
+  },
+  "throttling_plan": "RPM=5 on the Free Trial tier means at most 1 request per 12 seconds sustained. All experiment calls (pilot n=8, full dev n<=45) will be issued strictly sequentially with a >=13s minimum spacing between requests (no parallel/burst calls), and any 429 response will pause and back off rather than retry immediately - no retry pattern that could approach or exceed 5 RPM."
+}

@@ -1,0 +1,39 @@
+{
+  "config_version": 2,
+  "config_version_history": [
+    {
+      "config_version": 1,
+      "frozen_at": "2026-09-24",
+      "status": "SUPERSEDED - declared OPEN after phase3_heldout run found a real defect (docs/v2/PHASE3_STATUS.md): ClinicalTrialsSearchArgs.status/phase were typed Optional[str] with a custom field_validator, so .model_json_schema() emitted no `enum` for Cerebras and the model could (and did, case CT-008) guess a non-canonical phase/status value ('Phase 4') that was correctly rejected with no fallback, missing a required clinical_trials source on held-out."
+    },
+    {
+      "config_version": 2,
+      "frozen_at": "2026-09-24",
+      "status": "current",
+      "note": "Fix for the config_version 1 defect: orchestration/models.py's ClinicalTrialsSearchArgs.status/phase changed from Optional[str] + field_validator to Optional[Literal[tuple(sorted(VALID_TRIAL_STATUSES/PHASES))]] (derived from tools/clinical_trials_tool.py's own sets, never hand-typed), so .model_json_schema() now emits a real `enum` array for both fields in the tool declaration orchestration/candidate_b_native_tools.py sends to Cerebras. The old field_validators were kept for defense-in-depth (empirically redundant - pydantic's own Literal coercion now rejects out-of-set values first, at the type-coercion level, before the custom validator runs). Regression-verified (not a fresh held-out check - directive Step 33 forbids reusing the spent phase3_heldout split) against the same development+validation 59-case split: schema_valid_rate 0.9140 -> 1.0000, schema_invalid_count 8 -> 0, all 8 of which were clinical_trials phase/status format mismatches in the original run and 0 in this one; clinical_trials required-source miss rate stayed 0.0 -> 0.0 (was already passing on this split - the miss only showed up on the held-out split). Full numbers: artifacts/v2/phase3_candidate_b_regression_after_fix.json, docs/v2/PHASE3_CANDIDATE_B_FIX_REGRESSION.md. phase3_heldout and artifacts/v2/phase3_heldout_results.json were NOT touched or re-run by this fix. A fresh held-out supplement (new cases, not reusing the spent 15) is still required before Phase 3 can close - see docs/v2/PHASE3_STATUS.md."
+    }
+  ],
+  "frozen_at": "2026-09-24",
+  "phase": 3,
+  "winner": "Candidate B - Cerebras qwen-3.8-27b provider-native tool calling",
+  "selection_doc": "docs/v2/PHASE3_WINNER_SELECTION.md",
+  "comparison_artifact": "artifacts/v2/phase3_candidate_comparison.json",
+  "frozen_components": {
+    "orchestration_models_module": "orchestration/models.py",
+    "orchestration_registry_module": "orchestration/registry.py",
+    "orchestration_registry_version": "1 (5 registered (tool_name, operation) bindings: pubmed/search_pubmed, clinical_trials/search_trials, chembl/search_by_target, chembl/search_by_indication, chembl/get_drug_info)",
+    "candidate_b_adapter_module": "orchestration/candidate_b_native_tools.py",
+    "tool_schemas_source": "Generated via pydantic .model_json_schema() directly from orchestration/models.py's PubMedSearchArgs, ClinicalTrialsSearchArgs, ChEMBLSearchByTargetArgs, ChEMBLSearchByIndicationArgs, ChEMBLGetDrugInfoArgs - frozen by virtue of freezing orchestration/models.py; any future schema change requires a new config_version.",
+    "provider": "Cerebras",
+    "model": "qwen-3.8-27b",
+    "endpoint": "Chat Completions (the same endpoint Phase 2's NLU extractor already uses)",
+    "tool_choice": "auto",
+    "parallel_tool_calls": true,
+    "validation_boundary": "Every provider-returned tool_call passes orchestration/candidate_b_native_tools.py::parse_and_validate_tool_call() -> typed ToolCall construction -> orchestration/registry.py DEFAULT_REGISTRY.validate_call() before any execution. No exceptions.",
+    "retry_policy": "No LLM-call retry added for this measurement/integration (single attempt per case) - see orchestration/candidate_b_native_tools.py docstring for rationale. Tool-execution-level retry is unchanged from the existing tools/*.py + utils/retry_handler.py stack (RETRYABLE_STATUS_CODES = {429,500,502,503,504}, exponential backoff+jitter, bounded by settings.MAX_RETRIES).",
+    "trace_schema": "orchestration/models.py::ToolExecutionResult (call_id, tool_name, status, records_count, latency_ms, retry_count, error_category, error_summary, raw_result_ref, source_metadata) - no secrets, no hidden chain-of-thought, only a short reason_code where present.",
+    "benchmark_version_used_for_selection": "See artifacts/v2/phase3_benchmark_manifest.json benchmark_version field; development+validation splits (59 cases) used for candidate comparison; phase3_heldout (15 cases) reserved for the one-shot final acceptance run."
+  },
+  "no_semantic_changes_after_this_freeze": true,
+  "next_step": "Run phase3_heldout split exactly once against this frozen configuration (directive Steps 32-33). No tuning permitted based on held-out results."
+}

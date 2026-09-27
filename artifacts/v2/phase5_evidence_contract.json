@@ -1,0 +1,49 @@
+{
+  "contract_version": "1.0.0",
+  "phase": 5,
+  "generated_at": "2026-09-25",
+  "core_problem_being_solved": "state['citations'] is built deterministically from real source IDs, but the report's References section and in-text [N] markers are written independently by the LLM with zero code-level connection - a citation can reference an ID never in that run's tool results and nothing catches it. Phase 5's Evidence object makes closing this structurally possible for later phases; Phase 5 itself does not touch report generation.",
+  "input": {
+    "types": ["PubMed RAG Document (retrieval/retriever.py)", "PubMed live-API parsed dict (tools/pubmed_tool.py)", "ClinicalTrials parsed dict (tools/clinical_trials_tool.py)", "ChEMBL parsed dict, 4 operations (tools/chembl_tool.py)"],
+    "optional_input": "orchestration call_id from tool_call_history (agent/nodes.py) when available - must be threaded through, not replaced with a new ID scheme"
+  },
+  "output": {
+    "type": "Evidence",
+    "fields": ["evidence_id", "source_type", "source_record_id", "source_url", "evidence_type", "content", "content_format", "title", "source_metadata", "provenance"],
+    "excludes": ["citation number", "hidden chain-of-thought", "invented numeric confidence"]
+  },
+  "evidence_id_scheme": {
+    "pubmed_rag_chunk": "pubmed:<pmid>:chunk:<chunk_index>",
+    "pubmed_live_article": "pubmed:<pmid>",
+    "clinical_trials": "nct:<nct_id>",
+    "chembl": "chembl:<chembl_id>",
+    "rule": "deterministic, source-namespaced, never randomly generated when stable source identity exists; no Evidence record created for a no_match/ambiguous_match resolve_compound_name result (no real ID exists)"
+  },
+  "provenance_fields": [
+    "source", "source_record_id", "source_url", "retrieval_method", "retrieval_rank",
+    "retrieval_score", "call_id", "corpus_index_version", "chunk_index", "num_chunks",
+    "field_path", "retrieved_at"
+  ],
+  "source_specific_metadata_types": ["PubMedEvidenceMetadata", "ClinicalTrialEvidenceMetadata", "ChemblEvidenceMetadata"],
+  "evidence_type_taxonomy": [
+    "TEXT_PASSAGE", "COMPOUND_IDENTITY", "TARGET_RELATION", "INDICATION",
+    "TRIAL_STATUS", "TRIAL_PHASE", "TRIAL_FIELD"
+  ],
+  "source_faithful_content_rule": "content must be verbatim source text OR a deterministic representation of a structured field - never an LLM paraphrase. Raw and normalized values both retained where Phase 5 introduces normalization.",
+  "source_url_generation": {
+    "pubmed": "https://pubmed.ncbi.nlm.nih.gov/<pmid>/",
+    "clinical_trials": "https://clinicaltrials.gov/study/<nct_id>",
+    "chembl": "https://www.ebi.ac.uk/chembl/compound_report_card/<chembl_id>/",
+    "rule": "deterministic from verified source_record_id only, never model-generated"
+  },
+  "no_invented_confidence_rule": "retrieval_score preserved only when a real source pipeline produces one, tagged with producing method; never reinterpreted as factual confidence. Follows the resolve_compound_name match_type pattern (deterministic category, not a fabricated float) identified in the audit as the correct existing template.",
+  "non_goals": [
+    "final answer generation", "claim generation", "claim-to-evidence verification",
+    "hallucination judging", "citation-faithfulness scoring", "[1]/[2] citation numbering",
+    "citation compiler", "final source appendix", "conversational UX", "deployment"
+  ],
+  "local_rag_provenance_requirement": "every PubMed RAG Evidence record must carry corpus_index_version (from data/index/index_meta.json) alongside chunk_id/chunk_index/num_chunks - never only a FAISS row position. Does not resolve Phase 4's documented corpus-reproducibility gap.",
+  "structured_field_path_rule": "field_path recorded only when the parser's own field-access path is fixed and verifiable against actual code; left absent (not guessed) when the parser derives/joins a value without one fixed source path.",
+  "audit_source": "docs/v2/PHASE5_INITIAL_EVIDENCE_AUDIT.md",
+  "contract_doc": "docs/v2/PHASE5_EVIDENCE_CONTRACT.md"
+}

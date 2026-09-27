@@ -1,0 +1,55 @@
+{
+  "date": "2026-09-24",
+  "hard_cap_usd": 0.50,
+  "prior_cumulative_cerebras_spend_usd_verified": {
+    "round1_gptoss_blocked": 0.0,
+    "round2_gptoss_pilot_total": 0.01785295,
+    "round2_breakdown": {
+      "smoke_test_cost_usd": 0.00093315,
+      "official_pilot_run_cost_usd": 0.0079171,
+      "true_latency_diagnostic_single_probe_cost_usd": 0.00105935,
+      "true_latency_diagnostic_full_8case_pass_cost_usd": 0.00794335
+    },
+    "round3_gptoss_intent_revision_total": 0.0172145,
+    "round3_breakdown": {
+      "official_pilot_run_cost_usd": 0.008647,
+      "latency_diagnostic_pass_cost_usd": 0.0085675
+    },
+    "sum_all_gptoss_rounds_usd": 0.03506745,
+    "note": "Computed directly from artifacts/v2/nlu_cerebras_gptoss_pilot_results.json and nlu_cerebras_intent_revision_pilot_results.json usage_and_cost fields (not trusted from prose alone); matches the ~$0.0351 figure the round-3 doc states in prose."
+  },
+  "remaining_budget_before_qwen_usd": 0.46493255,
+  "qwen_pricing_used_usd_per_million_tokens": {"input": 0.99, "output": 1.49},
+  "qwen_projected_costs": {
+    "A_one_smoke_test": {
+      "assumed_tokens": {"input": 2100, "output": 260},
+      "estimate_usd": 0.0025,
+      "note": "Sized off the GPT-OSS smoke test's actual token counts (2111 in / 259 out) since prompt is the same STRUCTURED_EXTRACTION_PROMPT length; Qwen's higher per-token price (~2.8x gpt-oss on input, ~2x on output) applied."
+    },
+    "B_second_smoke_test_if_needed": {
+      "estimate_usd": 0.0025,
+      "note": "Step 8 allows at most 2 configuration smoke calls total."
+    },
+    "C_8case_pilot": {
+      "assumed_avg_tokens_per_case": {"input": 2100, "output": 300},
+      "estimate_usd": 0.0273,
+      "note": "8 cases x (2100*0.99 + 300*1.49)/1e6 = 8 x ~0.00341 = ~0.0273"
+    },
+    "D_full_dev_45_examples_if_authorized": {
+      "assumed_avg_tokens_per_case": {"input": 2100, "output": 300},
+      "estimate_usd": 0.1536,
+      "note": "45 x ~0.00341 = ~0.1536"
+    },
+    "E_bounded_infrastructure_retries": {
+      "assumption": "Each candidate call has at most 1 bounded retry per _invoke_cerebras_json; assume worst case 20% of calls retry once across smoke+pilot+dev (53 calls total x 1.2 = ~64 billed calls)",
+      "estimate_usd": 0.03,
+      "note": "Conservative upper bound, not expected to be reached given round2/round3 both needed 0 retries."
+    },
+    "projected_total_realistic_usd": 0.0025 + 0.0025 + 0.0273 + 0.1536,
+    "projected_total_realistic_usd_rounded": 0.186,
+    "projected_total_pathological_worst_case_usd": 0.216
+  },
+  "fits_within_remaining_budget": true,
+  "check": "0.216 (pathological worst case, smoke A+B + pilot C + full dev D + retries E) < 0.46493255 (remaining budget before Qwen) -- comfortable margin, no need to raise the $0.50 cumulative cap.",
+  "decision": "Proceed. Re-verify remaining budget at each stage checkpoint (after smoke test, after pilot, before full dev) per the same per-stage-checkpoint discipline used in the GPT-OSS rounds."
+}

@@ -1,0 +1,138 @@
+{
+  "plan_name": "phase4_pubmed_candidate_plan",
+  "plan_version": "1.0.0",
+  "written": "2026-09-25",
+  "written_before_any_new_measurement": true,
+  "governing_docs": [
+    "docs/v2/PHASE4_RETRIEVAL_CONTRACT.md",
+    "docs/v2/PHASE4_GATE_PLAN.md",
+    "docs/v2/PHASE4_BASELINE_MEASUREMENT.md (including AMENDMENT section)"
+  ],
+  "purpose": "Predeclare the exact set of PubMed retrieval candidates to be measured, per the governing directive's Step 32 causal-separation requirement: the PubMed live-API date-filter fix and the (new) deterministic query compiler are two independent interventions, and their effects on Recall must not be collapsed into one before/after number. This file is written BEFORE any Candidate B2/C measurement code is run.",
+  "benchmark_scope": {
+    "manifest": "artifacts/v2/phase4_benchmark_manifest.json",
+    "splits_used": ["development", "validation"],
+    "n_cases": 22,
+    "case_ids": [
+      "PM-EXACT-01", "PM-EXACT-02", "PM-LEX-01", "PM-LEX-02", "PM-MECH-01",
+      "PM-MECH-02", "PM-MULTI-01", "PM-NARROW-02", "PM-NARROW-04",
+      "PM-NARROW-05", "PM-TOPICAL-01", "PM-TOPICAL-03", "PM-TOPICAL-04",
+      "PM-LIVE-01", "PM-LIVE-02", "MS-01", "MS-02", "MS-03", "MS-04",
+      "MS-05", "MS-06", "MS-07"
+    ],
+    "note": "Identical 22-case set Candidates A and B1 were already measured on in artifacts/v2/phase4_baseline_results.json (confirmed by enumerating per_case_results entries carrying a 'pubmed' key -- 15 PM-* cases + 7 MS-* multi_source cases = 22, matching that file's aggregate_metrics.pubmed_rag.n_cases_with_gold and pubmed_live_api.n_cases_with_gold, both 22). phase4_heldout (12 cases) is not touched, per the same protected-split discipline the baseline measurement used."
+  },
+  "candidates": [
+    {
+      "candidate_id": "A",
+      "name": "existing local RAG",
+      "status": "already_measured_do_not_remeasure",
+      "citation": "artifacts/v2/phase4_baseline_results.json#aggregate_metrics.pubmed_rag (per-case: per_case_results[*].pubmed.rag)",
+      "input": "raw natural-language query text (case.query)",
+      "query_generation_method": "none -- full NL string passed directly to retrieve()",
+      "corpus_api_source": "local: data/index/ (FAISS dense index + BM25 + 9,000-abstract/22,674-chunk corpus subsample)",
+      "ranking_method": "hybrid dense (FAISS cosine) + BM25 sparse -> Reciprocal Rank Fusion (k=60) -> cross-encoder rerank",
+      "fusion_method": "RRF (k=60) fusing dense+BM25 candidate pools before rerank; not a cross-SOURCE fusion",
+      "top_k": 10,
+      "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "benchmark_version": "1.0.0 (phase4_benchmark_manifest.json)",
+      "measured_recall_at_10": 0.7727272727272727,
+      "comparability_caveats": [
+        "Not directly comparable to the live-API candidates on corpus freshness -- the local index has a known, documented STALE_INDEX gap (13,115->9,000 non-reproducible subsample; PM-LIVE-01/02 are deliberately post-corpus-build articles RAG is expected to miss).",
+        "retrieve() takes raw NL text as input, unlike Candidates C/D which use the compiled term -- this is intentional (RAG is not being re-architected here), not an oversight."
+      ]
+    },
+    {
+      "candidate_id": "B1",
+      "name": "old live PubMed (implicit 2-year filter, raw NL query)",
+      "status": "already_measured_do_not_remeasure",
+      "citation": "artifacts/v2/phase4_baseline_results.json#aggregate_metrics.pubmed_live_api (per-case: per_case_results[*].pubmed.live_api)",
+      "input": "raw natural-language query text (case.query)",
+      "query_generation_method": "none -- full NL string passed directly as esearch term",
+      "corpus_api_source": "live NCBI E-utilities (eutils.ncbi.nlm.nih.gov), no local index",
+      "ranking_method": "PubMed's own esearch relevance sort (sort=relevance), no local reranking",
+      "fusion_method": "none",
+      "top_k": 10,
+      "reranker": "none",
+      "benchmark_version": "1.0.0",
+      "measured_recall_at_10": 0.045454545454545456,
+      "comparability_caveats": [
+        "Measured against the THEN-current tools/pubmed_tool.py, which silently applied PUBMED_DEFAULT_DATE_RANGE=2 years whenever the caller passed neither years_back nor date_from -- this is the BEFORE state for the date-filter fix.",
+        "Confounds two independent defects (silent date filter + raw-NL-text search term) in one number -- do not attribute the full B1->C delta to either cause alone; B2 below exists specifically to separate them."
+      ]
+    },
+    {
+      "candidate_id": "B2",
+      "name": "fixed live PubMed, raw query",
+      "status": "new_measurement_required",
+      "purpose": "Isolate the date-fix's own contribution, independent of the compiler. Same raw NL query text as B1, same live API, ONLY the date-filter defect is fixed (already true of the current tools/pubmed_tool.py -- no further code change needed for this candidate, just a fresh measurement).",
+      "input": "raw natural-language query text (case.query) -- byte-identical to what B1 used",
+      "query_generation_method": "none -- full NL string passed directly as esearch term, exactly as B1",
+      "corpus_api_source": "live NCBI E-utilities, current (fixed) tools/pubmed_tool.py::PubMedTool().search_pubmed(query) with no years_back/date_from override",
+      "ranking_method": "PubMed's own esearch relevance sort (sort=relevance), no local reranking",
+      "fusion_method": "none",
+      "top_k": 10,
+      "reranker": "none",
+      "benchmark_version": "1.0.0",
+      "comparability_caveats": [
+        "Directly comparable to B1 on every axis except the date-filter code path -- this is the controlled A/B pair for the date-fix's isolated effect.",
+        "Still not comparable to A on corpus freshness semantics: a live-API call always sees current PubMed content, so PM-LIVE-01/02 are NOT stale-index misses here the way they are for A."
+      ]
+    },
+    {
+      "candidate_id": "C",
+      "name": "fixed live PubMed + deterministic query compiler",
+      "status": "new_measurement_required",
+      "purpose": "Isolate the compiler's added effect on top of B2 (which already has the date-fix applied). B2->C isolates the compiler; B1->B2 isolates the date-fix; B1->C is the combined, non-attributable total.",
+      "input": "a real nlu.schemas.ResearchQuery produced by nlu.understand_query(case.query) -- the actual frozen Phase-2 NLU architecture (Cerebras qwen-3.8-27b, per artifacts/v2/nlu_frozen_config.json), NOT derived from the benchmark's gold_query_must_contain_concepts (using gold concepts as compiler input would leak benchmark answers into the query and invalidate the comparison, not just the compiler's internal logic).",
+      "query_generation_method": "retrieval/pubmed_query_compiler.py::compile_pubmed_query(research_query) -- deterministic, entity-verbatim, no invented MeSH/synonyms, temporal constraint reflected only if explicitly present in the ResearchQuery",
+      "corpus_api_source": "live NCBI E-utilities, current (fixed) tools/pubmed_tool.py::PubMedTool().search_pubmed(compiled_query)",
+      "ranking_method": "PubMed's own esearch relevance sort (sort=relevance), no local reranking",
+      "fusion_method": "none",
+      "top_k": 10,
+      "reranker": "none",
+      "benchmark_version": "1.0.0",
+      "comparability_caveats": [
+        "Directly comparable to B2 on every axis except the search-term construction -- controlled pair for the compiler's isolated effect.",
+        "An extra NLU extraction step (LLM call) is now in the pipeline before retrieval; this candidate's own latency/cost numbers include that step separately from the PubMed API call latency, per the gate plan's 'never conflate stages' rule -- NOT counted in B1/B2/A's latency, which have no such step.",
+        "If nlu.understand_query() fails structurally (schema_valid=False) for a case, that case is recorded as a QUERY_COMPILATION_FAILURE for Candidate C specifically, not silently dropped from the denominator."
+      ]
+    },
+    {
+      "candidate_id": "D",
+      "name": "RAG + Candidate C fused",
+      "status": "conditional_build_only_if_justified",
+      "condition": "Build only if B2/C results show live PubMed (fixed, with or without compiler) recovering gold items RAG misses on a non-trivial share of the 22 cases (e.g. the PM-LIVE-01/PM-LIVE-02 stale-index cases, or any case where C's recall exceeds A's at some k) -- i.e. fusion is only worth measuring if the two candidates' error patterns look complementary, not merely if both individually work. Decision made and recorded in docs/v2/PHASE4_HETEROGENEOUS_RETRIEVAL.md AFTER B2/C are measured, not assumed here.",
+      "input": "if built: same case query, both RAG's retrieve() output and Candidate C's live-API output",
+      "query_generation_method": "if built: RAG uses raw NL text (as Candidate A), live leg uses compile_pubmed_query() (as Candidate C)",
+      "corpus_api_source": "if built: local FAISS/BM25 index (RAG leg) + live NCBI E-utilities (live leg)",
+      "ranking_method": "if built: documented explicitly at build time per PHASE4_RETRIEVAL_CONTRACT.md Section 5 -- never a naive cross-source score sort",
+      "fusion_method": "if built: to be named explicitly (e.g. round-robin interleave with dedup by PMID, or a documented RRF variant) -- not decided in advance of seeing B2/C data",
+      "top_k": "if built: 10 (post-fusion)",
+      "reranker": "if built: none new -- reuses each leg's own",
+      "benchmark_version": "1.0.0",
+      "comparability_caveats": [
+        "Not built reflexively; this row is a placeholder describing what WOULD be measured, not a promise it will be."
+      ]
+    }
+  ],
+  "metrics_to_report_per_new_candidate": [
+    "recall@1", "recall@5", "recall@10", "mrr", "precision@5", "hit@10",
+    "query_concept_coverage (gold_query_must_contain_concepts-style substring/synonym-tolerant check)",
+    "zero_result_rate", "duplicate_rate", "unique_pmids_in_top_k",
+    "latency_p50_p90_p95_seconds (external API latency and, for Candidate C, local compiler+NLU latency reported SEPARATELY, never conflated)"
+  ],
+  "metrics_explicitly_not_used": [
+    "nDCG -- benchmark gold labels are binary (a PMID is gold or it isn't; gold_relevance_type is exact_id or concept_based-with-any-of-N-counts-as-hit, never a graded 0-3 relevance score), so nDCG would require inventing graded relevance not present in the data. Confirmed by reading gold.gold_relevance_type across all 22 cases in the manifest -- no graded field exists.",
+    "a single composite score -- per PHASE4_GATE_PLAN.md Section 4, no composite decides a winner; the priority order (correctness/recall > no systematic source failure > ranking quality > multi-source coverage > latency > cost) is applied narratively in the comparison writeup instead."
+  ],
+  "priority_order_for_winner_selection": [
+    "1. Retrieval correctness/recall",
+    "2. No systematic source failure (a candidate that starves a whole case subset fails this even with good aggregate recall)",
+    "3. Ranking quality (MRR, precision@5)",
+    "4. Multi-source coverage (not directly applicable to a PubMed-only comparison, noted for completeness)",
+    "5. Latency",
+    "6. Cost/complexity"
+  ],
+  "causal_separation_requirement": "The chain is B1 (old, broken) -> B2 (date-fix only) -> C (date-fix + compiler). B2's own recall number is the date-fix's isolated contribution (B1->B2 delta). C's number over B2 is the compiler's isolated contribution (B2->C delta). The raw B1->C delta must always be reported ALONGSIDE both isolated deltas, explicitly labeled as non-attributable to either intervention alone, never presented as if it measures the compiler's effect by itself."
+}

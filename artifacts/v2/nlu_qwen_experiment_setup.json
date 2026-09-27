@@ -1,0 +1,56 @@
+{
+  "phase": "2_qwen_latency_experiment",
+  "human_approval": "Exactly one new action approved: download and evaluate Qwen/Qwen2.5-1.5B-Instruct (Apache 2.0, ~3GB) as a candidate replacement for nvidia/nemotron-3-super-120b-a12b in the NLU stage. Experiment, not pre-approved adoption. No other model, no mlx-lm install, no Phase 3 work.",
+  "step0_checkpoint_verification": {
+    "head": "14a59b9e4c514714883245e8ac1e95a2f1457775 - MATCHED",
+    "modified_tracked_files": ["agent/nodes.py", "tests/test_chembl.py", "tests/test_nodes.py", "tests/test_pubmed.py"],
+    "pytest_before_any_change": "126 passed, 0 failed, 0 skipped - MATCHED checkpoint exactly"
+  },
+  "step1_model_metadata_verification": {
+    "source": "Live HuggingFace model card fetch (Qwen/Qwen2.5-1.5B-Instruct) + direct read of the downloaded LICENSE and config.json files",
+    "model_id_confirmed": "Qwen/Qwen2.5-1.5B-Instruct",
+    "license": "Apache License, Version 2.0 - confirmed directly from the downloaded LICENSE file's header text, not just the model card claim",
+    "parameter_count": "1.54B total / 1.31B non-embedding",
+    "architecture": "Qwen2ForCausalLM (config.json): hidden_size=1536, num_hidden_layers=28, num_attention_heads=12, num_key_value_heads=2 (GQA), max_position_embeddings=32768, torch_dtype bfloat16 (upstream); transformers_version listed as 4.43.1 minimum in config.json, well below this project's installed 5.17.0 - fully compatible, no version conflict",
+    "chat_template_support": "YES - tokenizer_config.json ships a chat template; tokenizer.apply_chat_template() used directly by nlu/local_qwen_extractor.py",
+    "structured_json_output": "Model card states 'significant improvements in generating structured outputs especially JSON' for the Qwen2.5 instruct family",
+    "expected_download_size": "~3GB (fp16-class safetensors for a 1.5B model) - matches the directive's expectation, no silent substitution",
+    "non_reasoning_confirmed": "Standard instruction-tuned chat model, no chain-of-thought/reasoning_content field in its output protocol (unlike nvidia/nemotron-3-super-120b-a12b) - this is the entire latency hypothesis under test"
+  },
+  "step2_pre_download_state": {
+    "hardware": "Apple M3, 8 cores (4 performance + 4 efficiency), 16GB unified RAM",
+    "os": "macOS 15.7.4 (Darwin 24.6.0), arm64",
+    "python": "3.12.7",
+    "torch": "2.14.0 (already installed, MPS backend available: torch.backends.mps.is_available()==True)",
+    "transformers": "5.17.0 (already installed)",
+    "huggingface_hub": "1.31.0 (already installed)",
+    "disk_free_before_download": "54Gi available on /",
+    "no_new_pip_install_performed": true
+  },
+  "step3_download": {
+    "method": "huggingface_hub.snapshot_download(repo_id='Qwen/Qwen2.5-1.5B-Instruct') - transformers/huggingface_hub only, no new package",
+    "cache_location": "~/.cache/huggingface/hub/models--Qwen--Qwen2.5-1.5B-Instruct/snapshots/989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "actual_disk_footprint": "2.9GB (du -sh), matches the ~3GB expectation - no silent substitution",
+    "download_time": "~32 seconds",
+    "download_success": true,
+    "files": ["config.json", "generation_config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json", "vocab.json", "merges.txt", "LICENSE", "README.md", ".gitattributes"]
+  },
+  "step4_isolated_adapter": {
+    "new_files": ["nlu/local_qwen_extractor.py", "nlu/_qwen_worker.py"],
+    "modified_files": ["nlu/extractor.py (added extract_candidate_d_local_qwen + ARCHITECTURE_FUNCS registration - additive, no change to candidate_a/b/c)"],
+    "design": "extract_candidate_d_local_qwen() in nlu/extractor.py reuses candidate_b_structured's EXACT STRUCTURED_EXTRACTION_PROMPT (with the same B_VS_G_RULE/DI_VS_E_RULE injections and EXHAUSTIVE ENTITY SCAN fix) and IDENTICAL postprocessing (_canonicalize_constraint_fields, _coerce_intent, _coerce_entities including nlu/normalization.py's deterministic lookup, _coerce_evidence_types, ConstraintSet/AmbiguityState/ResearchQuery validation, 1-retry-then-NLU_FAILURE recovery) as candidate_b_structured. This experiment swaps ONLY the model, not the surrounding architecture, per the directive.",
+    "registered_as": "candidate_d_local_qwen in nlu/extractor.py::ARCHITECTURE_FUNCS - reachable via evaluation/v2/run_nlu_eval.py --architecture candidate_d_local_qwen --split dev with zero eval-script changes needed",
+    "process_isolation_finding": "Live-tested and REPRODUCED a segfault (exit 139) when the Qwen model loads in the same process after this project's RAG retriever (FAISS + sentence-transformers) has already initialized - happens on every normal import of the nlu package (nlu -> agent.prompts -> agent/__init__.py -> agent.graph -> agent.nodes -> eager FAISS load), on both mps and cpu torch devices, regardless of KMP_DUPLICATE_LIB_OK. Fix: nlu/_qwen_worker.py runs as an isolated `subprocess.Popen` SCRIPT process (plain python invocation, not multiprocessing-spawn, since spawn's unpickling re-triggers the same nlu/agent import chain in the child) that imports only stdlib + torch/transformers, communicating via newline-delimited JSON over stdin/stdout. Verified working end-to-end afterward (no crash, live model output produced) - see nlu_qwen_pilot_results.json."
+  },
+  "step5_generation_settings": {
+    "decoding": "do_sample=False (greedy) - temperature=0 equivalent, deterministic",
+    "max_new_tokens": 700,
+    "rationale": "Non-reasoning model, bounded structured-extraction task - no long free-running generation expected or permitted",
+    "json_enforcement": "No grammar-constrained decoding available in this transformers version for this task; strongest practical approach used instead - an explicit few-shot-free structured prompt (identical to candidate_b's) + strict Pydantic ResearchQuery validation on the parsed output. Invalid JSON / schema-invalid output is NEVER treated as valid - it returns NLUExtractionResult(schema_valid=False, ...) exactly like candidate_b/c, with the same bounded 1-retry recovery, never a fabricated fallback."
+  },
+  "step6_warmup": {
+    "cold_load_time_sec": "reported separately in nlu_qwen_pilot_results.json / nlu_qwen_full_dev_results.json - measured via nlu/local_qwen_extractor.py::warm_up(), called once before any latency measurement",
+    "device_used": "mps (Apple GPU via PyTorch MPS backend) - reported per-run",
+    "note": "warm_up() is called exactly once at the start of the pilot/full-dev run; all per-example latencies reported thereafter are steady-state (post-warm-up), but the one-time load cost is reported separately, never hidden, per the directive's explicit requirement to report both."
+  }
+}

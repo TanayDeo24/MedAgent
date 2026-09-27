@@ -1,0 +1,7 @@
+{
+  "phase": "2_alternate_inference_closure",
+  "hosted_provider_candidates_tested": [],
+  "reason_empty": "No alternate-provider credential exists in .env (only NVIDIA_API_KEY) and no alternate-provider SDK is installed (only langchain-nvidia-ai-endpoints). Obtaining a new API key is explicitly outside this round's authority (would require the user to provision one, which was not requested or provided). This reconfirms the prior latency-closure round's family-B finding (artifacts/v2/nlu_latency_experiment_plan.json) rather than re-deriving it. No hosted candidate was therefore ever in a runnable state, so none could be evaluated - this file is intentionally empty of results, not a placeholder for skipped work.",
+  "hosted_search_performed": "Re-checked (not assumed): .env variable names, `pip list` for provider SDKs. Both re-checks matched the prior round exactly.",
+  "conclusion": "NO HOSTED ALTERNATIVE AVAILABLE - confirmed."
+}

@@ -1,0 +1,139 @@
+{
+  "phase": "2_cerebras_experiment_resumed",
+  "candidate": "candidate_f_cerebras_gptoss (Cerebras gpt-oss-120b, reasoning_effort=low, strict JSON Schema)",
+  "status": "PILOT COMPLETED - REJECTED at hard rejection gate (generic-intent collapse). Full dev NOT run.",
+  "resume_date": "2026-09-24",
+  "resume_context": "Human confirmed on the Cerebras console: balance $5.00 (free signup credits), auto-recharge OFF, credits expire 2026-10-25 UTC, API simply stops at $0 (no auto-charge possible). Smoke test (Step 1) succeeded: HTTP 200, ~670ms wall, cost ~$0.00093. The prior round's 402 (artifacts/v2/nlu_cerebras_gptoss_pilot_results_prior_blocked_attempt below) is preserved for history.",
+  "pilot_plan_ref": "artifacts/v2/nlu_cerebras_gptoss_pilot_plan.json",
+  "cases_planned": 8,
+  "cases_run": 8,
+  "cases_schema_valid": 8,
+  "cases_parse_success": 8,
+  "cases_needing_retry": 0,
+  "semantically_empty_despite_valid_schema": 0,
+  "methodology_note_latency": "IMPORTANT: the extractor's `latency_ms` field measures wall time starting BEFORE the 5-RPM self-throttle wait (utils.rate_limiter.wait_for_rate_limit, called inside nlu/extractor.py::_invoke_cerebras_json before each POST). On the official pilot run this produced ~12,000ms per case (7 of 8), which is almost entirely OUR OWN rate-limit wait (token bucket refill ~12s at 5 RPM, capacity=1), not model latency - confirmed by a follow-up diagnostic pass that measured (a) pure requests.post() round-trip time and (b) the provider's own `time_info.total_time`/`queue_time`/`prompt_time`/`completion_time` fields, both timed AFTER the rate-limit wait had already elapsed. This is a measurement artifact of Free-Trial-tier throttling, not a property of the model's inference speed, and is corrected below. The Free Trial's 5 RPM cap is a temporary account-tier limit (paid Developer tier has materially higher RPM per the provider verification doc), so uncorrected wall-clock-including-throttle numbers would misrepresent this candidate for the architectural latency question this experiment exists to answer.",
+  "semantics_by_case": [
+    {
+      "query_id": "nlu_v1_0013", "category": "simple entity question",
+      "intent_correct": true, "predicted_intent": ["A_literature_evidence"], "gold_intent": ["A_literature_evidence"],
+      "entities_correct": "2/2 (type+canonical_id match)", "fabricated_ids": 0,
+      "constraints_correct": "n/a (gold empty, predicted empty)", "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0106", "category": "constraint-heavy trial question",
+      "intent_correct": true, "predicted_intent": ["G_constraint_heavy"], "gold_intent": ["G_constraint_heavy"],
+      "entities_correct": "2/2, semantic_roles populated correctly for EGFR (['gene','protein'])", "fabricated_ids": 0,
+      "constraints_correct": "3/3 (trial_phases PHASE1, trial_statuses RECRUITING, population adults - all exact)",
+      "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0100", "category": "multi-entity question",
+      "intent_correct": false, "predicted_intent": ["A_literature_evidence"], "gold_intent": ["E_multi_hop_research"],
+      "note": "MISCLASSIFIED - collapsed to A_literature_evidence (generic-intent-collapse pattern; matches the exact failure signature flagged for candidate_e_nvidia_fast)",
+      "entities_correct": "2/2 (type+canonical_id correct despite wrong intent)", "fabricated_ids": 0,
+      "constraints_correct": "n/a (gold empty)",
+      "sources_correct": false, "sources_note": "predicted ['pubmed'] only vs gold ['chembl','clinicaltrials','pubmed'] - 2/3 required sources missed, directly downstream of the wrong intent",
+      "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0048", "category": "cross-source question",
+      "intent_correct": true, "predicted_intent": ["D_cross_source_synthesis"], "gold_intent": ["D_cross_source_synthesis"],
+      "entities_correct": "2/2", "fabricated_ids": 0,
+      "constraints_correct": "0/1 missed", "constraints_note": "gold expects trial_statuses=ACTIVE_NOT_RECRUITING; predicted constraints empty. Query text says 'active trials', not the more specific 'active, not recruiting' - a defensible under-canonicalization rather than a fabrication or corruption.",
+      "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0136", "category": "ambiguous abbreviation (disclosed substitution, see pilot plan)",
+      "intent_correct": false, "predicted_intent": ["A_literature_evidence"], "gold_intent": ["I_ambiguous"],
+      "note": "MISCLASSIFIED - collapsed to A_literature_evidence (second instance of the generic-intent-collapse pattern)",
+      "entities_correct": "1/1", "fabricated_ids": 0,
+      "constraints_correct": "n/a", "sources_correct": "n/a (gold empty, predicted ['pubmed'])",
+      "ambiguity_correct": false, "ambiguity_note": "gold_ambiguity_is_ambiguous=true; predicted is_ambiguous=false - missed a genuine ambiguity flag (this is a bare-topic-mention case known to be a substituted/imperfect gold example per the pilot plan's disclosed limitation, so weighted lightly, but still a real miss)"
+    },
+    {
+      "query_id": "nlu_v1_0071", "category": "gene/protein/target semantic-role ambiguity",
+      "intent_correct": true, "predicted_intent": ["F_mechanism"], "gold_intent": ["F_mechanism"],
+      "entities_correct": "2/2 (sotorasib, BTK - both correct)", "fabricated_ids": 0,
+      "semantic_roles_note": "BTK's semantic_roles left empty (no gold annotation exists for this field per documented pre-existing limitation; not scored as a regression, but not a strong positive signal either)",
+      "constraints_correct": "n/a", "sources_correct": false,
+      "sources_note": "predicted ['pubmed'] only vs gold ['pubmed','chembl'] - chembl missed",
+      "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0017", "category": "class B example",
+      "intent_correct": true, "predicted_intent": ["B_clinical_trial_landscape"], "gold_intent": ["B_clinical_trial_landscape"],
+      "b_vs_g_note": "correctly predicted B, not G - no B/G confusion",
+      "entities_correct": "2/2", "fabricated_ids": 0,
+      "constraints_correct": "1/1 (trial_phases PHASE2)", "sources_correct": true, "ambiguity_correct": true
+    },
+    {
+      "query_id": "nlu_v1_0119", "category": "class G example",
+      "intent_correct": true, "predicted_intent": ["G_constraint_heavy"], "gold_intent": ["G_constraint_heavy"],
+      "b_vs_g_note": "correctly predicted G, not B - no B/G confusion",
+      "entities_correct": "1/1", "fabricated_ids": 0,
+      "constraints_correct": "1/2 exact-field, 1/2 value-captured-in-adjacent-field",
+      "constraints_note": "trial_statuses=ACTIVE_NOT_RECRUITING exact match. gold population='elderly patients' - predicted placed 'elderly' under the `age` constraint field instead of `population`; the semantic content is captured but field-routed differently, not lost or fabricated.",
+      "sources_correct": true, "ambiguity_correct": true
+    }
+  ],
+  "semantics_summary": {
+    "intent_accuracy": "6/8 (75%)",
+    "generic_intent_collapse_finding": "2/8 (25%) of misclassifications both collapsed to the SAME class, A_literature_evidence, and did so on exactly the two most reasoning-dependent categories in the pilot (E_multi_hop_research and I_ambiguous/bare-topic). This is a smaller-magnitude instance of the exact failure pattern that disqualified candidate_e_nvidia_fast (5/8, 62.5%), but it is a repeating pattern (two distinct gold classes collapsing into one predicted class), not an isolated single error, and it is directly consistent with reasoning_effort='low' under-performing on the reasoning-heaviest query types - the same tradeoff this experiment exists to probe.",
+    "b_vs_g_confusion": "NONE observed (2 G-class and 1 B-class case all correctly distinguished)",
+    "entity_extraction": "16/16 gold entity mentions correctly typed and normalized (canonical_id exact match) across all 8 cases, including in both intent-misclassified cases - entity extraction itself is not degraded",
+    "fabricated_canonical_ids": 0,
+    "constraint_extraction": "5/6 gold constraint instances captured; 1 plausible under-canonicalization (case 0048), 1 field-routing variance not a loss (case 0119 age vs population) - no catastrophic or systematic constraint loss",
+    "ambiguity_handling": "1 missed true-positive (case 0136, disclosed substituted/imperfect gold case); 0 false positives (no broad false ambiguity)",
+    "semantic_roles": "not regressed vs. control's documented pre-existing no-gold-annotation limitation; one case (0106) shows correct semantic_roles population",
+    "normalization": "no corruption observed - all canonical names/IDs/systems correct where present",
+    "unsupported_field_invention": "none observed"
+  },
+  "hard_rejection_gate_assessment": {
+    "gate": "Step 3 - reject immediately on any SYSTEMIC defect, skip full dev",
+    "engineering_judgment": "REJECT. The generic-intent-collapse pattern (2/8 cases, both distinct gold classes collapsing into the identical predicted class A_literature_evidence, concentrated in exactly the two hardest/most reasoning-dependent categories) is explicitly named in the task's own gate language as the disqualifying pattern to watch for ('multiple different question types all collapsing to the same predicted intent'). At n=8 the absolute count is small and could partly be sampling noise, but (a) it recurs across two structurally different query types rather than being a single fluke, (b) it correlates directly with a secondary failure (required_sources under-coverage) in both of the same two cases, and (c) it has an identifiable, non-fixable-within-scope root cause: reasoning_effort='low' is the genuine lowest officially-supported setting on this model, and raising it to medium/high (the only lever that would plausibly fix multi-hop/ambiguity reasoning) would reintroduce the reasoning-token latency burn this experiment exists to eliminate - there is no mechanical prompt/schema fix available under the Step 6 bounded-adaptation allowance (which explicitly excludes tuning away a fundamental semantic-behavior problem). All other candidate-disqualifying patterns (B/G confusion, catastrophic entity loss, entity mistyping, fabricated IDs, major constraint loss, broad false ambiguity, semantic_roles regression, semantically-empty-valid outputs, normalization corruption, unsupported field invention) were NOT observed. This is a narrower, less severe failure than candidate_e_nvidia_fast's 5/8 collapse, but it is the same failure class, and quality has explicit priority over latency per the task's decision rule.",
+    "decision": "REJECT at pilot stage. Full dev (Step 7) NOT run - correctly skipped per the hard gate."
+  },
+  "latency_gate_assessment": {
+    "control": {"p50_ms": 19150, "p95_ms": 66983, "source": "artifacts/v2/nlu_frozen_config.json"},
+    "raw_extractor_latency_ms_INCLUDES_self_throttle_wait": {
+      "values_ms": [310.5, 12184.5, 12064.1, 12068.6, 12044.5, 12291.6, 11977.6, 11978.8],
+      "note": "NOT used for the gate decision - see methodology_note_latency above. Included here only for full transparency/reproducibility of the raw pilot run."
+    },
+    "corrected_true_latency_pure_network_round_trip_ms": {
+      "values_ms": [401, 541, 420, 498, 346, 498, 372, 608],
+      "p50_ms": 459.0, "p90_ms": 561.1, "max_ms": 608, "mean_ms": 460.5
+    },
+    "provider_reported_time_info_total_time_ms": {
+      "values_ms": [254, 341, 176, 322, 150, 286, 193, 262],
+      "p50_ms": 258.0, "p90_ms": 327.7, "max_ms": 341, "mean_ms": 248.0,
+      "note": "Cerebras' own server-side queue_time + prompt_time + completion_time breakdown, captured via a diagnostic direct-HTTP pass mirroring the pilot's exact request bodies (same prompts, same schema, same reasoning_effort=low), issued respecting the 5 RPM throttle."
+    },
+    "p50_reduction_vs_control_pct": "97.6% (using corrected pure-round-trip P50 of 459ms vs control 19150ms)",
+    "p95_proxy_reduction_vs_control_pct": "99.1% (using n=8 max of 608ms as a conservative P95 proxy vs control 66983ms)",
+    "gate_requirement": "P50 <=~5000ms OR >=60% P50 reduction, no pathological tail",
+    "gate_result": "PASS, decisively - true model latency is ~250-600ms, no pathological tail (max/P50 ratio ~1.3x, nothing resembling the reasoning-preamble blowups seen in the Nemotron control)."
+  },
+  "usage_and_cost": {
+    "official_pilot_run_cost_usd": 0.0079171,
+    "smoke_test_cost_usd": 0.00093315,
+    "true_latency_diagnostic_single_probe_cost_usd": 0.00105935,
+    "true_latency_diagnostic_full_8case_pass_cost_usd": 0.00794335,
+    "total_this_round_usd": 0.01785295,
+    "note": "Two extra 8-case-equivalent diagnostic passes were run beyond the single predeclared pilot pass, specifically to correct the self-throttle-contaminated latency measurement (see methodology_note_latency). This was judged necessary for an accurate, defensible latency-gate decision and stayed trivially within the $0.50 cap (~3.6% of cap used)."
+  },
+  "decision": "PILOT REJECTED at the hard rejection gate (generic-intent collapse). Latency gate would have PASSED decisively (~97-99% reduction vs control), but quality has priority per the task's explicit decision rule (Step 5: 'Fast-but-semantically-poor -> reject'). Full dev (Step 7) NOT run.",
+  "active_runtime_after_experiment": "UNCHANGED: candidate_b_structured / nvidia/nemotron-3-super-120b-a12b remains the frozen production NLU architecture, per artifacts/v2/nlu_frozen_config.json (unmodified this round).",
+  "prior_blocked_attempt_2026_09_24_earlier_session": {
+    "status": "BLOCKED - pilot NOT completed (HTTP 402 Payment Required on both attempts of a single smoke-test call, before this round's billing was confirmed fixed)",
+    "cases_attempted": 1,
+    "cases_completed_successfully": 0,
+    "total_actual_spend_usd": 0.0,
+    "preserved_for_history": "This entire block reproduces the prior pilot-results artifact verbatim before this round overwrote it, per the task's instruction not to erase the 402-blocked history.",
+    "attempt_record": [
+      {"query_id": "nlu_v1_0013", "attempt": 1, "http_status": 402, "error_body_type": "payment_required_error", "error_message": "Payment required to access this resource. Visit your billing tab.", "tokens_billed": 0, "cost_usd": 0.0},
+      {"query_id": "nlu_v1_0013", "attempt": 2, "http_status": 402, "error_body_type": "payment_required_error", "error_message": "Payment required to access this resource. Visit your billing tab.", "tokens_billed": 0, "cost_usd": 0.0}
+    ],
+    "diagnostic_calls": [{"endpoint": "GET https://api.cerebras.ai/v1/models", "http_status": 200, "result": "models listed: gpt-oss-120b, qwen-3.8-27b - confirms API key validity and correct model IDs", "cost_usd": 0.0}],
+    "root_cause_assessment": "Account-level billing/credit state issue (payment method / credit provisioning not yet complete at the time), not a code defect - resolved by the human confirming console state before this round began."
+  }
+}

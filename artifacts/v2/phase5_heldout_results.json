@@ -1,0 +1,454 @@
+{
+  "validation_target": "evidence/adapters.py via evidence/registry.py (real, frozen adapter functions, no modification) run against artifacts/v2/phase5_benchmark_manifest.json's phase5_heldout split ONLY (14 of 72 cases). This is the ONE-TIME final held-out acceptance run -- the adapters were invoked exactly once per case (a second/third repeat call was made ONLY to verify deterministic evidence_id stability, using the same already-captured raw records, not a re-run against gold, and its result did not change scoring).",
+  "gate_plan_reference": "docs/v2/PHASE5_GATE_PLAN.md",
+  "cases_run": 14,
+  "raw_record_source": "All 14 cases' raw_record fields were already stored verbatim in artifacts/v2/phase5_benchmark_manifest.json (fetched live during benchmark construction). No live re-fetch was necessary or performed.",
+  "coverage": {
+    "definition": "% of raw input records for which the adapter's produce-N-Evidence-records-or-correctly-skip decision (including exact count where gold specifies one) matched the independently authored gold label",
+    "match": 14,
+    "total": 14,
+    "pct": 100.0
+  },
+  "provenance_completeness": {
+    "definition": "docs/v2/PHASE5_GATE_PLAN.md Section 1",
+    "overall_pct": 100.0,
+    "overall_complete": 45,
+    "overall_total": 45,
+    "per_source": {
+      "pubmed": {
+        "complete": 4,
+        "total": 4,
+        "pct": 100.0
+      },
+      "clinical_trials": {
+        "complete": 38,
+        "total": 38,
+        "pct": 100.0
+      },
+      "chembl": {
+        "complete": 3,
+        "total": 3,
+        "pct": 100.0
+      }
+    }
+  },
+  "source_id_integrity": {
+    "fabricated_ids": 0,
+    "corrupted_ids": 0
+  },
+  "content_fidelity": {
+    "checked": 45,
+    "exact_match": 45,
+    "pct": 100.0,
+    "unsupported_content_count": 0
+  },
+  "field_path_accuracy": {
+    "populated": 28,
+    "verified_correct": 28,
+    "pct": 100.0
+  },
+  "trace_linkage": {
+    "call_id_threading_failures": 0,
+    "pubmed_rag_call_id_none_by_design_note": "All PubMed-RAG Evidence in this held-out run carry provenance.call_id=None, verified."
+  },
+  "deduplication": {
+    "duplicate_evidence_ids": {
+      "nct:NCT03389399": [
+        "CT-NCT03389399",
+        "CT-NCT03389399",
+        "CT-NCT03389399",
+        "CT-NCT03389399",
+        "CT-NCT03389399",
+        "CT-NCT03389399",
+        "CT-NCT03389399"
+      ],
+      "nct:NCT03420742": [
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742",
+        "CT-NCT03420742"
+      ],
+      "nct:NCT05970497": [
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497",
+        "CT-NCT05970497"
+      ],
+      "nct:NCT04537923": [
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923",
+        "CT-NCT04537923"
+      ],
+      "chembl:CHEMBL3353410": [
+        "CHEMBL-get_drug_info-CHEMBL3353410",
+        "CHEMBL-resolve-osimertinib"
+      ]
+    },
+    "note": "chembl:CHEMBL3353410 was produced by both CHEMBL-get_drug_info-CHEMBL3353410 and CHEMBL-resolve-osimertinib -- correct deterministic behavior (same real compound, same evidence_id), same pattern already documented in dev/validation, not an accidental merge of distinct records."
+  },
+  "serialization": {
+    "roundtrip_ok": 45,
+    "roundtrip_total": 45,
+    "roundtrip_pct": 100.0,
+    "deterministic_evidence_id_stability_confirmed": true
+  },
+  "performance_latency_ms_per_source": {
+    "pubmed_rag": {
+      "n": 3,
+      "mean_ms": 0.0621,
+      "p50_ms": 0.0162,
+      "p90_ms": 0.1612,
+      "p95_ms": 0.1612,
+      "max_ms": 0.1612
+    },
+    "pubmed_live": {
+      "n": 3,
+      "mean_ms": 0.004,
+      "p50_ms": 0.0015,
+      "p90_ms": 0.0098,
+      "p95_ms": 0.0098,
+      "max_ms": 0.0098
+    },
+    "clinical_trials": {
+      "n": 4,
+      "mean_ms": 0.0414,
+      "p50_ms": 0.0429,
+      "p90_ms": 0.0449,
+      "p95_ms": 0.0449,
+      "max_ms": 0.0449
+    },
+    "chembl_search_by_target": {
+      "n": 1,
+      "mean_ms": 0.0084,
+      "p50_ms": 0.0084,
+      "p90_ms": 0.0084,
+      "p95_ms": 0.0084,
+      "max_ms": 0.0084
+    },
+    "chembl_get_drug_info": {
+      "n": 1,
+      "mean_ms": 0.0129,
+      "p50_ms": 0.0129,
+      "p90_ms": 0.0129,
+      "p95_ms": 0.0129,
+      "max_ms": 0.0129
+    },
+    "chembl_search_by_indication": {
+      "n": 1,
+      "mean_ms": 0.0078,
+      "p50_ms": 0.0078,
+      "p90_ms": 0.0078,
+      "p95_ms": 0.0078,
+      "max_ms": 0.0078
+    },
+    "chembl_resolve_compound_name": {
+      "n": 1,
+      "mean_ms": 0.0059,
+      "p50_ms": 0.0059,
+      "p90_ms": 0.0059,
+      "p95_ms": 0.0059,
+      "max_ms": 0.0059
+    }
+  },
+  "error_handling_taxonomy": {
+    "CORRECTLY_SKIPPED:placeholder_abstract": 2,
+    "CORRECTLY_SKIPPED:no_real_content_moa_and_name_both_placeholder_or_absent": 1
+  },
+  "hard_safety_gates": {
+    "Fabricated source IDs": 0,
+    "Corrupted source IDs": 0,
+    "Source mislabeling": 0,
+    "Model-generated unsourced content inside Evidence": 0,
+    "Secret/auth header leaks": 0,
+    "Evidence without evidence_id": 0,
+    "Evidence without source_type": 0,
+    "Silently missing required provenance": 0,
+    "Cross-source ID collision": 0,
+    "Trace link to a nonexistent call/retrieval": 0,
+    "all_gates_pass": true
+  },
+  "findings": {
+    "adapter_raised_exception_used_as_skip_signal": [
+      "CHEMBL-search_by_target-CHEMBL267864"
+    ],
+    "adapter_raised_exception_used_as_skip_signal_note": "chembl_target_or_indication_result_to_evidence raises ValueError (rather than returning None/[] like every other source's skip path) when neither mechanism_of_action nor name carries real content -- CHEMBL-search_by_target-CHEMBL267864 hit this path here. The harness caught the exception and correctly scored it as a 0-evidence skip matching gold (expected_skip=true), so this is NOT a hard-gate violation and NOT new: the identical code path fired 4 times in the dev+validation run per artifacts/v2/phase5_validation_results.json's error_handling_taxonomy ('CORRECTLY_SKIPPED:no_real_content_moa_and_name_both_placeholder_or_absent': 4). Flagged only as a pre-existing API inconsistency (exception-based skip vs every other adapter's graceful None/[] skip) that any caller of this adapter directly (not through the registry) must remember to try/except -- confirmed still present and reproducible in held-out data, not a new defect.",
+    "unexpected_errors": []
+  },
+  "per_case_details": [
+    {
+      "case_id": "RAG-24365143-1",
+      "source_path": "pubmed_rag",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "pubmed:24365143:chunk:1"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "RAG-40196933-0",
+      "source_path": "pubmed_rag",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "pubmed:40196933:chunk:0"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "RAG-34003802-0",
+      "source_path": "pubmed_rag",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "pubmed:34003802:chunk:0"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "LIVE-35867951",
+      "source_path": "pubmed_live",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "pubmed:35867951"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "LIVE-1",
+      "source_path": "pubmed_live",
+      "coverage_ok": true,
+      "expected_skip": true,
+      "expected_count": 0,
+      "actual_count": 0,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [],
+      "source_url_match": true,
+      "source_url_match_note": "n/a - no evidence produced (skip)",
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "LIVE-3",
+      "source_path": "pubmed_live",
+      "coverage_ok": true,
+      "expected_skip": true,
+      "expected_count": 0,
+      "actual_count": 0,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [],
+      "source_url_match": true,
+      "source_url_match_note": "n/a - no evidence produced (skip)",
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "CT-NCT03389399",
+      "source_path": "clinical_trials",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 7,
+      "actual_count": 7,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "nct:NCT03389399",
+        "nct:NCT03389399",
+        "nct:NCT03389399",
+        "nct:NCT03389399",
+        "nct:NCT03389399",
+        "nct:NCT03389399",
+        "nct:NCT03389399"
+      ],
+      "source_url_match": true,
+      "evidence_types_multiset_match": true
+    },
+    {
+      "case_id": "CT-NCT03420742",
+      "source_path": "clinical_trials",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 10,
+      "actual_count": 10,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742",
+        "nct:NCT03420742"
+      ],
+      "source_url_match": true,
+      "evidence_types_multiset_match": true
+    },
+    {
+      "case_id": "CT-NCT05970497",
+      "source_path": "clinical_trials",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 11,
+      "actual_count": 11,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497",
+        "nct:NCT05970497"
+      ],
+      "source_url_match": true,
+      "evidence_types_multiset_match": true
+    },
+    {
+      "case_id": "CT-NCT04537923",
+      "source_path": "clinical_trials",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 10,
+      "actual_count": 10,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923",
+        "nct:NCT04537923"
+      ],
+      "source_url_match": true,
+      "evidence_types_multiset_match": true
+    },
+    {
+      "case_id": "CHEMBL-search_by_target-CHEMBL267864",
+      "source_path": "chembl_search_by_target",
+      "coverage_ok": true,
+      "expected_skip": true,
+      "expected_count": 0,
+      "actual_count": 0,
+      "adapter_raised_exception_for_skip": true,
+      "error": "ValueError: chembl_target_or_indication_result_to_evidence: no real content available for evidence_type=<EvidenceType.COMPOUND_IDENTITY: 'compound_identity'> on chembl_id='CHEMBL267864'",
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [],
+      "source_url_match": true,
+      "source_url_match_note": "n/a - no evidence produced (skip)",
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "CHEMBL-get_drug_info-CHEMBL3353410",
+      "source_path": "chembl_get_drug_info",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "CHEMBL-search_by_indication-CHEMBL467",
+      "source_path": "chembl_search_by_indication",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "chembl:CHEMBL467"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    },
+    {
+      "case_id": "CHEMBL-resolve-osimertinib",
+      "source_path": "chembl_resolve_compound_name",
+      "coverage_ok": true,
+      "expected_skip": false,
+      "expected_count": 1,
+      "actual_count": 1,
+      "adapter_raised_exception_for_skip": false,
+      "error": null,
+      "evidence_ids_match": true,
+      "actual_evidence_ids": [
+        "chembl:CHEMBL3353410"
+      ],
+      "source_url_match": true,
+      "evidence_types_match": true
+    }
+  ]
+}

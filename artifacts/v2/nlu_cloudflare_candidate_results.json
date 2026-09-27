@@ -1,0 +1,5 @@
+{
+  "status": "NOT RUN",
+  "reason": "Full dev evaluation only runs if the pilot passes both quality and latency gates. The pilot itself was never run (stopped at the pre-call neuron budget/risk gate). See artifacts/v2/nlu_cloudflare_budget_plan.json and artifacts/v2/nlu_cloudflare_experiment_plan.json.",
+  "date": "2026-09-24"
+}

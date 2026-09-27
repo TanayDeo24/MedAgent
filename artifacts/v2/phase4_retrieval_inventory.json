@@ -1,0 +1,457 @@
+{
+  "_meta": {
+    "title": "Phase 4 Retrieval Asset Inventory",
+    "purpose": "Read-only, complete inventory of every retrieval-related asset in the repo (Phase 4 Step 4), classified as CURRENT / LEGACY / STALE / UNKNOWN against the live production path confirmed in docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md.",
+    "generated_at": "2026-09-25",
+    "classification_definitions": {
+      "CURRENT": "Actively used by the live production path (retrieval/retriever.py's default retrieve() -> retrieve_hybrid_reranked(), as wired into agent/nodes.py's synthesis_node).",
+      "LEGACY": "Superseded by a later, current asset but kept for reference/reproducibility/history (e.g. an intermediate eval config, a raw pre-subsample corpus).",
+      "STALE": "Present on disk/in repo but not known to be used by any current path, and possibly outdated relative to CURRENT config (e.g. experimental index variants).",
+      "UNKNOWN": "Cannot be determined from available evidence without guessing; stated explicitly rather than assumed."
+    },
+    "primary_source": "docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md",
+    "note_on_historical_docs": "Root-level PHASE3_*.md / RESULTS_RAG_COMPARISON.md / CITATIONS_BUG_INVESTIGATION.md / EVAL_HANG_FIX_COMPLETE.md / CHEMBL_BACKFILL_COMPLETE.md predate this project's current V2 phase-gate numbering. Their 'Phase 3' label is NOT this project's Phase 3 (already complete, unrelated). Their factual build/experiment history is used here; their metric numbers are flagged HISTORICAL/UNVERIFIED and are not treated as current baselines."
+  },
+
+  "corpus_assets": [
+    {
+      "path": "data/corpus/abstracts.jsonl",
+      "type": "corpus (working)",
+      "size_bytes": 25017097,
+      "record_count": 9000,
+      "description": "Production PubMed abstract corpus actually loaded by the index-build pipeline and, transitively, by the live data/index/ files. One JSON record per line: pmid, title, abstract, journal, pub_date, year, doi, url, query.",
+      "produced_by": "Deterministic subsample (random.seed(42)) of data/corpus/abstracts_raw_all.jsonl, per retrieval/README.md's 'Known gap' section and PHASE3_RETRIEVAL_LAYER_COMPLETE.md section 1. NOT reproducible from any committed script (see integrity_issues_found).",
+      "git_tracked": false,
+      "gitignore_rule": "data/ (repo root .gitignore)",
+      "classification": "CURRENT",
+      "classification_rationale": "This is the corpus data/index/{faiss.index,bm25.pkl,chunks.jsonl,index_meta.json} was built from (index_meta.json num_abstracts=9000 matches exactly); that index is what retrieval/retriever.py loads by default and what agent/nodes.py's synthesis_node calls via retrieve()."
+    },
+    {
+      "path": "data/corpus/abstracts_raw_all.jsonl",
+      "type": "corpus (raw, pre-subsample)",
+      "size_bytes": 36506201,
+      "record_count": 13115,
+      "description": "Full raw fetch of unique PubMed abstracts across all 72 hardcoded query terms in retrieval/build_corpus.py, before the 9,000-record subsample was taken. Kept for reference per retrieval/README.md.",
+      "produced_by": "retrieval/build_corpus.py::fetch_corpus() (reproducible from committed code, modulo PubMed's live index changing over time).",
+      "git_tracked": false,
+      "gitignore_rule": "data/ (repo root .gitignore)",
+      "classification": "LEGACY",
+      "classification_rationale": "Superseded input to the CURRENT corpus (abstracts.jsonl); not itself loaded by any index-build default path or by retrieval/retriever.py. Kept for reproducibility/reference of the pre-subsample state, and as the only remaining evidence of what the subsample step operated on."
+    }
+  ],
+
+  "index_assets": {
+    "main": {
+      "directory": "data/index/",
+      "classification": "CURRENT",
+      "classification_rationale": "retrieval/retriever.py's default INDEX_PATH/CHUNKS_PATH/BM25_PATH constants point here with no variant subdirectory; this is what agent/nodes.py's synthesis_node retrieves against via retrieve() -> retrieve_hybrid_reranked(). Confirmed directly in docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md section A.",
+      "files": [
+        {
+          "path": "data/index/faiss.index",
+          "size_bytes": 34827309,
+          "description": "FAISS IndexFlatIP (exact cosine similarity over L2-normalized vectors), embedding_model=all-MiniLM-L6-v2, embedding_dim=384, num_chunks=22674."
+        },
+        {
+          "path": "data/index/bm25.pkl",
+          "size_bytes": 26054064,
+          "description": "Pickled rank_bm25.BM25Okapi instance, num_docs=22674, tokenizer='lowercase alphanumeric regex, title + chunk_text'."
+        },
+        {
+          "path": "data/index/chunks.jsonl",
+          "size_bytes": 32651049,
+          "record_count": 22674,
+          "description": "One metadata record per vector/BM25 doc (parallel array to faiss.index and bm25.pkl), 180-word chunks / 30-word overlap."
+        },
+        {
+          "path": "data/index/index_meta.json",
+          "size_bytes": 337,
+          "content": {
+            "embedding_model": "all-MiniLM-L6-v2",
+            "embedding_dim": 384,
+            "index_type": "IndexFlatIP (cosine via L2-normalized vectors)",
+            "num_abstracts": 9000,
+            "num_chunks": 22674,
+            "chunk_size_words": 180,
+            "chunk_overlap_words": 30,
+            "build_time_seconds": 87.4,
+            "index_size_bytes": 34827309,
+            "chunks_file_size_bytes": 32651049
+          }
+        },
+        {
+          "path": "data/index/bm25_meta.json",
+          "size_bytes": 155,
+          "content": {
+            "num_docs": 22674,
+            "tokenizer": "lowercase alphanumeric regex, title + chunk_text",
+            "build_time_seconds": 1.2,
+            "bm25_file_size_bytes": 26054064
+          }
+        }
+      ],
+      "git_tracked": false,
+      "gitignore_rule": "data/ (repo root .gitignore)"
+    },
+    "variants": [
+      {
+        "tag": "bge_base_180_30",
+        "directory": "data/index/variants/bge_base_180_30/",
+        "classification": "STALE",
+        "classification_rationale": "Experimentation-only artifact from the embedding-model sweep (BAAI/bge-base-en-v1.5 vs all-MiniLM-L6-v2). Not referenced by retrieval/retriever.py's default INDEX_PATH or by agent/nodes.py. Corresponds to eval_results_bge_base_dense.json / eval_results_bge_base_hybrid.json, both of which measured worse than the CURRENT config (mean_recall_at_10 0.4173/0.4675 vs baseline 0.5711 dense / 0.6638 grounding-hybrid) and were not adopted.",
+        "files_summary": "bm25.pkl (26.1MB), bm25_meta.json, chunks.jsonl (32.7MB, 22674 lines), faiss.index (69.7MB, 768-dim), index_meta.json",
+        "index_meta": {
+          "embedding_model": "BAAI/bge-base-en-v1.5",
+          "embedding_dim": 768,
+          "num_abstracts": 9000,
+          "num_chunks": 22674,
+          "chunk_size_words": 180,
+          "chunk_overlap_words": 30,
+          "build_time_seconds": 1172.7
+        },
+        "git_tracked": false
+      },
+      {
+        "tag": "chunk_256_50",
+        "directory": "data/index/variants/chunk_256_50/",
+        "classification": "STALE",
+        "classification_rationale": "Experimentation-only artifact from the chunk-size sweep (256 words / 50 overlap, vs CURRENT's 180/30). Not referenced by any production path. Corresponds to eval_results_chunk_256_50_dense.json / _hybrid.json, both measured worse than CURRENT and not adopted.",
+        "files_summary": "bm25.pkl (22.6MB), bm25_meta.json, chunks.jsonl (30.7MB, 17146 lines), faiss.index (26.3MB, 384-dim), index_meta.json",
+        "index_meta": {
+          "embedding_model": "all-MiniLM-L6-v2",
+          "embedding_dim": 384,
+          "num_abstracts": 9000,
+          "num_chunks": 17146,
+          "chunk_size_words": 256,
+          "chunk_overlap_words": 50,
+          "build_time_seconds": 110.9
+        },
+        "git_tracked": false
+      },
+      {
+        "tag": "chunk_384_64",
+        "directory": "data/index/variants/chunk_384_64/",
+        "classification": "STALE",
+        "classification_rationale": "Experimentation-only artifact from the chunk-size sweep (384 words / 64 overlap). Not referenced by any production path. Corresponds to eval_results_chunk_384_64_dense.json / _hybrid.json, both measured worse than CURRENT's chunk config on the metric used and not adopted.",
+        "files_summary": "bm25.pkl (17.1MB), bm25_meta.json, chunks.jsonl (27.3MB, 11957 lines), faiss.index (18.4MB, 384-dim), index_meta.json",
+        "index_meta": {
+          "embedding_model": "all-MiniLM-L6-v2",
+          "embedding_dim": 384,
+          "num_abstracts": 9000,
+          "num_chunks": 11957,
+          "chunk_size_words": 384,
+          "chunk_overlap_words": 64,
+          "build_time_seconds": 90.6
+        },
+        "git_tracked": false
+      }
+    ]
+  },
+
+  "eval_set_assets": [
+    {
+      "path": "retrieval/eval_set.json",
+      "schema_version": 2,
+      "num_queries": 19,
+      "pool_method": "union(dense_top30, bm25_top30, hybrid_top30) via Retriever.get_pooled_candidates",
+      "labeling": "LOOSE relevance definition (general topical relevance), LLM-assisted (judge_model=nvidia/nemotron-3-super-120b-a12b), NOT human-verified.",
+      "ground_truth_granularity": "PMID-level (relevant_pmids), stable across chunk-size config changes.",
+      "built_at": "2026-09-10T13:27:40Z",
+      "classification": "LEGACY",
+      "classification_rationale": "Survey-query set under the LOOSE relevance definition; superseded for quality-judgment purposes by eval_set_strict.json's stricter, corrected re-labeling of the same candidate pools, though both are kept as part of the recorded experiment history."
+    },
+    {
+      "path": "retrieval/eval_set_strict_buggy_v1.json",
+      "schema_version": 3,
+      "num_queries": 18,
+      "pool_method": "Same pool as eval_set.json (re-labeled)",
+      "labeling": "STRICT relevance definition (must directly support a specific claim), LLM-assisted, judge_model=nvidia/nemotron-3-super-120b-a12b.",
+      "built_at": "2026-09-10T18:06:29Z",
+      "known_bug": "Labeling prompt let the model converge on a single best-sounding match per query instead of judging every candidate independently (per eval_set_strict.json's bug_fix_note).",
+      "classification": "LEGACY",
+      "classification_rationale": "Explicitly superseded/preserved-for-reference by eval_set_strict.json after a labeling-prompt bug fix; filename itself flags it 'buggy_v1'. Not used by any current measurement."
+    },
+    {
+      "path": "retrieval/eval_set_strict.json",
+      "schema_version": 5,
+      "num_queries": 18,
+      "pool_method": "Same pool as eval_set.json (re-labeled)",
+      "labeling": "STRICT relevance definition, per-candidate independent YES/NO verdicts, batched in groups of 8 to fit the 90s call timeout, LLM-assisted, judge_model=nvidia/nemotron-3-super-120b-a12b.",
+      "built_at": "2026-09-10T19:54:11Z",
+      "classification": "LEGACY",
+      "classification_rationale": "The corrected survey-query strict-label set (attempt 2b) — this is what eval_results_strict_dense.json / eval_results_strict_hybrid.json were measured against. Superseded as THE governing eval set once the grounding-query set (eval_set_grounding.json) was added and became the deciding factor for locking the hybrid default (per git commit f80e92f), but both strict sets are 'always reported together, paired' per its own methodology field, so kept as reference/history rather than stale."
+    },
+    {
+      "path": "retrieval/eval_set_grounding.json",
+      "schema_version": 1,
+      "num_queries": 29,
+      "pool_method": "Same 3-way union pooling as eval_set.json, applied to 28 specific-claim ('grounding') queries written before consulting corpus content.",
+      "labeling": "Identical locked STRICT definition and corrected batched per-candidate prompt reused from eval_set_strict.json, judge_model=nvidia/nemotron-3-super-120b-a12b.",
+      "built_at": "2026-09-11T16:16:11Z",
+      "classification": "CURRENT (as the eval set underlying the currently-locked config)",
+      "classification_rationale": "Per git log, this citation-grounding-oriented eval set (not the survey-query sets) is what the final round of experiments (HyDE, BM25-reweighting, BGE re-test) and the final f80e92f 'Lock final config: retrieve() now defaults to the hybrid pipeline' commit were measured against. It is the most recent/decisive eval set in the committed history, though per the governing Phase 4 directive its recorded metric numbers are still HISTORICAL/UNVERIFIED until re-run."
+    }
+  ],
+
+  "eval_result_assets": [
+    {
+      "path": "retrieval/eval_results_baseline.json",
+      "eval_set_used": "eval_set.json (loose, 19q -> 17 scored)",
+      "mode": "dense", "variant": null, "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.5711",
+      "classification": "LEGACY",
+      "note": "Pass-1/2 dense-only baseline on the original/loose survey eval set. Superseded as the deciding measurement by the grounding-set results once hybrid was found to win there."
+    },
+    {
+      "path": "retrieval/eval_results_hybrid.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "hybrid", "variant": null, "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4832",
+      "classification": "LEGACY",
+      "note": "Early hybrid measurement on the loose survey set, worse than dense-only baseline here — this is the result that led to shipping dense-only as the interim default (commit 5fb4fca) before the grounding-set results reversed that decision."
+    },
+    {
+      "path": "retrieval/eval_results_strict_dense.json",
+      "eval_set_used": "eval_set_strict.json (strict, 17q scored)",
+      "mode": "dense", "variant": null, "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.3408",
+      "classification": "LEGACY",
+      "note": "Strict-label re-measurement of dense-only on the survey-query set."
+    },
+    {
+      "path": "retrieval/eval_results_strict_hybrid.json",
+      "eval_set_used": "eval_set_strict.json (strict, 17q scored)",
+      "mode": "hybrid", "variant": null, "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4016",
+      "classification": "LEGACY",
+      "note": "Strict-label re-measurement of hybrid; hybrid beats dense here (unlike the loose-label result), per git commit 14ba958 'Strict-label re-measurement: hybrid now clearly wins' — this is the first result that started favoring hybrid, ahead of the final grounding-set confirmation."
+    },
+    {
+      "path": "retrieval/eval_results_bge_base_dense.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "dense", "variant": "bge_base_180_30", "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4173",
+      "classification": "LEGACY",
+      "note": "Corresponds to data/index/variants/bge_base_180_30 (STALE index). Embedding-model sweep; did not beat all-MiniLM-L6-v2, not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_bge_base_hybrid.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "hybrid", "variant": "bge_base_180_30", "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4675",
+      "classification": "LEGACY",
+      "note": "Corresponds to data/index/variants/bge_base_180_30. Not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_chunk_256_50_dense.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "dense", "variant": "chunk_256_50", "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.5541",
+      "classification": "LEGACY",
+      "note": "Corresponds to data/index/variants/chunk_256_50. Chunk-size sweep; did not beat 180/30, not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_chunk_256_50_hybrid.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "hybrid", "variant": "chunk_256_50", "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4792",
+      "classification": "LEGACY",
+      "note": "Corresponds to data/index/variants/chunk_256_50. Not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_chunk_384_64_dense.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "dense", "variant": "chunk_384_64", "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.567",
+      "classification": "LEGACY",
+      "note": "Corresponds to data/index/variants/chunk_384_64. Not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_chunk_384_64_hybrid.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "hybrid", "variant": "chunk_384_64", "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4689",
+      "classification": "LEGACY",
+      "note": "Corresponds to data/index/variants/chunk_384_64. Not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_expansion_hybrid.json",
+      "eval_set_used": "eval_set.json (loose, 18q)",
+      "mode": "hybrid", "variant": null, "expand": true,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.3807",
+      "classification": "LEGACY",
+      "note": "Query-expansion experiment (retrieval/query_expansion.py). Worse than plain hybrid/dense, not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_dense.json",
+      "eval_set_used": "eval_set_grounding.json (strict, grounding queries, 24q scored of 29)",
+      "mode": "dense", "variant": null, "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4761",
+      "classification": "LEGACY",
+      "note": "Dense-only baseline on the grounding-query set; hybrid measured decisively better here (see eval_results_grounding_hybrid.json), which is what finally locked the hybrid default."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_hybrid.json",
+      "eval_set_used": "eval_set_grounding.json (strict, grounding queries, 24q scored)",
+      "mode": "hybrid", "variant": null, "expand": false,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.6638",
+      "classification": "CURRENT (corresponds to the config retrieve() defaults to today)",
+      "note": "Best-measured result in the entire experiment series and the one cited by git commit f80e92f ('Lock final config: retrieve() now defaults to the hybrid pipeline') and retrieve_hybrid_reranked()'s own docstring in retrieval/retriever.py as justification for the production default. This is the closest thing to a 'current baseline' number in the repo, but per the governing Phase 4 directive it is still HISTORICAL/UNVERIFIED until independently re-run via retrieval/measure_recall.py."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_bge_dense.json",
+      "eval_set_used": "eval_set_grounding.json",
+      "mode": "unknown (fields null in file; filename implies dense)", "variant": "bge (implied)",
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.5363",
+      "classification": "LEGACY",
+      "note": "Re-test of BGE embedding upgrade against the grounding set (git commit 7479a1d 'no improvement'). Did not beat CURRENT hybrid (0.6638)."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_bge_hybrid.json",
+      "eval_set_used": "eval_set_grounding.json",
+      "mode": "unknown (fields null in file; filename implies hybrid)", "variant": "bge (implied)",
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.6325",
+      "classification": "LEGACY",
+      "note": "BGE + hybrid on grounding set; close to but below CURRENT (0.6638 with MiniLM). Not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_bm25_weight_2x.json",
+      "eval_set_used": "eval_set_grounding.json",
+      "mode": "unknown (fields null in file)", "variant": null,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.6549",
+      "classification": "LEGACY",
+      "note": "Weighted-RRF-toward-BM25 experiment (git commit 2e1e659 'no improvement'). Below CURRENT (0.6638), not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_bm25_weight_3x.json",
+      "eval_set_used": "eval_set_grounding.json",
+      "mode": "unknown (fields null in file)", "variant": null,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.6549",
+      "classification": "LEGACY",
+      "note": "Same as 2x weighting result (identical mean_recall_at_10); not adopted."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_hyde_dense_only.json",
+      "eval_set_used": "eval_set_grounding.json",
+      "mode": "unknown (fields null in file; filename implies HyDE dense-only)", "variant": null,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.4223",
+      "classification": "LEGACY",
+      "note": "HyDE (retrieval/hyde.py) dense-only experiment (git commit bcae012 'no improvement over existing hybrid'). Well below CURRENT."
+    },
+    {
+      "path": "retrieval/eval_results_grounding_hyde_hybrid.json",
+      "eval_set_used": "eval_set_grounding.json",
+      "mode": "unknown (fields null in file; filename implies HyDE hybrid)", "variant": null,
+      "mean_recall_at_10": "HISTORICAL/UNVERIFIED: 0.6437",
+      "classification": "LEGACY",
+      "note": "HyDE + hybrid; close to but below CURRENT (0.6638). Not adopted."
+    }
+  ],
+
+  "other_retrieval_experiment_artifacts": [
+    {
+      "path": "retrieval/hyde_cache_grounding.json",
+      "description": "Cache of 24 LLM-generated hypothetical-answer passages used by the HyDE experiment (retrieval/hyde.py) against the grounding query set, avoiding re-generation cost across repeated eval runs.",
+      "classification": "LEGACY",
+      "classification_rationale": "Supports a technique (HyDE) that measured worse than CURRENT and was not adopted into the production default."
+    },
+    {
+      "path": "RESULTS_RAG_COMPARISON.md",
+      "description": "Root-level, git-tracked doc: a controlled 30-case use_rag=True vs use_rag=False comparison run (concurrency=4, same test cases/order both arms), explicitly framed as replacing a fabricated resume claim with a measured number.",
+      "classification": "LEGACY/HISTORICAL",
+      "classification_rationale": "Documents a one-time experiment result, not a reproducible/re-runnable-by-default asset; its metric numbers are HISTORICAL/UNVERIFIED per the governing directive."
+    }
+  ],
+
+  "build_scripts": [
+    { "path": "retrieval/build_corpus.py", "lines": 175, "purpose": "Fetches the raw PubMed corpus via PubMedTool.search_pubmed() over 72 hardcoded query terms (max_results=200, years_back=15 each), dedupes by PMID, writes data/corpus/abstracts.jsonl.", "classification": "CURRENT (reproduces the raw fetch)/LEGACY-INCOMPLETE (does not reproduce the shipped 9,000-record subsample)", "reproducibility_note": "As committed today, writes every fetched record straight through with NO subsampling step -- cannot reproduce the exact 9,000-record production corpus. See integrity_issues_found." },
+    { "path": "retrieval/build_index.py", "lines": 147, "purpose": "Chunks corpus via chunking.py, embeds locally via sentence-transformers, writes FAISS IndexFlatIP + chunks.jsonl + index_meta.json. Also used (via --out-dir/--embed-model/--chunk-size flags) to build the three data/index/variants/* experimental builds.", "classification": "CURRENT" },
+    { "path": "retrieval/build_bm25.py", "lines": 93, "purpose": "Reads chunks.jsonl, builds and pickles a rank_bm25.BM25Okapi sparse index alongside the dense FAISS index for RRF fusion.", "classification": "CURRENT" },
+    { "path": "retrieval/chunking.py", "lines": 74, "purpose": "chunk_abstract(): fixed word-count windows (180 words / 30-word overlap default) since PubMed abstracts have no reliable paragraph structure to split on.", "classification": "CURRENT" },
+    { "path": "retrieval/retriever.py", "lines": 486, "purpose": "Retriever class + module-level retrieve()/retrieve_dense()/retrieve_hybrid_reranked() functions. Loads SentenceTransformer(all-MiniLM-L6-v2) + faiss index + lazy BM25 + lazy CrossEncoder(cross-encoder/ms-marco-MiniLM-L-6-v2); RRF fusion (k=60); retrieve() defaults to retrieve_hybrid_reranked(). Imported directly by agent/nodes.py.", "classification": "CURRENT" },
+    { "path": "retrieval/verify.py", "lines": 50, "purpose": "Standalone smoke test: runs representative queries through retrieve() and prints results/latency, no agent involved.", "classification": "CURRENT (utility, run manually)" },
+    { "path": "retrieval/measure_recall.py", "lines": 159, "purpose": "Runs PMID-level Recall@10 measurement against a fixed eval set for any retrieval mode/variant; the shared scoring harness behind every eval_results_*.json file.", "classification": "CURRENT (utility; this is the script Phase 4 should re-run for a trustworthy current number per the audit)" },
+    { "path": "retrieval/build_eval_set.py", "lines": 278, "purpose": "Builds eval_set.json: 19-query survey set, LOOSE relevance definition, 3-way pooled candidates, LLM-judge labeled.", "classification": "LEGACY (produces a LEGACY-classified eval set)" },
+    { "path": "retrieval/build_eval_set_strict.py", "lines": 275, "purpose": "Re-labels the same candidate pools under a STRICT relevance definition; produces eval_set_strict_buggy_v1.json then the corrected eval_set_strict.json.", "classification": "LEGACY (produces LEGACY-classified eval sets)" },
+    { "path": "retrieval/build_eval_set_grounding.py", "lines": 192, "purpose": "Builds eval_set_grounding.json: 28 citation-grounding (specific-claim) queries, written before consulting corpus content, strict definition, same pooling/labeling machinery reused from build_eval_set_strict.py.", "classification": "CURRENT (produces the eval set behind the CURRENT config decision)" },
+    { "path": "retrieval/experiment_grounding_optimization.py", "lines": 140, "purpose": "Final optimization pass against the LOCKED eval_set_grounding.json: runs HyDE, BM25-reweighted RRF, and combinations through measure_recall.py's scoring loop.", "classification": "LEGACY (experiment driver; its outputs did not beat the adopted config)" },
+    { "path": "retrieval/hyde.py", "lines": 89, "purpose": "HyDE: generates a hypothetical answer passage per query and embeds that instead of the raw query for the dense leg, to close the question-vs-answer phrasing gap.", "classification": "LEGACY (opt-in technique, not part of the CURRENT default pipeline)" },
+    { "path": "retrieval/query_expansion.py", "lines": 93, "purpose": "Generates 2-3 LLM reformulations per query, retrieves for each plus the original, fuses via RRF.", "classification": "LEGACY (opt-in technique, not part of the CURRENT default pipeline; measured worse, eval_results_expansion_hybrid.json)" },
+    { "path": "retrieval/__init__.py", "lines": 7, "purpose": "Package docstring/public-interface pointer (from retrieval.retriever import retrieve).", "classification": "CURRENT" },
+    { "path": "retrieval/README.md", "purpose": "Rebuild instructions for data/ from scratch (corpus fetch -> chunk/embed/FAISS -> BM25 -> verify); documents the corpus-subsampling reproducibility gap explicitly ('Known gap' section).", "classification": "CURRENT (authoritative build-process doc, cross-checked against code by the Phase 4 audit and found accurate)" }
+  ],
+
+  "root_level_historical_docs": [
+    { "path": "PHASE3_RETRIEVAL_LAYER_COMPLETE.md", "flag": "HISTORICAL/UNVERIFIED", "note": "Documents the original corpus build (72 queries, 13,115 raw -> 9,000 subsampled) and chunking/embedding decisions. Factual build-history content corroborated by the Phase 4 audit against index_meta.json and cross-checked as accurate; its own 'Phase 3' label is this project's pre-V2 numbering, unrelated to the current V2 phase gates." },
+    { "path": "PHASE3_RETRIEVAL_QUALITY_COMPLETE.md", "flag": "HISTORICAL/UNVERIFIED", "note": "Documents Pass 1 (hybrid loses to dense on the original/loose eval set) and Pass 2 (fixed eval-set bias, chunk-size/embedding-model/query-expansion sweeps, still dense wins on that pass's eval set) -- concludes 'retrieve() now defaults to dense-only', which was true AT THAT POINT IN HISTORY (git commit 5fb4fca) but is now superseded: the later grounding-query eval set (Section E of the audit; git commit f80e92f) reversed this and locked the hybrid pipeline as the actual current default. This doc's headline conclusion is stale relative to the current committed state of retrieval/retriever.py; its documented experiment mechanics/methodology remain accurate history." },
+    { "path": "PHASE3_WIRING_COMPLETE.md", "flag": "HISTORICAL/UNVERIFIED", "note": "Documents wiring retrieve() into agent/nodes.py's synthesis_node/report_generation_node (state.retrieved_context, use_rag flag, PubMed RAG vs PubMed API citation-label distinction) and a branch-merge/data-copy note (phase3-rag branch merged into main, data/ copied in from a sibling worktree). Corroborated as accurate by the Phase 4 audit's direct code citations." },
+    { "path": "PHASE3_CONCURRENCY_VALIDATION.md", "flag": "HISTORICAL/UNVERIFIED; NOT retrieval-scoped", "note": "Explicitly states 'No RAG/FAISS, corpus, embeddings, or agent/nodes.py retrieval work touched' -- covers evaluation/evaluator.py concurrency, not the retrieval layer itself. Included here only because it validates the concurrency level (concurrency=4) reused by RESULTS_RAG_COMPARISON.md." },
+    { "path": "REPORT_TABLE_DETERMINISM_COMPLETE.md", "flag": "HISTORICAL/UNVERIFIED; NOT retrieval-scoped", "note": "Explicitly states 'no RAG/FAISS ... work' touched -- about ChEMBL compound-table determinism in report_generation_node, unrelated to the retrieval layer." },
+    { "path": "CITATIONS_BUG_INVESTIGATION.md", "flag": "HISTORICAL/UNVERIFIED; NOT retrieval-scoped", "note": "About a ChEMBL citations field-name bug, not the PubMed RAG retrieval layer." },
+    { "path": "EVAL_HANG_FIX_COMPLETE.md", "flag": "HISTORICAL/UNVERIFIED; NOT retrieval-scoped", "note": "Explicitly states 'No RAG/FAISS ... work' -- about an evaluation-harness hang/timeout fix." },
+    { "path": "CHEMBL_BACKFILL_COMPLETE.md", "flag": "HISTORICAL/UNVERIFIED; NOT retrieval-scoped", "note": "Explicitly states 'no RAG/FAISS ... work touched' -- ChEMBL name-backfill logic in agent/nodes.py." }
+  ],
+
+  "dependencies": {
+    "source_file": "requirements.txt",
+    "section_header_note": "requirements.txt labels this section '# RAG / retrieval layer (Phase 3)' -- this is the SAME naming-inconsistency flagged by the Phase 4 audit: it is not this project's current V2 Phase 3 (already complete, unrelated to retrieval), just a leftover loose label from the old pre-V2 numbering scheme.",
+    "packages": [
+      { "name": "sentence-transformers", "pinned_version": "6.0.1", "used_for": "SentenceTransformer(all-MiniLM-L6-v2) dense embeddings + CrossEncoder(cross-encoder/ms-marco-MiniLM-L-6-v2) reranking, both in retrieval/retriever.py.", "reachable_from_production": true },
+      { "name": "faiss-cpu", "pinned_version": "1.15.0", "used_for": "faiss.read_index() / IndexFlatIP dense vector search, retrieval/retriever.py + retrieval/build_index.py.", "reachable_from_production": true },
+      { "name": "rank_bm25", "pinned_version": "0.2.2", "used_for": "BM25Okapi sparse index, retrieval/build_bm25.py, loaded lazily by Retriever in retrieval/retriever.py.", "reachable_from_production": true },
+      { "name": "numpy", "pinned_version": "<2", "used_for": "Pinned for ABI compatibility across sentence-transformers/scipy/scikit-learn and pandas 2.1.4, not retrieval-specific itself but required by the above.", "reachable_from_production": true }
+    ],
+    "cross_encoder_model_note": "cross-encoder/ms-marco-MiniLM-L-6-v2 is a HuggingFace model id loaded at runtime via sentence-transformers.CrossEncoder, not a separately pinned pip package -- no explicit version pin exists for the model weights themselves beyond sentence-transformers' own version."
+  },
+
+  "integrity_issues_found": [
+    {
+      "id": "corpus-subsample-not-reproducible",
+      "severity": "HIGH",
+      "title": "Production corpus (13,115 -> 9,000 abstracts) subsampling step has no committed script",
+      "description": "The live/CURRENT corpus data/corpus/abstracts.jsonl (9,000 records, what data/index/ was built from and what agent/nodes.py retrieves against) was produced by deterministically subsampling (random.seed(42)) the raw 13,115-abstract fetch preserved at data/corpus/abstracts_raw_all.jsonl. retrieval/build_corpus.py as committed today writes every fetched record straight through with no subsampling step at all, and git log --follow on that file shows only one commit ever touched it (the current version). The subsample was done via an ad hoc, uncommitted script at build time and cannot be reproduced from anything currently checked in.",
+      "evidence": ["retrieval/README.md 'Known gap' section", "docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md section A and E", "PHASE3_RETRIEVAL_LAYER_COMPLETE.md section 1"],
+      "relevant_directive": "Governing Phase 4 directive Step 28: 'Index builds must be reproducible... do not rely on opaque manually generated index files.'",
+      "impact": "A fresh clone + a fresh `python -m retrieval.build_corpus` run today CANNOT regenerate the exact corpus currently backing production retrieval -- only an equivalent-ish 13,115-abstract raw fetch (itself subject to PubMed's live index drift over time). The actually-running data/ artifacts are gitignored and were copied in from a prior build, not regenerated by any committed pipeline end-to-end."
+    },
+    {
+      "id": "data-dir-gitignored-not-committed",
+      "severity": "MEDIUM",
+      "title": "All of data/ (corpus + index + variants, ~406MB) is gitignored -- nothing under data/ arrives via git clone or git merge",
+      "description": "repo-root .gitignore excludes data/ entirely. Every corpus/index asset cataloged above physically exists only on this local disk (or wherever it was last copied from -- see PHASE3_WIRING_COMPLETE.md's note that data/ was copied from a sibling worktree during the original wiring pass). A fresh clone of this repository has none of retrieval/'s corpus/index files and cannot serve RAG-backed synthesis until someone manually rebuilds or copies data/ in.",
+      "evidence": ["repo root .gitignore line 58: 'data/'", "PHASE3_WIRING_COMPLETE.md section 0"],
+      "impact": "Combined with the corpus-subsample gap above, a from-scratch rebuild today produces a corpus that is neither byte-identical to production NOR obtainable any other reproducible way."
+    },
+    {
+      "id": "no-retrieval-test-coverage",
+      "severity": "MEDIUM",
+      "title": "No automated test coverage exists for the RAG retrieval layer",
+      "description": "tests/test_nodes.py exercises agent/nodes.py broadly but does not call _retrieve_rag_context, _dedupe_retrieved_by_pmid, or _format_retrieved_context; no test file under tests/ references faiss, BM25, CrossEncoder, or retrieve(). This is a live, production-wired code path with zero test coverage, unlike the rest of the codebase's tested surfaces (pubmed/clinical_trials/chembl tools, orchestration, NLU).",
+      "evidence": ["docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md section E"],
+      "impact": "Regressions in RAG retrieval wiring (dedup, context formatting, the RAG-vs-API citation-provenance distinction) would not be caught by the existing test suite."
+    },
+    {
+      "id": "eval-numbers-unverified-historical",
+      "severity": "LOW-MEDIUM",
+      "title": "All eval_results_*.json Recall@10 numbers are historical, LLM-judge-labeled, and not independently re-verified",
+      "description": "Every metric in every eval_results_*.json / eval_set*.json file comes from LLM-assisted relevance labeling (judge_model=nvidia/nemotron-3-super-120b-a12b) explicitly described in each eval-set's own 'methodology' field as 'NOT human-verified.' Per the governing Phase 4 directive, these should not be treated as current ground truth without re-running retrieval/measure_recall.py.",
+      "evidence": ["retrieval/eval_set.json / eval_set_strict.json / eval_set_grounding.json 'methodology' fields", "docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md section E"],
+      "impact": "Any Phase 4 claim about current retrieval quality needs an independent re-run, not a citation of these files."
+    },
+    {
+      "id": "eval-results-grounding-mode-fields-null",
+      "severity": "LOW",
+      "title": "Several grounding eval_results_*.json files have null mode/variant/expand fields",
+      "description": "eval_results_grounding_bge_dense.json, eval_results_grounding_bge_hybrid.json, eval_results_grounding_bm25_weight_2x.json, eval_results_grounding_bm25_weight_3x.json, eval_results_grounding_hyde_dense_only.json, and eval_results_grounding_hyde_hybrid.json all have mode/variant/expand recorded as null/None in the JSON itself -- what technique each represents has to be inferred from the filename and cross-referenced against git log commit messages (2e1e659, 7479a1d, bcae012), not read directly out of the result file's own structured fields.",
+      "evidence": ["Direct inspection of the six files' 'mode'/'variant'/'expand' keys"],
+      "impact": "Lower-severity documentation/provenance gap: these result files are less self-describing than the earlier eval_results_*.json files (baseline/hybrid/bge_base_*/chunk_*/expansion_hybrid), which do populate these fields."
+    },
+    {
+      "id": "phase-numbering-collision-in-requirements-txt",
+      "severity": "LOW",
+      "title": "requirements.txt labels the retrieval dependency block '# RAG / retrieval layer (Phase 3)', colliding with this project's current V2 Phase 3 (unrelated, already complete)",
+      "description": "Could cause a future contributor scoping V2 Phase 4 work to wrongly assume the retrieval layer was already covered/frozen under V2's Phase 3 tool-orchestration gate and skip auditing it.",
+      "evidence": ["requirements.txt line 17", "docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md section F"],
+      "impact": "Documentation/naming hazard only, no functional impact."
+    }
+  ]
+}

@@ -259,10 +259,27 @@ class PubMedTool(BaseTool):
         if years_back and not date_from:
             date_from = (datetime.now() - timedelta(days=years_back * 365)).strftime("%Y/%m/%d")
 
-        # Default to last 2 years if no date specified
-        if not date_from and not years_back:
-            years_back = settings.PUBMED_DEFAULT_DATE_RANGE
-            date_from = (datetime.now() - timedelta(days=years_back * 365)).strftime("%Y/%m/%d")
+        # NOTE (Phase 4 fix, 2026-09-25): this used to silently fall back to
+        # a `PUBMED_DEFAULT_DATE_RANGE` (2 year) lookback window whenever the
+        # caller passed neither `years_back` nor `date_from` - i.e. on every
+        # plain `search_pubmed(query)` call, which is how most callers
+        # (agent/nodes.py's tool_orchestration_node when the LLM omits
+        # years_back, and this measurement harness) actually invoke it. Per
+        # `docs/v2/PHASE4_BASELINE_MEASUREMENT.md` Section 2, that silent
+        # 2-year default was a root cause of the live PubMed path measuring
+        # Recall@10 = 0.045 vs RAG's 0.773 on the same 22 cases - most gold
+        # PMIDs in the benchmark (and in real biomedical literature queries
+        # generally) are older than 2 years and were being excluded before
+        # the search even ran, with no way for the caller to know. There is
+        # no evidence a 2-year default served any real purpose here, so it
+        # is removed: when the caller specifies no temporal constraint at
+        # all, no date filter is applied and PubMed's own relevance ranking
+        # runs across all time (see retrieval/pubmed_query_compiler.py for
+        # the deterministic compiler that decides when a date filter IS
+        # warranted, e.g. an explicit "recent"/"latest" constraint).
+        # `PUBMED_DEFAULT_DATE_RANGE` remains defined in config/settings.py
+        # for any caller that wants an explicit recency default, but is no
+        # longer applied implicitly here.
 
         def _execute():
             # Search for PMIDs

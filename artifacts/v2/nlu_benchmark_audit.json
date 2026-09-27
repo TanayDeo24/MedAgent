@@ -1,0 +1,96 @@
+{
+  "checks": [
+    {
+      "check": "exact_duplicate_query_text",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "valid_taxonomy_values",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "valid_entity_types",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "valid_source_values",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "missing_required_labels",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "entity_id_name_consistency",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "class_distribution",
+      "found": {
+        "A_literature_evidence": 15,
+        "B_clinical_trial_landscape": 15,
+        "C_compound_target": 15,
+        "D_cross_source_synthesis": 23,
+        "F_mechanism": 22,
+        "E_multi_hop_research": 15,
+        "G_constraint_heavy": 15,
+        "H_insufficient_evidence": 15,
+        "I_ambiguous": 15
+      }
+    },
+    {
+      "check": "split_template_group_leakage",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "split_query_text_overlap",
+      "found": 0,
+      "details": []
+    },
+    {
+      "check": "dev_split_class_distribution",
+      "found": {
+        "G_constraint_heavy": 8,
+        "H_insufficient_evidence": 4,
+        "B_clinical_trial_landscape": 6,
+        "D_cross_source_synthesis": 6,
+        "A_literature_evidence": 4,
+        "F_mechanism": 6,
+        "I_ambiguous": 5,
+        "E_multi_hop_research": 4,
+        "C_compound_target": 2
+      }
+    },
+    {
+      "check": "test_split_class_distribution",
+      "found": {
+        "G_constraint_heavy": 7,
+        "A_literature_evidence": 11,
+        "C_compound_target": 13,
+        "D_cross_source_synthesis": 17,
+        "F_mechanism": 16,
+        "I_ambiguous": 10,
+        "B_clinical_trial_landscape": 9,
+        "H_insufficient_evidence": 11,
+        "E_multi_hop_research": 11
+      }
+    }
+  ],
+  "accepted": 150,
+  "rejected": 0,
+  "rejected_examples": [],
+  "split_sizes": {
+    "dev": 45,
+    "test": 105,
+    "total": 150
+  },
+  "split_seed": 20260923,
+  "summary": "150/150 examples accepted, 0 rejected. dev=45 (45 template groups), test=105 (105 template groups). No template-group or exact-text leakage across splits."
+}

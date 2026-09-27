@@ -1,0 +1,40 @@
+{
+  "phase": "2 (latency-closure resume, security-incident recovery)",
+  "purpose": "Pre-declared neuron budget estimate for the Cloudflare Workers AI latency experiment, computed BEFORE any real inference call, per the hard 5000-neuron budget cap (half the 10,000/day free allocation).",
+  "date": "2026-09-24",
+  "primary_candidate": {
+    "model_id": "@cf/google/gemma-4-26b-a4b-it",
+    "verified_real_and_current": true,
+    "verification_source": "https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/ (fetched this session)",
+    "free_tier_eligible": true,
+    "verification_note": "Not on Cloudflare's documented paid-only model list (kimi-k2.6, kimi-k2.7-code, glm-5.2/5.3/5.3-flash, deepseek-v4-flash-0731/pro-0813, checked this session). Supports response_format (structured output) and chat_template_kwargs per its docs page. Reasoning-disable mechanism for THIS model documented as chat_template_kwargs: {enable_thinking: false} (confirmed applicable to gemma-4-26b-a4b-it specifically, not to be confused with the different {thinking: {type: 'disabled'}} / chat_template_kwargs.thinking mechanism used by unrelated Moonshot Kimi K2.5/K2.6 models on the same platform).",
+    "published_pricing": {
+      "input_usd_per_million_tokens": 0.10,
+      "output_usd_per_million_tokens": 0.30,
+      "neuron_price_usd_per_1000": 0.011,
+      "derived_neurons_per_input_token": 0.00909,
+      "derived_neurons_per_output_token": 0.02727
+    }
+  },
+  "nominal_estimate": {
+    "basis": "Published per-token pricing converted to neurons, using an estimated ~1800 input tokens (system prompt + ResearchQuery/BiomedicalEntity schema + taxonomy + query) and ~600 output tokens (structured JSON only, reasoning disabled) per NLU call -- same task shape as the frozen Nemotron config.",
+    "neurons_per_request_nominal": 33,
+    "pilot_8_cases_nominal": 264,
+    "full_dev_45_cases_nominal": 1485,
+    "retry_overhead_20pct_nominal": 350,
+    "total_projected_nominal": 2099,
+    "verdict_if_nominal_pricing_reliable": "Well under the 5000-neuron cap (pilot + full dev + retries ~2099 neurons)."
+  },
+  "risk_finding_pricing_anomaly": {
+    "summary": "A credible, specific, and UNRESOLVED community report was found for this exact model during this session's pre-call verification, showing real-world neuron/billing consumption approximately 37x higher than published per-token pricing would predict for @cf/google/gemma-4-26b-a4b-it.",
+    "source": "Cloudflare Community thread 'Potential Billing Error: Workers AI \"Gemma-4-26b-a4b-it\" cost 37x higher' (community.cloudflare.com/t/917868), corroborated by a second independent thread 'The Gemma 4 model is being priced incorrectly' (community.cloudflare.com/t/916875), both found via web search this session. Reported: expected ~$8 bill, actual ~$292 charged (~37x). As of this search, no Cloudflare-staff resolution/explanation was found confirming the anomaly is fixed.",
+    "worst_case_estimate": {
+      "neurons_per_request_worst_case": 1210,
+      "pilot_8_cases_worst_case": 9680,
+      "note": "The pilot alone (8 cases) at the worst-case reported multiplier already exceeds the entire 5000-neuron experiment cap, before any full-dev run or retries."
+    }
+  },
+  "decision": "STOP before any real inference call. Given an unresolved, credibly-sourced, order-of-magnitude billing/neuron-consumption anomaly reported specifically for the primary candidate model, per-request neuron cost cannot be treated as reliably bounded by published pricing. Proceeding under the hard 5000-neuron cap would risk consuming the entire budget (or more) on the 8-case pilot alone if the anomaly is still live, with no way to detect this in advance short of making the call. Per the task's explicit rule ('if projected usage exceeds 5,000, stop and report rather than proceeding'), the risk-adjusted (worst-case) projection is used rather than the optimistic nominal projection, because the anomaly report is specific to this exact model and unresolved -- not a generic caveat. No Cloudflare inference call was made in this session.",
+  "second_candidate_not_evaluated": "Per the task's own ordering rule, the second candidate (@cf/zai-org/glm-4.7-flash or current equivalent) is only evaluated if the primary is rejected AND >=70% of the 5000-neuron budget remains. Since 100% of the budget remains unspent (no primary pilot was run) this condition is technically met, but the primary rejection here is a budget/risk-gate stop, not a quality rejection -- the experiment as a whole is being reported as blocked-pending-human-review rather than silently substituting a second model, consistent with the task's instruction to report and stop rather than proceed past a budget concern.",
+  "recommendation_for_human_review": "Either (a) verify with Cloudflare directly / re-check the community threads for a staff resolution before re-attempting, (b) set a strict per-call neuron ceiling via the Cloudflare dashboard/AI Gateway budget alerting before any real call, or (c) proceed with a single, isolated, manually-monitored 1-request smoke test (not the 8-case pilot) with live dashboard neuron-usage monitoring, only after explicit human sign-off, before committing to the full pilot."
+}

@@ -1,0 +1,120 @@
+{
+  "purpose": "Predeclared 8-case pilot plan for candidate_f_cerebras_gptoss (Cerebras gpt-oss-120b, reasoning_effort=low, strict JSON Schema), written and committed to disk BEFORE any Cerebras API call is made.",
+  "benchmark_source": "evaluation/v2/nlu_benchmark_v1.json 'dev' split (45 examples) ONLY. The 105-example 'test' split (consumed once, pre-closure) and any Phase-10 held-out data are NOT touched.",
+  "case_selection_rationale": "7 of these 8 query_ids are the SAME items used in the prior candidate_e_nvidia_fast pilot (artifacts/v2/nlu_nvidia_fastmodel_pilot_results.json) - deliberately reused for direct cross-candidate comparability. The 8th (nlu_v1_0119) is a NEW distinct G_constraint_heavy example added specifically to satisfy the task's 'class G example' category as a separate item from the 'constraint-heavy trial question' category (both G-class, different query instances, since the task lists them as two distinct predeclared slots).",
+  "known_limitation": "No example in the 45-item dev split is a true 'ambiguous ABBREVIATION' case (e.g. an acronym with 2+ biomedical meanings). The closest available I_ambiguous dev example, nlu_v1_0136 ('Tell me about KRAS inhibitors.' - a bare-topic mention with no specific question), is substituted for that slot; this substitution is disclosed here rather than silently reinterpreting the category.",
+  "pilot_cases": [
+    {
+      "category": "simple entity question",
+      "query_id": "nlu_v1_0013",
+      "query_text": "What evidence supports PD-1 as a therapeutic target in breast cancer?",
+      "gold_intent": ["A_literature_evidence"],
+      "gold_entities": [
+        {"surface": "PD-1", "type": "target", "canonical_id": "HGNC:8760"},
+        {"surface": "breast cancer", "type": "disease", "canonical_id": "MeSH:D001943"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["pubmed"]
+    },
+    {
+      "category": "constraint-heavy trial question",
+      "query_id": "nlu_v1_0106",
+      "query_text": "Find recruiting Phase 1 trials in adults with non-small cell lung cancer using EGFR inhibitors",
+      "gold_intent": ["G_constraint_heavy"],
+      "gold_entities": [
+        {"surface": "EGFR", "type": "target", "canonical_id": "HGNC:3236"},
+        {"surface": "non-small cell lung cancer", "type": "disease", "canonical_id": "MeSH:D002289"}
+      ],
+      "gold_constraints": [
+        {"field": "trial_phases", "value": "PHASE1"},
+        {"field": "trial_statuses", "value": "RECRUITING"},
+        {"field": "population", "value": "adults"}
+      ],
+      "gold_required_sources": ["clinicaltrials"]
+    },
+    {
+      "category": "multi-entity question",
+      "query_id": "nlu_v1_0100",
+      "query_text": "Starting from compounds that inhibit KRAS, which ones progressed to trials in melanoma and what do published studies report on their outcomes?",
+      "gold_intent": ["E_multi_hop_research"],
+      "gold_entities": [
+        {"surface": "KRAS", "type": "target", "canonical_id": "HGNC:6407"},
+        {"surface": "melanoma", "type": "disease", "canonical_id": "MeSH:D008545"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["chembl", "clinicaltrials", "pubmed"]
+    },
+    {
+      "category": "cross-source question",
+      "query_id": "nlu_v1_0048",
+      "query_text": "Which BTK inhibitors have both published evidence and active trials in type 2 diabetes?",
+      "gold_intent": ["D_cross_source_synthesis"],
+      "gold_entities": [
+        {"surface": "BTK", "type": "target", "canonical_id": "HGNC:1133"},
+        {"surface": "type 2 diabetes", "type": "disease", "canonical_id": "MeSH:D003924"}
+      ],
+      "gold_constraints": [{"field": "trial_statuses", "value": "ACTIVE_NOT_RECRUITING"}],
+      "gold_required_sources": ["pubmed", "clinicaltrials"]
+    },
+    {
+      "category": "ambiguous abbreviation (substituted - see known_limitation)",
+      "query_id": "nlu_v1_0136",
+      "query_text": "Tell me about KRAS inhibitors.",
+      "gold_intent": ["I_ambiguous"],
+      "gold_entities": [{"surface": "KRAS", "type": "target", "canonical_id": "HGNC:6407"}],
+      "gold_constraints": [],
+      "gold_required_sources": [],
+      "gold_ambiguity_is_ambiguous": true
+    },
+    {
+      "category": "gene/protein/target semantic-role ambiguity",
+      "query_id": "nlu_v1_0071",
+      "query_text": "What is the mechanism of action of sotorasib against BTK?",
+      "gold_intent": ["F_mechanism"],
+      "gold_entities": [
+        {"surface": "sotorasib", "type": "compound", "canonical_id": "ChEMBL:CHEMBL4535757"},
+        {"surface": "BTK", "type": "target", "canonical_id": "HGNC:1133"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["pubmed", "chembl"],
+      "note": "BTK is a canonical gene/protein/target ambiguity case for this benchmark's semantic_roles field; gold benchmark itself has no gold semantic_roles annotation (documented pre-existing limitation, same as noted in nlu_frozen_config.json), so this case is scored on entity_type/normalization correctness plus qualitative semantic_roles behavior, not a semantic_roles P/R/F1 number."
+    },
+    {
+      "category": "class B example",
+      "query_id": "nlu_v1_0017",
+      "query_text": "What Phase 2 trials are evaluating osimertinib in melanoma?",
+      "gold_intent": ["B_clinical_trial_landscape"],
+      "gold_entities": [
+        {"surface": "osimertinib", "type": "compound", "canonical_id": "ChEMBL:CHEMBL3353410"},
+        {"surface": "melanoma", "type": "disease", "canonical_id": "MeSH:D008545"}
+      ],
+      "gold_constraints": [{"field": "trial_phases", "value": "PHASE2"}],
+      "gold_required_sources": ["clinicaltrials"]
+    },
+    {
+      "category": "class G example",
+      "query_id": "nlu_v1_0119",
+      "query_text": "Find active, not recruiting trials for pembrolizumab in elderly patients",
+      "gold_intent": ["G_constraint_heavy"],
+      "gold_entities": [{"surface": "pembrolizumab", "type": "compound", "canonical_id": "ChEMBL:CHEMBL3137343"}],
+      "gold_constraints": [
+        {"field": "trial_statuses", "value": "ACTIVE_NOT_RECRUITING"},
+        {"field": "population", "value": "elderly patients"}
+      ],
+      "gold_required_sources": ["clinicaltrials"]
+    }
+  ],
+  "request_settings_predeclared": {
+    "model": "gpt-oss-120b",
+    "reasoning_effort": "low",
+    "temperature": 0,
+    "response_format": "strict json_schema (CEREBRAS_RESEARCH_QUERY_JSON_SCHEMA, nlu/extractor.py)",
+    "max_completion_tokens": 4096,
+    "streaming": false,
+    "prompt": "IDENTICAL STRUCTURED_EXTRACTION_PROMPT text used by candidate_b_structured (the canonical Phase 2 NLU prompt, not simplified for this provider)",
+    "retry_policy": "1 initial attempt + 1 identical retry on empty/unparseable/malformed response only, matching every other candidate's empty_response_handling contract",
+    "rate_limiting": "sequential calls only, >=13s spacing enforced via utils.rate_limiter (5 RPM Free Trial cap), no parallel/burst requests"
+  },
+  "hard_rejection_gate_reminder": "Reject immediately (no full dev run) on any SYSTEMIC defect: generic-intent collapse (the exact failure that killed candidate_e_nvidia_fast - 5/8 collapsed to A_literature_evidence), repeated B/G confusion, catastrophic entity loss, repeated entity mistyping, fabricated canonical IDs, major constraint loss, broad false ambiguity, semantic_roles regression, semantically-empty-but-valid outputs, normalization corruption, repeated unsupported field invention. One isolated minor error does not disqualify; a clear systemic pattern does.",
+  "latency_gate_reminder": "Control: P50 19150ms / P95 66983ms (artifacts/v2/nlu_frozen_config.json). Pilot needs P50 <=~5000ms OR >=60% P50 reduction with no obvious pathological tail."
+}

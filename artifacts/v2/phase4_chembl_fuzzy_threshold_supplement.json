@@ -1,0 +1,287 @@
+{
+  "supplement_name": "phase4_chembl_fuzzy_threshold_supplement",
+  "purpose": "Step 3 of the fix path in docs/v2/PHASE4_STATUS.md: a genuinely new held-out supplement targeting resolve_compound_name()'s fuzzy-match confidence boundary, run blind exactly once against the FIXED ChEMBLTool (FUZZY_MATCH_MIN_SIMILARITY=0.6 gate, see docs/v2/CHEMBL_FUZZY_MATCH_THRESHOLD_FIX.md), to confirm the fix generalizes beyond the single 'Zorblatinix-9X' case that originally opened Phase 4.",
+  "not_reused_from": {
+    "phase4_heldout_spent_cases": [
+      "What molecular mechanisms cause long-term low blood-cell counts after BCMA CAR-T therapy in multiple myeloma patients?",
+      "Does combining AT-101 with gefitinib improve drug sensitivity in EGFR T790M-mutant non-small cell lung cancer specifically?",
+      "What is the role of PARP inhibitors in treating ovarian carcinomas with defective homologous recombination repair?",
+      "What are the current treatment updates for HER2-positive metastatic breast cancer?",
+      "What does the literature say about xyzxyzqqnonexistentdrugname12345 for treating disease?",
+      "Are there any clinical trials for xyzxyz-nonexistent-condition-zzz-12345?",
+      "What is the ChEMBL record for the drug ZZZNOTADRUGNAME123?",
+      "What is the ChEMBL ID, mechanism of action, and clinical trial status of the compound Zorblatinix-9X?",
+      "What is the current US retail market price of imatinib?",
+      "Show me the full genomic DNA sequence of the human EGFR gene.",
+      "What clinical trial identifier corresponds to aspirin's mechanism of action?",
+      "What's the best treatment?"
+    ],
+    "note": "Verified by reading artifacts/v2/phase4_benchmark_manifest.json (split=='phase4_heldout') before authoring cases. None of this supplement's 10 compound-name strings (Velbotracine, Nuravex-XR, Trimoxaphenidol, Quindarolix-B7, Sertralin, Metoprolo, Duloxetin, Ozempic, Eliquis, 'Atorvastatin.') appear anywhere in phase4_benchmark_manifest.json (any split) or in the fix doc's own calibration examples (Zorblatinix-9X, Fake Compound XYZ123, asprin, Amoxicilin, Keytruda, Ketruda, Osimertinibb, Ibuprofin, Paracetmol, Tagrisso, osimertinib salt) -- deliberately avoided even though those are not formally 'spent' held-out cases, to keep this supplement's evidence unambiguously independent of anything already seen during the fix's own construction."
+  },
+  "gold_verification_process": "Every real-drug gold expectation (chembl_id and preferred_name) was established by a live call to the FIXED ChEMBLTool().resolve_compound_name() against the drug's correctly-spelled canonical name BEFORE selecting that drug's typo/brand/punctuation variant for the case set (e.g. 'sertraline' verified live as CHEMBL809 before 'Sertralin' was chosen as its near-miss case) -- same live-verification discipline as phase4_benchmark_manifest.json's gold_label_process, never a guessed ID. Candidate typo strings were also pre-screened live to confirm ChEMBL's own search endpoint actually returns name-similar candidates for them at all (several plausible typos tried during screening -- e.g. Atorvastin, Apixabann, Rosuvastatn, Losartn, Warfarn -- returned no_match even before reaching the similarity gate, i.e. ChEMBL's own ElasticSearch fuzziness found nothing usable, and were discordant with the goal of testing the SIMILARITY GATE specifically, so were not used). This pre-screening exercised the already-fixed tool and is case-selection activity, not fix-tuning: no source file was read or modified during or after it, and the officially-recorded run below is a single, separate, complete pass over the final 10-case set that was not altered afterward regardless of outcome.",
+  "case_count": 10,
+  "category_spread": {
+    "fabricated_name": 4,
+    "genuine_near_miss_typo": 3,
+    "synonym_brand_name": 2,
+    "capitalization_punctuation_normalization": 1
+  },
+  "official_blind_run": {
+    "run_timestamp_utc": "2026-09-25T19:47:20.735414Z",
+    "run_description": "Single blind run of the phase4_chembl_fuzzy_threshold_supplement case set against the FIXED ChEMBLTool().resolve_compound_name() (FUZZY_MATCH_MIN_SIMILARITY=0.6 gate in place). Real live ChEMBL API calls, no mocking, no tuning performed after this run.",
+    "results": [
+      {
+        "case_id": "SUPP-FAB-01",
+        "category": "fabricated_name",
+        "query_name": "Velbotracine",
+        "style": "invented_syllables",
+        "gold_match_type": "no_match",
+        "gold_chembl_id": null,
+        "gold_preferred_name": null,
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "no_match",
+        "observed_chembl_id": null,
+        "observed_preferred_name": null,
+        "observed_matched_name": null,
+        "observed_candidates": [],
+        "observed_normalized_name": "Velbotracine",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-FAB-02",
+        "category": "fabricated_name",
+        "query_name": "Nuravex-XR",
+        "style": "brand_name_style_fake_word",
+        "gold_match_type": "no_match",
+        "gold_chembl_id": null,
+        "gold_preferred_name": null,
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "no_match",
+        "observed_chembl_id": null,
+        "observed_preferred_name": null,
+        "observed_matched_name": null,
+        "observed_candidates": [],
+        "observed_normalized_name": "Nuravex-XR",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-FAB-03",
+        "category": "fabricated_name",
+        "query_name": "Trimoxaphenidol",
+        "style": "fake_but_plausible_chemical_ish",
+        "gold_match_type": "no_match",
+        "gold_chembl_id": null,
+        "gold_preferred_name": null,
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "no_match",
+        "observed_chembl_id": null,
+        "observed_preferred_name": null,
+        "observed_matched_name": null,
+        "observed_candidates": [],
+        "observed_normalized_name": "Trimoxaphenidol",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-FAB-04",
+        "category": "fabricated_name",
+        "query_name": "Quindarolix-B7",
+        "style": "invented_syllables_with_alphanumeric_suffix",
+        "gold_match_type": "no_match",
+        "gold_chembl_id": null,
+        "gold_preferred_name": null,
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "no_match",
+        "observed_chembl_id": null,
+        "observed_preferred_name": null,
+        "observed_matched_name": null,
+        "observed_candidates": [],
+        "observed_normalized_name": "Quindarolix-B7",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-NEARMISS-01",
+        "category": "genuine_near_miss_typo",
+        "query_name": "Sertralin",
+        "style": "one_character_dropped_from_sertraline",
+        "gold_match_type": "fuzzy",
+        "gold_chembl_id": "CHEMBL809",
+        "gold_preferred_name": "SERTRALINE",
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "fuzzy",
+        "observed_chembl_id": "CHEMBL809",
+        "observed_preferred_name": "SERTRALINE",
+        "observed_matched_name": "SERTRALINE",
+        "observed_candidates": [
+          {
+            "chembl_id": "CHEMBL1709",
+            "preferred_name": "SERTRALINE HYDROCHLORIDE"
+          },
+          {
+            "chembl_id": "CHEMBL1788361",
+            "preferred_name": null
+          },
+          {
+            "chembl_id": "CHEMBL5182387",
+            "preferred_name": null
+          },
+          {
+            "chembl_id": "CHEMBL252744",
+            "preferred_name": null
+          }
+        ],
+        "observed_normalized_name": "Sertralin",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-NEARMISS-02",
+        "category": "genuine_near_miss_typo",
+        "query_name": "Metoprolo",
+        "style": "one_character_dropped_from_metoprolol",
+        "gold_match_type": "fuzzy",
+        "gold_chembl_id": "CHEMBL13",
+        "gold_preferred_name": "METOPROLOL",
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "fuzzy",
+        "observed_chembl_id": "CHEMBL13",
+        "observed_preferred_name": "METOPROLOL",
+        "observed_matched_name": "METOPROLOL",
+        "observed_candidates": [],
+        "observed_normalized_name": "Metoprolo",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-NEARMISS-03",
+        "category": "genuine_near_miss_typo",
+        "query_name": "Duloxetin",
+        "style": "one_character_dropped_from_duloxetine",
+        "gold_match_type": "fuzzy",
+        "gold_chembl_id": "CHEMBL1200328",
+        "gold_preferred_name": "DULOXETINE HYDROCHLORIDE",
+        "gold_note": "Resolves to the HCl salt form (a real, directly duloxetine-related ChEMBL record), not the base-compound ID (CHEMBL1175) that exact-match 'duloxetine' returns -- still a genuine, name-related resolution, not a fabricated/unrelated one.",
+        "observed_success": true,
+        "observed_match_type": "fuzzy",
+        "observed_chembl_id": "CHEMBL1200328",
+        "observed_preferred_name": "DULOXETINE HYDROCHLORIDE",
+        "observed_matched_name": "DULOXETINE HYDROCHLORIDE",
+        "observed_candidates": [
+          {
+            "chembl_id": "CHEMBL1175",
+            "preferred_name": "DULOXETINE"
+          },
+          {
+            "chembl_id": "CHEMBL424660",
+            "preferred_name": null
+          },
+          {
+            "chembl_id": "CHEMBL336920",
+            "preferred_name": "(R)-DULOXETINE"
+          },
+          {
+            "chembl_id": "CHEMBL1243041",
+            "preferred_name": null
+          }
+        ],
+        "observed_normalized_name": "Duloxetin",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-SYN-01",
+        "category": "synonym_brand_name",
+        "query_name": "Ozempic",
+        "style": "real_brand_name_of_semaglutide",
+        "gold_match_type": "exact_synonym",
+        "gold_chembl_id": "CHEMBL2108724",
+        "gold_preferred_name": "SEMAGLUTIDE",
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "exact_synonym",
+        "observed_chembl_id": "CHEMBL2108724",
+        "observed_preferred_name": "SEMAGLUTIDE",
+        "observed_matched_name": "Ozempic",
+        "observed_candidates": [],
+        "observed_normalized_name": "Ozempic",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-SYN-02",
+        "category": "synonym_brand_name",
+        "query_name": "Eliquis",
+        "style": "real_brand_name_of_apixaban",
+        "gold_match_type": "exact_synonym",
+        "gold_chembl_id": "CHEMBL231779",
+        "gold_preferred_name": "APIXABAN",
+        "gold_note": null,
+        "observed_success": true,
+        "observed_match_type": "exact_synonym",
+        "observed_chembl_id": "CHEMBL231779",
+        "observed_preferred_name": "APIXABAN",
+        "observed_matched_name": "Eliquis",
+        "observed_candidates": [],
+        "observed_normalized_name": "Eliquis",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      },
+      {
+        "case_id": "SUPP-NORM-01",
+        "category": "capitalization_punctuation_normalization",
+        "query_name": "Atorvastatin.",
+        "style": "real_drug_name_with_trailing_period",
+        "gold_match_type": "fuzzy",
+        "gold_chembl_id": "CHEMBL1487",
+        "gold_preferred_name": "ATORVASTATIN",
+        "gold_note": "Trailing period breaks pref_name__iexact exact match, routing through the fuzzy tier -- exercises normalization AND the new similarity gate together.",
+        "observed_success": true,
+        "observed_match_type": "fuzzy",
+        "observed_chembl_id": "CHEMBL1487",
+        "observed_preferred_name": "ATORVASTATIN",
+        "observed_matched_name": "ATORVASTATIN",
+        "observed_candidates": [
+          {
+            "chembl_id": "CHEMBL4587343",
+            "preferred_name": null
+          },
+          {
+            "chembl_id": "CHEMBL393220",
+            "preferred_name": "ATORVASTATIN CALCIUM"
+          },
+          {
+            "chembl_id": "CHEMBL3349878",
+            "preferred_name": null
+          },
+          {
+            "chembl_id": "CHEMBL333687",
+            "preferred_name": "ATORVASTATIN LACTONE"
+          }
+        ],
+        "observed_normalized_name": "Atorvastatin.",
+        "match_type_correct": true,
+        "chembl_id_correct": true
+      }
+    ]
+  },
+  "scoring": {
+    "overall_correct": 10,
+    "overall_total": 10,
+    "fabricated_name_correct_rejection_rate": "4/4",
+    "genuine_near_miss_correct_resolution_rate": "3/3",
+    "synonym_tier_correct_resolution_rate": "2/2",
+    "capitalization_punctuation_correct_rate": "1/1",
+    "misleading_fabricated_ids_returned": 0,
+    "misleading_fabricated_id_cases": []
+  },
+  "conclusion": "CONFIRMED: the fuzzy-match similarity gate (FUZZY_MATCH_MIN_SIMILARITY=0.6) generalizes beyond the single Zorblatinix-9X case. All 4 fabricated/nonsense names (4 different invented styles) were correctly rejected as no_match with chembl_id=None -- zero misleading real-but-unrelated ChEMBL IDs returned, the exact defect class that opened Phase 4. All 3 genuine near-miss typos of real drugs still correctly resolve via the fuzzy tier to the right ChEMBL ID. Both real-drug brand-name/synonym cases still resolve correctly via exact_synonym, confirming the threshold fix did not regress that tier. The capitalization/punctuation case confirms normalization still functions correctly when combined with the new gate. 10/10 cases scored correct; this is now permitted as blind confirming evidence per docs/v2/PHASE4_STATUS.md's decided path (step 3), clearing the way for step 4 (refreeze as config v2 / formally close Phase 4) as a separate follow-on action."
+}

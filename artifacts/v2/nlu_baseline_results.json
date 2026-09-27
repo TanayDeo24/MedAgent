@@ -1,0 +1,1710 @@
+{
+  "architecture": "candidate_a_baseline",
+  "split": "dev",
+  "benchmark_version": "1.0.0",
+  "benchmark_name": "nlu_benchmark",
+  "n_examples": 45,
+  "schema_parse_success_rate": 0.9777777777777777,
+  "schema_parse_failures": [
+    {
+      "query_id": "nlu_v1_0063",
+      "error": "LLM call failed: [###] {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}\n{'error': {'message': 'Service temporarily overloaded', 'type': 'Service Unavailable', 'code': 503}}"
+    }
+  ],
+  "entity_prf": {
+    "n": 44,
+    "micro": {
+      "precision": 0.8048780487804879,
+      "recall": 0.9850746268656716,
+      "f1": 0.8859060402684563
+    },
+    "macro": {
+      "precision": 0.8446969696969696,
+      "recall": 0.9886363636363636,
+      "f1": 0.8878787878787879
+    }
+  },
+  "normalization": {
+    "n_normalizable_gold": 67,
+    "correct": 0,
+    "accuracy_at_1": 0.0,
+    "fabricated_id_count": 0
+  },
+  "intent": {
+    "n": 45,
+    "accuracy": 0.26666666666666666,
+    "macro_f1": 0.14968071519795656,
+    "per_class": {
+      "A_literature_evidence": {
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666,
+        "support": 4
+      },
+      "B_clinical_trial_landscape": {
+        "precision": 0.2608695652173913,
+        "recall": 1.0,
+        "f1": 0.41379310344827586,
+        "support": 6
+      },
+      "C_compound_target": {
+        "precision": 0.15384615384615385,
+        "recall": 1.0,
+        "f1": 0.2666666666666667,
+        "support": 2
+      },
+      "D_cross_source_synthesis": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 6
+      },
+      "E_multi_hop_research": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      },
+      "F_mechanism": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 6
+      },
+      "G_constraint_heavy": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 8
+      },
+      "H_insufficient_evidence": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 4
+      },
+      "I_ambiguous": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 5
+      }
+    }
+  },
+  "intent_confusion_matrix": {
+    "G_constraint_heavy": {
+      "B_clinical_trial_landscape": 8
+    },
+    "H_insufficient_evidence": {
+      "B_clinical_trial_landscape": 2,
+      "C_compound_target": 1,
+      "A_literature_evidence": 1
+    },
+    "B_clinical_trial_landscape": {
+      "B_clinical_trial_landscape": 6
+    },
+    "D_cross_source_synthesis": {
+      "B_clinical_trial_landscape": 4,
+      "C_compound_target": 1,
+      "NONE_PREDICTED": 1
+    },
+    "A_literature_evidence": {
+      "A_literature_evidence": 4
+    },
+    "F_mechanism": {
+      "C_compound_target": 6
+    },
+    "I_ambiguous": {
+      "A_literature_evidence": 3,
+      "B_clinical_trial_landscape": 1,
+      "C_compound_target": 1
+    },
+    "E_multi_hop_research": {
+      "B_clinical_trial_landscape": 2,
+      "C_compound_target": 2
+    },
+    "C_compound_target": {
+      "C_compound_target": 2
+    }
+  },
+  "constraint_prf": {
+    "n": 44,
+    "micro": {
+      "precision": null,
+      "recall": 0.0,
+      "f1": null
+    },
+    "macro": {
+      "precision": 0.6136363636363636,
+      "recall": 0.6136363636363636,
+      "f1": 0.6136363636363636
+    }
+  },
+  "source_set_prf": {
+    "n": 44,
+    "micro": {
+      "precision": null,
+      "recall": 0.0,
+      "f1": null
+    },
+    "macro": {
+      "precision": 0.06818181818181818,
+      "recall": 0.06818181818181818,
+      "f1": 0.06818181818181818
+    }
+  },
+  "latency_ms": {
+    "p50": 6553.4508228302,
+    "p95": 21745.24209499359,
+    "mean": 7571.921798917982,
+    "n": 45
+  },
+  "llm_calls_per_question": 1.0,
+  "per_example_results": [
+    {
+      "query_id": "nlu_v1_0107",
+      "schema_valid": true,
+      "latency_ms": 7227.7891635894775,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0123",
+      "schema_valid": true,
+      "latency_ms": 7363.6908531188965,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0018",
+      "schema_valid": true,
+      "latency_ms": 17776.24487876892,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0111",
+      "schema_valid": true,
+      "latency_ms": 5102.518081665039,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0130",
+      "schema_valid": true,
+      "latency_ms": 5121.099948883057,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0048",
+      "schema_valid": true,
+      "latency_ms": 5625.363349914551,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0119",
+      "schema_valid": true,
+      "latency_ms": 23446.24090194702,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0013",
+      "schema_valid": true,
+      "latency_ms": 4290.655136108398,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0084",
+      "schema_valid": true,
+      "latency_ms": 6423.334836959839,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0080",
+      "schema_valid": true,
+      "latency_ms": 4606.786012649536,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0055",
+      "schema_valid": true,
+      "latency_ms": 5574.275732040405,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0140",
+      "schema_valid": true,
+      "latency_ms": 8353.827714920044,
+      "entity_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      },
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0083",
+      "schema_valid": true,
+      "latency_ms": 10960.191011428833,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0112",
+      "schema_valid": true,
+      "latency_ms": 7285.530805587769,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0110",
+      "schema_valid": true,
+      "latency_ms": 7473.739147186279,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "schema_valid": true,
+      "latency_ms": 3404.4480323791504,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0149",
+      "schema_valid": true,
+      "latency_ms": 11733.042240142822,
+      "entity_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0071",
+      "schema_valid": true,
+      "latency_ms": 9097.311973571777,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0100",
+      "schema_valid": true,
+      "latency_ms": 6773.571968078613,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0002",
+      "schema_valid": true,
+      "latency_ms": 4045.351982116699,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "schema_valid": true,
+      "latency_ms": 6810.322284698486,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "schema_valid": true,
+      "latency_ms": 7893.043041229248,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0106",
+      "schema_valid": true,
+      "latency_ms": 3575.2508640289307,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0017",
+      "schema_valid": true,
+      "latency_ms": 3785.778760910034,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0085",
+      "schema_valid": true,
+      "latency_ms": 5460.30592918396,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0091",
+      "schema_valid": true,
+      "latency_ms": 25878.920078277588,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0060",
+      "schema_valid": true,
+      "latency_ms": 5174.049139022827,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0132",
+      "schema_valid": true,
+      "latency_ms": 12340.760231018066,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0134",
+      "schema_valid": true,
+      "latency_ms": 7677.213191986084,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 2,
+        "fn": 0,
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0064",
+      "schema_valid": true,
+      "latency_ms": 6757.442951202393,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0098",
+      "schema_valid": true,
+      "latency_ms": 10841.522216796875,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0136",
+      "schema_valid": true,
+      "latency_ms": 4618.62587928772,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0115",
+      "schema_valid": true,
+      "latency_ms": 3473.836898803711,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0007",
+      "schema_valid": true,
+      "latency_ms": 3060.110092163086,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0148",
+      "schema_valid": true,
+      "latency_ms": 9647.135972976685,
+      "entity_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "schema_valid": true,
+      "latency_ms": 8090.105056762695,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0022",
+      "schema_valid": true,
+      "latency_ms": 5221.079111099243,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0016",
+      "schema_valid": true,
+      "latency_ms": 5018.266201019287,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0031",
+      "schema_valid": true,
+      "latency_ms": 5424.929141998291,
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0019",
+      "schema_valid": true,
+      "latency_ms": 6553.4508228302,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0063",
+      "schema_valid": false,
+      "latency_ms": 4251.354932785034
+    },
+    {
+      "query_id": "nlu_v1_0073",
+      "schema_valid": true,
+      "latency_ms": 9578.376054763794,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 2,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0025",
+      "schema_valid": true,
+      "latency_ms": 9310.190916061401,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0139",
+      "schema_valid": true,
+      "latency_ms": 4300.847291946411,
+      "entity_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0012",
+      "schema_valid": true,
+      "latency_ms": 4308.550119400024,
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    }
+  ]
+}

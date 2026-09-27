@@ -1,0 +1,22 @@
+{
+  "phase": "2 (Cloudflare neuron canary review round)",
+  "status": "NOT RUN",
+  "date": "2026-09-24",
+  "reason": "No canary request was designed or sent this round. Step 3's anomaly investigation (artifacts/v2/nlu_cloudflare_canary_plan.json) classified the Gemma-4-26b-a4b-it neuron/billing anomaly as CONFIRMED CURRENT ISSUE, which per this task's own decision rules is treated as equivalent to a pre-emptive FAIL — the round stopped before Step 4 (baseline), Step 6-8 (canary design/safety math), and Step 9 (the one permitted request) were reached. Zero model inference requests were made in this session. Zero Cloudflare neurons were consumed by this session.",
+  "http_status": null,
+  "latency_ms": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "reasoning_observed": null,
+  "request_succeeded": null,
+  "accounting": {
+    "usage_before": null,
+    "usage_after": null,
+    "actual_neuron_delta": null,
+    "expected_actual_neurons": null,
+    "accounting_ratio": null,
+    "note": "Not computable — no request was sent, no baseline was taken."
+  },
+  "decision": "FAIL-equivalent (anomaly-driven pre-emptive stop) — see artifacts/v2/nlu_cloudflare_canary_plan.json for full reasoning.",
+  "credentials_in_this_file": "none"
+}

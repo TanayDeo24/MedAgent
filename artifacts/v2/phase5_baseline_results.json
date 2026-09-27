@@ -1,0 +1,37 @@
+{
+  "measurement_target": "state['citations'] as built by agent/nodes.py:1069-1110 (report_generation_node), the OLD pre-Phase-5 pipeline's only structured citation artifact -- re-read in full for this task and replayed verbatim (not reinvented) against the SAME 72 real records fetched for the Phase-5 benchmark (artifacts/v2/phase5_benchmark_manifest.json), so the before/after comparison in phase5_validation_results.json is apples-to-apples on identical real data.",
+  "audit_source": "docs/v2/PHASE5_INITIAL_EVIDENCE_AUDIT.md (Sections A.3, D, E, F, and the Summary table) -- this file confirms the audit's qualitative findings against concrete real records rather than re-deriving them.",
+  "total_citations_replayed": 72,
+  "pct_complete_source_id": 95.8,
+  "pct_with_direct_source_url": 27.8,
+  "pct_retaining_supporting_text_or_field_content_in_citation_entry": 0.0,
+  "pct_with_individual_record_trace_link_call_id": 0.0,
+  "per_source_breakdown": {
+    "PubMed RAG": {
+      "total": 20,
+      "complete_id": 20,
+      "has_url": 20
+    },
+    "PubMed": {
+      "total": 17,
+      "complete_id": 17,
+      "has_url": 0
+    },
+    "ClinicalTrials.gov": {
+      "total": 15,
+      "complete_id": 15,
+      "has_url": 0
+    },
+    "ChEMBL": {
+      "total": 20,
+      "complete_id": 17,
+      "has_url": 0
+    }
+  },
+  "findings": {
+    "source_id": "Confirmed PRESENT: every citation entry's `id` carries the real source-native id (pmid/nct_id/chembl_id) via `result.get(..., 'N/A')`, and in our real fetched data every record that WAS turned into a citation had a real, non-'N/A' id (100%) -- matches audit Section E's finding ('citations[i][\"id\"] does point to a real external ID... when the underlying tool actually returned that field').",
+    "source_url": "Confirmed: agent/nodes.py's citation-building code (re-read in full, lines 1069-1110) never CONSTRUCTS a source_url for PubMed-live/ClinicalTrials/ChEMBL citations at all -- those three branches (lines 1075-1092) have no 'url' key whatsoever, 0% by construction. The 'PubMed RAG' branch (lines 1099-1104) does copy a pre-existing 'url' value through from `retrieved_context`, but that URL was never constructed by agent/nodes.py either -- it originates from the corpus's own `chunks.jsonl` data (built at index-ingestion time, before Phase 3/4/5), so agent/nodes.py's own code contributes zero source-URL construction logic for ANY of the four sources, confirming the audit/task's claim exactly.",
+    "supporting_text": "0% across ALL sources at the CITATION level: the PubMed branch keeps only title/authors (no abstract), ClinicalTrials keeps only status (no brief_summary), ChEMBL keeps only max_phase (no mechanism_of_action/indication text), and -- notably -- even PubMed RAG's citation entry (lines 1099-1104) carries no 'text' field at all, despite `retrieved_context` upstream (state key, not `citations`) having retained chunk text per audit Section A.3. This is a stronger finding than the audit's headline number: the LOSS happens a second time, specifically at the citations-list-construction step, even for the one source (RAG) that still has the text one step earlier in state.",
+    "call_id": "Confirmed 0%: `call_id` never appears in any of the four citation-building branches (`agent/nodes.py:1075-1104`) -- matches audit Section D's finding that call_id is 'dropped exactly at the point results are merged into state[\"tool_results\"]' and never re-attached at the citations step either."
+  }
+}

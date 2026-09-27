@@ -1,0 +1,26 @@
+{
+  "phase": "2 (Cloudflare neuron canary review round — Step 16 FAIL-branch follow-up)",
+  "status": "PLANNING ONLY — NO API CALL MADE — requires human approval before any live call",
+  "date": "2026-09-24",
+  "context": "Gemma-4-26b-a4b-it was rejected this round without any inference call (see artifacts/v2/nlu_cloudflare_canary_plan.json — anomaly classified CONFIRMED CURRENT ISSUE). Per Step 16's FAIL branch, this document investigates @cf/zai-org/glm-4.7-flash as a possible alternative candidate, via documentation/web search only.",
+  "candidate_model": "@cf/zai-org/glm-4.7-flash",
+  "findings_this_session": {
+    "availability": "Currently listed on Workers AI (introduced per Cloudflare changelog, 2026-02-13: 'Introducing GLM-4.7-Flash on Workers AI').",
+    "free_tier": "Reported as free-tier accessible, subject to the shared 10,000 neurons/day account-wide allocation (same pool Gemma would have drawn from) — not independently verified against Cloudflare's official paid-only model list this session (unlike Gemma, which WAS cross-checked against that list in the prior round).",
+    "published_pricing": {
+      "input_usd_per_million_tokens": 0.0605,
+      "output_usd_per_million_tokens": 0.40,
+      "source": "https://developers.cloudflare.com/workers-ai/models/glm-4.7-flash/ (fetched this session)"
+    },
+    "structured_output": "response_format parameter is documented as accepted; depth of JSON-schema enforcement not verified (no call made).",
+    "reasoning_control": {
+      "parameter_found": "reasoning_effort: low | medium | high",
+      "gap": "No documented option to fully DISABLE reasoning (unlike Gemma's documented, if unverified-reliable, chat_template_kwargs.enable_thinking:false). 'low' is the closest available setting. This is a materially weaker reasoning-minimization guarantee than what was planned for Gemma, and is itself a new risk factor for the same class of hidden-reasoning-token billing implicated in the Gemma anomaly (step3 of the canary plan) — reasoning_effort:low does not necessarily mean reasoning tokens = 0."
+    },
+    "billing_anomaly_check": "No community reports of a GLM-4.7-flash-specific billing/neuron anomaly were found this session (search was not exhaustive — a full repeat of the Gemma-style search was not performed given the round was already concluding). Absence of a found report is not proof of absence; this should be explicitly re-checked before any live call is approved."
+  },
+  "would_fit_remaining_budget": "Yes, under NOMINAL published pricing (0.0605/0.40 vs Gemma's 0.10/0.30 — comparable order of magnitude, input rate is actually lower). This says nothing about real-world accounting reliability, which is exactly the open question the Gemma investigation could not resolve.",
+  "recommendation": "Do NOT call this model without explicit human sign-off. Before any call: (1) run a dedicated billing-anomaly search specific to glm-4.7-flash (not yet done exhaustively this session), (2) confirm with the human whether reasoning_effort has any documented true-off equivalent, (3) re-derive a nominal + worst-case neuron budget plan analogous to nlu_cloudflare_budget_plan.json using a conservative worst-case multiplier (e.g. the same ~37x used for Gemma, absent better information) and re-check it against the 5,000-neuron cap before designing a canary request.",
+  "no_api_call_made": true,
+  "credentials_in_this_file": "none"
+}

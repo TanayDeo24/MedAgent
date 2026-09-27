@@ -1,0 +1,272 @@
+{
+  "run_metadata": {
+    "run_date": "2026-09-25",
+    "run_type": "ONE_TIME_HELDOUT_ACCEPTANCE_RUN",
+    "frozen_config_reference": "artifacts/v2/phase4_frozen_config.json, config_version 1",
+    "benchmark_split": "phase4_heldout (12 cases, artifacts/v2/phase4_benchmark_manifest.json)",
+    "split_touched_before_this_run": false,
+    "architecture_measured": {
+      "pubmed": "retrieval/retriever.py::retrieve(query, k=10) -- local RAG hybrid (FAISS dense + BM25 sparse -> RRF fusion k=60 -> cross-encoder rerank). NOT the live PubMed API, NOT the query compiler.",
+      "clinical_trials": "tools/clinical_trials_tool.py::ClinicalTrialsTool().search_trials() -- live ClinicalTrials.gov v2 API, AREA[Phase] phase filtering",
+      "chembl": "tools/chembl_tool.py::ChEMBLTool().resolve_compound_name() for name-based cases (matching phase4_chembl_resolution_results.json methodology); get_drug_info() used only for one post-hoc verification call outside the scored run"
+    },
+    "code_modified": false,
+    "cases_run_exactly_once": true,
+    "iteration_or_rerun_performed": false,
+    "raw_call_log": "/tmp/heldout_raw_results.json (all 12 cases, single pass, real network/model calls, no mocking)"
+  },
+  "per_case_results": [
+    {
+      "case_id": "PM-MULTI-02",
+      "source": "pubmed",
+      "gold_relevance_type": "exact_id",
+      "gold_ids": ["39058976"],
+      "retrieved_pmids_top10": ["39058976","38777913","38574299","39502704","40380297","40057828","40154960","39614361","39024031","41479909"],
+      "found_rank": 1,
+      "hit@1": true, "hit@5": true, "hit@10": true, "reciprocal_rank": 1.0, "precision@5": 0.2,
+      "latency_s": 3.579,
+      "latency_note": "includes one-time process-level embedding+cross-encoder model load (first call in process); see latency section for warm timings",
+      "failure_category": null
+    },
+    {
+      "case_id": "PM-NARROW-01",
+      "source": "pubmed",
+      "gold_relevance_type": "exact_id",
+      "gold_ids": ["27431492"],
+      "retrieved_pmids_top10": ["27431492","36728908","29455650","26882288","34217707","35927783","21723791","39639305","40323013","27912836"],
+      "found_rank": 1,
+      "hit@1": true, "hit@5": true, "hit@10": true, "reciprocal_rank": 1.0, "precision@5": 0.2,
+      "latency_s": 0.318,
+      "failure_category": null
+    },
+    {
+      "case_id": "PM-NARROW-03",
+      "source": "pubmed",
+      "gold_relevance_type": "exact_id",
+      "gold_ids": ["22591423"],
+      "retrieved_pmids_top10": ["22591423","27127105","29521233","27267353","29871906","36539830","22489345","27141070","27065456","35412195"],
+      "found_rank": 1,
+      "hit@1": true, "hit@5": true, "hit@10": true, "reciprocal_rank": 1.0, "precision@5": 0.2,
+      "latency_s": 0.289,
+      "failure_category": null
+    },
+    {
+      "case_id": "PM-TOPICAL-02",
+      "source": "pubmed",
+      "gold_relevance_type": "exact_id",
+      "gold_ids": ["39520520"],
+      "retrieved_pmids_top10": ["39520520","32896428","25634227","42708992","39320608","32622272","32721042","27939064","26892151","42025215"],
+      "found_rank": 1,
+      "hit@1": true, "hit@5": true, "hit@10": true, "reciprocal_rank": 1.0, "precision@5": 0.2,
+      "latency_s": 0.274,
+      "failure_category": null
+    },
+    {
+      "case_id": "PM-ZERO-01",
+      "source": "pubmed",
+      "gold_relevance_type": "no_results_expected",
+      "gold_ids": [],
+      "retrieved_pmids_top10": ["31073921","34558098","35590041","29559117","42233619","22762423","28707590","38681984","30761815","31743251"],
+      "cross_encoder_scores_top10": [-4.121,-5.736,-5.983,-6.269,-6.97,-7.984,-8.219,-8.279,-8.574,-8.661],
+      "expected_behavior": "return zero/no relevant results for a fabricated drug-name query",
+      "actual_behavior": "returned 10 real, non-fabricated but topically irrelevant PMIDs (all cross-encoder scores strongly negative)",
+      "gate_relevant": "no fabricated PMID was produced (all 10 are real corpus articles) -- this is NOT a fabrication/ID-integrity violation",
+      "correctness_note": "the frozen local-RAG-only architecture has no existence-check / relevance-threshold / zero-result path; a pure top-k similarity retriever always returns its k nearest neighbors regardless of true relevance",
+      "failure_category": "NO_RESULTS (system-level: correct behavior was NO_RESULTS, architecture returned low-relevance filler instead)",
+      "first_time_measured": "this is the ONLY pubmed_zero_result case in the entire 61-case benchmark and it was assigned to phase4_heldout, so this specific behavior was never exercised in development or validation"
+    },
+    {
+      "case_id": "CT-ZERO-01",
+      "source": "clinical_trials",
+      "gold_relevance_type": "no_results_expected",
+      "gold_ids": [],
+      "call_args": {"condition": "xyzxyz-nonexistent-condition-zzz-12345", "status": null, "max_results": 20},
+      "n_returned": 0,
+      "correct": true,
+      "latency_s": 0.239,
+      "failure_category": null
+    },
+    {
+      "case_id": "CHEMBL-ZERO-01",
+      "source": "chembl",
+      "gold_relevance_type": "no_results_expected",
+      "gold_ids": [],
+      "operation": "resolve_compound_name",
+      "call_arg": "ZZZNOTADRUGNAME123",
+      "result": {"match_type": "no_match", "chembl_id": null},
+      "correct": true,
+      "latency_s": 1.754,
+      "failure_category": null
+    },
+    {
+      "case_id": "NEG-ABSENT-01",
+      "sources": ["pubmed", "clinical_trials", "chembl"],
+      "gold_relevance_type": "no_results_expected (all 3 sources)",
+      "gold_ids": {"pubmed": [], "clinical_trials": [], "chembl": []},
+      "legs": {
+        "pubmed": {
+          "retrieved_pmids_top10": ["31916629","27633039","24128964","40608494","26269204","35841169","25456737","35067907","37188578","34110507"],
+          "expected": "no relevant results",
+          "actual": "10 real but irrelevant PMIDs returned (same architectural NO_RESULTS gap as PM-ZERO-01)",
+          "correct": false,
+          "latency_s": 0.42
+        },
+        "clinical_trials": {
+          "call_args": {"condition": "Zorblatinix-9X", "status": null, "max_results": 20},
+          "n_returned": 0,
+          "correct": true,
+          "latency_s": 0.037
+        },
+        "chembl": {
+          "operation": "resolve_compound_name",
+          "call_arg": "Zorblatinix-9X",
+          "result": {"match_type": "fuzzy", "chembl_id": "CHEMBL5875133", "preferred_name": null},
+          "correct": false,
+          "note": "CHEMBL5875133 independently verified live via get_drug_info -- it is a REAL ChEMBL molecule record (molecular_weight=440.45, no pref_name, mechanism_of_action='Not available'), so this is NOT a fabricated identifier (gate passes) but IS an incorrect/misleading match: the tool's fuzzy fallback (ChEMBL's relevance-ranked search.json endpoint) returned a real molecule as its 'top hit' for a fully fabricated compound name, and resolve_compound_name has no confidence/similarity threshold to suppress a low-quality fuzzy hit and fall back to no_match. Compare CHEMBL-ZERO-01, a different fabricated name, which DID correctly return no_match -- the fuzzy path's behavior on nonsense input is inconsistent/query-dependent.",
+          "latency_s": 2.151
+        }
+      },
+      "failure_category": "pubmed leg: NO_RESULTS (architectural, same as PM-ZERO-01). chembl leg: WRONG_ENTITY (fuzzy match returned a real-but-unrelated molecule instead of no_match; no exact taxonomy category perfectly fits a false-positive fuzzy resolution, WRONG_ENTITY is the closest fit per the gate plan's definition of a real-but-not-intended record being returned)",
+      "first_time_measured": "resolve_compound_name's fuzzy-fallback path on genuinely nonexistent compound names was never exercised on any dev/validation case (all 21 dev/validation ChEMBL cases had a real gold entity); this is the first empirical measurement of that path's failure mode"
+    },
+    {
+      "case_id": "NEG-UNSUPPORTED-01",
+      "sources": [],
+      "gold_relevance_type": "abstention_expected",
+      "note": "query asks for retail drug pricing; no PubMed/ClinicalTrials/ChEMBL operation exposes pricing data (confirmed by re-reading tool signatures, same as the benchmark's own verification). No tool call made -- correct behavior is abstention, which is a decision made by the orchestration/agent layer (not exercised by this retrieval-layer-only measurement per the task's scope restriction against modifying/invoking orchestration/agent/). Retrieval-layer finding: no tool exists that could produce a plausible-looking but wrong answer here, so there is no fabrication surface for this case at the tool level.",
+      "failure_category": null,
+      "scope_caveat": "full end-to-end agent abstention behavior not measured here (out of scope)"
+    },
+    {
+      "case_id": "NEG-UNSUPPORTED-02",
+      "sources": [],
+      "gold_relevance_type": "abstention_expected",
+      "note": "query asks for raw EGFR genomic DNA sequence; none of the three tools wrap a sequence database. Same scope caveat as NEG-UNSUPPORTED-01.",
+      "failure_category": null,
+      "scope_caveat": "full end-to-end agent abstention behavior not measured here (out of scope)"
+    },
+    {
+      "case_id": "NEG-CROSSSOURCE-01",
+      "source": "chembl",
+      "gold_relevance_type": "exact_id",
+      "gold_ids": ["CHEMBL25"],
+      "operation": "resolve_compound_name",
+      "call_arg": "aspirin",
+      "result": {"match_type": "exact_preferred_name", "chembl_id": "CHEMBL25", "preferred_name": "ASPIRIN"},
+      "found_rank": 1,
+      "hit@1": true, "reciprocal_rank": 1.0,
+      "correct": true,
+      "wrong_source_trap_passed": "query surface text says 'clinical trial identifier' but the correct source is ChEMBL alone -- tool call was correctly routed to ChEMBL, not ClinicalTrials, in this measurement harness. Note: which SOURCE to call is an orchestration/routing decision in the real system; here the harness routed per the case's own target_sources=['chembl'] declaration, so this case verifies ChEMBL's own resolution correctness, not the orchestration layer's WRONG_SOURCE avoidance end-to-end.",
+      "latency_s": 0.185,
+      "failure_category": null
+    },
+    {
+      "case_id": "NEG-ABSTAIN-AMBIG-01",
+      "sources": [],
+      "gold_relevance_type": "abstention_expected",
+      "note": "query 'What's the best treatment?' names no drug/disease/target -- no source's required arguments can be populated from this text. No tool call made. Same scope caveat as NEG-UNSUPPORTED-01/02.",
+      "failure_category": null,
+      "scope_caveat": "full end-to-end agent abstention behavior not measured here (out of scope)"
+    }
+  ],
+  "headline_metrics": {
+    "pubmed": {
+      "n_cases_total": 6,
+      "n_cases_scored_for_recall_mrr": 4,
+      "n_cases_zero_result_expected": 2,
+      "recall@1": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "precision@5_mean": 0.2,
+      "hit@10": 1.0,
+      "zero_result_correctness_rate": 0.0,
+      "zero_result_correctness_note": "0/2 zero-result-expected cases (PM-ZERO-01, NEG-ABSENT-01 pubmed leg) correctly returned no/irrelevant-suppressed results -- both returned 10 real-but-irrelevant PMIDs. This is an architectural property of a pure top-k similarity retriever with no relevance threshold, not a fabrication or ID-integrity issue; the metric is honestly 0/2 and should not be averaged into the positive-case recall numbers above.",
+      "query_concept_coverage": 1.0,
+      "query_concept_coverage_note": "trivially 1.0 for all cases -- the frozen architecture sends the raw user query directly to retrieve() with no query-compilation/rewriting step, so there is no opportunity for concept loss between ResearchQuery and the retrieval call",
+      "duplicate_rate": 0.0,
+      "duplicate_rate_note": "0 duplicate PMIDs within any case's top-10 (retriever.py's built-in per-PMID chunk dedup)",
+      "latency_p50_s": 0.321,
+      "latency_p90_s": 3.579,
+      "latency_p95_s": 3.579,
+      "latency_note": "n=6, one cold-start call (PM-MULTI-02, first call in process, includes embedding+cross-encoder model load: 3.579s) dominates p90/p95; warm-call latencies (n=5) range 0.274s-0.42s, median 0.318s. P50/P90/P95 at n=6 are not statistically meaningful point estimates -- reported as observed order statistics only, per the gate plan's instruction not to conflate latency components; this run did not separately instrument BM25/FAISS/reranker sub-stage latency (only end-to-end retrieve() time was captured, since the frozen retrieve() call is a single opaque call per the frozen config -- sub-stage timing was not available without modifying retrieval/retriever.py, which is out of scope)."
+    },
+    "clinical_trials": {
+      "n_cases_total": 2,
+      "n_cases_with_positive_gold": 0,
+      "required_trial_recall": "not measurable on this split -- both phase4_heldout ClinicalTrials cases (CT-ZERO-01, NEG-ABSENT-01) are zero-result-expected negative cases; no positive-gold ClinicalTrials case exists in phase4_heldout to measure required-trial recall against",
+      "zero_result_correctness_rate": 1.0,
+      "zero_result_correctness_note": "2/2 zero-result-expected cases correctly returned 0 studies",
+      "structured_filter_correctness_rate": "not measurable on this split -- neither heldout ClinicalTrials case declares an expected_structured_filters gold field (both are unfiltered condition-only zero-result probes)",
+      "latency_p50_s": 0.138,
+      "latency_note": "n=2 only: 0.239s, 0.037s -- too few samples for meaningful percentiles"
+    },
+    "chembl": {
+      "n_cases_total": 3,
+      "n_cases_scored_for_recall_mrr": 1,
+      "n_cases_zero_result_expected": 2,
+      "recall@1": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "hit@10": 1.0,
+      "recall_mrr_note": "n=1 (NEG-CROSSSOURCE-01, aspirin->CHEMBL25, exact_preferred_name match, rank 1) -- consistent with but far too small a sample to independently confirm the dev/validation Recall@10=1.0/MRR=0.898 measured on 21 cases in phase4_chembl_resolution_results.json",
+      "zero_result_correctness_rate": 0.5,
+      "zero_result_correctness_note": "1/2 zero-result-expected cases correct: CHEMBL-ZERO-01 ('ZZZNOTADRUGNAME123') correctly returned no_match; NEG-ABSENT-01's chembl leg ('Zorblatinix-9X') incorrectly returned match_type='fuzzy' with a real, non-null chembl_id (CHEMBL5875133). This inconsistency (one fabricated name -> no_match, a different fabricated name -> a confident-looking fuzzy hit) had NEVER been measured before this run: chembl_zero_result is a 1-count category in the whole 61-case benchmark and it landed in development... actually it is the ONLY zero-result chembl case and it is in phase4_heldout; NEG-ABSENT-01's chembl leg is likewise phase4_heldout-only. So resolve_compound_name's behavior on fabricated/absent names is being measured here for the first time in this project.",
+      "latency_p50_s": 1.754,
+      "latency_note": "n=3: 1.754s, 2.151s, 0.185s (0.185s case hit ChEMBL's fast exact_preferred_name path; the two fuzzy/no_match cases needed the slower search.json ElasticSearch fallback) -- too few samples for meaningful percentiles"
+    },
+    "multi_source": {
+      "n_multi_source_heldout_cases": 1,
+      "case_id": "NEG-ABSENT-01",
+      "all_required_sources_covered_rate": "n/a in the classic positive sense -- gold expects ZERO results from all 3 required sources (pubmed, clinical_trials, chembl), so 'coverage' here means correctly abstaining per source, not returning a hit",
+      "per_source_correctness": {"pubmed": false, "clinical_trials": true, "chembl": false},
+      "source_starvation": "none observed -- all 3 required sources were successfully queried (no source silently skipped or erroring); the 2 incorrect legs both returned non-empty but non-gold, non-fabricated content rather than starving/erroring",
+      "note": "phase4_heldout contains exactly one multi-source case and it is a negative (absent-information) case, not a positive multi-source coverage case like MS-01..MS-07 in dev/validation; the dev/validation multi-source coverage metric (0.571, 4/7) cannot be directly reproduced or contradicted by this split since no comparable positive multi-source case exists in phase4_heldout"
+      }
+  },
+  "hard_safety_gates": {
+    "fabricated_source_identifiers": {"value": 0, "pass": true, "evidence": "every PMID, ChEMBL ID, and (absent) NCT ID returned across all 12 cases was independently verifiable as a real record from its respective public API/corpus; CHEMBL5875133 (the NEG-ABSENT-01 fuzzy-match concern) was live-verified via get_drug_info and is a real ChEMBL molecule, not a fabrication -- it is a WRONG_ENTITY/precision defect, not an ID-fabrication gate violation"},
+    "source_id_corruption": {"value": 0, "pass": true, "evidence": "all PMIDs are well-formed numeric strings, all returned ChEMBL IDs match ^CHEMBL\\d+$, no malformed/truncated/mangled identifiers observed in any of the 12 raw results"},
+    "cross_source_id_collision": {"value": 0, "pass": true, "evidence": "PMIDs, ChEMBL IDs, and NCT IDs use disjoint, unambiguous formats; no identifier from one source's result set could be mistaken for another source's identifier format in any of the 12 cases"},
+    "retrieval_result_without_source_id": {"value": 0, "pass": true, "evidence": "every pubmed Document carried a non-empty pmid; every chembl resolve_compound_name result with match_type != no_match carried a non-null chembl_id; both clinical_trials calls returned 0 studies (no result rows to check, trivially 0 violations)"},
+    "required_supported_structured_filter_silently_dropped": {"value": 0, "pass": true, "evidence": "neither phase4_heldout ClinicalTrials case declares an expected_structured_filters gold field, so no filter-preservation defect could be observed either way on this split -- reported as 0 observed violations with the explicit caveat that this gate had no positive test case in phase4_heldout to actually exercise it (dev/validation's structured_filter_correctness_dev_validation=0.850 is the only evidence available for this gate's real-world behavior)"},
+    "wrong_source_result_mislabeled_as_another_source": {"value": 0, "pass": true, "evidence": "this measurement harness called each source's tool separately and kept results in per-source keys; no cross-labeling was possible or observed at the tool-call level measured here. Scope caveat: this gate is really about the orchestration layer's RetrievalCandidate.source tagging (agent/orchestration, out of scope for this pure-retrieval-layer measurement task) -- the direct-tool-call harness used here cannot fully exercise that wrapping layer, so this result should be read as 'no mislabeling observed at the tool-output level', not as full end-to-end confirmation of the orchestration layer's tagging"},
+    "secrets_or_auth_headers_in_retrieval_trace": {"value": 0, "pass": true, "evidence": "grepped the full raw result trace (/tmp/heldout_raw_results.json) for key/token/secret patterns -- zero matches; PubMed/ClinicalTrials.gov/ChEMBL are all unauthenticated public APIs for the calls made in this run (no API key was used or could have leaked), confirmed by reading config/settings.py's secret-field definitions (only NVIDIA_API_KEY and CEREBRAS_API_KEY exist as SecretStr fields in this project, neither is used by any of the three retrieval tools measured here)"}
+  },
+  "all_gates_pass": true,
+  "hard_gate_violations_found": 0,
+  "consistency_with_dev_validation_and_accepted_limitations": {
+    "consistent_findings": [
+      "PubMed RAG positive-case recall/MRR (1.0/1.0/1.0 recall@1/5/10, MRR 1.0 on n=4) is consistent with (not contradicted by; in fact stronger than) the dev/validation-measured 0.773 Recall@10 / 0.636 MRR reported in phase4_frozen_config.json -- small held-out n and an easier narrow-constraint-heavy case mix plausibly explain the higher point estimate; no regression observed.",
+      "ChEMBL positive-case resolution (aspirin->CHEMBL25, exact_preferred_name, rank 1) is consistent with the dev/validation resolve_compound_name methodology's measured Recall@10=1.0, MRR=0.898 (phase4_chembl_resolution_results.json).",
+      "ClinicalTrials zero-result handling (2/2 correct empty returns) is consistent with the AREA[Phase]/query.term fix already documented as FIXED in phase4_failure_analysis.json -- no new ClinicalTrials defect observed.",
+      "No hard safety gate violation occurred, consistent with phase4_failure_analysis.json's hard_gate_violations_found: 0 on dev/validation."
+    ],
+    "new_findings_not_previously_documented": [
+      {
+        "finding": "PubMed RAG architecture has no zero-result / relevance-threshold mechanism: for a fabricated-drug-name query, retrieve() always returns k=10 nearest-neighbor chunks regardless of true relevance (observed cross-encoder scores strongly negative, -4.1 to -8.7, yet all 10 were still returned as if they were candidate results).",
+        "why_new": "pubmed_zero_result is a 1-count category across the entire 61-case benchmark and that single case (PM-ZERO-01) was assigned to phase4_heldout -- this exact behavior was never exercised in development or validation measurement, so this is the first empirical evidence of it.",
+        "gate_impact": "none -- no fabricated ID was produced, so no hard gate is violated",
+        "correctness_impact": "real: a downstream consumer that does not itself apply a relevance/score threshold to retrieve()'s output could present 10 irrelevant PMIDs as if they were supporting citations for a nonexistent drug. This is an architectural property of the frozen, already-selected top-k similarity retriever, not a bug introduced by this measurement, and it was implicitly foreseeable from the architecture description (no existence-check layer exists anywhere in the frozen config) -- but it had not actually been measured before now.",
+        "severity_assessment": "moderate, pre-existing/architectural, not a regression -- does not on its own indicate a NEW defect introduced since the freeze, but is new EVIDENCE that a previously-untested edge case behaves in a way worth the orchestrating session's attention before relying on PubMed RAG results as self-certifying relevance."
+      },
+      {
+        "finding": "ChEMBL resolve_compound_name's fuzzy-fallback path is inconsistent on fabricated/nonexistent compound names: 'ZZZNOTADRUGNAME123' correctly returns match_type='no_match', but 'Zorblatinix-9X' returns match_type='fuzzy' with a real, non-null chembl_id (CHEMBL5875133, independently verified as a real but unrelated ChEMBL molecule with no preferred name). The fuzzy path has no confidence/similarity threshold and simply takes ChEMBL's own ElasticSearch top hit whenever that endpoint returns anything at all for the input string.",
+        "why_new": "all 21 dev/validation ChEMBL cases had a real gold entity to resolve (chembl_zero_result, the only fabricated-name test category, is a 1-count category and it too landed in phase4_heldout) -- this fuzzy-fallback failure mode on genuinely nonexistent input was never exercised before this run.",
+        "gate_impact": "none -- CHEMBL5875133 is a real record, not a fabricated identifier, so the fabricated-source-identifiers gate is not violated",
+        "correctness_impact": "real: a caller that treats any non-null chembl_id as a usable answer (rather than checking match_type=='fuzzy' and treating it with appropriate skepticism) would present a real but entirely unrelated drug record as if it were information about a nonexistent compound named 'Zorblatinix-9X'. This directly undermines the intended NO_RESULTS/abstention behavior the NEG-ABSENT-01 case is designed to test.",
+        "severity_assessment": "moderate, newly discovered, affects the specific and narrow 'fabricated compound name' input class -- 1 of the 3 ChEMBL held-out cases (33%), though only 2 total zero-result-type ChEMBL cases exist in the entire benchmark so this is a very small n to generalize a rate from. Worth flagging clearly to the orchestrating session as new evidence; not confirmed here as a widespread problem across the whole ChEMBL surface (the 21 dev/validation positive-entity cases and 1 correct no_match case show no analogous issue)."
+      }
+    ],
+    "already_accepted_limitations_reflected_here": [
+      "ChEMBL search_by_target first-hit WRONG_ENTITY heuristic (accepted limitation per phase4_failure_analysis.json) was NOT exercised in phase4_heldout at all -- no heldout case calls search_by_target, so this accepted limitation could not recur or be contradicted here.",
+      "ClinicalTrials MS-06-style single ranking miss (accepted limitation) was not exercised either -- no positive-gold multi-result ClinicalTrials case exists in phase4_heldout."
+    ]
+  },
+  "scope_caveats": [
+    "This measurement calls retrieve()/search_trials()/resolve_compound_name() directly, matching the frozen architecture's retrieval functions exactly as specified. It does NOT invoke agent/orchestration/ code, per the task's explicit prohibition on modifying or (by extension) exercising those layers as the decision-making abstention/routing logic. The 3 abstention-expected cases (NEG-UNSUPPORTED-01/02, NEG-ABSTAIN-AMBIG-01) are therefore reported as 'no tool call made, consistent with no supporting operation existing' rather than as a full end-to-end confirmation that the live agent correctly abstains.",
+    "ClinicalTrials call arguments (condition/intervention/status/phase) were hand-compiled from each case's query/gold fields by this measurement harness, standing in for the orchestration layer's real query-compilation step (which is out of scope here) -- this matches how the case's own gold verification was done (a human-constructed live API call), not a test of the orchestration layer's own compilation correctness.",
+    "PubMed sub-stage latency (BM25 vs FAISS vs cross-encoder rerank) was not separately instrumented -- only end-to-end retrieve() latency was captured, since instrumenting internals would require modifying retrieval/retriever.py, which is out of scope for this pure-measurement task."
+  ]
+}

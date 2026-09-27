@@ -1,0 +1,174 @@
+{
+  "validation_target": "evidence/adapters.py via evidence/registry.py (real adapter functions, no mocking) run against artifacts/v2/phase5_benchmark_manifest.json's development+validation splits ONLY (58 of 72 cases). phase5_heldout (14 cases) was NOT touched.",
+  "gate_plan_reference": "docs/v2/PHASE5_GATE_PLAN.md",
+  "cases_run": 58,
+  "cases_by_split": {
+    "development": 43,
+    "validation": 15,
+    "phase5_heldout_excluded": 14
+  },
+  "coverage": {
+    "definition": "% of raw input records for which the adapter's produce-N-Evidence-records-or-correctly-skip decision matched the independently authored gold label",
+    "match": 58,
+    "total": 58,
+    "pct": 100.0
+  },
+  "provenance_completeness": {
+    "definition": "docs/v2/PHASE5_GATE_PLAN.md Section 1",
+    "overall_pct": 100.0,
+    "overall_complete": 152,
+    "overall_total": 152,
+    "per_source": {
+      "pubmed": {
+        "complete": 28,
+        "total": 28,
+        "pct": 100.0
+      },
+      "clinical_trials": {
+        "complete": 115,
+        "total": 115,
+        "pct": 100.0
+      },
+      "chembl": {
+        "complete": 9,
+        "total": 9,
+        "pct": 100.0
+      }
+    }
+  },
+  "source_id_integrity": {
+    "fabricated_ids": 0,
+    "corrupted_ids": 0,
+    "note": "0/0 confirmed empirically across all 152 real Evidence records produced -- every source_record_id traces to a field verbatim-copied from the real API/local-retrieval response (verified by direct string comparison in the harness), never synthesized."
+  },
+  "content_fidelity": {
+    "definition": "% of Evidence.content exactly traceable to the real source record (verbatim text match for PubMed abstracts/chunks, exact field-value match for ClinicalTrials/ChEMBL structured content)",
+    "checked": 152,
+    "exact_match": 152,
+    "pct": 100.0,
+    "source_content_mutation_rate": 0.0,
+    "unsupported_content_count": 0
+  },
+  "field_path_accuracy": {
+    "definition": "docs/v2/PHASE5_GATE_PLAN.md Section 2 -- % of populated ClinicalTrials/ChEMBL field_path values verified correct against the actual parser code",
+    "verified_correct": "100% -- every field_path value adapters.py emits (status/conditions/sponsor/enrollment/start_date/completion_date/brief_summary) was independently re-checked in this task against tools/clinical_trials_tool.py's _parse_study source lines and matches exactly; phase/interventions/locations correctly carry field_path=None since the parser derives/joins those without one fixed source key."
+  },
+  "trace_linkage": {
+    "evidence_to_retrieval_candidate_link_success_rate_pct": 100.0,
+    "evidence_to_call_id_link": {
+      "pubmed_rag_call_id_none_by_design": "confirmed 100% of PubMed RAG Evidence records carry provenance.call_id=None (N/A by design per contract Section 4 -- never fabricated)",
+      "other_sources_call_id_present_when_supplied": "135/152 total Evidence records carry a non-null call_id -- exactly the PubMed-live/ClinicalTrials/ChEMBL records, since the harness supplied a synthetic 'test-call-1' call_id to those adapters (simulating tool_call_history threading) and None to the RAG adapter; no adapter invented its own call_id in either direction."
+    },
+    "evidence_to_source_record_link_success_rate_pct": 100.0
+  },
+  "deduplication": {
+    "duplicate_evidence_rate": "2 evidence_id values (chembl:CHEMBL941, chembl:CHEMBL25) were each produced by two DIFFERENT benchmark cases (a resolve_compound_name call and a get_drug_info/second-resolve call both naming the same real compound) -- this is CORRECT deterministic behavior (same real source identity -> same evidence_id, contract Section 3), not an accidental merge: inspected by hand, both cases in each pair genuinely refer to the identical real ChEMBL molecule.",
+    "accidental_merge_rate": 0,
+    "note": "No case where two DISTINCT real source records collapsed to the same evidence_id was found."
+  },
+  "serialization": {
+    "roundtrip_success_rate_pct": 100.0,
+    "roundtrip_ok": 152,
+    "roundtrip_total": 152,
+    "deterministic_evidence_id_stability": "Confirmed -- re-running make_evidence_id/adapters on the same stored raw record within this harness (dev+validation re-run, see git history of this run) reproduced identical evidence_id values every time; pure-function construction guarantees this (no randomness/uuid in evidence/models.py)."
+  },
+  "performance_latency_ms_per_source": {
+    "pubmed_rag": {
+      "n": 17,
+      "mean_ms": 0.0178,
+      "p50_ms": 0.0063,
+      "p90_ms": 0.0177,
+      "p95_ms": 0.1835,
+      "max_ms": 0.1835
+    },
+    "pubmed_live": {
+      "n": 14,
+      "mean_ms": 0.0049,
+      "p50_ms": 0.0057,
+      "p90_ms": 0.0071,
+      "p95_ms": 0.0088,
+      "max_ms": 0.0088
+    },
+    "clinical_trials": {
+      "n": 11,
+      "mean_ms": 0.0428,
+      "p50_ms": 0.0401,
+      "p90_ms": 0.051,
+      "p95_ms": 0.0589,
+      "max_ms": 0.0589
+    },
+    "chembl_search_by_target": {
+      "n": 4,
+      "mean_ms": 0.0048,
+      "p50_ms": 0.0044,
+      "p90_ms": 0.0103,
+      "p95_ms": 0.0103,
+      "max_ms": 0.0103
+    },
+    "chembl_get_drug_info": {
+      "n": 1,
+      "mean_ms": 0.0123,
+      "p50_ms": 0.0123,
+      "p90_ms": 0.0123,
+      "p95_ms": 0.0123,
+      "max_ms": 0.0123
+    },
+    "chembl_search_by_indication": {
+      "n": 4,
+      "mean_ms": 0.006,
+      "p50_ms": 0.006,
+      "p90_ms": 0.0075,
+      "p95_ms": 0.0075,
+      "max_ms": 0.0075
+    },
+    "chembl_resolve_compound_name": {
+      "n": 7,
+      "mean_ms": 0.0032,
+      "p50_ms": 0.0049,
+      "p90_ms": 0.0059,
+      "p95_ms": 0.0059,
+      "max_ms": 0.0059
+    }
+  },
+  "performance_note": "All latencies are pure in-process Python object transformation (no I/O in evidence/adapters.py itself) -- sub-millisecond throughout, as expected for a model-free, network-free adapter layer.",
+  "error_handling_taxonomy": {
+    "CORRECTLY_SKIPPED:placeholder_abstract": 3,
+    "CORRECTLY_SKIPPED:no_real_content_moa_and_name_both_placeholder_or_absent": 4,
+    "CORRECTLY_SKIPPED:no_match_or_ambiguous": 3
+  },
+  "hard_safety_gates": {
+    "Fabricated source IDs": 0,
+    "Corrupted source IDs": 0,
+    "Source mislabeling": 0,
+    "Model-generated unsourced content inside Evidence": 0,
+    "Secret/auth header leaks": 0,
+    "Evidence without evidence_id": 0,
+    "Evidence without source_type": 0,
+    "Silently missing required provenance": 0,
+    "Cross-source ID collision": 0,
+    "Trace link to a nonexistent call/retrieval": 0,
+    "all_gates_pass": true
+  },
+  "hard_safety_gates_methodology_note": "Secret/auth-header-leak scan initially flagged 8 false positives from the substring 'authorization' appearing inside a real trial's own title text ('Post Authorization Study to Monitor...', NCT04887519) -- manually inspected and confirmed benign (no actual API key/token/header value anywhere in any Evidence record); corrected count is 0.",
+  "per_source_breakdown_summary": {
+    "pubmed": {
+      "records_processed": 31,
+      "evidence_produced": 28,
+      "provenance_completeness_pct": 100.0,
+      "includes_real_placeholder_abstract_rejection_cases": 5
+    },
+    "clinical_trials": {
+      "records_processed": 11,
+      "evidence_produced": 115,
+      "provenance_completeness_pct": 100.0
+    },
+    "chembl": {
+      "records_processed": 16,
+      "evidence_produced": 9,
+      "provenance_completeness_pct": 100.0,
+      "includes_real_no_match": true,
+      "includes_real_ambiguous_match": true,
+      "includes_real_null_pref_name_edge_case": "5 EGFR-target-search molecules with pref_name=None, mechanism_of_action='Not available' from the live API -- adapter correctly raised ValueError/skipped (no fabricated content), matching gold."
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "contract_version": "1.0.0",
+  "phase": 4,
+  "generated_at": "2026-09-25",
+  "corrects_assumption": "Phase 4 is not greenfield for PubMed - a live, production-wired hybrid retrieval pipeline (retrieval/retriever.py: FAISS+BM25+RRF+cross-encoder rerank) already exists and is called from agent/nodes.py's synthesis_node, separate from Phase 3's live-API PubMed path. It has zero test coverage and one real corpus-reproducibility gap - both named in-scope Phase-4 work.",
+  "input": {
+    "types": ["ResearchQuery (nlu/schemas.py, schema_version 2.1.0)", "ExecutionPlan/ToolExecutionResult (orchestration/models.py, Phase 3 frozen)"],
+    "pubmed_note": "Phase 4 may call retrieval/retriever.py's retrieve() directly (existing RAG path) in addition to or instead of live-API PubMed results as candidates - decided empirically by candidate comparison, not assumed."
+  },
+  "output": {
+    "type": "RetrievalCandidate",
+    "not": "Phase-5 Evidence object - no claim-level provenance, no citation numbering, no verification status",
+    "fields": [
+      "candidate_id", "source", "source_record_id", "retrieval_method", "rank",
+      "retrieval_score", "source_rank", "content", "title_or_name",
+      "source_metadata", "query_variant_id", "dedup_group_id"
+    ],
+    "based_on": "retrieval/retriever.py's existing Document dataclass (pmid, title, text, score, journal), extended with cross-source fields (source, candidate_id, dedup_group_id) that single-source dataclass didn't need"
+  },
+  "source_specific_contracts": {
+    "pubmed": {"source_record_id": "PMID", "granularity": "article and/or passage/chunk", "requirement": "chunk always traceable to parent article"},
+    "clinical_trials": {"source_record_id": "NCT ID", "requirement": "structured filter fidelity (phase/status/condition/intervention actually applied) preserved in source_metadata, never silently dropped"},
+    "chembl": {"source_record_id": "ChEMBL ID where present", "requirement": "exact-entity lookup semantics, no fuzzy match presented as canonical"}
+  },
+  "non_goals": [
+    "final Evidence object design", "claim-level provenance", "citation numbering",
+    "citation compiler", "claim-evidence verification", "source appendix rendering",
+    "grounded answer generation", "hallucination judging", "final response composition",
+    "conversational UI", "API deployment", "final reliability/performance optimization"
+  ],
+  "cross_source_ranking_rule": "retrieval_score is source-local and not directly comparable across sources. Any cross-source display ordering must use an explicit documented method (per-source quotas, intent-aware allocation, normalized rank fusion) - never a naive sort by retrieval_score across sources. Method selection deferred to candidate comparison with evidence, not fixed by this contract.",
+  "audit_source": "docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md",
+  "inventory_source": "artifacts/v2/phase4_retrieval_inventory.json",
+  "contract_doc": "docs/v2/PHASE4_RETRIEVAL_CONTRACT.md"
+}

@@ -1,0 +1,139 @@
+{
+  "document": "MedAgent V2 Evaluation Contract (machine-readable)",
+  "status": "design contract, Phase 1 - no benchmark data or measured results exist yet",
+  "source_markdown": "docs/v2/EVALUATION_CONTRACT.md",
+  "cross_cutting_rules": [
+    "No metric reported without stated denominator and sample size",
+    "No headline metric relies solely on an unvalidated LLM judge",
+    "Primary metrics gate phase completion; secondary metrics are diagnostic only",
+    "All benchmark-based metrics must name benchmark name + version",
+    "Test-set metrics reported once per architecture decision; dev splits used for iteration"
+  ],
+  "metric_families": [
+    {
+      "family": "nlu",
+      "metrics": [
+        {"name": "entity_precision_recall_f1", "formula": "precision = correct spans / extracted spans; recall = correct spans / gold spans; f1 = harmonic mean", "unit_of_analysis": "entity span (macro-averaged per query)", "required_label": "human-reviewed gold entity spans+types", "split": "nlu_benchmark_test", "primary": true, "known_limitation": "entity boundary disagreement requires a fixed annotation convention"},
+        {"name": "normalization_accuracy_at_1_k", "formula": "acc@1 = exact gold identifier match / normalizable entities; acc@k = gold id in top-k candidates", "unit_of_analysis": "entity mention", "required_label": "gold normalized identifier per normalizable entity", "split": "nlu_benchmark_test", "primary": true, "known_limitation": "multiple valid ontologies can apply to one entity type; must fix target ontology in advance"},
+        {"name": "intent_accuracy_macro_f1", "formula": "accuracy = correct class / total; macro-F1 = unweighted mean of per-class F1 over taxonomy classes A-I", "unit_of_analysis": "query", "required_label": "gold taxonomy class (multi-label where justified)", "split": "nlu_benchmark_test", "primary": true, "known_limitation": "class D/E boundary is fuzzy, needs adjudication rules"},
+        {"name": "constraint_field_precision_recall_f1", "formula": "same as entity P/R/F1 but over (field,value) pairs", "unit_of_analysis": "(field, value) pair", "required_label": "gold structured constraints", "split": "nlu_benchmark_test", "primary": false, "known_limitation": "small expected n unless class-G oversampled"},
+        {"name": "source_set_precision_recall_f1", "formula": "precision = correct predicted sources / predicted sources; recall = correct predicted sources / gold sources; micro and macro reported", "unit_of_analysis": "(query, source) pair", "required_label": "gold required source set", "split": "nlu_benchmark_test", "primary": true, "known_limitation": "\"required\" is a judgment call for borderline queries; needs annotation convention"}
+      ]
+    },
+    {
+      "family": "tool_source_routing",
+      "metrics": [
+        {"name": "source_precision_recall_f1", "formula": "see nlu.source_set_precision_recall_f1", "unit_of_analysis": "query", "required_label": "gold source set", "split": "source_routing_benchmark", "primary": true, "known_limitation": "shared with NLU family"},
+        {"name": "valid_call_rate", "formula": "schema-valid tool calls / total tool-call attempts", "unit_of_analysis": "tool call", "required_label": "none (deterministic vs tool schema)", "split": "source_routing_benchmark", "primary": true, "known_limitation": "architecture-dependent; current free-form JSON dispatch has documented hallucinated-tool-name failures"},
+        {"name": "execution_success_rate", "formula": "successful real API responses / valid-call attempts", "unit_of_analysis": "tool call", "required_label": "none (observed live)", "split": "source_routing_benchmark", "primary": true, "known_limitation": "depends on live external API availability at test time"},
+        {"name": "parameter_correctness_rate", "formula": "calls with correct filter/argument values / total valid calls", "unit_of_analysis": "tool call", "required_label": "human-reviewed gold parameters (subset)", "split": "source_routing_benchmark", "primary": false, "known_limitation": "requires reviewer familiar with each tool's real API schema"},
+        {"name": "useful_result_rate", "formula": "calls returning >=1 result later used as cited evidence / successful calls", "unit_of_analysis": "tool call", "required_label": "derived from claim-evidence links, no separate label", "split": "source_routing_benchmark", "primary": true, "known_limitation": "depends on downstream grounding pipeline existing"}
+      ]
+    },
+    {
+      "family": "retrieval",
+      "metrics": [
+        {"name": "recall_at_k", "formula": "relevant docs in top-K / total relevant docs for query, K in {1,5,10,20}", "unit_of_analysis": "query", "required_label": "graded or binary relevance judgments", "split": "retrieval_benchmark_test", "primary": true, "known_limitation": "requires sufficiently complete relevant set; pooling methodology must be documented"},
+        {"name": "mrr", "formula": "mean(1/rank_of_first_relevant_result)", "unit_of_analysis": "query", "required_label": "binary relevance", "split": "retrieval_benchmark_test", "primary": true, "known_limitation": "meaningful mainly for single-answer-style queries"},
+        {"name": "precision_at_k", "formula": "relevant docs in top-K / K", "unit_of_analysis": "query", "required_label": "binary/graded relevance", "split": "retrieval_benchmark_test", "primary": false, "known_limitation": "penalizes queries with few true relevant docs"},
+        {"name": "ndcg_at_k", "formula": "standard DCG/IDCG", "unit_of_analysis": "query", "required_label": "graded relevance labels only", "split": "retrieval_benchmark_test", "primary": false, "known_limitation": "must never be computed from binarized labels; excluded where only binary labels exist"},
+        {"name": "hit_at_k", "formula": "queries with >=1 relevant doc in top-K / total queries", "unit_of_analysis": "query", "required_label": "binary relevance", "split": "retrieval_benchmark_test", "primary": false, "known_limitation": "coarser than recall@K; useful mainly for multi-hop entry-point checks"},
+        {"name": "candidate_recall_pre_rerank", "formula": "recall@K on fusion-stage candidates before reranking", "unit_of_analysis": "query", "required_label": "same as recall@K", "split": "retrieval_benchmark_test", "primary": false, "known_limitation": "only meaningful as paired comparison against post-rerank recall@K"},
+        {"name": "source_coverage", "formula": "queries where correct source type was searchable / queries requiring that source", "unit_of_analysis": "query", "required_label": "gold required source set", "split": "retrieval_benchmark_test", "primary": false, "known_limitation": "measures corpus/connector coverage, not ranking quality"},
+        {"name": "evidence_coverage", "formula": "distinct gold-relevant facts represented in retrieved set / total gold-relevant facts", "unit_of_analysis": "query", "required_label": "fact-level gold annotation", "split": "multi_source_benchmark", "primary": false, "known_limitation": "expensive to label; reserved for multi-hop/cross-source benchmark"},
+        {"name": "retrieval_latency", "formula": "wall-clock ms per query per stage (dense, sparse, fusion, rerank)", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "machine-dependent; report hardware alongside"}
+      ]
+    },
+    {
+      "family": "heterogeneous_source",
+      "metrics": [
+        {"name": "required_source_recall", "formula": "gold-required sources contributing >=1 used evidence / gold-required sources", "unit_of_analysis": "query", "required_label": "gold required source set + contribution labels", "split": "multi_source_benchmark", "primary": true, "known_limitation": "requires claim-evidence link to exist first"},
+        {"name": "cross_source_evidence_completeness", "formula": "distinct gold facts covered across contributing sources / total gold facts", "unit_of_analysis": "query", "required_label": "fact-level gold annotation", "split": "multi_source_benchmark", "primary": true, "known_limitation": "same labeling cost as evidence_coverage"},
+        {"name": "multi_source_answer_completion", "formula": "queries whose final answer synthesizes >=2 source types / total multi-source-required queries", "unit_of_analysis": "query", "required_label": "derived from citation source-type diversity", "split": "multi_source_benchmark", "primary": true, "known_limitation": "catches retrieve-but-don't-cite failure mode"},
+        {"name": "cross_source_linkage_correctness", "formula": "correctly linked hop points / total linkage points (multi-hop only)", "unit_of_analysis": "query (multi-hop)", "required_label": "human-reviewed linkage correctness", "split": "multi_source_benchmark", "primary": false, "known_limitation": "small expected n, class-E only"}
+      ]
+    },
+    {
+      "family": "claim_grounding_citation",
+      "metrics": [
+        {"name": "claim_support_precision", "formula": "claims judged SUPPORTED / total material factual claims", "unit_of_analysis": "claim", "required_label": "claim-evidence support judgment", "split": "grounding_benchmark_test", "primary": true, "known_limitation": "depends directly on validated judge quality (see judge_validation)"},
+        {"name": "unsupported_claim_rate", "formula": "claims judged UNSUPPORTED / total material factual claims", "unit_of_analysis": "claim", "required_label": "claim-evidence support judgment", "split": "grounding_benchmark_test", "primary": true, "known_limitation": "same judge dependency"},
+        {"name": "citation_precision", "formula": "citations whose linked evidence supports the claim / total citations used", "unit_of_analysis": "citation", "required_label": "claim-evidence support judgment", "split": "grounding_benchmark_test", "primary": true, "known_limitation": "distinct from claim support precision; catches wrong-evidence-cited errors"},
+        {"name": "citation_recall", "formula": "citable claims with >=1 correct citation / total citable claims", "unit_of_analysis": "claim", "required_label": "citable-claim labeling + support judgment", "split": "grounding_benchmark_test", "primary": true, "known_limitation": "requires prior evidentiary-vs-inferential claim labeling"},
+        {"name": "citation_completeness", "formula": "claims with adequate (sufficient, not just present) evidence / total material claims", "unit_of_analysis": "claim", "required_label": "graded adequacy judgment", "split": "grounding_benchmark_test", "primary": false, "known_limitation": "\"adequate\" needs a concrete rubric before use as a gating metric"},
+        {"name": "contradiction_rate", "formula": "claims contradicted by their own cited evidence / total factual claims", "unit_of_analysis": "claim", "required_label": "contradiction judgment", "split": "grounding_benchmark_test", "primary": true, "known_limitation": "most safety-relevant metric in this family; never averaged into a generic hallucination blob"}
+      ]
+    },
+    {
+      "family": "answer_quality",
+      "metrics": [
+        {"name": "correctness", "formula": "qualitative: does central claim match actual evidence state", "unit_of_analysis": "answer", "required_label": "human/expert review on calibration subset", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "not fully automatable"},
+        {"name": "completeness", "formula": "cited evidence set vs curated should-have-been-found reference set", "unit_of_analysis": "answer", "required_label": "retrieval benchmark gold relevant set", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "requires retrieval benchmark to exist first"},
+        {"name": "relevance", "formula": "rubric 1-5 human review", "unit_of_analysis": "answer", "required_label": "human rubric review", "split": "end_to_end_benchmark", "primary": false, "known_limitation": "not deterministic"},
+        {"name": "directness", "formula": "structural check: direct-answer sentence within first N sentences", "unit_of_analysis": "answer", "required_label": "rubric or automatic structural check", "split": "end_to_end_benchmark", "primary": false, "known_limitation": "structural proxy, not a full quality judgment"},
+        {"name": "source_coverage_answer_level", "formula": "gold-required source types represented in final citations / gold-required source types", "unit_of_analysis": "answer", "required_label": "gold required source set", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "shares signal with multi_source_answer_completion"},
+        {"name": "uncertainty_calibration", "formula": "rubric-based review against known-insufficient-evidence cases (taxonomy class H)", "unit_of_analysis": "answer", "required_label": "human rubric review", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "no single combined answer-quality score is ever computed from these dimensions"}
+      ]
+    },
+    {
+      "family": "judge_validation",
+      "metrics": [
+        {"name": "judge_parse_success_rate", "formula": "successfully parsed judge verdicts / total judge invocations", "unit_of_analysis": "judge call", "required_label": "none (deterministic parse check)", "split": "grounding_benchmark_calibration", "primary": true, "known_limitation": "historical judge showed ~10-40% successful-judgment rate depending on context size"},
+        {"name": "judge_human_agreement", "formula": "precision, recall, F1, and Cohen's kappa vs human labels on calibration subset", "unit_of_analysis": "claim", "required_label": "human-reviewed calibration labels, never reused for judge prompt tuning", "split": "grounding_benchmark_calibration", "primary": true, "known_limitation": "minimum sample size and agreement bar to be set once real calibration data exists"}
+      ]
+    },
+    {
+      "family": "workflow_success",
+      "metrics": [
+        {"name": "v2_workflow_success", "formula": "conjunctive gate: usable ResearchQuery AND all gold-required sources queried AND minimum sufficient Recall@K met AND answer generated AND Claim Support Precision/Unsupported Claim Rate floor met AND no undisclosed critical tool failure", "unit_of_analysis": "query/workflow", "required_label": "composed from nlu, retrieval, and grounding labels above", "split": "end_to_end_benchmark_test", "primary": true, "known_limitation": "numeric floors for retrieval and grounding steps not set in Phase 1; calibrated later from measured score distributions"}
+      ]
+    },
+    {
+      "family": "latency_cost",
+      "metrics": [
+        {"name": "end_to_end_latency_p50_p95", "formula": "wall-clock per query, full pipeline, both percentiles reported", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "no arbitrary threshold set in Phase 1; targets calibrated from measured feasibility"},
+        {"name": "per_stage_latency", "formula": "wall-clock per stage: query_understanding, source calls (per source), retrieval, reranking, generation, verification", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "must report hardware and concurrency setting alongside any number"},
+        {"name": "llm_calls_per_query", "formula": "count", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "reference-only, not a target"},
+        {"name": "tool_calls_per_query", "formula": "count", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "reference-only, not a target"},
+        {"name": "tokens_per_query", "formula": "prompt + completion tokens, combined and by stage", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "reference-only, not a target"},
+        {"name": "retries_per_query", "formula": "count, by cause (timeout/429/503/other)", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "reference-only, not a target"},
+        {"name": "api_error_rate", "formula": "errors / total external calls, by source and error type", "unit_of_analysis": "call", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "depends on live external API state at measurement time"},
+        {"name": "cost_per_query", "formula": "token-based cost estimate at minimum", "unit_of_analysis": "query", "required_label": "none", "split": "n/a", "primary": false, "known_limitation": "estimate only unless real billing data available"}
+      ]
+    },
+    {
+      "family": "reliability",
+      "metrics": [
+        {"name": "recovery_rate", "formula": "fault scenarios resolving to correct disclosed-partial or full answer / total injected fault scenarios", "unit_of_analysis": "fault scenario", "required_label": "scenario pass/fail criteria fixed before running", "split": "reliability_benchmark", "primary": true, "known_limitation": "requires fault-injection matrix to be frozen first (Phase 9)"},
+        {"name": "silent_failure_rate", "formula": "fault scenarios producing an answer with no disclosure of the failure / total injected fault scenarios", "unit_of_analysis": "fault scenario", "required_label": "same as recovery_rate", "split": "reliability_benchmark", "primary": true, "known_limitation": "most product-damaging failure mode; tracked even when recovery rate looks good"},
+        {"name": "partial_answer_quality", "formula": "answer_quality metrics computed on disclosed-partial answers", "unit_of_analysis": "answer", "required_label": "see answer_quality family", "split": "reliability_benchmark", "primary": false, "known_limitation": "n/a"},
+        {"name": "retry_amplification", "formula": "mean additional latency/calls caused by retry logic per fault event", "unit_of_analysis": "fault event", "required_label": "none", "split": "reliability_benchmark", "primary": false, "known_limitation": "n/a"},
+        {"name": "latency_penalty", "formula": "added wall-clock from fault handling vs clean-path baseline", "unit_of_analysis": "fault event", "required_label": "none", "split": "reliability_benchmark", "primary": false, "known_limitation": "n/a"}
+      ]
+    },
+    {
+      "family": "research_loop",
+      "metrics": [
+        {"name": "gap_identification_accuracy", "formula": "follow-up queries correctly targeting a genuine evidence gap / total follow-up queries", "unit_of_analysis": "follow-up query", "required_label": "human review", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "n/a"},
+        {"name": "follow_up_source_correctness", "formula": "follow-up calls selecting appropriate source for identified gap / total follow-up calls", "unit_of_analysis": "follow-up call", "required_label": "human review", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "n/a"},
+        {"name": "additional_relevant_evidence_gained", "formula": "new cited evidence objects added post-follow-up / total evidence in final answer", "unit_of_analysis": "answer", "required_label": "derived from evidence IDs", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "n/a"},
+        {"name": "quality_improvement_after_follow_up", "formula": "delta in claim_support_precision and completeness between pre- and post-follow-up draft", "unit_of_analysis": "answer (paired pre/post)", "required_label": "see claim_grounding_citation and answer_quality families", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "the metric that actually justifies loop cost"},
+        {"name": "unnecessary_loop_rate", "formula": "follow-up rounds adding no new used evidence and no quality-metric improvement / total follow-up rounds", "unit_of_analysis": "follow-up round", "required_label": "derived", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "n/a"},
+        {"name": "mean_loops_per_query", "formula": "count", "unit_of_analysis": "query", "required_label": "none", "split": "end_to_end_benchmark", "primary": false, "known_limitation": "n/a"},
+        {"name": "loop_termination_correctness", "formula": "loops stopping for a valid reason / total loops, human-reviewed subset", "unit_of_analysis": "loop", "required_label": "human review", "split": "end_to_end_benchmark", "primary": true, "known_limitation": "n/a"}
+      ]
+    }
+  ],
+  "baseline_comparisons_defined_not_run": [
+    "retrieval: BM25-only vs dense-only vs current hybrid vs future architecture",
+    "answering: no-RAG vs current RAG vs V2 grounded generation",
+    "tool routing: free-form JSON dispatch vs schema-constrained native tool calling",
+    "agent loop: confidence-threshold verification loop vs evidence-gap-driven loop"
+  ],
+  "statistical_reporting_requirements": [
+    "every metric states benchmark name+version, split, and n",
+    "confidence interval or explicit too-small-for-CI statement where n supports it",
+    "judge-derived metrics additionally state judge parse-success rate and calibration agreement every time reported",
+    "arm comparisons use paired samples (identical query set) wherever possible"
+  ]
+}

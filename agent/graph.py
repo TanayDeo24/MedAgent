@@ -12,8 +12,7 @@ from langgraph.graph import StateGraph, END
 from agent.state import AgentState, create_initial_state
 from agent.nodes import (
     query_analysis_node,
-    planning_node,
-    tool_execution_node,
+    tool_orchestration_node,
     synthesis_node,
     verification_node,
     report_generation_node
@@ -62,22 +61,31 @@ def should_continue_research(state: AgentState) -> str:
 def build_agent_graph() -> StateGraph:
     """Build the MedAgent LangGraph state machine.
 
-    Phase 2 creates a complete autonomous agent flow:
+    Phase 3 (docs/v2/PHASE3_TOOL_ORCHESTRATION.md) integrates the frozen,
+    validated Candidate B architecture (orchestration/candidate_b_native_tools.py)
+    in place of the old two-node planning_node + tool_execution_node
+    dispatch. Planning (tool selection) and tool execution (parameter
+    generation + dispatch) are now ONE combined node,
+    `tool_orchestration_node`, because the frozen architecture is itself a
+    single Cerebras native-tool-calling round trip that both selects tools
+    and generates their arguments in one response - see
+    `tool_orchestration_node`'s own docstring in agent/nodes.py for why
+    this collapse is the correct integration shape rather than an
+    architectural simplification for its own sake.
 
     START
       ↓
-    query_analysis (extract targets, diseases, query type)
+    query_analysis (extract targets, diseases, query type - Phase 2 NLU)
       ↓
-    planning (select tools and create strategy)
-      ↓
-    tool_execution (call APIs with optimized queries)
+    tool_orchestration (Cerebras native tool calling -> registry-validated
+                         execution of pubmed/clinical_trials/chembl)
       ↓
     synthesis (combine and cross-reference findings)
       ↓
     verification (self-reflect on quality)
       ↓
     [CONDITIONAL ROUTING]
-      ├─→ continue → tool_execution (loop back for more research)
+      ├─→ continue → tool_orchestration (loop back for more research)
       └─→ report → report_generation → END
 
     The verification node uses the LLM to decide whether to continue
@@ -96,10 +104,10 @@ def build_agent_graph() -> StateGraph:
     # Initialize the state graph
     workflow = StateGraph(AgentState)
 
-    # Add all 6 reasoning nodes
+    # Add all 5 reasoning nodes (planning + tool_execution are now one
+    # combined tool_orchestration node - see docstring above)
     workflow.add_node("query_analysis", query_analysis_node)
-    workflow.add_node("planning", planning_node)
-    workflow.add_node("tool_execution", tool_execution_node)
+    workflow.add_node("tool_orchestration", tool_orchestration_node)
     workflow.add_node("synthesis", synthesis_node)
     workflow.add_node("verification", verification_node)
     workflow.add_node("report_generation", report_generation_node)
@@ -107,12 +115,11 @@ def build_agent_graph() -> StateGraph:
     # Define the flow
     workflow.set_entry_point("query_analysis")
 
-    # Linear flow: query_analysis → planning → tool_execution
-    workflow.add_edge("query_analysis", "planning")
-    workflow.add_edge("planning", "tool_execution")
+    # Linear flow: query_analysis → tool_orchestration
+    workflow.add_edge("query_analysis", "tool_orchestration")
 
-    # After tool execution, always synthesize
-    workflow.add_edge("tool_execution", "synthesis")
+    # After tool orchestration, always synthesize
+    workflow.add_edge("tool_orchestration", "synthesis")
 
     # After synthesis, always verify (self-reflect)
     workflow.add_edge("synthesis", "verification")
@@ -123,7 +130,7 @@ def build_agent_graph() -> StateGraph:
         "verification",
         should_continue_research,  # Decision function
         {
-            "continue": "tool_execution",  # Loop back for more research
+            "continue": "tool_orchestration",  # Loop back for more research
             "report": "report_generation"  # Research complete, generate report
         }
     )
@@ -134,7 +141,7 @@ def build_agent_graph() -> StateGraph:
     # Compile the graph
     compiled_graph = workflow.compile()
 
-    logger.info("Agent graph compiled successfully with 6 nodes and conditional routing")
+    logger.info("Agent graph compiled successfully with 5 nodes and conditional routing")
 
     return compiled_graph
 

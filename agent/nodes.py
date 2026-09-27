@@ -4,11 +4,14 @@ This module contains all the individual nodes that make up the agent's
 reasoning process. Each node performs a specific task in the research pipeline:
 
 1. query_analysis_node: Extract structured info from query using LLM
-2. planning_node: Create research strategy and select tools
-3. tool_execution_node: Actually call the APIs with optimized queries
-4. synthesis_node: Combine and cross-reference findings from multiple tools
-5. verification_node: Self-reflect on quality and decide if more research needed
-6. report_generation_node: Generate final markdown report
+2. tool_orchestration_node: Select tools and execute them via the frozen
+   Phase 3 Candidate B pipeline (Cerebras native tool calling, validated
+   through orchestration/registry.py) - see this node's own docstring for
+   why planning + dispatch are now one combined round trip instead of two
+   separate nodes each backed by their own free-text LLM call.
+3. synthesis_node: Combine and cross-reference findings from multiple tools
+4. verification_node: Self-reflect on quality and decide if more research needed
+5. report_generation_node: Generate final markdown report
 
 All nodes use the LLM to make autonomous decisions and return structured outputs.
 """
@@ -19,21 +22,32 @@ from typing import Dict, Any, List, Tuple
 from agent.state import AgentState
 from agent.prompts import (
     QUERY_ANALYSIS_PROMPT,
-    PLANNING_PROMPT,
-    TOOL_QUERY_GENERATION_PROMPT,
     SYNTHESIS_PROMPT,
     VERIFICATION_PROMPT,
     REPORT_GENERATION_PROMPT
 )
 from config.llm_config import get_llm
-from tools.pubmed_tool import PubMedTool
-from tools.clinical_trials_tool import ClinicalTrialsTool
 from tools.chembl_tool import ChEMBLTool
+from orchestration.candidate_b_native_tools import (
+    call_cerebras_native_tools,
+    parse_and_validate_tool_call,
+    execute_validated_call,
+)
+from orchestration.models import ToolName
 from retrieval.retriever import retrieve as retrieve_passages, _get_retriever
 from utils.logger import get_logger
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 logger = get_logger(__name__)
+
+# Used only for ChEMBL name-backfill (_backfill_chembl_names below), never
+# for tool execution itself - real execution for every (tool, operation)
+# pair goes exclusively through orchestration.registry.DEFAULT_REGISTRY /
+# orchestration.candidate_b_native_tools.execute_validated_call. Constructing
+# a ChEMBLTool() here is safe (tools/base_tool.py's __init__ only sets up
+# config/rate-limit/session state, no network call - same reasoning
+# orchestration/registry.py's own module-level tool construction relies on).
+_chembl_backfill_tool = ChEMBLTool()
 
 RAG_RETRIEVAL_K = 10
 
@@ -415,26 +429,46 @@ def query_analysis_node(state: AgentState) -> AgentState:
     logger.info(f"[QUERY ANALYSIS] Analyzing query: {query}")
 
     try:
-        # Get LLM
-        llm = get_llm(temperature=0.1)  # Low temperature for consistent extraction
+        # Phase 2 (docs/v2/PHASE2_BIOMEDICAL_NLU.md): query understanding now
+        # delegates to nlu.understand_query(), which runs the frozen,
+        # dev-split-selected NLU architecture (artifacts/v2/nlu_frozen_config.json)
+        # and returns a validated ResearchQuery (nlu/schemas.py) - typed
+        # entities, multi-label intent, structured constraints, and a
+        # source-requirement prediction, instead of this node's previous
+        # untyped free-form JSON extraction.
+        #
+        # to_legacy_research_plan() is a TEMPORARY, explicitly-labeled
+        # backward-compatibility adapter: it serializes the new
+        # ResearchQuery into the exact OLD research_plan dict shape
+        # (drug_targets/diseases/compounds/query_type/key_constraints/
+        # extracted_keywords/confidence) so planning_node and every node
+        # downstream of it keep working completely unchanged. A future
+        # phase that redesigns planning_node's input contract should
+        # remove this adapter rather than extend it - see nlu/__init__.py's
+        # to_legacy_research_plan() docstring.
+        from nlu import understand_query_with_result, to_legacy_research_plan
 
-        # Create prompt
-        prompt = QUERY_ANALYSIS_PROMPT.format(query=query)
+        nlu_result = understand_query_with_result(query)
+        if isinstance(nlu_result.token_usage, dict) and nlu_result.token_usage.get("total_tokens"):
+            state["total_tokens_used"] = state.get("total_tokens_used", 0) + nlu_result.token_usage["total_tokens"]
+        if not nlu_result.schema_valid or nlu_result.research_query is None:
+            raise ValueError(f"NLU extraction failed ({nlu_result.architecture}): {nlu_result.parse_error}")
+        research_query = nlu_result.research_query
+        analysis = to_legacy_research_plan(research_query)
 
-        # Call LLM (using HumanMessage for consistent prompt formatting)
-        response = llm.invoke([HumanMessage(content=prompt)])
-        _accumulate_tokens(state, response)
-        analysis = _parse_llm_json(response.content, "query_analysis_node")
-
-        # Store analysis in research_plan (will be used by planning node)
+        # Store analysis in research_plan (will be used by planning node) -
+        # same field, same shape, same downstream consumer as before Phase 2.
         state["research_plan"] = json.dumps(analysis, indent=2)
 
         # Log to reasoning trace
         state["intermediate_thoughts"].append(
-            f"Query Analysis Complete:\n"
+            f"Query Analysis Complete (Phase 2 NLU):\n"
+            f"  - Intent: {[i.value for i in research_query.intent]}\n"
+            f"  - Entities: {[(e.entity_type.value, e.surface_form, e.canonical_id) for e in research_query.entities]}\n"
             f"  - Targets: {analysis.get('drug_targets', [])}\n"
             f"  - Diseases: {analysis.get('diseases', [])}\n"
             f"  - Type: {analysis.get('query_type', 'unknown')}\n"
+            f"  - Ambiguous: {research_query.ambiguity.is_ambiguous}\n"
             f"  - Confidence: {analysis.get('confidence', 0)}"
         )
 
@@ -445,7 +479,7 @@ def query_analysis_node(state: AgentState) -> AgentState:
         state["messages"].append(HumanMessage(content=query))
         state["messages"].append(AIMessage(content=f"Analysis: {json.dumps(analysis, indent=2)}"))
 
-        logger.info(f"[QUERY ANALYSIS] Extracted: {analysis.get('query_type')} query")
+        logger.info(f"[QUERY ANALYSIS] Extracted: {analysis.get('query_type')} query (Phase 2 NLU)")
 
     except Exception as e:
         logger.error(f"[QUERY ANALYSIS] Failed: {e}", exc_info=True)
@@ -462,274 +496,322 @@ def query_analysis_node(state: AgentState) -> AgentState:
 
 
 # =============================================================================
-# NODE 2: PLANNING
+# NODE 2: TOOL ORCHESTRATION (Phase 3 Step 34 integration)
 # =============================================================================
+#
+# Replaces the old, separate `planning_node` (a free-text LLM call that
+# picked tool names from a hand-written catalog, disconnected from Phase 2's
+# ResearchQuery) and `tool_execution_node` (hardcoded if/elif dispatch plus
+# a THIRD free-text LLM call per tool for parameter generation, gated only
+# by an ad hoc dict-membership check at execution time - see
+# docs/v2/PHASE3_INITIAL_ORCHESTRATION_AUDIT.md).
+#
+# Design decision (documented per Step 34's directive; see also
+# docs/v2/PHASE3_TOOL_ORCHESTRATION.md): planning_node + tool_execution_node
+# are COLLAPSED into this single node rather than kept as two nodes with new
+# internals. The frozen, validated winning architecture
+# (orchestration/candidate_b_native_tools.py, Candidate B - see
+# docs/v2/PHASE3_WINNER_SELECTION.md) is ONE Cerebras native-tool-calling
+# round trip that both SELECTS which tools to call AND generates each
+# tool's typed arguments in the same response (`tool_calls[]`). There is no
+# longer a separate "planning" output to hand from one node to another -
+# splitting this into two nodes would mean either (a) calling Cerebras
+# twice for the same decision, which the frozen/measured architecture never
+# does and would invalidate the Phase 3 measurement basis, or (b) an empty
+# first node that does nothing, which is not a real two-node structure. The
+# graph wiring (agent/graph.py) is updated accordingly: query_analysis ->
+# tool_orchestration -> synthesis -> verification -> (continue back to
+# tool_orchestration | report_generation).
 
-def planning_node(state: AgentState) -> AgentState:
-    """Create research strategy and select which tools to use.
 
-    This node uses the query analysis to decide:
-    - Which tools to call (PubMed, ClinicalTrials, ChEMBL)
-    - In what order (priority)
-    - What each tool should find
+def tool_orchestration_node(state: AgentState) -> AgentState:
+    """Select and execute tools via the frozen Phase 3 Candidate B pipeline.
 
-    The plan is autonomous - the agent decides its own strategy based on
-    the query type and available tools.
+    For the current `state["query"]`, this node:
+    1. Calls `call_cerebras_native_tools()` - ONE real Cerebras
+       `qwen-3.8-27b` Chat Completions request with the three real tools
+       declared via `build_tool_declarations()` (JSON Schemas generated
+       directly from `orchestration/models.py`'s pydantic argument
+       schemas). The model decides, in this single response, which tools
+       (if any) to call and with what arguments.
+    2. For each returned raw `tool_calls[i]` entry, calls
+       `parse_and_validate_tool_call()` - the ONLY path from a raw
+       provider tool call to something this node will execute: recognized-
+       function-name check against a static allowlist, JSON-arguments
+       parse, typed `ToolCall` (pydantic) construction, and
+       `orchestration.registry.DEFAULT_REGISTRY.validate_call()`. An
+       unrecognized/malformed/invalid call is recorded in
+       `tool_call_history` (with a `call_id` and typed `failure_category`)
+       and never reaches execution - this closes the two hard-gate defects
+       Candidate A failed on (no schema validation boundary, no `call_id`
+       - see docs/v2/PHASE3_WINNER_SELECTION.md Section 1).
+    3. For each call that passes validation, calls `execute_validated_call()`
+       - the real `tools/pubmed_tool.py` / `tools/clinical_trials_tool.py` /
+       `tools/chembl_tool.py` client method, via the registry's bound
+       execution function, with the same rate limiters/retry handling those
+       clients already use internally.
+    4. Merges each call's `ToolResult.data` into `state["tool_results"]`
+       keyed by tool name (`pubmed`/`clinical_trials`/`chembl`) in exactly
+       the shape `synthesis_node`/`verification_node`/`report_generation_node`
+       already expect (a list of parsed dicts per tool, or a single dict
+       wrapped in a list for `chembl_get_drug_info`, which - unlike the two
+       ChEMBL search operations - returns one compound's record, not a
+       list) - this is what keeps those three downstream nodes fully
+       unchanged by this integration.
+
+    If the model returns zero tool calls, that is the valid
+    `NO_EXECUTION_NEEDS_CLARIFICATION` outcome (contract Section 1 /
+    `orchestration/models.py`'s `PlanStatus`) - e.g. an ambiguous or
+    non-actionable query the model chose not to guess at. This is recorded
+    explicitly in `intermediate_thoughts` and in `research_plan`'s
+    "orchestration" block, `tools_to_call` is left empty, and `tool_results`
+    stays empty - downstream nodes already handle an empty `tool_results`
+    gracefully (no tool ever populated a key, so nothing looks like "data
+    was found"), so this cannot be silently mistaken for a real empty
+    search result.
 
     Args:
-        state: Current agent state with query analysis
+        state: Current agent state with `query` set
 
     Returns:
-        Modified state with tools_to_call populated
-
-    Example:
-        For "Find EGFR inhibitors for lung cancer":
-        Plan: Use ChEMBL first (find compounds), then ClinicalTrials (find trials),
-              then PubMed (find mechanisms)
+        Modified state with `tools_to_call`, `tool_results`,
+        `tool_call_history`, `errors`, `intermediate_thoughts`,
+        `total_tokens_used`, and `current_step` updated.
     """
-    query = state["query"]
-    query_analysis = state.get("research_plan", "{}")
-
-    logger.info(f"[PLANNING] Creating research strategy")
-
-    try:
-        # Get LLM
-        llm = get_llm(temperature=0.3)  # Moderate temperature for creative planning
-
-        # Define available tools
-        available_tools = """
-1. **pubmed**: Search scientific literature
-   - Best for: mechanisms, biology, research background
-   - Returns: Paper titles, abstracts, authors, PubMed IDs
-
-2. **clinical_trials**: Search ClinicalTrials.gov
-   - Best for: treatment efficacy, trial phases, recruitment
-   - Returns: Trial titles, status, conditions, interventions, NCT IDs
-
-3. **chembl**: Search ChEMBL compound database
-   - Best for: drug properties, targets, chemical structures, bioactivity
-   - Returns: Compound names, targets, max phase, molecule types
-"""
-
-        # Create prompt
-        prompt = PLANNING_PROMPT.format(
-            query=query,
-            query_analysis=query_analysis,
-            available_tools=available_tools
-        )
-
-        # Call LLM (using HumanMessage for consistent prompt formatting)
-        response = llm.invoke([HumanMessage(content=prompt)])
-        _accumulate_tokens(state, response)
-        plan = _parse_llm_json(response.content, "planning_node")
-
-        # Extract tools to call (sorted by priority)
-        tools_info = plan.get("tools_to_use", [])
-        tools_sorted = sorted(tools_info, key=lambda x: x.get("priority", 999))
-        tool_names = [t["tool"] for t in tools_sorted]
-
-        # Store in state
-        state["tools_to_call"] = tool_names
-
-        # Update research plan to include full plan
-        current_plan = json.loads(query_analysis)
-        current_plan["research_plan"] = plan
-        state["research_plan"] = json.dumps(current_plan, indent=2)
-
-        # Log to reasoning trace
-        state["intermediate_thoughts"].append(
-            f"Research Plan Created:\n"
-            f"  - Strategy: {plan.get('research_strategy', 'N/A')}\n"
-            f"  - Tools: {', '.join(tool_names)}\n"
-            f"  - Complexity: {plan.get('estimated_complexity', 'unknown')}"
-        )
-
-        logger.info(f"[PLANNING] Selected tools: {tool_names}")
-
-    except Exception as e:
-        logger.error(f"[PLANNING] Failed: {e}", exc_info=True)
-        state["errors"].append(f"Planning failed: {str(e)}")
-        state["intermediate_thoughts"].append(f"⚠ Planning error: {str(e)}")
-        # Fallback: use all tools
-        state["tools_to_call"] = ["pubmed", "clinical_trials", "chembl"]
-
-    return state
-
-
-# =============================================================================
-# NODE 3: TOOL EXECUTION
-# =============================================================================
-
-def tool_execution_node(state: AgentState) -> AgentState:
-    """Execute tool calls with LLM-generated queries.
-
-    This node:
-    1. For each tool in tools_to_call, uses LLM to generate optimal query
-    2. Calls the actual API with those parameters
-    3. Stores results in tool_results
-    4. Logs all calls in tool_call_history
-
-    The LLM autonomously decides what query parameters will best answer
-    the user's question for each specific tool.
-
-    Args:
-        state: Current agent state with tools_to_call list
-
-    Returns:
-        Modified state with tool_results populated
-    """
-    tools_to_call = state.get("tools_to_call", [])
     query = state["query"]
     research_plan = state.get("research_plan", "{}")
 
-    logger.info(f"[TOOL EXECUTION] Calling {len(tools_to_call)} tools")
+    logger.info("[TOOL ORCHESTRATION] Requesting native tool selection from Cerebras")
 
-    # Initialize tool instances
-    tool_instances = {
-        "pubmed": PubMedTool(),
-        "clinical_trials": ClinicalTrialsTool(),
-        "chembl": ChEMBLTool()
-    }
-
-    # Get LLM for query generation
-    llm = get_llm(temperature=0.2)
-
-    # Parse query analysis
     try:
-        query_analysis = json.loads(research_plan)
-    except:
-        query_analysis = {}
+        cerebras_result = call_cerebras_native_tools(query)
+    except RuntimeError as e:
+        # settings.CEREBRAS_API_KEY not configured - a real, actionable
+        # configuration error, not a query-specific failure. Recorded like
+        # any other node failure (state["errors"]) rather than raised, so
+        # one misconfigured run doesn't crash the whole graph.invoke().
+        logger.error(f"[TOOL ORCHESTRATION] {e}")
+        state["errors"].append(f"Tool orchestration failed: {e}")
+        state["intermediate_thoughts"].append(f"⚠ Tool orchestration error: {e}")
+        state["tools_to_call"] = []
+        state["current_step"] += 1
+        return state
 
-    for tool_name in tools_to_call:
-        if tool_name not in tool_instances:
-            # Nemotron occasionally hallucinates a tool name that doesn't
-            # exist (e.g. "pubchem"). Previously this was only a warning
-            # log line - the attempt vanished with no trace in state, so
-            # AgentMetrics.tool_precision (which reads tool_call_history)
-            # never saw it and couldn't count it as a precision miss.
-            # Recording it here (before any LLM/API call is made for it)
-            # makes hallucinated tool selection show up in the real
-            # evaluation numbers instead of silently disappearing.
-            logger.warning(f"[TOOL EXECUTION] Unknown tool: {tool_name}")
-            state["tool_call_history"].append({
-                "tool": tool_name,
-                "query": None,
-                "params": {},
-                "success": False,
-                "results_count": 0,
-                "error": f"Invalid tool name '{tool_name}' - not one of pubmed/clinical_trials/chembl",
-                "timestamp": None,
-            })
-            state["intermediate_thoughts"].append(
-                f"✗ {tool_name}: Invalid tool name (hallucinated - not a real tool)"
+    if isinstance(cerebras_result.usage, dict) and cerebras_result.usage.get("total_tokens"):
+        state["total_tokens_used"] = state.get("total_tokens_used", 0) + cerebras_result.usage["total_tokens"]
+
+    if cerebras_result.error:
+        # HTTP/parse failure at the Cerebras boundary itself (never raised -
+        # call_cerebras_native_tools always returns, per its own contract).
+        logger.error(f"[TOOL ORCHESTRATION] Cerebras call failed: {cerebras_result.error}")
+        state["errors"].append(f"Tool orchestration (Cerebras call) failed: {cerebras_result.error}")
+        state["intermediate_thoughts"].append(f"⚠ Tool orchestration error: {cerebras_result.error}")
+        state["tools_to_call"] = []
+        state["current_step"] += 1
+        return state
+
+    raw_tool_calls = cerebras_result.raw_tool_calls
+
+    if not raw_tool_calls:
+        # NO_EXECUTION_NEEDS_CLARIFICATION: the model itself decided no
+        # tool call is warranted for this query (ambiguous / not
+        # actionable / already answerable) - a valid, non-error outcome,
+        # not a best-guess fallback. Never silently substituted with "call
+        # everything" (that was the old planning_node's failure-path
+        # behavior, which is exactly the over-selection-on-uncertainty
+        # pattern this integration is meant to remove).
+        state["tools_to_call"] = []
+        state["intermediate_thoughts"].append(
+            "Tool orchestration: model selected NO tools "
+            "(NO_EXECUTION_NEEDS_CLARIFICATION - ambiguous or non-actionable "
+            f"query). Model message: {cerebras_result.message_content!r}"
+        )
+        try:
+            current_plan = json.loads(research_plan)
+        except (json.JSONDecodeError, TypeError):
+            current_plan = {}
+        current_plan["orchestration"] = {
+            "status": "no_execution_needs_clarification",
+            "model_message": cerebras_result.message_content,
+        }
+        state["research_plan"] = json.dumps(current_plan, indent=2)
+        state["current_step"] += 1
+        logger.info("[TOOL ORCHESTRATION] No tool calls selected (abstention)")
+        return state
+
+    tool_names: List[str] = []
+    orchestration_trace: List[Dict[str, Any]] = []
+
+    for i, raw_call in enumerate(raw_tool_calls):
+        call_id = f"step{state['current_step']}-{i}"
+        outcome = parse_and_validate_tool_call(raw_call, call_id=call_id)
+
+        history_entry: Dict[str, Any] = {
+            "call_id": call_id,
+            "tool": outcome.tool_name.value if outcome.tool_name else outcome.declared_function_name,
+            "operation": outcome.operation,
+            "query": None,
+            "params": (
+                outcome.pydantic_call.arguments.model_dump()
+                if outcome.pydantic_call is not None
+                else {}
+            ),
+            "success": False,
+            "results_count": 0,
+            "error": None,
+            "error_category": outcome.failure_category,
+            "timestamp": None,
+        }
+        # Best-effort human-readable "query" field for redundancy_rate()/
+        # logging, mirroring what the old dispatch stored - the primary
+        # free-text argument of whichever operation this call is, when one
+        # exists.
+        if outcome.pydantic_call is not None:
+            args = outcome.pydantic_call.arguments
+            history_entry["query"] = (
+                getattr(args, "query", None)
+                or getattr(args, "condition", None)
+                or getattr(args, "target_name", None)
+                or getattr(args, "disease", None)
+                or getattr(args, "chembl_id", None)
             )
+
+        if not outcome.registry_valid:
+            # Covers both an unrecognized/hallucinated function name (the
+            # Candidate-A-style failure this integration is meant to make
+            # structurally impossible past this point) and a
+            # schema/registry validation failure - neither ever reaches
+            # execute_validated_call().
+            history_entry["error"] = outcome.failure_detail or outcome.failure_category
+            state["tool_call_history"].append(history_entry)
+            state["intermediate_thoughts"].append(
+                f"✗ {outcome.declared_function_name}: {outcome.failure_category} - {outcome.failure_detail}"
+            )
+            logger.warning(
+                f"[TOOL ORCHESTRATION] {outcome.declared_function_name} rejected "
+                f"({outcome.failure_category}): {outcome.failure_detail}"
+            )
+            orchestration_trace.append({
+                "call_id": call_id,
+                "function": outcome.declared_function_name,
+                "registry_valid": False,
+                "failure_category": outcome.failure_category,
+            })
             continue
 
+        tool_key = outcome.tool_name.value
+        tool_names.append(tool_key)
+
         try:
-            logger.info(f"[TOOL EXECUTION] Generating query for {tool_name}")
-
-            # Use LLM to generate tool-specific query
-            prompt = TOOL_QUERY_GENERATION_PROMPT.format(
-                original_query=query,
-                tool_name=tool_name,
-                research_plan=research_plan,
-                query_analysis=json.dumps(query_analysis.get("research_plan", {}), indent=2)
-            )
-
-            response = llm.invoke([HumanMessage(content=prompt)])
-            _accumulate_tokens(state, response)
-            tool_params = _parse_llm_json(response.content, f"tool_query_gen_{tool_name}")
-
-            params = tool_params.get("parameters", {})
-            search_query = params.get("query") or params.get("condition") or query
-
-            logger.info(f"[TOOL EXECUTION] {tool_name} query: {search_query}")
-
-            # Call the actual tool
-            tool = tool_instances[tool_name]
-
-            if tool_name == "pubmed":
-                result = tool.search_pubmed(
-                    query=search_query,
-                    max_results=params.get("max_results", 20),
-                    years_back=params.get("years_back", 5)
-                )
-            elif tool_name == "clinical_trials":
-                # ClinicalTrialsTool.search_trials() has no "query" parameter —
-                # it takes "condition" / "intervention" separately.
-                result = tool.search_trials(
-                    condition=params.get("condition") or search_query,
-                    intervention=params.get("intervention"),
-                    status=params.get("status"),
-                    phase=params.get("phase"),
-                    max_results=params.get("max_results", 20)
-                )
-            elif tool_name == "chembl":
-                # ChEMBLTool has no "search_compounds" method — dispatch to the
-                # real method based on the LLM-selected query_type.
-                query_type = params.get("query_type", "target")
-                if query_type == "indication":
-                    result = tool.search_by_indication(
-                        disease=search_query,
-                        max_results=params.get("max_results", 20)
-                    )
-                else:
-                    result = tool.search_by_target(
-                        target_name=search_query,
-                        max_results=params.get("max_results", 20)
-                    )
-
-                # ChEMBL search results frequently come back with a null/
-                # empty compound name (a real ChEMBL data gap). Backfill the
-                # top few via get_drug_info(), which sometimes has a name
-                # even when the search result didn't.
-                if result.success and result.data:
-                    backfill_stats = _backfill_chembl_names(tool, result.data, query_type)
-                    if backfill_stats["missing_before"] > 0:
-                        logger.info(
-                            f"[TOOL EXECUTION] ChEMBL name backfill: "
-                            f"{backfill_stats['missing_before']} missing, "
-                            f"{backfill_stats['attempted']} attempted, "
-                            f"{backfill_stats['backfilled']} backfilled, "
-                            f"{backfill_stats['still_missing']} still missing"
-                        )
-
-            # Store results
-            state["tool_results"][tool_name] = result.data if result.success else None
-
-            # Log call history
-            state["tool_call_history"].append({
-                "tool": tool_name,
-                "query": search_query,
-                "params": params,
-                "success": result.success,
-                "results_count": len(result.data) if result.success and result.data else 0,
-                "error": result.error,
-                "timestamp": result.metadata.get("timestamp") if result.metadata else None
-            })
-
-            # Update reasoning trace
-            if result.success:
-                count = len(result.data) if result.data else 0
-                state["intermediate_thoughts"].append(
-                    f"✓ {tool_name}: Found {count} results for '{search_query}'"
-                )
-                logger.info(f"[TOOL EXECUTION] {tool_name} returned {count} results")
-            else:
-                state["intermediate_thoughts"].append(
-                    f"✗ {tool_name}: Failed - {result.error}"
-                )
-                logger.error(f"[TOOL EXECUTION] {tool_name} failed: {result.error}")
-
+            raw_result, latency_ms = execute_validated_call(outcome.pydantic_call)
         except Exception as e:
-            logger.error(f"[TOOL EXECUTION] {tool_name} error: {e}", exc_info=True)
-            state["errors"].append(f"{tool_name} execution failed: {str(e)}")
-            state["intermediate_thoughts"].append(f"✗ {tool_name}: Error - {str(e)}")
+            logger.error(
+                f"[TOOL ORCHESTRATION] {tool_key}/{outcome.operation} execution error: {e}",
+                exc_info=True,
+            )
+            history_entry["error"] = str(e)
+            history_entry["error_category"] = "internal_error"
+            state["tool_call_history"].append(history_entry)
+            state["errors"].append(f"{tool_key} execution failed: {e}")
+            state["intermediate_thoughts"].append(f"✗ {tool_key}: Error - {e}")
+            orchestration_trace.append({
+                "call_id": call_id,
+                "function": outcome.declared_function_name,
+                "registry_valid": True,
+                "execution_error": str(e),
+            })
+            continue
 
-    # Increment step counter
+        success = bool(getattr(raw_result, "success", False))
+        data = getattr(raw_result, "data", None)
+        error = getattr(raw_result, "error", None)
+        metadata = getattr(raw_result, "metadata", None)
+
+        # ChEMBL search results frequently come back with a null/empty
+        # compound name (a real ChEMBL data gap, not a parsing bug) - same
+        # backfill the old dispatch applied, now keyed off the real
+        # (tool_name, operation) pair rather than an LLM-chosen
+        # "query_type" string.
+        if (
+            outcome.tool_name == ToolName.CHEMBL
+            and outcome.operation in ("search_by_target", "search_by_indication")
+            and success
+            and data
+        ):
+            backfill_query_type = "indication" if outcome.operation == "search_by_indication" else "target"
+            backfill_stats = _backfill_chembl_names(_chembl_backfill_tool, data, backfill_query_type)
+            if backfill_stats["missing_before"] > 0:
+                logger.info(
+                    f"[TOOL ORCHESTRATION] ChEMBL name backfill: "
+                    f"{backfill_stats['missing_before']} missing, "
+                    f"{backfill_stats['attempted']} attempted, "
+                    f"{backfill_stats['backfilled']} backfilled, "
+                    f"{backfill_stats['still_missing']} still missing"
+                )
+
+        if success and data is not None:
+            # chembl_get_drug_info returns a single compound dict (not a
+            # list) - normalize to a list so tool_results[tool_key] is
+            # always list-shaped, matching what
+            # _build_chembl_compound_table/report_generation_node's
+            # citation builder already assume for every other operation.
+            items = data if isinstance(data, list) else [data]
+            existing = state["tool_results"].get(tool_key)
+            if isinstance(existing, list):
+                existing.extend(items)
+            elif tool_key not in state["tool_results"] or state["tool_results"][tool_key] is None:
+                state["tool_results"][tool_key] = list(items)
+            results_count = len(items)
+        else:
+            results_count = 0
+            state["tool_results"].setdefault(tool_key, None)
+
+        history_entry.update({
+            "success": success,
+            "results_count": results_count,
+            "error": error,
+            "error_category": None if success else "tool_error",
+            "timestamp": metadata.get("timestamp") if isinstance(metadata, dict) else None,
+        })
+        state["tool_call_history"].append(history_entry)
+
+        if success:
+            state["intermediate_thoughts"].append(
+                f"✓ {tool_key}/{outcome.operation}: Found {results_count} results"
+            )
+            logger.info(f"[TOOL ORCHESTRATION] {tool_key}/{outcome.operation} returned {results_count} results")
+        else:
+            state["intermediate_thoughts"].append(
+                f"✗ {tool_key}/{outcome.operation}: Failed - {error}"
+            )
+            state["errors"].append(f"{tool_key} execution failed: {error}")
+            logger.error(f"[TOOL ORCHESTRATION] {tool_key}/{outcome.operation} failed: {error}")
+
+        orchestration_trace.append({
+            "call_id": call_id,
+            "function": outcome.declared_function_name,
+            "registry_valid": True,
+            "success": success,
+            "results_count": results_count,
+        })
+
+    state["tools_to_call"] = tool_names
+
+    try:
+        current_plan = json.loads(research_plan)
+    except (json.JSONDecodeError, TypeError):
+        current_plan = {}
+    current_plan["orchestration"] = {
+        "status": "executed",
+        "calls": orchestration_trace,
+    }
+    state["research_plan"] = json.dumps(current_plan, indent=2)
+
     state["current_step"] += 1
-
-    logger.info(f"[TOOL EXECUTION] Completed. Step {state['current_step']}/{state['max_iterations']}")
+    logger.info(
+        f"[TOOL ORCHESTRATION] Completed. Step {state['current_step']}/{state['max_iterations']}, "
+        f"tools called: {tool_names}"
+    )
 
     return state
 

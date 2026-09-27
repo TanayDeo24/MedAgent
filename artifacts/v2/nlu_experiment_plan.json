@@ -1,0 +1,47 @@
+{
+  "phase": 2,
+  "written_before_running_candidates": true,
+  "benchmark": "nlu_benchmark_v1.0.0",
+  "split_used_for_selection": "dev (45 examples, 45 template groups)",
+  "candidates": [
+    {
+      "id": "candidate_a_baseline",
+      "description": "The CURRENT, unmodified agent/nodes.py::query_analysis_node + QUERY_ANALYSIS_PROMPT, mapped onto ResearchQuery/NLUExtractionResult for measurement only. No code changes. Already measured (see artifacts/v2/nlu_baseline_results.json) before this plan's remaining candidates run, per the task's framing of it as 'Candidate A, the baseline you must measure, not modify, until after you've established its numbers'.",
+      "hyperparameters": {"temperature": 0.1, "model": "nvidia/nemotron-3-super-120b-a12b (via get_llm default)"},
+      "normalization_mechanism": "none - architecture has no normalization capability"
+    },
+    {
+      "id": "candidate_b_structured",
+      "description": "Schema-constrained structured LLM extraction (nlu/extractor.py::extract_candidate_b) with strict Pydantic validation of the full ResearchQuery schema (typed entities, multi-label intent, structured constraints, source-requirement prediction, ambiguity state), plus deterministic normalization (nlu/normalization.py) against a small curated, live-API-verified alias/synonym table for disease (MeSH), gene/protein/target (HGNC), and compound/drug (ChEMBL) - the LLM never proposes a canonical_id itself, so normalization cannot be fabricated by construction.",
+      "hyperparameters": {"temperature": 0.0, "model": "nvidia/nemotron-3-super-120b-a12b (via get_llm default)"},
+      "normalization_mechanism": "curated lookup table, 24 entities (8 disease/8 gene/8 compound), exact case-insensitive match only, abstains (returns None) on any miss"
+    }
+  ],
+  "candidate_c_decision": {
+    "considered": true,
+    "added": false,
+    "rationale": "The task brief requires justifying Candidate C (hybrid biomedical NER, e.g. a transformer-based NER model such as BioBERT/SciSpacy en_ner_bc5cdr_md) only if Candidate B's normalization coverage is 'clearly inadequate' AND a lightweight, Apple-Silicon-compatible, permissively-licensed option exists. Decision: NOT added in this phase. Reasoning: (1) Candidate B's curated-table approach was evaluated first per this plan's own ordering; if its normalization Accuracy@1 on the dev split materially fails (see nlu_candidate_results.json), that is the trigger to revisit this decision in a future phase, not to add an NER model speculatively now. (2) A general-purpose biomedical NER transformer (e.g. scispaCy's en_ner_bc5cdr_md, ~800MB+ model download, Apache-2.0/MIT-compatible license, CPU/MPS-runnable) solves span DETECTION, not normalization/entity-linking - it would need a separate entity-linking step (e.g. scispaCy's UMLS linker, which itself needs the full UMLS Metathesaurus, a licensed resource requiring a UTS account) to produce canonical IDs at all, so it does not directly fix a normalization coverage gap without a second, heavier dependency. (3) Adding a large model 'for resume value alone' is explicitly prohibited by this phase's constraints. Net: Candidate C is deferred, not rejected outright - it remains a documented, justified follow-up if Candidate B's measured normalization coverage proves the curated-table approach is fundamentally insufficient at a larger benchmark scale."
+  },
+  "primary_decision_metrics": [
+    {"metric": "Entity F1 (micro, dev split)", "why": "EVALUATION_CONTRACT.md 1.1 Primary; entity extraction is the foundational capability every downstream NLU metric depends on."},
+    {"metric": "Intent Macro-F1 (dev split)", "why": "EVALUATION_CONTRACT.md 1.3 Primary; protects against the 9-class imbalance in the benchmark's weighted distribution."},
+    {"metric": "Source-Set F1 (micro, dev split)", "why": "EVALUATION_CONTRACT.md 1.5 Primary, explicitly called out as 'the clearest measurable proxy for did the system understand what kind of evidence this question needs' - and the direct input to Phase 3's tool-routing evaluation."}
+  ],
+  "secondary_metrics_tracked": [
+    "Normalization Accuracy@1 (diagnostic for candidate_b_structured only; not applicable to candidate_a_baseline which has no normalization mechanism)",
+    "Constraint Field F1 (secondary per EVALUATION_CONTRACT.md 1.4, primary only for class-G-heavy slices)",
+    "schema_parse_success_rate (structural output reliability)",
+    "fabricated_id_count (must be 0 for any candidate to be selectable, regardless of other metrics)",
+    "latency P50/P95, LLM calls/question"
+  ],
+  "tie_break_rules": [
+    "If Entity F1, Intent Macro-F1, and Source-Set F1 are all within 0.03 of each other between candidates, prefer the SIMPLER architecture (fewer moving parts, fewer LLM calls) - matches this phase's stop-condition discipline of not adopting complexity that doesn't measurably pay for itself.",
+    "A candidate with fabricated_id_count > 0 is disqualified outright regardless of its other metrics - this is a hard safety gate, not a tunable tradeoff.",
+    "A candidate with schema_parse_success_rate below 0.80 on the dev split is disqualified outright - an architecture that frequently fails to produce parseable structured output cannot be relied on by planning_node's adapter."
+  ],
+  "maximum_experiment_count": {
+    "limit": 2,
+    "meaning": "At most 2 candidate architectures are run on the dev split for selection purposes (candidate_a_baseline, candidate_b_structured). No additional prompt variants, temperature sweeps, or model swaps are run beyond what is needed to produce one clean measurement per candidate above. If candidate_b_structured's first prompt version fails the schema_parse_success_rate gate, ONE revised prompt version may be tried (recorded as candidate_b_structured_v2 in nlu_candidate_results.json) before selection - this is the only permitted iteration beyond the 2 candidates."
+  },
+  "stop_condition_reference": "V2_PHASE_GATES.md Phase 2: 'if entity/intent extraction cannot reliably beat a naive keyword-matching baseline on the dev split after reasonable iteration, stop and report that as a finding'. This plan's naive-keyword-baseline check is folded into candidate_a_baseline's own entity extraction (which is itself close to keyword extraction - it has no typed spans or normalization) rather than building a third, separate naive baseline, since candidate_a_baseline already represents the simplest pre-Phase-2 mechanism this system has; if candidate_b_structured does not materially beat candidate_a_baseline on the primary metrics, Phase 2 reports that honestly per the stop condition rather than selecting candidate_b_structured on narrative grounds."
+}

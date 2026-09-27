@@ -1,0 +1,1774 @@
+{
+  "measurement_metadata": {
+    "measured_date": "2026-09-25",
+    "n_cases": 22,
+    "splits_used": [
+      "development",
+      "validation"
+    ],
+    "phase4_heldout_touched": false,
+    "no_mocking": true,
+    "candidate_b2_engine": "tools/pubmed_tool.py::PubMedTool().search_pubmed(raw_query) -- current (fixed) code, no years_back/date_from override, byte-identical query text to B1",
+    "candidate_c_engine": "nlu.understand_query_with_result(raw_query) [live Cerebras qwen-3.8-27b call, frozen architecture] -> retrieval/pubmed_query_compiler.py::compile_pubmed_query() -> tools/pubmed_tool.py::PubMedTool().search_pubmed(compiled_query)",
+    "nlu_failures": []
+  },
+  "aggregate_metrics": {
+    "candidate_b2": {
+      "recall@1": 0.045454545454545456,
+      "recall@5": 0.045454545454545456,
+      "recall@10": 0.045454545454545456,
+      "precision@5": 0.009090909090909092,
+      "mrr": 0.045454545454545456,
+      "hit@10": 0.045454545454545456,
+      "n_cases_with_gold": 22
+    },
+    "candidate_c": {
+      "recall@1": 0.045454545454545456,
+      "recall@5": 0.09090909090909091,
+      "recall@10": 0.13636363636363635,
+      "precision@5": 0.018181818181818184,
+      "mrr": 0.05909090909090909,
+      "hit@10": 0.13636363636363635,
+      "n_cases_with_gold": 22
+    }
+  },
+  "query_quality": {
+    "candidate_b2_mean_concept_coverage": 0.9166666666666667,
+    "candidate_c_mean_concept_coverage": 0.6969696969696969
+  },
+  "zero_result_rate": {
+    "candidate_b2": 0.6363636363636364,
+    "candidate_c": 0.0
+  },
+  "duplicate_rate": {
+    "candidate_b2": 0.0,
+    "candidate_c": 0.0
+  },
+  "unique_pmids_in_top_k_total": {
+    "candidate_b2": 62,
+    "candidate_c": 196
+  },
+  "latency_summary_seconds": {
+    "candidate_b2_pubmed_api": {
+      "p50": 0.4012511968612671,
+      "p90": 1.3606202840805055,
+      "p95": 1.4010202407836914,
+      "mean": 0.641832557591525,
+      "n": 22
+    },
+    "candidate_c_pubmed_api": {
+      "p50": 0.3020329475402832,
+      "p90": 0.46347949504852304,
+      "p95": 0.4828156590461731,
+      "mean": 0.3059254667975686,
+      "n": 22
+    },
+    "candidate_c_nlu_extraction": {
+      "p50": 11.166966319084167,
+      "p90": 11.70846745967865,
+      "p95": 11.767925643920899,
+      "mean": 10.620443192395298,
+      "n": 22,
+      "note": "Reported SEPARATELY from PubMed API latency, per PHASE4_GATE_PLAN.md's 'never conflate stages' rule. This stage does not exist for Candidates A/B1/B2."
+    }
+  },
+  "per_case_results": [
+    {
+      "case_id": "PM-EXACT-01",
+      "category": "pubmed_exact_entity",
+      "split": "development",
+      "group_key": "family_brigatinib",
+      "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+      "gold_ids": [
+        "29119148",
+        "31109722",
+        "31331844"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "34537440",
+          "39197358",
+          "39232917",
+          "41110382",
+          "37268866",
+          "34051652",
+          "37574132",
+          "36096442",
+          "37183643"
+        ],
+        "raw_count": 9,
+        "latency_s": 0.4244711399078369,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "brigatinib AND ALK AND \"Carcinoma, Non-Small-Cell Lung\"",
+        "source_concepts": [
+          "brigatinib",
+          "ALK",
+          "Carcinoma, Non-Small-Cell Lung"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 1.1103270053863525,
+        "returned_ids": [
+          "30280657",
+          "30804663",
+          "36038416",
+          "30638036",
+          "39197358",
+          "35575153",
+          "39368244",
+          "34139965",
+          "35608148",
+          "32074131"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.2878248691558838,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "non-small cell lung cancer"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-EXACT-02",
+      "category": "pubmed_exact_entity",
+      "split": "development",
+      "group_key": "family_cart_ball_cd22",
+      "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia?",
+      "gold_ids": [
+        "40306957"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "40306957"
+        ],
+        "raw_count": 1,
+        "latency_s": 1.0724332332611084,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 1.0,
+          "hit@1": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "recall@10": 1.0,
+          "hit@10": 1.0,
+          "precision@5": 0.2,
+          "mrr": 1.0,
+          "found_rank": 1
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "CD22 AND CD19 AND \"B-cell acute lymphoblastic leukemia\"",
+        "source_concepts": [
+          "CD22",
+          "CD19",
+          "B-cell acute lymphoblastic leukemia"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 10.007752895355225,
+        "returned_ids": [
+          "33627493",
+          "38223477",
+          "36346962",
+          "34642489",
+          "38212207",
+          "38376944",
+          "37548560",
+          "33764809",
+          "34312556",
+          "40306957"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.35591888427734375,
+        "error": null,
+        "query_concept_coverage": 0.75,
+        "missing_concepts": [
+          "CAR-T"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 1.0,
+          "hit@10": 1.0,
+          "precision@5": 0.0,
+          "mrr": 0.1,
+          "found_rank": 10
+        }
+      }
+    },
+    {
+      "case_id": "PM-LEX-01",
+      "category": "pubmed_lexical_gap",
+      "split": "validation",
+      "group_key": "family_osimertinib_egfr",
+      "query": "What causes tumor cells to stop responding to a third-generation EGFR-blocking pill used as first-line therapy for lung adenocarcinoma with an EGFR mutation?",
+      "gold_ids": [
+        "35883645"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.327495813369751,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "resistance"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "\"lung adenocarcinoma\" AND EGFR",
+        "source_concepts": [
+          "lung adenocarcinoma",
+          "EGFR"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.239681005477905,
+        "returned_ids": [
+          "40350470",
+          "33818198",
+          "31959334",
+          "37131310",
+          "28678431",
+          "35023616",
+          "41516316",
+          "35862867",
+          "41033606",
+          "41406940"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.3291289806365967,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "resistance"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-LEX-02",
+      "category": "pubmed_lexical_gap",
+      "split": "development",
+      "group_key": "family_hiv_immunomodulatory",
+      "query": "Is it safe to give drugs that dampen the immune system to people who are HIV positive?",
+      "gold_ids": [
+        "32310901"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.17159414291381836,
+        "error": null,
+        "query_concept_coverage": 0.5,
+        "missing_concepts": [
+          "immunomodulatory"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "HIV AND \"drugs that dampen the immune system\"",
+        "source_concepts": [
+          "HIV",
+          "drugs that dampen the immune system"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.664336919784546,
+        "returned_ids": [
+          "36313942",
+          "31301135",
+          "19108693"
+        ],
+        "raw_count": 3,
+        "pubmed_latency_s": 0.2458968162536621,
+        "error": null,
+        "query_concept_coverage": 0.5,
+        "missing_concepts": [
+          "immunomodulatory"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-MECH-01",
+      "category": "pubmed_mechanism",
+      "split": "validation",
+      "group_key": "family_cml_imatinib",
+      "query": "What are the mechanisms of resistance to imatinib in chronic myeloid leukemia?",
+      "gold_ids": [
+        "31646577",
+        "30332954",
+        "30504658"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "38280275",
+          "14633780",
+          "30069623",
+          "20072827",
+          "36899844",
+          "19337198",
+          "41331927",
+          "26391311",
+          "18653275",
+          "42235483"
+        ],
+        "raw_count": 10,
+        "latency_s": 1.3076930046081543,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "imatinib AND \"chronic myeloid leukemia\"",
+        "source_concepts": [
+          "imatinib",
+          "chronic myeloid leukemia"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 10.934570074081421,
+        "returned_ids": [
+          "26852913",
+          "36763239",
+          "31812340",
+          "34350970",
+          "25947908",
+          "31239209",
+          "22215488",
+          "29417559",
+          "30672497",
+          "15271395"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.4674801826477051,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "resistance"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-MECH-02",
+      "category": "pubmed_mechanism",
+      "split": "development",
+      "group_key": "family_metformin",
+      "query": "How do a patient's genetics influence how well metformin works for type 2 diabetes?",
+      "gold_ids": [
+        "28770331",
+        "41031844",
+        "37317976"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "37541452",
+          "32722720",
+          "22861817"
+        ],
+        "raw_count": 3,
+        "latency_s": 1.4028370380401611,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "METFORMIN AND \"Diabetes Mellitus, Type 2\"",
+        "source_concepts": [
+          "METFORMIN",
+          "Diabetes Mellitus, Type 2"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 9.689933061599731,
+        "returned_ids": [
+          "37397787",
+          "35640743",
+          "32897388",
+          "28770321",
+          "24393785",
+          "38763510",
+          "36814831",
+          "40775736",
+          "30874963",
+          "25456737"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.4274733066558838,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "genetics"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-MULTI-01",
+      "category": "pubmed_multi_concept",
+      "split": "validation",
+      "group_key": "family_cart_dlbcl_cd19",
+      "query": "Why does CD19-targeted CAR-T cell therapy fail in some patients with relapsed or refractory diffuse large B cell lymphoma?",
+      "gold_ids": [
+        "38336529"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "37435781",
+          "29413279",
+          "35933930",
+          "40597378",
+          "23753028",
+          "37211991",
+          "35764309",
+          "38072433",
+          "40902836",
+          "30213390"
+        ],
+        "raw_count": 10,
+        "latency_s": 1.2784278392791748,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "CD19 AND \"CAR-T cell therapy\" AND \"relapsed or refractory diffuse large B cell lymphoma\"",
+        "source_concepts": [
+          "CD19",
+          "CAR-T cell therapy",
+          "relapsed or refractory diffuse large B cell lymphoma"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 10.434786081314087,
+        "returned_ids": [
+          "37838564",
+          "36505470"
+        ],
+        "raw_count": 2,
+        "pubmed_latency_s": 0.2696802616119385,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-NARROW-02",
+      "category": "pubmed_narrow_constraint",
+      "split": "development",
+      "group_key": "family_almonertinib",
+      "query": "How does the third-generation EGFR inhibitor almonertinib trigger cell death via reactive oxygen species in lung cancer cells?",
+      "gold_ids": [
+        "34219533"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.2380681037902832,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "apoptosis"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "almonertinib AND EGFR AND \"lung cancer\"",
+        "source_concepts": [
+          "almonertinib",
+          "EGFR",
+          "lung cancer"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.508767127990723,
+        "returned_ids": [
+          "40897431",
+          "35580297",
+          "41211184",
+          "41818162",
+          "39552885",
+          "40569623",
+          "34911833",
+          "41092159",
+          "41539318",
+          "38987909"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.3189260959625244,
+        "error": null,
+        "query_concept_coverage": 0.3333333333333333,
+        "missing_concepts": [
+          "reactive oxygen species",
+          "apoptosis"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-NARROW-04",
+      "category": "pubmed_narrow_constraint",
+      "split": "development",
+      "group_key": "family_dexmedetomidine_sepsis",
+      "query": "Do randomized controlled trials show dexmedetomidine improves outcomes in sepsis patients?",
+      "gold_ids": [
+        "31045827"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "36272399",
+          "27885969",
+          "26712078",
+          "42244837",
+          "20233428",
+          "32778146",
+          "34966760",
+          "28322414",
+          "30075898"
+        ],
+        "raw_count": 9,
+        "latency_s": 1.3665010929107666,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "dexmedetomidine AND sepsis",
+        "source_concepts": [
+          "dexmedetomidine",
+          "sepsis"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 10.205915927886963,
+        "returned_ids": [
+          "33039659",
+          "39982143",
+          "39581576",
+          "40424824",
+          "33528922",
+          "36272399",
+          "32746469",
+          "40388916",
+          "36029410",
+          "40242975"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.48924803733825684,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "randomized controlled trials"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-NARROW-05",
+      "category": "pubmed_narrow_constraint",
+      "split": "development",
+      "group_key": "family_upadacitinib",
+      "query": "Is the JAK inhibitor upadacitinib effective for Crohn's disease patients who failed prior therapy?",
+      "gold_ids": [
+        "38362641"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.1524972915649414,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "upadacitinib AND \"Crohn's disease\"",
+        "source_concepts": [
+          "upadacitinib",
+          "Crohn's disease"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.565684080123901,
+        "returned_ids": [
+          "37224198",
+          "39326583",
+          "38492904",
+          "32044319",
+          "35907636",
+          "38229787",
+          "38512115",
+          "40704669",
+          "36898598",
+          "38873701"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.3003518581390381,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "JAK"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-TOPICAL-01",
+      "category": "pubmed_topical",
+      "split": "validation",
+      "group_key": "family_statin_cv",
+      "query": "What does the evidence say about using statins to prevent cardiovascular disease in people who have not yet had a cardiac event?",
+      "gold_ids": [
+        "31015265"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.2781651020050049,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "primary prevention"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "statins AND \"cardiovascular disease\"",
+        "source_concepts": [
+          "statins",
+          "cardiovascular disease"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.402339935302734,
+        "returned_ids": [
+          "39135464",
+          "40808229",
+          "28057795",
+          "37795366",
+          "29617000",
+          "30653440",
+          "39337662",
+          "39709592",
+          "16581326",
+          "30375494"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.39821600914001465,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "primary prevention"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-TOPICAL-03",
+      "category": "pubmed_topical",
+      "split": "development",
+      "group_key": "family_trop2_breast",
+      "query": "Are TROP2-targeted antibody-drug conjugates a promising option for HER2-negative metastatic breast cancer patients with brain metastases?",
+      "gold_ids": [
+        "40359710"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.19309687614440918,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "TROP2 AND ERBB2 AND \"metastatic breast cancer\" AND \"brain metastases\"",
+        "source_concepts": [
+          "TROP2",
+          "ERBB2",
+          "metastatic breast cancer",
+          "brain metastases"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.711852073669434,
+        "returned_ids": [
+          "40359710"
+        ],
+        "raw_count": 1,
+        "pubmed_latency_s": 0.26221728324890137,
+        "error": null,
+        "query_concept_coverage": 0.5,
+        "missing_concepts": [
+          "antibody-drug conjugate",
+          "HER2-negative"
+        ],
+        "metrics": {
+          "recall@1": 1.0,
+          "hit@1": 1.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "recall@10": 1.0,
+          "hit@10": 1.0,
+          "precision@5": 0.2,
+          "mrr": 1.0,
+          "found_rank": 1
+        }
+      }
+    },
+    {
+      "case_id": "PM-TOPICAL-04",
+      "category": "pubmed_topical",
+      "split": "development",
+      "group_key": "family_pembrolizumab_tnbc",
+      "query": "What is the current status of immune checkpoint inhibitor therapy and response biomarkers for triple-negative breast cancer?",
+      "gold_ids": [
+        "40324951"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.25952887535095215,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "\"triple-negative breast cancer\" AND \"immune checkpoint inhibitor therapy\"",
+        "source_concepts": [
+          "triple-negative breast cancer",
+          "immune checkpoint inhibitor therapy"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.678005933761597,
+        "returned_ids": [
+          "39214650",
+          "38569519",
+          "35646659",
+          "39176080",
+          "40371160",
+          "35760778",
+          "32394753",
+          "28750120",
+          "34448400",
+          "27755140"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.29340314865112305,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "biomarkers"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-LIVE-01",
+      "category": "pubmed_live_api",
+      "split": "development",
+      "group_key": "family_tirzepatide",
+      "query": "What do recent real-world studies show about long-term effectiveness of tirzepatide for weight management in adults with overweight or obesity?",
+      "gold_ids": [
+        "42769739"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "32437302",
+          "37191347",
+          "28292619",
+          "36928809",
+          "30721956",
+          "39824509",
+          "33270290",
+          "34749902",
+          "36043953",
+          "29100895"
+        ],
+        "raw_count": 10,
+        "latency_s": 1.7641098499298096,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "tirzepatide AND \"overweight or obesity\"",
+        "source_concepts": [
+          "tirzepatide",
+          "overweight or obesity"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 9.502105951309204,
+        "returned_ids": [
+          "38976257",
+          "41491349",
+          "39888616",
+          "40804463",
+          "39329873",
+          "39583142",
+          "37840095",
+          "39761578",
+          "40491239",
+          "41816857"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.27350568771362305,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "real-world effectiveness"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "PM-LIVE-02",
+      "category": "pubmed_live_api",
+      "split": "development",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "What is known about lecanemab and donanemab as anti-amyloid monoclonal antibodies for early Alzheimer's disease?",
+      "gold_ids": [
+        "42784125"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [
+          "40118715",
+          "41352683",
+          "42093461",
+          "39581354",
+          "41548526",
+          "41145338",
+          "42055092",
+          "41544372",
+          "41047654",
+          "42552749"
+        ],
+        "raw_count": 10,
+        "latency_s": 1.14335298538208,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "lecanemab AND donanemab AND \"early Alzheimer's disease\"",
+        "source_concepts": [
+          "lecanemab",
+          "donanemab",
+          "early Alzheimer's disease"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.08072304725647,
+        "returned_ids": [
+          "40887393",
+          "39332901",
+          "38429615",
+          "38405341",
+          "40386876",
+          "41852829",
+          "41428477",
+          "38759015",
+          "40865297",
+          "42088086"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.30649590492248535,
+        "error": null,
+        "query_concept_coverage": 0.75,
+        "missing_concepts": [
+          "amyloid"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "MS-01",
+      "category": "multi_source",
+      "split": "validation",
+      "group_key": "family_osimertinib_egfr",
+      "query": "For osimertinib in EGFR-mutant NSCLC: what does the literature say about resistance mechanisms, what is its ChEMBL compound record, and are there currently recruiting clinical trials?",
+      "gold_ids": [
+        "35883645"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.3773939609527588,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "OSIMERTINIB AND EGFR AND \"Carcinoma, Non-Small-Cell Lung\"",
+        "source_concepts": [
+          "OSIMERTINIB",
+          "EGFR",
+          "Carcinoma, Non-Small-Cell Lung"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.457287311553955,
+        "returned_ids": [
+          "31564718",
+          "36482474",
+          "34911336",
+          "41150710",
+          "34278827",
+          "37093192",
+          "33113300",
+          "40090182",
+          "38689087",
+          "31754333"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.3567640781402588,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "resistance"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "MS-02",
+      "category": "multi_source",
+      "split": "validation",
+      "group_key": "family_cml_imatinib",
+      "query": "For imatinib in chronic myeloid leukemia: summarize resistance mechanisms from the literature, give its ChEMBL identifier, and name a clinical trial comparing it to another TKI.",
+      "gold_ids": [
+        "31646577",
+        "30332954",
+        "30504658"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.4571220874786377,
+        "error": null,
+        "query_concept_coverage": 0.6666666666666666,
+        "missing_concepts": [
+          "CML"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "imatinib AND \"chronic myeloid leukemia\"",
+        "source_concepts": [
+          "imatinib",
+          "chronic myeloid leukemia"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 10.919511079788208,
+        "returned_ids": [
+          "26852913",
+          "36763239",
+          "31812340",
+          "34350970",
+          "25947908",
+          "31239209",
+          "22215488",
+          "29417559",
+          "30672497",
+          "15271395"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.0004949569702148438,
+        "error": null,
+        "query_concept_coverage": 0.3333333333333333,
+        "missing_concepts": [
+          "resistance",
+          "CML"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "MS-03",
+      "category": "multi_source",
+      "split": "development",
+      "group_key": "family_brigatinib",
+      "query": "What is brigatinib's ChEMBL identifier, and what does the literature say about its use in ALK-positive NSCLC?",
+      "gold_ids": [
+        "29119148",
+        "31109722"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.2685718536376953,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "brigatinib AND ALK AND \"Carcinoma, Non-Small-Cell Lung\"",
+        "source_concepts": [
+          "brigatinib",
+          "ALK",
+          "Carcinoma, Non-Small-Cell Lung"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.77087688446045,
+        "returned_ids": [
+          "30280657",
+          "30804663",
+          "36038416",
+          "30638036",
+          "39197358",
+          "35575153",
+          "39368244",
+          "34139965",
+          "35608148",
+          "32074131"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.0004451274871826172,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "MS-04",
+      "category": "multi_source",
+      "split": "development",
+      "group_key": "family_tirzepatide",
+      "query": "For tirzepatide: what does the live literature say about its real-world effectiveness for obesity, what is its ChEMBL record, and what Phase 3 weight-management trials exist?",
+      "gold_ids": [
+        "42769739"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.4631218910217285,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "tirzepatide AND obesity",
+        "source_concepts": [
+          "tirzepatide",
+          "obesity"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.503486394882202,
+        "returned_ids": [
+          "38912654",
+          "38976257",
+          "41491349",
+          "39566869",
+          "38978621",
+          "38819983",
+          "37385275",
+          "35658024",
+          "39996356",
+          "38078870"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.48362278938293457,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "MS-05",
+      "category": "multi_source",
+      "split": "development",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "For lecanemab in early Alzheimer's disease: what recent literature discusses it, what is its ChEMBL record, and what Phase 3 trial is evaluating it in preclinical/early disease?",
+      "gold_ids": [
+        "42784125"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.37803125381469727,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "lecanemab AND \"early Alzheimer's disease\"",
+        "source_concepts": [
+          "lecanemab",
+          "early Alzheimer's disease"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.09425163269043,
+        "returned_ids": [
+          "36449413",
+          "41355080",
+          "36544184",
+          "37099355",
+          "37955845",
+          "40011173",
+          "40437535",
+          "38405341",
+          "40887393",
+          "41069006"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.28571105003356934,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    },
+    {
+      "case_id": "MS-06",
+      "category": "multi_source",
+      "split": "development",
+      "group_key": "family_upadacitinib",
+      "query": "For upadacitinib: what does the literature say about its use in Crohn's disease, what is its ChEMBL identifier, and are there recruiting rheumatoid arthritis trials?",
+      "gold_ids": [
+        "38362641"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.30416107177734375,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "upadacitinib AND \"Crohn's disease\" AND \"Arthritis, Rheumatoid\"",
+        "source_concepts": [
+          "upadacitinib",
+          "Crohn's disease",
+          "Arthritis, Rheumatoid"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 12.109965801239014,
+        "returned_ids": [
+          "40875187",
+          "37984057",
+          "35695972",
+          "40666511",
+          "38362641",
+          "31701537",
+          "36571701",
+          "33188136",
+          "37664943",
+          "38169057"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.27384090423583984,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 1.0,
+          "hit@5": 1.0,
+          "recall@10": 1.0,
+          "hit@10": 1.0,
+          "precision@5": 0.2,
+          "mrr": 0.2,
+          "found_rank": 5
+        }
+      }
+    },
+    {
+      "case_id": "MS-07",
+      "category": "multi_source",
+      "split": "development",
+      "group_key": "family_pembrolizumab_tnbc",
+      "query": "For pembrolizumab in triple-negative breast cancer: what does the literature say about checkpoint-inhibitor biomarkers, what is pembrolizumab's ChEMBL identifier, and what completed trials tested it in TNBC?",
+      "gold_ids": [
+        "40324951"
+      ],
+      "b2_raw_live_fixed": {
+        "returned_ids": [],
+        "raw_count": 0,
+        "latency_s": 0.4916417598724365,
+        "error": null,
+        "query_concept_coverage": 1.0,
+        "missing_concepts": [],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      },
+      "c_compiled_live_fixed": {
+        "compiled_query": "PEMBROLIZUMAB AND \"triple-negative breast cancer\" AND TNBC",
+        "source_concepts": [
+          "PEMBROLIZUMAB",
+          "triple-negative breast cancer",
+          "TNBC"
+        ],
+        "fallback_used": false,
+        "date_filter": {
+          "years_back": null,
+          "date_from": null
+        },
+        "nlu_schema_valid": true,
+        "nlu_architecture": "candidate_g_cerebras_qwen",
+        "nlu_latency_s": 11.057590007781982,
+        "returned_ids": [
+          "38369015",
+          "37991778",
+          "37641116",
+          "40460322",
+          "33015734",
+          "39062758",
+          "34949142",
+          "40418298",
+          "36423745",
+          "40196378"
+        ],
+        "raw_count": 10,
+        "pubmed_latency_s": 0.3037140369415283,
+        "error": null,
+        "query_concept_coverage": 0.5,
+        "missing_concepts": [
+          "checkpoint inhibitor"
+        ],
+        "metrics": {
+          "recall@1": 0.0,
+          "hit@1": 0.0,
+          "recall@5": 0.0,
+          "hit@5": 0.0,
+          "recall@10": 0.0,
+          "hit@10": 0.0,
+          "precision@5": 0.0,
+          "mrr": 0.0,
+          "found_rank": null
+        }
+      }
+    }
+  ]
+}

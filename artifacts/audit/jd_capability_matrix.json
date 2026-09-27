@@ -1,0 +1,21 @@
+[
+  {"capability": "Search-based QA", "status": "DIRECTLY DEMONSTRATED", "evidence": ["main.py", "agent/graph.py", "agent/nodes.py:956-1111"]},
+  {"capability": "Heterogeneous-source retrieval", "status": "DIRECTLY DEMONSTRATED", "evidence": ["agent/nodes.py:563-734", "agent/nodes.py:225-315"]},
+  {"capability": "Text processing", "status": "DIRECTLY DEMONSTRATED", "evidence": ["retrieval/chunking.py", "tools/pubmed_tool.py (XML parsing)"]},
+  {"capability": "Information retrieval", "status": "DIRECTLY DEMONSTRATED", "evidence": ["retrieval/retriever.py:205-232 (RRF)", "retrieval/retriever.py:121-151 (cross-encoder rerank)", "retrieval/eval_results_*.json"]},
+  {"capability": "Semantic understanding", "status": "PARTIALLY DEMONSTRATED", "evidence": ["data/index/index_meta.json embedding_model=all-MiniLM-L6-v2", "agent/prompts.py:18-58"]},
+  {"capability": "NLU (query understanding)", "status": "PARTIALLY DEMONSTRATED", "evidence": ["agent/prompts.py:18-58 QUERY_ANALYSIS_PROMPT"]},
+  {"capability": "ML", "status": "PARTIALLY DEMONSTRATED", "evidence": ["pretrained sentence-transformer + cross-encoder + LLM integration, no training/fine-tuning in repo"]},
+  {"capability": "RAG", "status": "DIRECTLY DEMONSTRATED", "evidence": ["retrieval/build_corpus.py", "retrieval/build_index.py", "retrieval/retriever.py", "agent/nodes.py:794-806,1044-1051", "data/index/variants/*"]},
+  {"capability": "Source-aware retrieval", "status": "DIRECTLY DEMONSTRATED", "evidence": ["agent/nodes.py:993-1028 (PubMed vs PubMed RAG distinct labels)"]},
+  {"capability": "Biomedical query understanding", "status": "PARTIALLY DEMONSTRATED", "evidence": ["agent/prompts.py:157-160 MeSH guidance", "no domain-specific NER model present"]},
+  {"capability": "Evidence-grounded generation", "status": "DIRECTLY DEMONSTRATED", "evidence": ["agent/prompts.py:222,425", "agent/nodes.py:225-315"]},
+  {"capability": "Citation grounding", "status": "PARTIALLY DEMONSTRATED", "evidence": ["agent/nodes.py:987-1030", "no per-claim citation verification"]},
+  {"capability": "Retrieval-relevance evaluation", "status": "DIRECTLY DEMONSTRATED", "evidence": ["PHASE3_RETRIEVAL_QUALITY_COMPLETE.md sections 10-12", "retrieval/eval_results_*.json (19 files)"]},
+  {"capability": "Answer-quality evaluation", "status": "PARTIALLY DEMONSTRATED", "evidence": ["evaluation/evaluator.py:548-605", "evaluation/hallucination_judge.py (self-documented ~39% reliability)"]},
+  {"capability": "Tool reliability", "status": "PARTIALLY DEMONSTRATED", "evidence": ["evaluation/metrics.py tool_precision", "measured 85.3%/76.8%", "agent/nodes.py:603-626 hallucinated-tool tracking"]},
+  {"capability": "Workflow reliability", "status": "PARTIALLY DEMONSTRATED", "evidence": ["EVAL_HANG_FIX_COMPLETE.md", "RESULTS_RAG_COMPARISON.md section 2", "measured task success 18-38%"]},
+  {"capability": "Production-aware latency", "status": "PARTIALLY DEMONSTRATED", "evidence": ["RESULTS.md latency anomaly section", "tools/base_tool.py:100-133 TTL cache only", "no async concurrent external calls"]},
+  {"capability": "Failure handling", "status": "DIRECTLY DEMONSTRATED", "evidence": ["agent/nodes.py (all 6 nodes try/except)", "tools/base_tool.py:135-240", "RESULTS.md failure characterization"]},
+  {"capability": "Reproducibility", "status": "PARTIALLY DEMONSTRATED", "evidence": ["evaluation/evaluator.py:113-146,197-307 incremental persistence + resume", "not independently re-run by this audit - see INITIAL_STATE.md section 1"]}
+]

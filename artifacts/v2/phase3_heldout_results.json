@@ -1,0 +1,1922 @@
+{
+  "benchmark_source": "artifacts/v2/phase3_benchmark_manifest.json (benchmark_version see manifest)",
+  "splits_used": [
+    "phase3_heldout"
+  ],
+  "candidate": "B - provider-native tool calling (Cerebras qwen-3.8-27b) - FROZEN config_version 1 (artifacts/v2/phase3_frozen_config.json)",
+  "run_type": "ONE-TIME final held-out acceptance run (governing Phase 3 directive Step 33) - this split had never been touched by any prior measurement",
+  "methodology_summary": "Identical methodology and code path to docs/v2/PHASE3_CANDIDATE_B_MEASUREMENT.md, applied to the 15 phase3_heldout cases instead of the 59 development+validation cases. See that document for full methodology detail.",
+  "aggregate_metrics": {
+    "run_metadata": {
+      "cases_total_in_phase3_heldout_split": 15,
+      "cases_scored": 15,
+      "cases_skipped": 0,
+      "skipped_case_ids_and_reasons": [],
+      "wall_clock_seconds": 169.46224287501536
+    },
+    "source_routing": {
+      "precision_mean": 0.8,
+      "recall_mean": 0.9333333333333333,
+      "f1_mean": 0.8,
+      "exact_source_set_match_rate": 0.8,
+      "exact_source_set_match_count": "12/15",
+      "required_source_miss_rate_per_source": {
+        "pubmed": {
+          "required_count": 7,
+          "missed_count": 0,
+          "miss_rate": 0.0,
+          "missed_case_ids": []
+        },
+        "clinical_trials": {
+          "required_count": 4,
+          "missed_count": 1,
+          "miss_rate": 0.25,
+          "missed_case_ids": [
+            "CT-008"
+          ]
+        },
+        "chembl": {
+          "required_count": 7,
+          "missed_count": 0,
+          "miss_rate": 0.0,
+          "missed_case_ids": []
+        }
+      },
+      "unnecessary_source_call_rate_cases": 0.13333333333333333,
+      "unnecessary_source_call_case_ids": [
+        "AM-001",
+        "AM-004"
+      ]
+    },
+    "source_routing_per_case": [
+      {
+        "case_id": "PM-010",
+        "gold_required": [
+          "pubmed"
+        ],
+        "called": [
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "PM-014",
+        "gold_required": [
+          "pubmed"
+        ],
+        "called": [
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "CT-002",
+        "gold_required": [
+          "clinical_trials"
+        ],
+        "called": [
+          "clinical_trials"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "CT-008",
+        "gold_required": [
+          "clinical_trials"
+        ],
+        "called": [],
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "case_id": "CH-006",
+        "gold_required": [
+          "chembl"
+        ],
+        "called": [
+          "chembl"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "CH-009",
+        "gold_required": [
+          "chembl"
+        ],
+        "called": [
+          "chembl"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "CH-011",
+        "gold_required": [
+          "chembl"
+        ],
+        "called": [
+          "chembl"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "MS-003",
+        "gold_required": [
+          "pubmed",
+          "clinical_trials"
+        ],
+        "called": [
+          "clinical_trials",
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "MS-007",
+        "gold_required": [
+          "pubmed",
+          "chembl"
+        ],
+        "called": [
+          "chembl",
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "MS-008",
+        "gold_required": [
+          "pubmed",
+          "chembl"
+        ],
+        "called": [
+          "chembl",
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "MS-010",
+        "gold_required": [
+          "pubmed",
+          "chembl"
+        ],
+        "called": [
+          "chembl",
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "MS-011",
+        "gold_required": [
+          "pubmed",
+          "clinical_trials",
+          "chembl"
+        ],
+        "called": [
+          "chembl",
+          "clinical_trials",
+          "pubmed"
+        ],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "AM-001",
+        "gold_required": [],
+        "called": [
+          "chembl",
+          "pubmed"
+        ],
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      },
+      {
+        "case_id": "AM-002",
+        "gold_required": [],
+        "called": [],
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "case_id": "AM-004",
+        "gold_required": [],
+        "called": [
+          "clinical_trials",
+          "pubmed"
+        ],
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      }
+    ],
+    "tool_selection": {
+      "total_tool_calls_returned_by_model": 23,
+      "valid_registered_tool_count": 23,
+      "valid_registered_tool_rate": 1.0,
+      "unregistered_tool_generation_count": 0,
+      "unregistered_tool_generation_rate": 0.0,
+      "hallucinated_tool_names_observed": [],
+      "operation_accuracy": 1.0,
+      "operation_accuracy_n": 18
+    },
+    "parameter_quality": {
+      "total_calls_with_recognized_tool_name": 23,
+      "arguments_json_invalid_count": 0,
+      "schema_invalid_count": 1,
+      "registry_error_count_after_schema_valid": 0,
+      "schema_valid_count": 22,
+      "schema_valid_rate": 0.9565217391304348,
+      "malformed_calls_reaching_executor_count": 0,
+      "pubmed_concept_coverage_rate": 0.85,
+      "pubmed_concept_coverage_n_calls": 8,
+      "pubmed_concept_coverage_detail": [
+        {
+          "case_id": "PM-010",
+          "concepts_present": 3,
+          "concepts_total": 3
+        },
+        {
+          "case_id": "PM-014",
+          "concepts_present": 3,
+          "concepts_total": 3
+        },
+        {
+          "case_id": "PM-014",
+          "concepts_present": 0,
+          "concepts_total": 3
+        },
+        {
+          "case_id": "MS-003",
+          "concepts_present": 2,
+          "concepts_total": 2
+        },
+        {
+          "case_id": "MS-007",
+          "concepts_present": 2,
+          "concepts_total": 2
+        },
+        {
+          "case_id": "MS-008",
+          "concepts_present": 3,
+          "concepts_total": 3
+        },
+        {
+          "case_id": "MS-010",
+          "concepts_present": 2,
+          "concepts_total": 2
+        },
+        {
+          "case_id": "MS-011",
+          "concepts_present": 2,
+          "concepts_total": 2
+        }
+      ],
+      "semantically_invalid_parameter_rate": "NOT MEASURED - requires a semantic judge (LLM-as-judge or manual annotation), out of scope, same convention as the dev+validation measurement."
+    },
+    "execution_safety_hard_gates": {
+      "unregistered_tool_execution_count": 0,
+      "unregistered_tool_execution_note": "0 by construction: 0 model-returned tool_call(s) named a function outside DECLARED_TOOLS_BY_NAME (rejected at parse_and_validate_tool_call before execute_validated_call); 0 more failed JSON-argument parsing, 1 more failed typed pydantic argument-schema construction, 0 more failed DEFAULT_REGISTRY.validate_call after schema construction \u2014 none executed.",
+      "arbitrary_model_generated_callable_execution_count": 0,
+      "arbitrary_model_generated_callable_execution_note": "execute_validated_call() only ever calls DEFAULT_REGISTRY.get_execution_fn(tool_name, operation); no eval/exec/dynamic import/getattr-by-string in candidate_b_native_tools.py or registry.py (unchanged, frozen code).",
+      "arbitrary_model_generated_url_execution_count": 0,
+      "arbitrary_model_generated_url_execution_note": "All three tools use fixed hardcoded base URLs; the model never supplies a URL.",
+      "schema_invalid_call_reaching_executor_count": 0,
+      "schema_invalid_call_reaching_executor_note": "1 schema-invalid call(s) occurred and were all rejected at typed ToolCall construction, never reaching execute_validated_call().",
+      "secret_or_auth_header_in_trace_count": 0,
+      "secret_or_auth_header_in_trace_note": "Regex-scanned every recorded field of the raw run for bearer-token/api-key-shaped substrings. CEREBRAS_API_KEY is read only at the HTTP Authorization header construction point inside call_cerebras_native_tools() and never assigned to a recorded field; PubMed/ClinicalTrials/ChEMBL are unauthenticated public GET APIs.",
+      "secret_leak_case_ids": [],
+      "call_without_traceable_call_id_count": 0,
+      "call_without_traceable_call_id_note": "ToolCallBase.call_id is a required, non-empty field; call_id assigned by the harness as f'{case_id}-{idx}' for every parsed outcome before typed construction is attempted.",
+      "unknown_tool_silent_fallback_count": 0,
+      "unknown_tool_silent_fallback_note": "Every rejected call is recorded with a failure_category, never substituted with a different tool, never executed.",
+      "hallucinated_tool_boundary_checks": [
+        {
+          "injected_tool_call": {
+            "call_id": "heldout-hallucinated-boundary-check",
+            "tool_name": "semantic_scholar",
+            "operation": "search_papers",
+            "arguments": {
+              "query": "test"
+            }
+          },
+          "rejected_before_execution": true,
+          "rejection_reason": "1 validation error for tagged-union[PubMedSearchCall,ClinicalTrialsSearchCall,ChEMBLSearchByTargetCall,ChEMBLSearchByIndicationCall,ChEMBLGetDrugInfoCall]\n  Input tag 'search_papers' found using 'operation' does not match any of the expected tags: 'search_pubmed', 'search_trials', 'search_by_target', 'search_by_indication', 'get_drug_info' [type=union_tag_invalid, input_value={'call_id': 'heldout-hall...nts': {'query': 'test'}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.9/v/union_tag_invalid"
+        },
+        {
+          "injected_tool_call": {
+            "call_id": "heldout-hallucinated-boundary-check",
+            "tool_name": "drugbank",
+            "operation": "lookup_drug",
+            "arguments": {
+              "drug_name": "imatinib"
+            }
+          },
+          "rejected_before_execution": true,
+          "rejection_reason": "1 validation error for tagged-union[PubMedSearchCall,ClinicalTrialsSearchCall,ChEMBLSearchByTargetCall,ChEMBLSearchByIndicationCall,ChEMBLGetDrugInfoCall]\n  Input tag 'lookup_drug' found using 'operation' does not match any of the expected tags: 'search_pubmed', 'search_trials', 'search_by_target', 'search_by_indication', 'get_drug_info' [type=union_tag_invalid, input_value={'call_id': 'heldout-hall...drug_name': 'imatinib'}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.9/v/union_tag_invalid"
+        }
+      ]
+    },
+    "execution_reliability": {
+      "real_executions_total": 22,
+      "simulated_executions_total": 0,
+      "simulated_executions_note": "phase3_heldout has zero cases with failure_injection.simulate_live_call=false (verified against the manifest) \u2014 all 15 cases' failure_injection is null, so every executed call in this run is a real, live HTTP request; no simulation was needed or performed.",
+      "successful_executions": 22,
+      "failed_executions": 0,
+      "success_rate": 1.0,
+      "retry_count": "NOT MEASURED DIRECTLY - retries happen transparently inside utils/retry_handler.py's RetrySession (observed in logs, e.g. a real PubMed 429 recovered automatically during this run for PM-014) but are not persisted as a structured count, same limitation as the dev+validation measurement.",
+      "error_category_breakdown_typed": {}
+    },
+    "result_utility": {
+      "nonempty_result_when_expected_rate": "see per-case execution_records in per_case_results; aggregate not separately recomputed, same convention as dev+validation measurement."
+    },
+    "multi_source": {
+      "n_multi_source_gold_cases": 5,
+      "all_required_sources_success_rate": 1.0,
+      "partial_success_rate": 0.0,
+      "missed_source_rate": 0.0,
+      "per_case_detail": [
+        {
+          "case_id": "MS-003",
+          "gold_required": [
+            "pubmed",
+            "clinical_trials"
+          ],
+          "all_required_sources_success": true,
+          "missed_sources": []
+        },
+        {
+          "case_id": "MS-007",
+          "gold_required": [
+            "pubmed",
+            "chembl"
+          ],
+          "all_required_sources_success": true,
+          "missed_sources": []
+        },
+        {
+          "case_id": "MS-008",
+          "gold_required": [
+            "pubmed",
+            "chembl"
+          ],
+          "all_required_sources_success": true,
+          "missed_sources": []
+        },
+        {
+          "case_id": "MS-010",
+          "gold_required": [
+            "pubmed",
+            "chembl"
+          ],
+          "all_required_sources_success": true,
+          "missed_sources": []
+        },
+        {
+          "case_id": "MS-011",
+          "gold_required": [
+            "pubmed",
+            "clinical_trials",
+            "chembl"
+          ],
+          "all_required_sources_success": true,
+          "missed_sources": []
+        }
+      ],
+      "parallel_execution_success": "N/A - sequential execution, matches dev+validation measurement scope."
+    },
+    "performance_latency_ms": {
+      "cerebras_call_latency": {
+        "n": 15,
+        "mean_ms": 552.3454000397275,
+        "p50_ms": 467.1078339451924,
+        "p95_ms": 983.8998455321406,
+        "max_ms": 1638.7277080211788,
+        "note": "Wall-clock time of the single Cerebras Chat Completions HTTP request per case, INCLUDING the 5 RPM Free-Trial-tier rate-limiter self-throttle wait, not throttle-corrected \u2014 same convention as the dev+validation measurement."
+      },
+      "tool_execution_latency_real_only": {
+        "n": 22,
+        "mean_ms": 652.0602102444337,
+        "p50_ms": 449.28287505172193,
+        "p95_ms": 1954.3921226460948,
+        "max_ms": 2087.8169999923557
+      },
+      "orchestration_overhead_ms": "NOT MEASURED SEPARATELY - same convention as dev+validation measurement."
+    },
+    "cost": {
+      "model_calls_per_case": {
+        "mean": 1.0,
+        "p50": 1.0,
+        "max": 1,
+        "min": 1
+      },
+      "model_calls_per_case_note": "Exactly 1 Cerebras Chat Completions call per case, by construction (no retry).",
+      "input_tokens_per_case": {
+        "mean": 1142.0,
+        "total": 17130
+      },
+      "output_tokens_per_case": {
+        "mean": 283.4,
+        "total": 4251
+      },
+      "measured_total_spend_usd": 0.02329269,
+      "measured_dollar_cost_per_query": 0.001552846,
+      "pricing_used": {
+        "input_usd_per_million_tokens": 0.99,
+        "output_usd_per_million_tokens": 1.49,
+        "source": "Frozen Phase-2 Cerebras qwen-3.8-27b pricing, reused verbatim, same as the dev+validation measurement."
+      },
+      "spend_cap_usd_this_measurement": 0.5,
+      "spend_cap_note": "Separate $0.50 cap for this Phase-3 held-out acceptance run only."
+    },
+    "traceability": {
+      "valid_call_id_rate": 1.0,
+      "valid_call_id_rate_note": "Every ToolCall subclass requires a non-empty call_id at pydantic construction time.",
+      "execution_result_linked_to_call_rate": 1.0,
+      "execution_result_linked_to_call_rate_note": "execution_records[i].call_id assigned directly by the harness from the same parsed outcome that produced it.",
+      "error_category_completeness": 1.0,
+      "sanitized_trace_completeness": 1.0
+    },
+    "abstention_handling": {
+      "does_candidate_b_have_an_abstention_concept": true,
+      "abstention_mechanism_note": "Same as dev+validation measurement: implicit \u2014 a case is scored 'abstained' iff n_raw_tool_calls == 0.",
+      "n_abstention_expected_cases_in_heldout": 3,
+      "n_correctly_abstained": 1,
+      "correct_abstention_rate": 0.3333333333333333,
+      "cases": [
+        {
+          "case_id": "AM-001",
+          "original_query": "What about MS treatment options?",
+          "abstained": false,
+          "correctly_abstained": false,
+          "called_sources_instead": [
+            "chembl",
+            "pubmed"
+          ]
+        },
+        {
+          "case_id": "AM-002",
+          "original_query": "Can you tell me about IT for cancer?",
+          "abstained": true,
+          "correctly_abstained": true,
+          "called_sources_instead": []
+        },
+        {
+          "case_id": "AM-004",
+          "original_query": "Tell me about NAC studies.",
+          "abstained": false,
+          "correctly_abstained": false,
+          "called_sources_instead": [
+            "clinical_trials",
+            "pubmed"
+          ]
+        }
+      ]
+    }
+  },
+  "per_case_results": [
+    {
+      "case_id": "PM-010",
+      "category": "pubmed_only",
+      "split": "phase3_heldout",
+      "original_query": "What is the role of the CFTR protein in cystic fibrosis pathophysiology?",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed"
+        ],
+        "gold_permitted_sources": [
+          "pubmed"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text, see gold_query_must_contain_concepts>"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "CFTR",
+            "cystic fibrosis",
+            "pathophysiology"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 636.7972909938544,
+      "cerebras_usage": {
+        "input_tokens": 1144,
+        "output_tokens": 273,
+        "total_tokens": 1417
+      },
+      "cerebras_call_cost_usd": 0.0015393300000000002,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "0defcdac0",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"CFTR protein cystic fibrosis pathophysiology chloride channel\", \"max_results\": \"8\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "CFTR protein cystic fibrosis pathophysiology chloride channel",
+            "max_results": 8,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "PM-010-0",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 8,
+          "latency_ms": 1510.5386250652373
+        }
+      ]
+    },
+    {
+      "case_id": "PM-014",
+      "category": "pubmed_only",
+      "split": "phase3_heldout",
+      "original_query": "What testing methods for ALK rearrangement in lung adenocarcinoma are described in the literature?",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed"
+        ],
+        "gold_permitted_sources": [
+          "pubmed"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text, see gold_query_must_contain_concepts>"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "ALK rearrangement",
+            "testing",
+            "lung adenocarcinoma"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 472.08945907186717,
+      "cerebras_usage": {
+        "input_tokens": 1147,
+        "output_tokens": 304,
+        "total_tokens": 1451
+      },
+      "cerebras_call_cost_usd": 0.0015884900000000001,
+      "message_content": "\n\nI'll search the biomedical literature for testing methods for ALK rearrangement in lung adenocarcinoma.\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "53b14d80f",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"ALK rearrangement testing methods lung adenocarcinoma\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "ALK rearrangement testing methods lung adenocarcinoma",
+            "max_results": 20,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        },
+        {
+          "provider_tool_call_id": "f0c6aa9a3",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"ALK detection immunohistochemistry FISH RT-PCR next-generation sequencing non-small cell lung cancer\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "ALK detection immunohistochemistry FISH RT-PCR next-generation sequencing non-small cell lung cancer",
+            "max_results": 20,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "PM-014-0",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 20,
+          "latency_ms": 456.1602920293808
+        },
+        {
+          "call_id": "PM-014-1",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 1,
+          "latency_ms": 1347.7191670099273
+        }
+      ]
+    },
+    {
+      "case_id": "CT-002",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout",
+      "original_query": "Show me completed clinical trials for metformin in polycystic ovary syndrome.",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "polycystic ovary syndrome",
+            "intervention": "metformin",
+            "status": "COMPLETED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 435.53004204295576,
+      "cerebras_usage": {
+        "input_tokens": 1144,
+        "output_tokens": 144,
+        "total_tokens": 1288
+      },
+      "cerebras_call_cost_usd": 0.00134712,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "7ec023162",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"polycystic ovary syndrome\", \"intervention\": \"metformin\", \"status\": \"COMPLETED\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "polycystic ovary syndrome",
+            "intervention": "metformin",
+            "status": "COMPLETED",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "CT-002-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 20,
+          "latency_ms": 271.6419999487698
+        }
+      ]
+    },
+    {
+      "case_id": "CT-008",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout",
+      "original_query": "Show active, not recruiting phase 4 trials for a statin in cardiovascular disease.",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "cardiovascular disease",
+            "intervention": "statin",
+            "status": "ACTIVE_NOT_RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "phase": "PHASE4",
+            "max_results": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 378.34937509614974,
+      "cerebras_usage": {
+        "input_tokens": 1143,
+        "output_tokens": 157,
+        "total_tokens": 1300
+      },
+      "cerebras_call_cost_usd": 0.0013655,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "57ded464c",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"cardiovascular disease\", \"intervention\": \"statin\", \"status\": \"ACTIVE_NOT_RECRUITING\", \"phase\": \"Phase 4\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": false,
+          "registry_valid": false,
+          "failure_category": "schema_invalid",
+          "failure_detail": "1 validation error for ClinicalTrialsSearchCall\narguments.phase\n  Value error, invalid trial phase 'Phase 4'; must be one of ['EARLY_PHASE1', 'NA', 'PHASE1', 'PHASE2', 'PHASE3', 'PHASE4'] [type=value_error, input_value='Phase 4', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.9/v/value_error",
+          "arguments": null
+        }
+      ],
+      "execution_records": []
+    },
+    {
+      "case_id": "CH-006",
+      "category": "chembl_only",
+      "split": "phase3_heldout",
+      "original_query": "List compounds acting on the JAK2 target.",
+      "gold": {
+        "gold_required_sources": [
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "chembl": "search_by_target"
+        },
+        "gold_required_params": {
+          "chembl": {
+            "target_name": "JAK2"
+          }
+        },
+        "gold_optional_params": {
+          "chembl": {
+            "max_results": 10
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 547.4573750980198,
+      "cerebras_usage": {
+        "input_tokens": 1136,
+        "output_tokens": 257,
+        "total_tokens": 1393
+      },
+      "cerebras_call_cost_usd": 0.0015075700000000002,
+      "message_content": "\n\nI'll search the ChEMBL database for bioactive compounds tested against the JAK2 target.\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "7a90c7e43",
+          "declared_function_name": "chembl_search_by_target",
+          "raw_arguments_text": "{\"target_name\": \"JAK2\", \"max_results\": 20}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "target_name": "JAK2",
+            "max_results": 20
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "CH-006-0",
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 20,
+          "latency_ms": 1977.7528330450878
+        }
+      ]
+    },
+    {
+      "case_id": "CH-009",
+      "category": "chembl_only",
+      "split": "phase3_heldout",
+      "original_query": "What drugs treat chronic myeloid leukemia?",
+      "gold": {
+        "gold_required_sources": [
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "chembl": "search_by_indication"
+        },
+        "gold_required_params": {
+          "chembl": {
+            "disease": "chronic myeloid leukemia"
+          }
+        },
+        "gold_optional_params": {
+          "chembl": {
+            "max_results": 20
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 260.810042032972,
+      "cerebras_usage": {
+        "input_tokens": 1135,
+        "output_tokens": 89,
+        "total_tokens": 1224
+      },
+      "cerebras_call_cost_usd": 0.00125626,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "364e0c85f",
+          "declared_function_name": "chembl_search_by_indication",
+          "raw_arguments_text": "{\"disease\": \"chronic myeloid leukemia\", \"max_results\": 20}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "disease": "chronic myeloid leukemia",
+            "max_results": 20
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "CH-009-0",
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 0,
+          "latency_ms": 167.22729103639722
+        }
+      ]
+    },
+    {
+      "case_id": "CH-011",
+      "category": "chembl_only",
+      "split": "phase3_heldout",
+      "original_query": "What drugs are used for multiple myeloma?",
+      "gold": {
+        "gold_required_sources": [
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "chembl": "search_by_indication"
+        },
+        "gold_required_params": {
+          "chembl": {
+            "disease": "multiple myeloma"
+          }
+        },
+        "gold_optional_params": {
+          "chembl": {
+            "max_results": 20
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 373.5332080395892,
+      "cerebras_usage": {
+        "input_tokens": 1136,
+        "output_tokens": 105,
+        "total_tokens": 1241
+      },
+      "cerebras_call_cost_usd": 0.0012810900000000001,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "df585d9fd",
+          "declared_function_name": "chembl_search_by_indication",
+          "raw_arguments_text": "{\"disease\": \"multiple myeloma\", \"max_results\": 50}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "disease": "multiple myeloma",
+            "max_results": 50
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "CH-011-0",
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 50,
+          "latency_ms": 677.1677499637008
+        }
+      ]
+    },
+    {
+      "case_id": "MS-003",
+      "category": "multi_source",
+      "split": "phase3_heldout",
+      "original_query": "What is known about adalimumab safety, and what completed trials exist for it in rheumatoid arthritis?",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed",
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "pubmed",
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed",
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text>"
+          },
+          "clinical_trials": {
+            "condition": "rheumatoid arthritis",
+            "intervention": "adalimumab",
+            "status": "COMPLETED"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          },
+          "clinical_trials": {
+            "phase": null,
+            "max_results": null
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "adalimumab",
+            "safety"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 451.6476250719279,
+      "cerebras_usage": {
+        "input_tokens": 1149,
+        "output_tokens": 204,
+        "total_tokens": 1353
+      },
+      "cerebras_call_cost_usd": 0.00144147,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "b10f99a3b",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"adalimumab safety adverse events\", \"max_results\": \"10\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "adalimumab safety adverse events",
+            "max_results": 10,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        },
+        {
+          "provider_tool_call_id": "f109653a0",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"rheumatoid arthritis\", \"intervention\": \"adalimumab\", \"status\": \"COMPLETED\", \"max_results\": \"15\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "rheumatoid arthritis",
+            "intervention": "adalimumab",
+            "status": "COMPLETED",
+            "phase": null,
+            "max_results": 15,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "MS-003-0",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 10,
+          "latency_ms": 347.10895898751915
+        },
+        {
+          "call_id": "MS-003-1",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 15,
+          "latency_ms": 201.6182920197025
+        }
+      ]
+    },
+    {
+      "case_id": "MS-007",
+      "category": "multi_source",
+      "split": "phase3_heldout",
+      "original_query": "List drugs for type 2 diabetes and summarize recent literature on GLP-1 receptor agonist efficacy.",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed",
+          "chembl": "search_by_indication"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text>"
+          },
+          "chembl": {
+            "disease": "type 2 diabetes"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          },
+          "chembl": {
+            "max_results": 20
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "GLP-1 receptor agonist",
+            "efficacy"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 475.3122500842437,
+      "cerebras_usage": {
+        "input_tokens": 1147,
+        "output_tokens": 230,
+        "total_tokens": 1377
+      },
+      "cerebras_call_cost_usd": 0.00147823,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "901b4d8bd",
+          "declared_function_name": "chembl_search_by_indication",
+          "raw_arguments_text": "{\"disease\": \"type 2 diabetes\", \"max_results\": 30}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "disease": "type 2 diabetes",
+            "max_results": 30
+          }
+        },
+        {
+          "provider_tool_call_id": "dca2f0f9d",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"GLP-1 receptor agonist efficacy type 2 diabetes\", \"years_back\": \"3\", \"max_results\": \"15\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "GLP-1 receptor agonist efficacy type 2 diabetes",
+            "max_results": 15,
+            "years_back": 3,
+            "date_from": null,
+            "date_to": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "MS-007-0",
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 0,
+          "latency_ms": 465.94179107341915
+        },
+        {
+          "call_id": "MS-007-1",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 15,
+          "latency_ms": 442.40545807406306
+        }
+      ]
+    },
+    {
+      "case_id": "MS-008",
+      "category": "multi_source",
+      "split": "phase3_heldout",
+      "original_query": "What compounds inhibit BCR-ABL, and what is the mechanism of imatinib resistance according to the literature?",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed",
+          "chembl": "search_by_target"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text>"
+          },
+          "chembl": {
+            "target_name": "BCR-ABL"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          },
+          "chembl": {
+            "max_results": 10
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "imatinib",
+            "resistance",
+            "mechanism"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 397.99412502907217,
+      "cerebras_usage": {
+        "input_tokens": 1149,
+        "output_tokens": 211,
+        "total_tokens": 1360
+      },
+      "cerebras_call_cost_usd": 0.0014519,
+      "message_content": "\n\nI'll research both questions: compounds that inhibit BCR-ABL (via ChEMBL) and the mechanism of imatinib resistance (via PubMed literature).\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "e70557b08",
+          "declared_function_name": "chembl_search_by_target",
+          "raw_arguments_text": "{\"target_name\": \"BCR-ABL\", \"max_results\": 20}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "target_name": "BCR-ABL",
+            "max_results": 20
+          }
+        },
+        {
+          "provider_tool_call_id": "8732218ec",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"imatinib resistance mechanism BCR-ABL mutations\", \"max_results\": \"10\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "imatinib resistance mechanism BCR-ABL mutations",
+            "max_results": 10,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "MS-008-0",
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 20,
+          "latency_ms": 1358.85512502864
+        },
+        {
+          "call_id": "MS-008-1",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 10,
+          "latency_ms": 324.07558301929384
+        }
+      ]
+    },
+    {
+      "case_id": "MS-010",
+      "category": "multi_source",
+      "split": "phase3_heldout",
+      "original_query": "What compounds target PD-1, and what does the literature say about checkpoint inhibitor combination strategies?",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed",
+          "chembl": "search_by_target"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text>"
+          },
+          "chembl": {
+            "target_name": "PD-1"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          },
+          "chembl": {
+            "max_results": 10
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "checkpoint inhibitor",
+            "combination"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 467.1078339451924,
+      "cerebras_usage": {
+        "input_tokens": 1145,
+        "output_tokens": 285,
+        "total_tokens": 1430
+      },
+      "cerebras_call_cost_usd": 0.0015581999999999998,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "5623cfe83",
+          "declared_function_name": "chembl_search_by_target",
+          "raw_arguments_text": "{\"target_name\": \"PD-1\", \"max_results\": 20}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "target_name": "PD-1",
+            "max_results": 20
+          }
+        },
+        {
+          "provider_tool_call_id": "31cb1ccea",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"checkpoint inhibitor combination strategies PD-1 PD-L1 immunotherapy\", \"max_results\": \"10\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "checkpoint inhibitor combination strategies PD-1 PD-L1 immunotherapy",
+            "max_results": 10,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "MS-010-0",
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 20,
+          "latency_ms": 2087.8169999923557
+        },
+        {
+          "call_id": "MS-010-1",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 10,
+          "latency_ms": 690.6034999992698
+        }
+      ]
+    },
+    {
+      "case_id": "MS-011",
+      "category": "multi_source",
+      "split": "phase3_heldout",
+      "original_query": "For pembrolizumab in melanoma: what does the literature show, are there recruiting trials, and what compounds target PD-1?",
+      "gold": {
+        "gold_required_sources": [
+          "pubmed",
+          "clinical_trials",
+          "chembl"
+        ],
+        "gold_permitted_sources": [
+          "pubmed",
+          "clinical_trials",
+          "chembl"
+        ],
+        "gold_operation_per_source": {
+          "pubmed": "search_pubmed",
+          "clinical_trials": "search_trials",
+          "chembl": "search_by_target"
+        },
+        "gold_required_params": {
+          "pubmed": {
+            "query": "<free-text>"
+          },
+          "clinical_trials": {
+            "condition": "melanoma",
+            "intervention": "pembrolizumab",
+            "status": "RECRUITING"
+          },
+          "chembl": {
+            "target_name": "PD-1"
+          }
+        },
+        "gold_optional_params": {
+          "pubmed": {
+            "max_results": null,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          },
+          "clinical_trials": {
+            "phase": null,
+            "max_results": null
+          },
+          "chembl": {
+            "max_results": 10
+          }
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "pembrolizumab",
+            "melanoma"
+          ]
+        },
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 703.25933303684,
+      "cerebras_usage": {
+        "input_tokens": 1155,
+        "output_tokens": 354,
+        "total_tokens": 1509
+      },
+      "cerebras_call_cost_usd": 0.00167091,
+      "message_content": "\n\nI'll research all three aspects in parallel: the literature, recruiting trials, and PD-1 targeting compounds.\n\n",
+      "n_raw_tool_calls": 3,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "717014a63",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"pembrolizumab melanoma\", \"max_results\": \"10\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "pembrolizumab melanoma",
+            "max_results": 10,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        },
+        {
+          "provider_tool_call_id": "5e20942a8",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"melanoma\", \"intervention\": \"pembrolizumab\", \"status\": \"RECRUITING\", \"max_results\": \"10\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "melanoma",
+            "intervention": "pembrolizumab",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 10,
+            "sponsor": null,
+            "country": null
+          }
+        },
+        {
+          "provider_tool_call_id": "eb4f1cecf",
+          "declared_function_name": "chembl_search_by_target",
+          "raw_arguments_text": "{\"target_name\": \"PD-1\", \"max_results\": 10}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "target_name": "PD-1",
+            "max_results": 10
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "MS-011-0",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 10,
+          "latency_ms": 327.5426250183955
+        },
+        {
+          "call_id": "MS-011-1",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 10,
+          "latency_ms": 86.70949994120747
+        },
+        {
+          "call_id": "MS-011-2",
+          "tool_name": "chembl",
+          "operation": "search_by_target",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 20,
+          "latency_ms": 0.10058307088911533
+        }
+      ]
+    },
+    {
+      "case_id": "AM-001",
+      "category": "ambiguous_abstain",
+      "split": "phase3_heldout",
+      "original_query": "What about MS treatment options?",
+      "gold": {
+        "gold_required_sources": [],
+        "gold_permitted_sources": [],
+        "gold_operation_per_source": {},
+        "gold_required_params": {},
+        "gold_optional_params": {},
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": true
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 609.9743749946356,
+      "cerebras_usage": {
+        "input_tokens": 1132,
+        "output_tokens": 377,
+        "total_tokens": 1509
+      },
+      "cerebras_call_cost_usd": 0.00168241,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "0a1245630",
+          "declared_function_name": "chembl_search_by_indication",
+          "raw_arguments_text": "{\"disease\": \"multiple sclerosis\", \"max_results\": 30}",
+          "recognized_tool": true,
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "disease": "multiple sclerosis",
+            "max_results": 30
+          }
+        },
+        {
+          "provider_tool_call_id": "f5438a259",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"multiple sclerosis treatment options disease-modifying therapies review\", \"years_back\": \"3\", \"max_results\": \"10\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "multiple sclerosis treatment options disease-modifying therapies review",
+            "max_results": 10,
+            "years_back": 3,
+            "date_from": null,
+            "date_to": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "AM-001-0",
+          "tool_name": "chembl",
+          "operation": "search_by_indication",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 30,
+          "latency_ms": 472.2907090326771
+        },
+        {
+          "call_id": "AM-001-1",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 10,
+          "latency_ms": 728.745499975048
+        }
+      ]
+    },
+    {
+      "case_id": "AM-002",
+      "category": "ambiguous_abstain",
+      "split": "phase3_heldout",
+      "original_query": "Can you tell me about IT for cancer?",
+      "gold": {
+        "gold_required_sources": [],
+        "gold_permitted_sources": [],
+        "gold_operation_per_source": {},
+        "gold_required_params": {},
+        "gold_optional_params": {},
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": true
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 1638.7277080211788,
+      "cerebras_usage": {
+        "input_tokens": 1135,
+        "output_tokens": 1024,
+        "total_tokens": 2159
+      },
+      "cerebras_call_cost_usd": 0.0026494099999999996,
+      "message_content": null,
+      "n_raw_tool_calls": 0,
+      "parsed_outcomes": [],
+      "execution_records": []
+    },
+    {
+      "case_id": "AM-004",
+      "category": "ambiguous_abstain",
+      "split": "phase3_heldout",
+      "original_query": "Tell me about NAC studies.",
+      "gold": {
+        "gold_required_sources": [],
+        "gold_permitted_sources": [],
+        "gold_operation_per_source": {},
+        "gold_required_params": {},
+        "gold_optional_params": {},
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": true
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 436.59095803741366,
+      "cerebras_usage": {
+        "input_tokens": 1133,
+        "output_tokens": 237,
+        "total_tokens": 1370
+      },
+      "cerebras_call_cost_usd": 0.0014748,
+      "message_content": "\n\nI'll look up NAC (N-acetylcysteine) studies for you. Let me search the literature and clinical trials.\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "f3ee510c4",
+          "declared_function_name": "pubmed_search_pubmed",
+          "raw_arguments_text": "{\"query\": \"N-acetylcysteine NAC clinical trial\", \"max_results\": \"15\"}",
+          "recognized_tool": true,
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "query": "N-acetylcysteine NAC clinical trial",
+            "max_results": 15,
+            "years_back": null,
+            "date_from": null,
+            "date_to": null
+          }
+        },
+        {
+          "provider_tool_call_id": "c80072712",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"intervention\": \"N-acetylcysteine\", \"status\": \"RECRUITING\", \"max_results\": \"15\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": null,
+            "intervention": "N-acetylcysteine",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 15,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "AM-004-0",
+          "tool_name": "pubmed",
+          "operation": "search_pubmed",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 15,
+          "latency_ms": 315.66900003235787
+        },
+        {
+          "call_id": "AM-004-1",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": 15,
+          "latency_ms": 87.63304201420397
+        }
+      ]
+    }
+  ]
+}

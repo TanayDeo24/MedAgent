@@ -286,29 +286,55 @@ class TestChEMBLCaching:
 
 
 class TestChEMBLRateLimiting:
-    """Test rate limiting functionality."""
+    """Test rate limiting functionality.
 
-    @patch('tools.chembl_tool.ChEMBLTool._search_by_indication')
+    NOTE: this used to @patch ChEMBLTool._search_by_indication directly.
+    unittest.mock.patch replaces the entire bound method - including the
+    @rate_limit(...) decorator wrapping it - with a MagicMock, so
+    utils/rate_limiter.py's token bucket was never invoked and the test
+    could not observe rate limiting no matter how the limiter behaved.
+    Fixed the same way as tests/test_pubmed.py::TestPubMedRateLimiting: mock
+    only the HTTP layer (session.get) so the real decorated method - and the
+    real rate limiter - stays in the call path, and inject a fake clock
+    instead of relying on real wall-clock timing. See
+    tests/test_rate_limiter.py for direct, deterministic coverage of the
+    limiter itself.
+    """
+
     def test_rate_limit_applied(
         self,
-        mock_search,
         chembl_tool,
-        mock_drug_indication_response
+        mock_drug_indication_response,
+        monkeypatch
     ):
-        """Test that rate limiting is applied."""
-        import time
-        mock_search.return_value = mock_drug_indication_response
+        """5 rapid real (decorated) calls at CHEMBL_RATE_LIMIT=10/sec against
+        a deliberately small bucket must trigger at least one
+        wait_for_token sleep, deterministically via a fake clock."""
+        import utils.rate_limiter as rl_module
+        from tests.test_rate_limiter import FakeClock
 
-        start_time = time.time()
+        clock = FakeClock()
+        monkeypatch.setattr(rl_module.time, "time", clock.time)
+        monkeypatch.setattr(rl_module.time, "sleep", clock.sleep)
+        # Fresh, deliberately small-capacity bucket so 5 rapid calls must
+        # exhaust it and force a wait, independent of the configured
+        # CHEMBL_RATE_LIMIT / other tests' bucket state.
+        monkeypatch.setitem(rl_module._rate_limiter.buckets, "chembl", rl_module.TokenBucket(rate=2, capacity=2))
 
-        # Make rapid searches
-        for _ in range(5):
-            chembl_tool.search_by_indication("test")
+        mock_resp = Mock()
+        mock_resp.json.return_value = mock_drug_indication_response
+        mock_resp.raise_for_status = Mock()
+        monkeypatch.setattr(chembl_tool.session, "get", lambda *a, **k: mock_resp)
 
-        elapsed = time.time() - start_time
+        # Distinct queries so the tool's response cache (tested separately in
+        # TestChEMBLCaching) doesn't short-circuit calls before they reach
+        # the rate-limited, decorated method.
+        for i in range(5):
+            result = chembl_tool.search_by_indication(f"test {i}")
+            assert result.success is True
 
-        # Should have some delay due to rate limiting
-        assert elapsed >= 0.1
+        assert clock.now > 0
+        assert len(clock.sleep_calls) > 0
 
 
 if __name__ == "__main__":

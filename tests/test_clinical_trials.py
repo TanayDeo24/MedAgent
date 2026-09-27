@@ -241,6 +241,87 @@ class TestClinicalTrialsFiltering:
         assert "PHASE1" in clinical_trials_tool.VALID_PHASES
         assert "PHASE3" in clinical_trials_tool.VALID_PHASES
 
+    @patch('tools.clinical_trials_tool.ClinicalTrialsTool._search_trials_page')
+    def test_phase_filter_uses_area_term_not_filter_phase(
+        self,
+        mock_search,
+        clinical_trials_tool,
+        mock_study_response
+    ):
+        """Regression test: phase filtering must NOT use `filter.phase`.
+
+        ClinicalTrials.gov v2 API has no `filter.phase` query parameter -
+        every call using it returns HTTP 400 "`filter.phase` is unknown
+        parameter". Phase must instead be expressed as an AREA[Phase]<value>
+        term inside `query.term`, matching how condition/intervention/
+        sponsor/country are already combined.
+        """
+        mock_search.return_value = mock_study_response
+
+        result = clinical_trials_tool.search_trials(
+            condition="lung cancer",
+            phase="PHASE3",
+            status="RECRUITING"
+        )
+
+        assert result.success is True
+        assert mock_search.call_count == 1
+
+        called_params = mock_search.call_args[0][0]
+
+        # The broken parameter must never be sent.
+        assert "filter.phase" not in called_params
+
+        # Phase must be embedded as an AREA[Phase] term in query.term,
+        # ANDed together with the other AREA terms exactly like
+        # condition/intervention/sponsor/country are.
+        assert "AREA[Phase]PHASE3" in called_params["query.term"]
+        assert "AREA[ConditionSearch]lung cancer" in called_params["query.term"]
+        assert " AND " in called_params["query.term"]
+
+        # Status filtering is unaffected and still uses filter.overallStatus.
+        assert called_params["filter.overallStatus"] == "RECRUITING"
+
+    @patch('tools.clinical_trials_tool.ClinicalTrialsTool._search_trials_page')
+    def test_phase_only_filter_query_term(
+        self,
+        mock_search,
+        clinical_trials_tool,
+        mock_study_response
+    ):
+        """Phase-only search (no condition/intervention) still uses AREA[Phase]."""
+        mock_search.return_value = mock_study_response
+
+        result = clinical_trials_tool.search_trials(phase="PHASE2", status=None)
+
+        assert result.success is True
+        called_params = mock_search.call_args[0][0]
+
+        assert "filter.phase" not in called_params
+        assert called_params["query.term"] == "AREA[Phase]PHASE2"
+        assert "filter.overallStatus" not in called_params
+
+    @patch('tools.clinical_trials_tool.ClinicalTrialsTool._search_trials_page')
+    def test_invalid_phase_omitted_from_query(
+        self,
+        mock_search,
+        clinical_trials_tool,
+        mock_study_response
+    ):
+        """An invalid phase value is silently omitted, not sent as filter.phase."""
+        mock_search.return_value = mock_study_response
+
+        result = clinical_trials_tool.search_trials(
+            condition="lung cancer",
+            phase="NOT_A_REAL_PHASE"
+        )
+
+        assert result.success is True
+        called_params = mock_search.call_args[0][0]
+
+        assert "filter.phase" not in called_params
+        assert "AREA[Phase]" not in called_params["query.term"]
+
 
 class TestClinicalTrialsErrorHandling:
     """Test error handling."""

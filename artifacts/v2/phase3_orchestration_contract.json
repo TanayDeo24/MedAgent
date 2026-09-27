@@ -1,0 +1,77 @@
+{
+  "contract_version": "1.0.0",
+  "phase": 3,
+  "generated_at": "2026-09-24",
+  "input": {
+    "type": "ResearchQuery",
+    "source": "nlu/schemas.py",
+    "schema_version": "2.1.0",
+    "producing_stage": "Phase 2 frozen NLU (Cerebras qwen-3.8-27b, config v3)",
+    "consumable_fields": [
+      "intent",
+      "entities",
+      "constraints",
+      "requested_evidence_types",
+      "ambiguity",
+      "normalized_query",
+      "original_query"
+    ],
+    "field_usage_notes": {
+      "requested_evidence_types": "Prediction, not a routing decision (see nlu/schemas.py docstring and EVALUATION_CONTRACT.md 1.5). May be used as a deterministic input signal to Phase 3 source selection but is not itself the source-selection output.",
+      "entities.canonical_id": "Only trustworthy when normalization_system is also non-None; an entity with both None is unnormalized.",
+      "original_query": "Available only for free-text search-string construction where structured fields are insufficient; must not be used to re-derive intent/entities/constraints already computed by Phase 2."
+    }
+  },
+  "output": {
+    "types": ["ExecutionPlan", "ToolExecutionResult"],
+    "description": "A schema-validated execution plan (list of typed ToolCall objects) produced before any execution, and a per-call typed ToolExecutionResult list produced after execution, each correlated to its plan entry via call_id."
+  },
+  "non_goals": [
+    "Phase 4 retrieval optimization",
+    "evidence normalization",
+    "citation verification",
+    "answer generation",
+    "claim verification",
+    "final conversational UI",
+    "deployment",
+    "CI/CD",
+    "full agent performance optimization",
+    "architecture added purely for complexity"
+  ],
+  "registered_tools_at_freeze": [
+    {
+      "tool_name": "PUBMED",
+      "client": "tools/pubmed_tool.py::PubMedTool",
+      "operations": ["search_pubmed"]
+    },
+    {
+      "tool_name": "CLINICAL_TRIALS",
+      "client": "tools/clinical_trials_tool.py::ClinicalTrialsTool",
+      "operations": ["search_trials"]
+    },
+    {
+      "tool_name": "CHEMBL",
+      "client": "tools/chembl_tool.py::ChEMBLTool",
+      "operations": ["search_by_target", "search_by_indication", "get_drug_info"]
+    }
+  ],
+  "architectural_boundary": [
+    "ResearchQuery (Phase 2, frozen)",
+    "source selection (Phase 3, deterministic-preferred)",
+    "tool/operation selection (Phase 3)",
+    "typed parameter generation (Phase 3, deterministic where possible)",
+    "schema validation (hard boundary)",
+    "registry lookup (hard boundary, allowlist)",
+    "safe execution (reuses existing tools/*.py HTTP+retry+rate-limit stack)",
+    "normalized ToolExecutionResult",
+    "failure attribution (typed ToolErrorCategory)",
+    "sanitized trace entry"
+  ],
+  "hard_rule": "No LLM-produced arbitrary string may directly choose and invoke a Python function. Every ToolCall passes model validation, then registry lookup, then argument-schema validation, before any HTTP request.",
+  "undecided_at_contract_freeze": [
+    "Whether Cerebras qwen-3.8-27b supports usable provider-native tool calling (Candidate B) - to be verified against current docs, not assumed.",
+    "Whether parameter generation per source is pure deterministic compilation or constrained-LLM assisted for free-text fields - decided by candidate comparison, not this contract."
+  ],
+  "audit_source": "docs/v2/PHASE3_INITIAL_ORCHESTRATION_AUDIT.md",
+  "contract_doc": "docs/v2/PHASE3_ORCHESTRATION_CONTRACT.md"
+}

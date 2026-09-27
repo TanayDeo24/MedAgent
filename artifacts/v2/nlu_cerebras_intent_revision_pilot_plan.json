@@ -1,0 +1,141 @@
+{
+  "purpose": "Predeclared, uncontaminated 8-case fresh pilot for the intent-revised Cerebras gpt-oss-120b candidate. Written and committed to disk BEFORE any new inference call under the frozen revision (nlu_cerebras_intent_revision_frozen.json). All gold labels below are copied verbatim from evaluation/v2/nlu_benchmark_v1.json's dev split; none were altered.",
+  "benchmark_source": "evaluation/v2/nlu_benchmark_v1.json 'dev' split (45 examples) ONLY. The 105-example 'test' split (consumed once, pre-closure) and any Phase-10 held-out data are NOT touched.",
+  "case_selection_rationale": "Covers the same 8 semantic-surface categories as the prior pilot (nlu_cerebras_gptoss_pilot_plan.json) but with 8 DIFFERENT query_ids, 8 different query texts, and 8 different template_group instances (verified programmatically - see overlap_verification below). At least one A_literature_evidence example is included (nlu_v1_0002). Two non-A cases were deliberately chosen because their surface form contains literature/evidence-flavored language alongside a more specific structural requirement - exactly the shape that could plausibly be misclassified as generic A: nlu_v1_0091 (E_multi_hop_research, ends '...and what published efficacy evidence exists?') and nlu_v1_0140 (I_ambiguous, 'What's new in cancer research?' - a bare-topic research question). Neither of these two, nor any other case, reuses the wording, entities, or template_group of the two questions that failed in the prior pilot (nlu_v1_0100, nlu_v1_0136).",
+  "known_limitation": "As in the prior pilot, no example in the 45-item dev split is a true 'ambiguous ABBREVIATION' case (an acronym with 2+ biomedical meanings). The closest available I_ambiguous dev example not already used in the prior pilot, nlu_v1_0140 ('What's new in cancer research?' - a bare, unscoped research question with no target/disease/population), is substituted for that slot; disclosed here rather than silently reinterpreted.",
+  "pilot_cases": [
+    {
+      "category": "simple entity question",
+      "query_id": "nlu_v1_0002",
+      "query_text": "What does published research say about KRAS inhibition in melanoma?",
+      "gold_intent": ["A_literature_evidence"],
+      "gold_entities": [
+        {"surface": "KRAS", "type": "target", "canonical_id": "HGNC:6407"},
+        {"surface": "melanoma", "type": "disease", "canonical_id": "MeSH:D008545"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["pubmed"],
+      "template_group": "tmplA::KRAS::melanoma"
+    },
+    {
+      "category": "constraint-heavy trial question",
+      "query_id": "nlu_v1_0111",
+      "query_text": "Find active, not recruiting Phase 3 trials in elderly patients with Alzheimer's disease using HER2 inhibitors",
+      "gold_intent": ["G_constraint_heavy"],
+      "gold_entities": [
+        {"surface": "HER2", "type": "target", "canonical_id": "HGNC:3430"},
+        {"surface": "Alzheimer's disease", "type": "disease", "canonical_id": "MeSH:D000544"}
+      ],
+      "gold_constraints": [
+        {"field": "trial_phases", "value": "PHASE3"},
+        {"field": "trial_statuses", "value": "ACTIVE_NOT_RECRUITING"},
+        {"field": "population", "value": "elderly patients"}
+      ],
+      "gold_required_sources": ["clinicaltrials"],
+      "template_group": "tmplG::HER2::Alzheimer's disease::3::active, not recruiting::elderly patients"
+    },
+    {
+      "category": "multi-entity question (also: A-confusable, literature-flavored trailing clause)",
+      "query_id": "nlu_v1_0091",
+      "query_text": "Which compounds targeting EGFR have entered trials for non-small cell lung cancer, and what published efficacy evidence exists?",
+      "gold_intent": ["E_multi_hop_research"],
+      "gold_entities": [
+        {"surface": "EGFR", "type": "target", "canonical_id": "HGNC:3236"},
+        {"surface": "non-small cell lung cancer", "type": "disease", "canonical_id": "MeSH:D002289"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["chembl", "clinicaltrials", "pubmed"],
+      "template_group": "tmplE::EGFR::non-small cell lung cancer"
+    },
+    {
+      "category": "cross-source question",
+      "query_id": "nlu_v1_0055",
+      "query_text": "Which drugs have both ChEMBL bioactivity data and clinical trial records for melanoma?",
+      "gold_intent": ["D_cross_source_synthesis"],
+      "gold_entities": [
+        {"surface": "melanoma", "type": "disease", "canonical_id": "MeSH:D008545"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["chembl", "clinicaltrials"],
+      "template_group": "tmplD2::melanoma"
+    },
+    {
+      "category": "ambiguous-abbreviation (substituted - see known_limitation; also: A-confusable, bare research-topic mention)",
+      "query_id": "nlu_v1_0140",
+      "query_text": "What's new in cancer research?",
+      "gold_intent": ["I_ambiguous"],
+      "gold_entities": [],
+      "gold_constraints": [],
+      "gold_required_sources": [],
+      "gold_ambiguity_is_ambiguous": true,
+      "template_group": "tmplI::2bef4a96",
+      "note": "Benchmark lists required_sources=['pubmed'] as the template's nominal downstream source, but intent_class is I_ambiguous and adjudication_notes confirms this is a genuinely underspecified query (no target/disease/population) - scored on intent==I_ambiguous and ambiguity.is_ambiguous==true, consistent with how nlu_v1_0136 was scored in the prior pilot."
+    },
+    {
+      "category": "gene/protein/target semantic-role ambiguity",
+      "query_id": "nlu_v1_0084",
+      "query_text": "By what biochemical pathway does adagrasib inhibit mTOR signaling?",
+      "gold_intent": ["F_mechanism"],
+      "gold_entities": [
+        {"surface": "adagrasib", "type": "compound", "canonical_id": "ChEMBL:CHEMBL4594350"},
+        {"surface": "mTOR", "type": "target", "canonical_id": "HGNC:3942"}
+      ],
+      "gold_constraints": [],
+      "gold_required_sources": ["pubmed", "chembl"],
+      "template_group": "tmplF3::adagrasib::mTOR",
+      "note": "mTOR is a canonical gene/protein/target ambiguity case for this benchmark's semantic_roles field, same role BTK played in the prior pilot's case 0071; gold benchmark itself has no gold semantic_roles annotation (documented pre-existing limitation), so this case is scored on entity_type/normalization correctness plus qualitative semantic_roles behavior, not a semantic_roles P/R/F1 number."
+    },
+    {
+      "category": "class B example",
+      "query_id": "nlu_v1_0018",
+      "query_text": "What Phase 3 trials are evaluating sotorasib in type 2 diabetes?",
+      "gold_intent": ["B_clinical_trial_landscape"],
+      "gold_entities": [
+        {"surface": "sotorasib", "type": "compound", "canonical_id": "ChEMBL:CHEMBL4535757"},
+        {"surface": "type 2 diabetes", "type": "disease", "canonical_id": "MeSH:D003924"}
+      ],
+      "gold_constraints": [{"field": "trial_phases", "value": "PHASE3"}],
+      "gold_required_sources": ["clinicaltrials"],
+      "template_group": "tmplB::sotorasib::type 2 diabetes::3"
+    },
+    {
+      "category": "class G example",
+      "query_id": "nlu_v1_0112",
+      "query_text": "Find recruiting Phase 1 trials in adults with multiple myeloma using JAK2 inhibitors",
+      "gold_intent": ["G_constraint_heavy"],
+      "gold_entities": [
+        {"surface": "JAK2", "type": "target", "canonical_id": "HGNC:6192"},
+        {"surface": "multiple myeloma", "type": "disease", "canonical_id": "MeSH:D009101"}
+      ],
+      "gold_constraints": [
+        {"field": "trial_phases", "value": "PHASE1"},
+        {"field": "trial_statuses", "value": "RECRUITING"},
+        {"field": "population", "value": "adults"}
+      ],
+      "gold_required_sources": ["clinicaltrials"],
+      "template_group": "tmplG::JAK2::multiple myeloma::1::recruiting::adults"
+    }
+  ],
+  "overlap_verification": {
+    "method": "Programmatic check (venv/bin/python, ad hoc script, not persisted as project code - one-off verification) comparing query_id, exact query_text, and template_group of all 8 new cases against the prior pilot's 8 cases and the full 105-example consumed test split.",
+    "query_id_overlap_with_prior_pilot": 0,
+    "query_id_overlap_with_consumed_test_split": 0,
+    "exact_text_overlap_with_prior_pilot": 0,
+    "template_group_overlap_with_prior_pilot": 0,
+    "phase_10_touched": false,
+    "result": "PASS - zero overlap on every dimension checked. Some cases share a template FAMILY prefix with the prior pilot (e.g. tmplG appears in both, tmplE/tmplE2, tmplD/tmplD2, tmplA/tmplA2, tmplF/tmplF3) with different substituted parameters (different target/disease/compound/constraint values) - this is expected (the dev split only has a finite number of template families) and does not constitute example reuse; template_group (the full parameter-instantiated string) is disjoint in all 8 cases."
+  },
+  "request_settings_predeclared": {
+    "model": "gpt-oss-120b",
+    "reasoning_effort": "low",
+    "temperature": 0,
+    "response_format": "strict json_schema (CEREBRAS_RESEARCH_QUERY_JSON_SCHEMA, nlu/extractor.py - unchanged from prior pilot)",
+    "max_completion_tokens": 4096,
+    "streaming": false,
+    "prompt": "nlu/extractor.py::CEREBRAS_INTENT_CLARIFIED_PROMPT (the ONE frozen revision - see nlu_cerebras_intent_revision_frozen.json). Identical to the prior pilot's STRUCTURED_EXTRACTION_PROMPT plus exactly one added RULES bullet.",
+    "retry_policy": "1 initial attempt + 1 identical retry on empty/unparseable/malformed response only, matching every other candidate's empty_response_handling contract",
+    "rate_limiting": "sequential calls only, throttled via utils.rate_limiter (5 RPM Free Trial cap), no parallel/burst requests"
+  },
+  "hard_rejection_gate_reminder": "Reject immediately (no full dev run) on any SYSTEMIC defect: generic-intent collapse, repeated B/G confusion, catastrophic entity loss, repeated entity mistyping, fabricated canonical IDs, major constraint loss, broad false ambiguity, semantic_roles regression, semantically-empty-but-valid outputs, normalization corruption, repeated unsupported field invention. Target for intent: 8/8 correct. One isolated minor error does not automatically disqualify (classify per Step 14-15's (A)/(B)/(C) test); a clear systemic pattern does. There is no second revision regardless of outcome.",
+  "latency_gate_reminder": "Control: P50 19150ms / P95 66983ms (artifacts/v2/nlu_frozen_config.json). True (throttle-excluded) latency must show >=60% P50 AND >=60% P95 reduction; ideally P50<=5s/P95<=15s. Throttle/self-rate-limit wait must be measured and reported SEPARATELY from true model/API latency (methodology fix from the prior round)."
+}

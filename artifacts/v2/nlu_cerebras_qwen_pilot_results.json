@@ -1,0 +1,561 @@
+{
+  "summary": {
+    "n": 8,
+    "schema_valid_count": 8,
+    "retries": 0,
+    "fabricated_id_count": 0,
+    "intent_correct": 8,
+    "intent_total": 8,
+    "false_A_count": 0,
+    "generic_A_collapse": false,
+    "bg_confusion": false,
+    "latency_true_ms": {
+      "p50": 481.72760009765625,
+      "max": 918.9467430114746,
+      "mean": 582.1458399295807,
+      "n": 8
+    },
+    "latency_throttle_note": "true_latency_ms excludes 5-RPM self-throttle wait (throttle_wait_ms reported per-case separately in cases[]); provider_timings carries Cerebras time_info.",
+    "gate_decision": "PASS - proceed to full dev (Step 22)"
+  },
+  "cases": [
+    {
+      "query_id": "nlu_v1_0007",
+      "slot": "simple_entity_extraction / true_A_literature_evidence_case",
+      "query_text": "What does published research say about JAK2 inhibition in multiple myeloma?",
+      "gold_intent": [
+        "A_literature_evidence"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 403.28192710876465,
+      "throttle_wait_ms": 0.010013580322265625,
+      "true_latency_ms": 403.2719135284424,
+      "extractor_latency_ms_raw": 403.2456874847412,
+      "provider_timings": [
+        {
+          "created": 1790292042.8783572,
+          "queue_time": 0.003349116,
+          "prompt_time": 0.095709705,
+          "completion_time": 0.097720458,
+          "total_time": 0.19887137413024902
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2081,
+        "output_tokens": 260,
+        "total_tokens": 2341,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "A_literature_evidence"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "JAK2",
+          "entity_type": "target",
+          "canonical_id": "HGNC:6192",
+          "canonical_name": "JAK2",
+          "semantic_roles": [
+            "gene",
+            "protein"
+          ]
+        },
+        {
+          "surface_form": "multiple myeloma",
+          "entity_type": "disease",
+          "canonical_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma",
+          "semantic_roles": []
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [],
+        "trial_statuses": [],
+        "population": [],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0107",
+      "slot": "constraint_heavy_trial_question",
+      "query_text": "Find completed Phase 2 trials in pediatric patients with melanoma using KRAS inhibitors",
+      "gold_intent": [
+        "G_constraint_heavy"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 12168.37191581726,
+      "throttle_wait_ms": 11691.07985496521,
+      "true_latency_ms": 477.2920608520508,
+      "extractor_latency_ms_raw": 12168.336868286133,
+      "provider_timings": [
+        {
+          "created": 1790292055.0036511,
+          "queue_time": 0.003467267,
+          "prompt_time": 0.072422596,
+          "completion_time": 0.101635321,
+          "total_time": 0.179473876953125
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2081,
+        "output_tokens": 285,
+        "total_tokens": 2366,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "G_constraint_heavy"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "melanoma",
+          "entity_type": "disease",
+          "canonical_id": "MeSH:D008545",
+          "canonical_name": "Melanoma",
+          "semantic_roles": []
+        },
+        {
+          "surface_form": "KRAS",
+          "entity_type": "target",
+          "canonical_id": "HGNC:6407",
+          "canonical_name": "KRAS",
+          "semantic_roles": [
+            "gene",
+            "protein"
+          ]
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [
+          "PHASE2"
+        ],
+        "trial_statuses": [
+          "COMPLETED"
+        ],
+        "population": [
+          "pediatric patients"
+        ],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "slot": "multi_entity_question / multi_hop_specific_research_operation / non_A_susceptible_1",
+      "query_text": "Starting from compounds that inhibit EGFR, which ones progressed to trials in non-small cell lung cancer and what do published studies report on their outcomes?",
+      "gold_intent": [
+        "E_multi_hop_research"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 12051.074266433716,
+      "throttle_wait_ms": 11564.911127090454,
+      "true_latency_ms": 486.1631393432617,
+      "extractor_latency_ms_raw": 12051.023244857788,
+      "provider_timings": [
+        {
+          "created": 1790292067.0305157,
+          "queue_time": 0.031152651,
+          "prompt_time": 0.122546225,
+          "completion_time": 0.112020274,
+          "total_time": 0.26757001876831055
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2094,
+        "output_tokens": 283,
+        "total_tokens": 2377,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "E_multi_hop_research"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "EGFR",
+          "entity_type": "target",
+          "canonical_id": "HGNC:3236",
+          "canonical_name": "EGFR",
+          "semantic_roles": [
+            "gene",
+            "protein"
+          ]
+        },
+        {
+          "surface_form": "non-small cell lung cancer",
+          "entity_type": "disease",
+          "canonical_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung",
+          "semantic_roles": []
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [],
+        "trial_statuses": [],
+        "population": [],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "slot": "cross_source_question / non_A_susceptible_2",
+      "query_text": "Is metformin supported by both peer-reviewed literature and an active clinical trial for multiple myeloma?",
+      "gold_intent": [
+        "D_cross_source_synthesis"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 12011.117935180664,
+      "throttle_wait_ms": 11543.362140655518,
+      "true_latency_ms": 467.7557945251465,
+      "extractor_latency_ms_raw": 12011.07406616211,
+      "provider_timings": [
+        {
+          "created": 1790292079.0660923,
+          "queue_time": 0.003474038,
+          "prompt_time": 0.126918411,
+          "completion_time": 0.087580083,
+          "total_time": 0.2198178768157959
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2086,
+        "output_tokens": 241,
+        "total_tokens": 2327,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "D_cross_source_synthesis"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "metformin",
+          "entity_type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN",
+          "semantic_roles": []
+        },
+        {
+          "surface_form": "multiple myeloma",
+          "entity_type": "disease",
+          "canonical_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma",
+          "semantic_roles": []
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [],
+        "trial_statuses": [],
+        "population": [],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0139",
+      "slot": "ambiguous_case (abbreviation-proxy, see known_limitation)",
+      "query_text": "Is this drug safe?",
+      "gold_intent": [
+        "I_ambiguous"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 12403.388977050781,
+      "throttle_wait_ms": 11626.670837402344,
+      "true_latency_ms": 776.7181396484375,
+      "extractor_latency_ms_raw": 12403.350830078125,
+      "provider_timings": [
+        {
+          "created": 1790292091.1637201,
+          "queue_time": 0.272032599,
+          "prompt_time": 0.17673847799999998,
+          "completion_time": 0.119512255,
+          "total_time": 0.5706577301025391
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2070,
+        "output_tokens": 234,
+        "total_tokens": 2304,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "I_ambiguous"
+      ],
+      "predicted_entities": [],
+      "predicted_constraints": {
+        "trial_phases": [],
+        "trial_statuses": [],
+        "population": [],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": true,
+        "ambiguity_reason": "The query uses the demonstrative pronoun 'this drug' without providing a specific antecedent or name, making it impossible to identify the compound in question.",
+        "candidate_interpretations": [
+          "Safety profile of a specific drug mentioned in a previous conversation turn",
+          "General safety guidelines for a class of drugs (though 'this' implies a specific instance)"
+        ]
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "slot": "gene_protein_target_semantic_role_ambiguity / multiple_possible_entity_roles",
+      "query_text": "Which compounds target HER2 and what activity is reported?",
+      "gold_intent": [
+        "C_compound_target"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 11956.989049911499,
+      "throttle_wait_ms": 11274.031162261963,
+      "true_latency_ms": 682.9578876495361,
+      "extractor_latency_ms_raw": 11956.955909729004,
+      "provider_timings": [
+        {
+          "created": 1790292103.1964269,
+          "queue_time": 0.003461659,
+          "prompt_time": 0.149557883,
+          "completion_time": 0.27157607,
+          "total_time": 0.4263331890106201
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2076,
+        "output_tokens": 222,
+        "total_tokens": 2298,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "C_compound_target"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "HER2",
+          "entity_type": "target",
+          "canonical_id": "HGNC:3430",
+          "canonical_name": "ERBB2",
+          "semantic_roles": [
+            "gene",
+            "protein"
+          ]
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [],
+        "trial_statuses": [],
+        "population": [],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0016",
+      "slot": "class_B",
+      "query_text": "What Phase 1 trials are evaluating erlotinib in non-small cell lung cancer?",
+      "gold_intent": [
+        "B_clinical_trial_landscape"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 11786.329984664917,
+      "throttle_wait_ms": 11342.268943786621,
+      "true_latency_ms": 444.0610408782959,
+      "extractor_latency_ms_raw": 11786.298036575317,
+      "provider_timings": [
+        {
+          "created": 1790292115.2316756,
+          "queue_time": 0.004029101,
+          "prompt_time": 0.062523853,
+          "completion_time": 0.070923101,
+          "total_time": 0.13934636116027832
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2083,
+        "output_tokens": 243,
+        "total_tokens": 2326,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "B_clinical_trial_landscape"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "erlotinib",
+          "entity_type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB",
+          "semantic_roles": []
+        },
+        {
+          "surface_form": "non-small cell lung cancer",
+          "entity_type": "disease",
+          "canonical_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung",
+          "semantic_roles": []
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [
+          "PHASE1"
+        ],
+        "trial_statuses": [],
+        "population": [],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "slot": "class_G (second, distinct instance from slot 2, per prior rounds' 2-independent-G-checks convention)",
+      "query_text": "Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors",
+      "gold_intent": [
+        "G_constraint_heavy"
+      ],
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "wall_total_ms": 12490.859031677246,
+      "throttle_wait_ms": 11571.912288665771,
+      "true_latency_ms": 918.9467430114746,
+      "extractor_latency_ms_raw": 12490.822792053223,
+      "provider_timings": [
+        {
+          "created": 1790292127.2387393,
+          "queue_time": 0.132694135,
+          "prompt_time": 0.088689135,
+          "completion_time": 0.519015592,
+          "total_time": 0.7421712875366211
+        }
+      ],
+      "token_usage": {
+        "input_tokens": 2081,
+        "output_tokens": 287,
+        "total_tokens": 2368,
+        "reasoning_tokens": 0
+      },
+      "predicted_intent": [
+        "G_constraint_heavy"
+      ],
+      "predicted_entities": [
+        {
+          "surface_form": "breast cancer",
+          "entity_type": "disease",
+          "canonical_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms",
+          "semantic_roles": []
+        },
+        {
+          "surface_form": "PD-1",
+          "entity_type": "target",
+          "canonical_id": "HGNC:8760",
+          "canonical_name": "PDCD1",
+          "semantic_roles": [
+            "gene",
+            "protein"
+          ]
+        }
+      ],
+      "predicted_constraints": {
+        "trial_phases": [
+          "PHASE1"
+        ],
+        "trial_statuses": [
+          "RECRUITING"
+        ],
+        "population": [
+          "adults"
+        ],
+        "age": [],
+        "geography": [],
+        "temporal": [],
+        "study_type": [],
+        "outcomes": []
+      },
+      "predicted_ambiguity": {
+        "is_ambiguous": false,
+        "ambiguity_reason": null,
+        "candidate_interpretations": []
+      },
+      "intent_confidence": 0.95,
+      "extraction_confidence": 0.95
+    }
+  ]
+}

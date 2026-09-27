@@ -1,0 +1,4886 @@
+{
+  "architecture": "candidate_b_structured",
+  "split": "dev",
+  "benchmark_version": "1.1.0",
+  "benchmark_name": "nlu_benchmark",
+  "n_examples": 45,
+  "schema_parse_success_rate": 1.0,
+  "schema_parse_failures": [],
+  "entity_prf": {
+    "n": 45,
+    "micro": {
+      "precision": 0.7972972972972973,
+      "recall": 0.855072463768116,
+      "f1": 0.8251748251748252
+    },
+    "macro": {
+      "precision": 0.7666666666666667,
+      "recall": 0.8555555555555555,
+      "f1": 0.7740740740740741
+    }
+  },
+  "entity_prf_by_type": {
+    "by_type": {
+      "disease": {
+        "tp": 26,
+        "fp": 5,
+        "fn": 0,
+        "precision": 0.8387096774193549,
+        "recall": 1.0,
+        "f1": 0.9122807017543859,
+        "support": 26
+      },
+      "target": {
+        "tp": 14,
+        "fp": 1,
+        "fn": 10,
+        "precision": 0.9333333333333333,
+        "recall": 0.5833333333333334,
+        "f1": 0.7179487179487181,
+        "support": 24
+      },
+      "compound": {
+        "tp": 19,
+        "fp": 5,
+        "fn": 0,
+        "precision": 0.7916666666666666,
+        "recall": 1.0,
+        "f1": 0.8837209302325582,
+        "support": 19
+      },
+      "intervention": {
+        "tp": 0,
+        "fp": 4,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "type_confusions": {}
+  },
+  "normalization": {
+    "n_normalizable_gold": 69,
+    "correct": 59,
+    "accuracy_at_1": 0.855072463768116,
+    "fabricated_id_count": 0
+  },
+  "intent": {
+    "n": 45,
+    "accuracy": 0.8666666666666667,
+    "macro_f1": 0.8475310637075343,
+    "per_class": {
+      "A_literature_evidence": {
+        "precision": 0.625,
+        "recall": 1.0,
+        "f1": 0.7692307692307693,
+        "support": 5
+      },
+      "B_clinical_trial_landscape": {
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.8571428571428571,
+        "support": 8
+      },
+      "C_compound_target": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8,
+        "support": 3
+      },
+      "D_cross_source_synthesis": {
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.8571428571428571,
+        "support": 6
+      },
+      "E_multi_hop_research": {
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666,
+        "support": 4
+      },
+      "F_mechanism": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 6
+      },
+      "G_constraint_heavy": {
+        "precision": 0.8888888888888888,
+        "recall": 1.0,
+        "f1": 0.9411764705882353,
+        "support": 8
+      },
+      "I_ambiguous": {
+        "precision": 1.0,
+        "recall": 0.8,
+        "f1": 0.888888888888889,
+        "support": 5
+      }
+    }
+  },
+  "intent_confusion_matrix": {
+    "G_constraint_heavy": {
+      "G_constraint_heavy": 8
+    },
+    "B_clinical_trial_landscape": {
+      "A_literature_evidence": 1,
+      "B_clinical_trial_landscape": 6,
+      "G_constraint_heavy": 1
+    },
+    "C_compound_target": {
+      "A_literature_evidence": 1,
+      "C_compound_target": 2
+    },
+    "D_cross_source_synthesis": {
+      "D_cross_source_synthesis": 6
+    },
+    "A_literature_evidence": {
+      "A_literature_evidence": 5
+    },
+    "F_mechanism": {
+      "F_mechanism": 6
+    },
+    "I_ambiguous": {
+      "A_literature_evidence": 1,
+      "I_ambiguous": 4
+    },
+    "E_multi_hop_research": {
+      "E_multi_hop_research": 2,
+      "D_cross_source_synthesis": 2
+    }
+  },
+  "constraint_prf": {
+    "n": 45,
+    "micro": {
+      "precision": 0.7428571428571429,
+      "recall": 0.8387096774193549,
+      "f1": 0.787878787878788
+    },
+    "macro": {
+      "precision": 0.8925925925925925,
+      "recall": 0.9444444444444444,
+      "f1": 0.9031746031746033
+    }
+  },
+  "constraint_prf_by_field": {
+    "by_field": {
+      "trial_phases": {
+        "tp": 12,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 12
+      },
+      "trial_statuses": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.9090909090909091,
+        "f1": 0.9523809523809523,
+        "support": 11
+      },
+      "population": {
+        "tp": 4,
+        "fp": 4,
+        "fn": 4,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5,
+        "support": 8
+      },
+      "age": {
+        "tp": 0,
+        "fp": 4,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "geography": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "formatting_mismatches": 0,
+    "semantic_misses": 5
+  },
+  "source_set_prf": {
+    "n": 45,
+    "micro": {
+      "precision": 0.9259259259259259,
+      "recall": 0.78125,
+      "f1": 0.847457627118644
+    },
+    "macro": {
+      "precision": 0.8888888888888888,
+      "recall": 0.837037037037037,
+      "f1": 0.8118518518518518
+    }
+  },
+  "latency_ms": {
+    "p50": 16578.477144241333,
+    "p95": 50605.982065200806,
+    "mean": 21240.644348992242,
+    "n": 45
+  },
+  "llm_calls_per_question": 1.0666666666666667,
+  "token_accounting": {
+    "n_with_usage_metadata": 45,
+    "n_examples": 45,
+    "coverage": 1.0,
+    "input_tokens": {
+      "mean": 1234.9333333333334,
+      "median": 1234,
+      "p95": 1243,
+      "total": 55572,
+      "n": 45
+    },
+    "output_tokens": {
+      "mean": 1329.6,
+      "median": 1343,
+      "p95": 1886,
+      "total": 59832,
+      "n": 45
+    },
+    "total_tokens": {
+      "mean": 2564.5333333333333,
+      "median": 2575,
+      "p95": 3117,
+      "total": 115404,
+      "n": 45
+    }
+  },
+  "per_example_results": [
+    {
+      "query_id": "nlu_v1_0107",
+      "schema_valid": true,
+      "latency_ms": 115687.08920478821,
+      "token_usage": {
+        "input_tokens": 1236,
+        "output_tokens": 1571,
+        "total_tokens": 2807
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "compound": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "canonical_id": "MeSH:D008545"
+        },
+        {
+          "text": "KRAS inhibitors",
+          "type": "compound",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0123",
+      "schema_valid": true,
+      "latency_ms": 17766.738891601562,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 1632,
+        "total_tokens": 2869
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "progeria",
+          "type": "disease",
+          "canonical_id": null
+        },
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0018",
+      "schema_valid": true,
+      "latency_ms": 44891.1669254303,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 1423,
+        "total_tokens": 2660
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "canonical_id": "MeSH:D003924"
+        },
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL4535757"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        },
+        {
+          "field": "population",
+          "value": "type 2 diabetes"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0111",
+      "schema_valid": true,
+      "latency_ms": 23192.25287437439,
+      "token_usage": {
+        "input_tokens": 1241,
+        "output_tokens": 1787,
+        "total_tokens": 3028
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "intervention": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        },
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "normalized_id": "MeSH:D000544",
+          "canonical_name": "Alzheimer Disease"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "Alzheimer's disease",
+          "type": "disease",
+          "canonical_id": "MeSH:D000544"
+        },
+        {
+          "text": "HER2 inhibitors",
+          "type": "intervention",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 2,
+        "fp": 2,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.6666666666666666,
+        "f1": 0.5714285714285715
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "age": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 1
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients with Alzheimer's disease"
+        },
+        {
+          "field": "age",
+          "value": "elderly"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0130",
+      "schema_valid": true,
+      "latency_ms": 16554.84700202942,
+      "token_usage": {
+        "input_tokens": 1235,
+        "output_tokens": 1498,
+        "total_tokens": 2733
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "tooth decay",
+          "type": "disease",
+          "canonical_id": null
+        },
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1229517"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "geography": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [
+        {
+          "field": "geography",
+          "value": "anywhere in the world"
+        }
+      ],
+      "source_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0048",
+      "schema_valid": true,
+      "latency_ms": 17738.71612548828,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 1443,
+        "total_tokens": 2680
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "compound": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "BTK inhibitors",
+          "type": "compound",
+          "canonical_id": null
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "canonical_id": "MeSH:D003924"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_statuses": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 1
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        }
+      ],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0119",
+      "schema_valid": true,
+      "latency_ms": 28938.671112060547,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 1976,
+        "total_tokens": 3210
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3137343",
+          "canonical_name": "PEMBROLIZUMAB"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "pembrolizumab",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL3137343"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "age": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 1
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "elderly patients"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "ACTIVE_NOT_RECRUITING"
+        },
+        {
+          "field": "age",
+          "value": "elderly"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0013",
+      "schema_valid": true,
+      "latency_ms": 8363.536834716797,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 1050,
+        "total_tokens": 2284
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "canonical_id": "HGNC:8760"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D001943"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0084",
+      "schema_valid": true,
+      "latency_ms": 14435.723066329956,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 1135,
+        "total_tokens": 2369
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4594350",
+          "canonical_name": "ADAGRASIB"
+        },
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "adagrasib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL4594350"
+        },
+        {
+          "text": "mTOR",
+          "type": "target",
+          "canonical_id": "HGNC:3942"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0080",
+      "schema_valid": true,
+      "latency_ms": 7372.596025466919,
+      "token_usage": {
+        "input_tokens": 1232,
+        "output_tokens": 722,
+        "total_tokens": 1954
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1229517"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0055",
+      "schema_valid": true,
+      "latency_ms": 8999.834060668945,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 910,
+        "total_tokens": 2147
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "canonical_id": "MeSH:D008545"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0140",
+      "schema_valid": true,
+      "latency_ms": 5030.823230743408,
+      "token_usage": {
+        "input_tokens": 1227,
+        "output_tokens": 621,
+        "total_tokens": 1848
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [],
+      "pred_entities": [
+        {
+          "text": "cancer",
+          "type": "disease",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0083",
+      "schema_valid": true,
+      "latency_ms": 6787.856101989746,
+      "token_usage": {
+        "input_tokens": 1229,
+        "output_tokens": 639,
+        "total_tokens": 1868
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0112",
+      "schema_valid": true,
+      "latency_ms": 17250.618934631348,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 1456,
+        "total_tokens": 2693
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "compound": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101"
+        },
+        {
+          "text": "JAK2 inhibitors",
+          "type": "compound",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0110",
+      "schema_valid": true,
+      "latency_ms": 22382.744073867798,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 2043,
+        "total_tokens": 3280
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "compound": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "canonical_id": "MeSH:D001172"
+        },
+        {
+          "text": "BRAF inhibitors",
+          "type": "compound",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 2,
+        "fp": 2,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.6666666666666666,
+        "f1": 0.5714285714285715
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "age": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 1
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "rheumatoid arthritis"
+        },
+        {
+          "field": "age",
+          "value": "pediatric"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "schema_valid": true,
+      "latency_ms": 16578.477144241333,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 1641,
+        "total_tokens": 2878
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "intervention": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "PD-1",
+          "type": "target",
+          "normalized_id": "HGNC:8760",
+          "canonical_name": "PDCD1"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D001943"
+        },
+        {
+          "text": "PD-1 inhibitors",
+          "type": "intervention",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 2,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.6666666666666666,
+        "recall": 0.6666666666666666,
+        "f1": 0.6666666666666666
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "age": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 1
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "age",
+          "value": "adults"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0149",
+      "schema_valid": true,
+      "latency_ms": 41217.63300895691,
+      "token_usage": {
+        "input_tokens": 1229,
+        "output_tokens": 1343,
+        "total_tokens": 2572
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [],
+      "pred_entities": [
+        {
+          "text": "the disease",
+          "type": "disease",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0071",
+      "schema_valid": true,
+      "latency_ms": 14582.552909851074,
+      "token_usage": {
+        "input_tokens": 1235,
+        "output_tokens": 1318,
+        "total_tokens": 2553
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL4535757"
+        },
+        {
+          "text": "BTK",
+          "type": "target",
+          "canonical_id": "HGNC:1133"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0100",
+      "schema_valid": true,
+      "latency_ms": 30423.453092575073,
+      "token_usage": {
+        "input_tokens": 1245,
+        "output_tokens": 1618,
+        "total_tokens": 2863
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "canonical_id": "HGNC:6407"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "canonical_id": "MeSH:D008545"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8
+      }
+    },
+    {
+      "query_id": "nlu_v1_0002",
+      "schema_valid": true,
+      "latency_ms": 6362.104177474976,
+      "token_usage": {
+        "input_tokens": 1232,
+        "output_tokens": 778,
+        "total_tokens": 2010
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "canonical_id": "HGNC:6407"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "canonical_id": "MeSH:D008545"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "schema_valid": true,
+      "latency_ms": 15421.621084213257,
+      "token_usage": {
+        "input_tokens": 1239,
+        "output_tokens": 1525,
+        "total_tokens": 2764
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "schema_valid": true,
+      "latency_ms": 32704.17022705078,
+      "token_usage": {
+        "input_tokens": 1231,
+        "output_tokens": 1357,
+        "total_tokens": 2588
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "normalized_id": "HGNC:3430",
+          "canonical_name": "ERBB2"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "HER2",
+          "type": "target",
+          "canonical_id": "HGNC:3430"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0106",
+      "schema_valid": true,
+      "latency_ms": 22040.300846099854,
+      "token_usage": {
+        "input_tokens": 1238,
+        "output_tokens": 1490,
+        "total_tokens": 2728
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "f1": 0.5
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "intervention": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D002289"
+        },
+        {
+          "text": "EGFR inhibitors",
+          "type": "intervention",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 1,
+        "accuracy_at_1": 0.5,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        },
+        {
+          "field": "population",
+          "value": "adults"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0017",
+      "schema_valid": true,
+      "latency_ms": 17734.594106674194,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 1558,
+        "total_tokens": 2792
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "normalized_id": "MeSH:D008545",
+          "canonical_name": "Melanoma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL3353410"
+        },
+        {
+          "text": "melanoma",
+          "type": "disease",
+          "canonical_id": "MeSH:D008545"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE2"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0085",
+      "schema_valid": true,
+      "latency_ms": 51591.88628196716,
+      "token_usage": {
+        "input_tokens": 1231,
+        "output_tokens": 1886,
+        "total_tokens": 3117
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431"
+        },
+        {
+          "text": "JAK2",
+          "type": "target",
+          "canonical_id": "HGNC:6192"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0091",
+      "schema_valid": true,
+      "latency_ms": 40071.71106338501,
+      "token_usage": {
+        "input_tokens": 1241,
+        "output_tokens": 1544,
+        "total_tokens": 2785
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D002289"
+        },
+        {
+          "text": "EGFR",
+          "type": "target",
+          "canonical_id": "HGNC:3236"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8
+      }
+    },
+    {
+      "query_id": "nlu_v1_0060",
+      "schema_valid": true,
+      "latency_ms": 12695.698738098145,
+      "token_usage": {
+        "input_tokens": 1239,
+        "output_tokens": 846,
+        "total_tokens": 2085
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0132",
+      "schema_valid": true,
+      "latency_ms": 15358.68787765503,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 858,
+        "total_tokens": 2092
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        }
+      ],
+      "pred_entities": [],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0134",
+      "schema_valid": true,
+      "latency_ms": 18387.18008995056,
+      "token_usage": {
+        "input_tokens": 1233,
+        "output_tokens": 1339,
+        "total_tokens": 2572
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 2,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "intervention": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          },
+          "disease": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "BTK",
+          "type": "target",
+          "normalized_id": "HGNC:1133",
+          "canonical_name": "BTK"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "flu",
+          "type": "disease",
+          "canonical_id": null
+        },
+        {
+          "text": "BTK inhibitors",
+          "type": "intervention",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0064",
+      "schema_valid": true,
+      "latency_ms": 14691.33710861206,
+      "token_usage": {
+        "input_tokens": 1241,
+        "output_tokens": 1267,
+        "total_tokens": 2508
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1229517"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D001943"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0098",
+      "schema_valid": true,
+      "latency_ms": 20480.473041534424,
+      "token_usage": {
+        "input_tokens": 1238,
+        "output_tokens": 1712,
+        "total_tokens": 2950
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "mTOR",
+          "type": "target",
+          "normalized_id": "HGNC:3942",
+          "canonical_name": "MTOR"
+        },
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "normalized_id": "MeSH:D011565",
+          "canonical_name": "Psoriasis"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "psoriasis",
+          "type": "disease",
+          "canonical_id": "MeSH:D011565"
+        },
+        {
+          "text": "mTOR",
+          "type": "target",
+          "canonical_id": "HGNC:3942"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8
+      }
+    },
+    {
+      "query_id": "nlu_v1_0136",
+      "schema_valid": true,
+      "latency_ms": 13617.252111434937,
+      "token_usage": {
+        "input_tokens": 1227,
+        "output_tokens": 1320,
+        "total_tokens": 2547
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "KRAS",
+          "type": "target",
+          "normalized_id": "HGNC:6407",
+          "canonical_name": "KRAS"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "KRAS inhibitors",
+          "type": "target",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 0,
+        "accuracy_at_1": 0.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0115",
+      "schema_valid": true,
+      "latency_ms": 21096.614122390747,
+      "token_usage": {
+        "input_tokens": 1232,
+        "output_tokens": 1096,
+        "total_tokens": 2328
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL3353410",
+          "canonical_name": "OSIMERTINIB"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "osimertinib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL3353410"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        },
+        {
+          "field": "population",
+          "value": "pediatric patients"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0007",
+      "schema_valid": true,
+      "latency_ms": 13924.899816513062,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 937,
+        "total_tokens": 2171
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "normalized_id": "HGNC:6192",
+          "canonical_name": "JAK2"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "JAK2",
+          "type": "target",
+          "canonical_id": "HGNC:6192"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0148",
+      "schema_valid": true,
+      "latency_ms": 10753.169059753418,
+      "token_usage": {
+        "input_tokens": 1229,
+        "output_tokens": 849,
+        "total_tokens": 2078
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {},
+        "type_confusions": {}
+      },
+      "gold_entities": [],
+      "pred_entities": [],
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "schema_valid": true,
+      "latency_ms": 14644.902229309082,
+      "token_usage": {
+        "input_tokens": 1248,
+        "output_tokens": 1704,
+        "total_tokens": 2952
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D002289"
+        },
+        {
+          "text": "EGFR",
+          "type": "target",
+          "canonical_id": "HGNC:3236"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8
+      }
+    },
+    {
+      "query_id": "nlu_v1_0022",
+      "schema_valid": true,
+      "latency_ms": 11361.455202102661,
+      "token_usage": {
+        "input_tokens": 1233,
+        "output_tokens": 1319,
+        "total_tokens": 2552
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101"
+        },
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0016",
+      "schema_valid": true,
+      "latency_ms": 10864.190816879272,
+      "token_usage": {
+        "input_tokens": 1237,
+        "output_tokens": 1641,
+        "total_tokens": 2878
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL553",
+          "canonical_name": "ERLOTINIB"
+        },
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D002289",
+          "canonical_name": "Carcinoma, Non-Small-Cell Lung"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "non-small cell lung cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D002289"
+        },
+        {
+          "text": "erlotinib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL553"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0031",
+      "schema_valid": true,
+      "latency_ms": 9749.773263931274,
+      "token_usage": {
+        "input_tokens": 1230,
+        "output_tokens": 1343,
+        "total_tokens": 2573
+      },
+      "entity_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "normalized_id": "HGNC:3236",
+          "canonical_name": "EGFR"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "EGFR",
+          "type": "target",
+          "canonical_id": "HGNC:3236"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 1,
+        "correct": 1,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0019",
+      "schema_valid": true,
+      "latency_ms": 48305.53889274597,
+      "token_usage": {
+        "input_tokens": 1235,
+        "output_tokens": 1411,
+        "total_tokens": 2646
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1229517",
+          "canonical_name": "VEMURAFENIB"
+        },
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "normalized_id": "MeSH:D001943",
+          "canonical_name": "Breast Neoplasms"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D001943"
+        },
+        {
+          "text": "vemurafenib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1229517"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.6666666666666666
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_phases": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          },
+          "population": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE1"
+        },
+        {
+          "field": "population",
+          "value": "breast cancer"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0063",
+      "schema_valid": true,
+      "latency_ms": 17407.346963882446,
+      "token_usage": {
+        "input_tokens": 1243,
+        "output_tokens": 1332,
+        "total_tokens": 2575
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL4535757",
+          "canonical_name": "SOTORASIB"
+        },
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "normalized_id": "MeSH:D003924",
+          "canonical_name": "Diabetes Mellitus, Type 2"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "type 2 diabetes",
+          "type": "disease",
+          "canonical_id": "MeSH:D003924"
+        },
+        {
+          "text": "sotorasib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL4535757"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0073",
+      "schema_valid": true,
+      "latency_ms": 18941.707134246826,
+      "token_usage": {
+        "input_tokens": 1234,
+        "output_tokens": 1094,
+        "total_tokens": 2328
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1873475",
+          "canonical_name": "IBRUTINIB"
+        },
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "ibrutinib",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1873475"
+        },
+        {
+          "text": "BRAF",
+          "type": "target",
+          "canonical_id": "HGNC:1097"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "query_id": "nlu_v1_0025",
+      "schema_valid": true,
+      "latency_ms": 11066.068887710571,
+      "token_usage": {
+        "input_tokens": 1231,
+        "output_tokens": 1314,
+        "total_tokens": 2545
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "normalized_id": "ChEMBL:CHEMBL1431",
+          "canonical_name": "METFORMIN"
+        },
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "normalized_id": "MeSH:D009101",
+          "canonical_name": "Multiple Myeloma"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101"
+        },
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {
+          "trial_statuses": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 1
+          }
+        },
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        }
+      ],
+      "pred_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        }
+      ],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0139",
+      "schema_valid": true,
+      "latency_ms": 20407.34887123108,
+      "token_usage": {
+        "input_tokens": 1225,
+        "output_tokens": 1743,
+        "total_tokens": 2968
+      },
+      "entity_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "compound": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 0,
+            "precision": 0.0,
+            "recall": 1.0,
+            "f1": 0.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [],
+      "pred_entities": [
+        {
+          "text": "this drug",
+          "type": "compound",
+          "canonical_id": null
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 0,
+        "correct": 0,
+        "accuracy_at_1": null,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.0,
+        "recall": 1.0,
+        "f1": 0.0
+      }
+    },
+    {
+      "query_id": "nlu_v1_0012",
+      "schema_valid": true,
+      "latency_ms": 7953.633069992065,
+      "token_usage": {
+        "input_tokens": 1233,
+        "output_tokens": 743,
+        "total_tokens": 1976
+      },
+      "entity_prf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "entity_prf_by_type": {
+        "by_type": {
+          "target": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          },
+          "disease": {
+            "tp": 1,
+            "fp": 0,
+            "fn": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0
+          }
+        },
+        "type_confusions": {}
+      },
+      "gold_entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "normalized_id": "HGNC:1097",
+          "canonical_name": "BRAF"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "normalized_id": "MeSH:D001172",
+          "canonical_name": "Arthritis, Rheumatoid"
+        }
+      ],
+      "pred_entities": [
+        {
+          "text": "BRAF",
+          "type": "target",
+          "canonical_id": "HGNC:1097"
+        },
+        {
+          "text": "rheumatoid arthritis",
+          "type": "disease",
+          "canonical_id": "MeSH:D001172"
+        }
+      ],
+      "normalization": {
+        "n_normalizable": 2,
+        "correct": 2,
+        "accuracy_at_1": 1.0,
+        "fabricated_id_count": 0
+      },
+      "constraint_prf": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "constraint_prf_by_field": {
+        "by_field": {},
+        "formatting_mismatches": 0,
+        "semantic_misses": 0
+      },
+      "gold_constraints": [],
+      "pred_constraints": [],
+      "source_prf": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    }
+  ]
+}

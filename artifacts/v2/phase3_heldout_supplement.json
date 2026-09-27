@@ -1,0 +1,1085 @@
+{
+  "benchmark_name": "phase3_heldout_supplement",
+  "benchmark_version": "1.0.0",
+  "created": "2026-09-24",
+  "seed": null,
+  "seed_note": "No randomized sampling/shuffling was used to construct this supplement (unlike phase3_benchmark_manifest.json's seeded dev/validation/heldout split assignment) -- all 12 cases were hand-authored directly to target specific VALID_STATUSES/VALID_PHASES coverage cells, so there is no generator step for a seed to make reproducible. This field is intentionally null.",
+  "purpose": "Step 2/3 of the human-approved path in docs/v2/PHASE3_STATUS.md: a small, genuinely NEW held-out supplement to blind-check the orchestration/models.py Literal-typed ClinicalTrialsSearchArgs.status/phase fix (config_version 2, artifacts/v2/phase3_frozen_config.json) that closed the enum-constraint gap responsible for the CT-008 miss in artifacts/v2/phase3_heldout_results.json. Focused entirely on ClinicalTrialsTool phase/status filtering: natural-language mapping onto the canonical enum, not copying a value handed verbatim.",
+  "methodology": "All 12 cases hand-authored by an agent given: (1) tools/clinical_trials_tool.py's own VALID_TRIAL_STATUSES (7 members) / VALID_TRIAL_PHASES (6 members) class-level sets as the sole source of truth for canonical values (never hand-typed from memory); (2) the full 74-case artifacts/v2/phase3_benchmark_manifest.json read in advance specifically to check every existing case_id/query/group_key for overlap before writing a single new case. Case format (case_id/category/group_key/original_query/research_query_input/gold.*/gold_label_rationale/failure_injection/split) matches phase3_benchmark_manifest.json's case_format_fields schema exactly, verified field-by-field against CT-001/CT-005/CT-008/CT-015/FL-002 as templates, with one additive-only extension (gold.gold_ambiguous_phase_acceptable_values / gold.gold_ambiguous_phase_note) used solely on SUP-CT-011 to document a deliberately ambiguous case's multi-value-acceptable gold label, per the task's explicit instruction to use judgment and document the reasoning rather than force a single spurious canonical answer.",
+  "non_overlap_confirmation": "Checked against every one of the 74 existing cases in artifacts/v2/phase3_benchmark_manifest.json (all categories: pubmed_only, clinicaltrials_only, chembl_only, multi_source, ambiguous, failure_*): no drug/intervention name, disease/condition name, or group_key in this supplement matches or is a close paraphrase of any existing case's. Existing clinicaltrials_only/multi_source drug-disease pairs (pembrolizumab/melanoma, metformin/PCOS, CAR-T/multiple myeloma, JAK inhibitor/myelofibrosis, semaglutide/obesity, CFTR modulator/cystic fibrosis, rituximab/lymphoma, statin/cardiovascular disease, adalimumab/rheumatoid arthritis, crizotinib/ALK lung cancer, insulin degludec/type 1 diabetes, PCSK9 inhibitor, trastuzumab/HER2 breast cancer, PARP inhibitor/ovarian cancer, diagnostic biomarker assay/lung cancer, GLP-1 agonist/obesity) are all deliberately avoided in favor of 12 new combinations (SGLT2 inhibitor/HFpEF, BTK inhibitor/CLL, bispecific antibody/DLBCL, ACE inhibitor/CKD, gene therapy/sickle cell disease, CGM device/type 1 diabetes, novel antibiotic/drug-resistant TB, CAR-NK therapy/AML, GLP-2 analog/short bowel syndrome, fecal microbiota transplant/C. diff, factor XI inhibitor/AFib stroke prevention, topical JAK inhibitor/atopic dermatitis). This supplement's 12 cases are also fully disjoint from the spent 15-case phase3_heldout split (artifacts/v2/phase3_heldout_results.json) -- CT-008 specifically is not read or reused anywhere in this file. This file (artifacts/v2/phase3_heldout_supplement.json) is standalone and does NOT modify artifacts/v2/phase3_benchmark_manifest.json.",
+  "valid_statuses_source": "tools/clinical_trials_tool.py ClinicalTrialsTool.VALID_STATUSES",
+  "valid_phases_source": "tools/clinical_trials_tool.py ClinicalTrialsTool.VALID_PHASES",
+  "status_coverage": {
+    "RECRUITING": [
+      "SUP-CT-001",
+      "SUP-CT-008"
+    ],
+    "NOT_YET_RECRUITING": [
+      "SUP-CT-002"
+    ],
+    "ACTIVE_NOT_RECRUITING": [
+      "SUP-CT-003"
+    ],
+    "COMPLETED": [
+      "SUP-CT-004",
+      "SUP-CT-012"
+    ],
+    "SUSPENDED": [
+      "SUP-CT-005"
+    ],
+    "TERMINATED": [
+      "SUP-CT-006"
+    ],
+    "WITHDRAWN": [
+      "SUP-CT-007"
+    ],
+    "not_mentioned": [
+      "SUP-CT-009",
+      "SUP-CT-010",
+      "SUP-CT-011"
+    ]
+  },
+  "phase_coverage": {
+    "EARLY_PHASE1": [
+      "SUP-CT-005"
+    ],
+    "PHASE1": [
+      "SUP-CT-002"
+    ],
+    "PHASE2": [
+      "SUP-CT-001",
+      "SUP-CT-007",
+      "SUP-CT-012"
+    ],
+    "PHASE3": [
+      "SUP-CT-003"
+    ],
+    "PHASE4": [
+      "SUP-CT-004"
+    ],
+    "NA": [
+      "SUP-CT-006"
+    ],
+    "not_mentioned_or_ambiguous": [
+      "SUP-CT-008",
+      "SUP-CT-009",
+      "SUP-CT-010",
+      "SUP-CT-011"
+    ]
+  },
+  "no_phase_or_status_case_count": 2,
+  "no_phase_case_count": 3,
+  "ambiguous_phase_case_count": 1,
+  "total_cases": 12,
+  "case_format_fields": [
+    "case_id",
+    "category",
+    "group_key",
+    "original_query",
+    "research_query_input",
+    "gold.gold_required_sources",
+    "gold.gold_permitted_sources",
+    "gold.gold_operation_per_source",
+    "gold.gold_required_params",
+    "gold.gold_optional_params",
+    "gold.gold_query_must_contain_concepts",
+    "gold.abstention_expected",
+    "gold.gold_ambiguous_phase_acceptable_values (additive, SUP-CT-011 only)",
+    "gold.gold_ambiguous_phase_note (additive, SUP-CT-011 only)",
+    "gold_label_rationale",
+    "failure_injection",
+    "split"
+  ],
+  "cases": [
+    {
+      "case_id": "SUP-CT-001",
+      "category": "clinicaltrials_only",
+      "group_key": "sglt2_hfpef",
+      "original_query": "Are there phase 2 trials still enrolling patients for an SGLT2 inhibitor in heart failure with preserved ejection fraction?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Are there phase 2 trials still enrolling patients for an SGLT2 inhibitor in heart failure with preserved ejection fraction?",
+        "normalized_query": "Are there phase 2 trials still enrolling patients for an SGLT2 inhibitor in heart failure with preserved ejection fraction?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "heart failure with preserved ejection fraction",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "SGLT2 inhibitor",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "PHASE2"
+          ],
+          "trial_statuses": [
+            "RECRUITING"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "heart failure with preserved ejection fraction",
+            "intervention": "SGLT2 inhibitor",
+            "status": "RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE2"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'still enrolling patients' is a natural-language paraphrase of RECRUITING (not the literal word 'recruiting'), testing whether the model maps informal phrasing to the correct canonical status rather than only copying a literal status word it was handed verbatim. 'phase 2' maps directly to PHASE2. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-002",
+      "category": "clinicaltrials_only",
+      "group_key": "btk_inhibitor_cll",
+      "original_query": "List phase 1 trials of a novel BTK inhibitor for chronic lymphocytic leukemia that haven't opened enrollment yet.",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "List phase 1 trials of a novel BTK inhibitor for chronic lymphocytic leukemia that haven't opened enrollment yet.",
+        "normalized_query": "List phase 1 trials of a novel BTK inhibitor for chronic lymphocytic leukemia that haven't opened enrollment yet.",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "chronic lymphocytic leukemia",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "BTK inhibitor",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "PHASE1"
+          ],
+          "trial_statuses": [
+            "NOT_YET_RECRUITING"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "chronic lymphocytic leukemia",
+            "intervention": "BTK inhibitor",
+            "status": "NOT_YET_RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE1"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'haven't opened enrollment yet' is a natural-language paraphrase of NOT_YET_RECRUITING, not the literal enum string. 'phase 1' maps directly to PHASE1. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-003",
+      "category": "clinicaltrials_only",
+      "group_key": "bispecific_dlbcl",
+      "original_query": "Show phase 3 trials of a bispecific antibody for diffuse large B-cell lymphoma that are ongoing but no longer taking new participants.",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Show phase 3 trials of a bispecific antibody for diffuse large B-cell lymphoma that are ongoing but no longer taking new participants.",
+        "normalized_query": "Show phase 3 trials of a bispecific antibody for diffuse large B-cell lymphoma that are ongoing but no longer taking new participants.",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "diffuse large B-cell lymphoma",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "bispecific antibody",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "PHASE3"
+          ],
+          "trial_statuses": [
+            "ACTIVE_NOT_RECRUITING"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "diffuse large B-cell lymphoma",
+            "intervention": "bispecific antibody",
+            "status": "ACTIVE_NOT_RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE3"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'ongoing but no longer taking new participants' is a natural-language paraphrase of ACTIVE_NOT_RECRUITING, not the literal enum string. 'phase 3' maps directly to PHASE3. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-004",
+      "category": "clinicaltrials_only",
+      "group_key": "ace_inhibitor_ckd",
+      "original_query": "What phase 4 trials of an ACE inhibitor for chronic kidney disease have already finished?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "What phase 4 trials of an ACE inhibitor for chronic kidney disease have already finished?",
+        "normalized_query": "What phase 4 trials of an ACE inhibitor for chronic kidney disease have already finished?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "chronic kidney disease",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "ACE inhibitor",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "PHASE4"
+          ],
+          "trial_statuses": [
+            "COMPLETED"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "chronic kidney disease",
+            "intervention": "ACE inhibitor",
+            "status": "COMPLETED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE4"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'already finished' is a natural-language paraphrase of COMPLETED, not the literal enum string. 'phase 4' maps directly to PHASE4. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-005",
+      "category": "clinicaltrials_only",
+      "group_key": "gene_therapy_scd",
+      "original_query": "Are there any early phase 1 trials of a gene therapy for sickle cell disease that have been put on hold?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Are there any early phase 1 trials of a gene therapy for sickle cell disease that have been put on hold?",
+        "normalized_query": "Are there any early phase 1 trials of a gene therapy for sickle cell disease that have been put on hold?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "sickle cell disease",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "gene therapy",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "EARLY_PHASE1"
+          ],
+          "trial_statuses": [
+            "SUSPENDED"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "sickle cell disease",
+            "intervention": "gene therapy",
+            "status": "SUSPENDED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "EARLY_PHASE1"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'put on hold' is a natural-language paraphrase of SUSPENDED, not the literal enum string. 'early phase 1' maps directly to EARLY_PHASE1 (distinct from PHASE1 in VALID_PHASES). status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-006",
+      "category": "clinicaltrials_only",
+      "group_key": "cgm_device_t1d",
+      "original_query": "Find trials of a continuous glucose monitoring device for type 1 diabetes that were stopped early and never completed.",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Find trials of a continuous glucose monitoring device for type 1 diabetes that were stopped early and never completed.",
+        "normalized_query": "Find trials of a continuous glucose monitoring device for type 1 diabetes that were stopped early and never completed.",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "type 1 diabetes",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "continuous glucose monitoring device",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "NA"
+          ],
+          "trial_statuses": [
+            "TERMINATED"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "type 1 diabetes",
+            "intervention": "continuous glucose monitoring device",
+            "status": "TERMINATED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "NA"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'stopped early and never completed' is a natural-language paraphrase of TERMINATED, not the literal enum string. This is a device trial (continuous glucose monitor), which has no drug-phase classification -- NA is the correct canonical phase for device/behavioral trials, same convention as CT-015 in the original benchmark (diagnostic biomarker assay), but a distinct drug/device-disease combination (CGM/T1D vs. CT-015's diagnostic assay/lung cancer). status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-007",
+      "category": "clinicaltrials_only",
+      "group_key": "novel_antibiotic_mdrtb",
+      "original_query": "What phase 2 trials of a new antibiotic for drug-resistant tuberculosis were withdrawn before starting?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "What phase 2 trials of a new antibiotic for drug-resistant tuberculosis were withdrawn before starting?",
+        "normalized_query": "What phase 2 trials of a new antibiotic for drug-resistant tuberculosis were withdrawn before starting?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "drug-resistant tuberculosis",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "novel antibiotic",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "PHASE2"
+          ],
+          "trial_statuses": [
+            "WITHDRAWN"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "drug-resistant tuberculosis",
+            "intervention": "novel antibiotic",
+            "status": "WITHDRAWN"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE2"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'withdrawn before starting' names WITHDRAWN directly (the one case in this set using the literal word, included as a straightforward positive control alongside the paraphrase-only cases). 'phase 2' maps directly to PHASE2. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-008",
+      "category": "clinicaltrials_only",
+      "group_key": "carnk_aml",
+      "original_query": "Are there any trials currently recruiting patients for a CAR-NK cell therapy in acute myeloid leukemia?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Are there any trials currently recruiting patients for a CAR-NK cell therapy in acute myeloid leukemia?",
+        "normalized_query": "Are there any trials currently recruiting patients for a CAR-NK cell therapy in acute myeloid leukemia?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "acute myeloid leukemia",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "CAR-NK cell therapy",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [],
+          "trial_statuses": [
+            "RECRUITING"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "acute myeloid leukemia",
+            "intervention": "CAR-NK cell therapy",
+            "status": "RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "Status is explicit ('currently recruiting patients' -> RECRUITING) but NO phase is mentioned or implied anywhere in the query. Correct gold behavior: phase omitted/null. A model that emits any specific phase value here (e.g. defaulting to PHASE1 or PHASE3) is over-constraining a filter the user never asked for -- this case exists specifically to catch that failure mode, per the task's explicit requirement to confirm the enum fix does not cause new over-constraint. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-009",
+      "category": "clinicaltrials_only",
+      "group_key": "glp2_analog_sbs",
+      "original_query": "What clinical trials exist for a GLP-2 analog in short bowel syndrome?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "What clinical trials exist for a GLP-2 analog in short bowel syndrome?",
+        "normalized_query": "What clinical trials exist for a GLP-2 analog in short bowel syndrome?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "short bowel syndrome",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "GLP-2 analog",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [],
+          "trial_statuses": [],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "short bowel syndrome",
+            "intervention": "GLP-2 analog"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "status": "RECRUITING",
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "Pure trial-landscape query with NEITHER status NOR phase mentioned or implied. Correct gold behavior: neither field is a required param; status falls back to ClinicalTrialsSearchArgs's own schema default (RECRUITING) if the model supplies it at all (acceptable either way, since the tool itself defaults to RECRUITING when status is omitted -- orchestration/models.py ClinicalTrialsSearchArgs.status Field(default='RECRUITING')), and phase must be null/omitted. A model that emits a specific non-default status or any phase here is hallucinating a filter that was never requested. status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-010",
+      "category": "clinicaltrials_only",
+      "group_key": "fmt_cdiff",
+      "original_query": "Is anyone studying fecal microbiota transplantation for recurrent Clostridioides difficile infection in a clinical trial?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Is anyone studying fecal microbiota transplantation for recurrent Clostridioides difficile infection in a clinical trial?",
+        "normalized_query": "Is anyone studying fecal microbiota transplantation for recurrent Clostridioides difficile infection in a clinical trial?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "recurrent Clostridioides difficile infection",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "fecal microbiota transplantation",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [],
+          "trial_statuses": [],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "recurrent Clostridioides difficile infection",
+            "intervention": "fecal microbiota transplantation"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "status": "RECRUITING",
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "Second pure trial-landscape query with NEITHER status NOR phase mentioned, using a completely different phrasing pattern ('is anyone studying X') from SUP-CT-009's 'what clinical trials exist' -- included as a second independent check against over-constraint (the task requires at least 1-2 such cases; this set has two, phrased differently, to reduce the chance a single phrasing pattern happens to avoid triggering hallucination while another would). status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-011",
+      "category": "clinicaltrials_only",
+      "group_key": "factorxi_afib_stroke",
+      "original_query": "Are there any late-stage trials of an oral factor XI inhibitor for stroke prevention in atrial fibrillation?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "Are there any late-stage trials of an oral factor XI inhibitor for stroke prevention in atrial fibrillation?",
+        "normalized_query": "Are there any late-stage trials of an oral factor XI inhibitor for stroke prevention in atrial fibrillation?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "atrial fibrillation stroke prevention",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "oral factor XI inhibitor",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "late-stage"
+          ],
+          "trial_statuses": [],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "atrial fibrillation stroke prevention",
+            "intervention": "oral factor XI inhibitor"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "status": "RECRUITING",
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false,
+        "gold_ambiguous_phase_acceptable_values": [
+          "PHASE3",
+          "PHASE4",
+          null
+        ],
+        "gold_ambiguous_phase_note": "'late-stage' is colloquial trial-industry shorthand commonly used for Phase 3 and/or Phase 4 trials, but it has NO single unambiguous mapping onto exactly one VALID_TRIAL_PHASES member -- unlike 'phase 3' or 'completed', it names no canonical value directly, and reasonable readers disagree whether it includes Phase 4. Gold-label judgment call (documented, not concealed): the CORRECT model behavior on this specific parameter is either (a) omit phase entirely (safest, avoids guessing), or (b) supply PHASE3 or PHASE4 specifically -- both scored as acceptable/non-hallucinating outcomes for the phase field on this case; any OTHER phase value (e.g. PHASE1, EARLY_PHASE1, NA) or any non-enum string is scored as a mapping failure. This deliberately differs from the malformed-parameter cases (FL-001/FL-002 in the main benchmark), which test a value with NO valid mapping at all -- here a *range* of plausible values exists, and the interesting question is whether the model abstains or narrows to a defensible choice rather than inventing a non-canonical string like 'late-stage' or 'Phase 3/4'."
+      },
+      "gold_label_rationale": "Deliberately ambiguous/informal phase phrasing per the task's requirement for at least one such case. See gold_ambiguous_phase_note in the gold block for full reasoning; status is not mentioned at all in this query. This is a genuinely new drug-class/disease combination not present anywhere in the existing 74-case manifest.",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    },
+    {
+      "case_id": "SUP-CT-012",
+      "category": "clinicaltrials_only",
+      "group_key": "topical_jak_ad",
+      "original_query": "What can you tell me about phase 2 trials of a topical JAK inhibitor for atopic dermatitis that have already wrapped up?",
+      "research_query_input": {
+        "schema_version": "2.1.0",
+        "original_query": "What can you tell me about phase 2 trials of a topical JAK inhibitor for atopic dermatitis that have already wrapped up?",
+        "normalized_query": "What can you tell me about phase 2 trials of a topical JAK inhibitor for atopic dermatitis that have already wrapped up?",
+        "intent": [
+          "B_clinical_trial_landscape"
+        ],
+        "entities": [
+          {
+            "entity_type": "disease",
+            "surface_form": "atopic dermatitis",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          },
+          {
+            "entity_type": "intervention",
+            "surface_form": "topical JAK inhibitor",
+            "semantic_roles": [],
+            "canonical_name": null,
+            "normalization_system": null,
+            "canonical_id": null
+          }
+        ],
+        "constraints": {
+          "trial_phases": [
+            "PHASE2"
+          ],
+          "trial_statuses": [
+            "COMPLETED"
+          ],
+          "population": [],
+          "age": [],
+          "geography": [],
+          "temporal": [],
+          "study_type": [],
+          "outcomes": []
+        },
+        "requested_evidence_types": [
+          "clinicaltrials"
+        ],
+        "ambiguity": {
+          "is_ambiguous": false,
+          "ambiguity_reason": null,
+          "candidate_interpretations": []
+        }
+      },
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "atopic dermatitis",
+            "intervention": "topical JAK inhibitor",
+            "status": "COMPLETED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE2"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "gold_label_rationale": "'already wrapped up' is a second, distinct natural-language paraphrase of COMPLETED (different wording from SUP-CT-004's 'already finished'), reinforcing the robustness check for informal completion phrasing across two independent cases with different drug/disease/phase combinations (COMPLETED+PHASE4 kidney disease vs. COMPLETED+PHASE2 atopic dermatitis here). status/phase values verified against ClinicalTrialsTool.VALID_STATUSES/VALID_PHASES (tools/clinical_trials_tool.py lines 24-42), not guessed. This is a genuinely new drug-class/disease combination, not present anywhere in artifacts/v2/phase3_benchmark_manifest.json (checked against all 74 existing case queries and group_keys before authoring).",
+      "failure_injection": null,
+      "split": "phase3_heldout_supplement"
+    }
+  ]
+}

@@ -1,0 +1,1568 @@
+{
+  "benchmark_source": "artifacts/v2/phase3_heldout_supplement.json",
+  "splits_used": [
+    "phase3_heldout_supplement"
+  ],
+  "candidate": "candidate_b_native_tools (config_version 2, Literal-typed ClinicalTrialsSearchArgs.status/phase)",
+  "run_type": "blind_single_run_no_retry_no_tuning",
+  "methodology_summary": "Identical methodology and code path to docs/v2/PHASE3_CANDIDATE_B_MEASUREMENT.md / docs/v2/PHASE3_HELDOUT_RESULTS.md, applied to the 12 NEW artifacts/v2/phase3_heldout_supplement.json cases instead of the spent phase3_heldout split. Real Cerebras qwen-3.8-27b Chat Completions calls (1 per case, no retry, tool_choice=auto, parallel_tool_calls=true), real HTTP calls to ClinicalTrials.gov for every registry_valid call. Run exactly once, blind, no tuning based on results.",
+  "run_metadata": {
+    "cases_total": 12,
+    "cases_scored": 12,
+    "cases_skipped": 0,
+    "wall_clock_seconds": 132.8764703749912
+  },
+  "source_routing": {
+    "precision_mean": 1.0,
+    "recall_mean": 1.0,
+    "f1_mean": 1.0,
+    "exact_source_set_match_rate": 1.0,
+    "exact_source_set_match_count": "12/12",
+    "required_source_miss_rate_per_source": {
+      "clinical_trials": {
+        "required_count": 12,
+        "missed_count": 0,
+        "miss_rate": 0.0,
+        "missed_case_ids": []
+      }
+    },
+    "unnecessary_source_call_rate_cases": 0.0,
+    "unnecessary_source_call_case_ids": []
+  },
+  "source_routing_per_case": [
+    {
+      "case_id": "SUP-CT-001",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-002",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-003",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-004",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-005",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-006",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-007",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-008",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-009",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-010",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-011",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    },
+    {
+      "case_id": "SUP-CT-012",
+      "gold_required": [
+        "clinical_trials"
+      ],
+      "called": [
+        "clinical_trials"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_match": true
+    }
+  ],
+  "tool_selection": {
+    "total_tool_calls_returned_by_model": 16,
+    "valid_registered_tool_count": 16,
+    "valid_registered_tool_rate": 1.0,
+    "unregistered_tool_generation_count": 0,
+    "unregistered_tool_generation_rate": 0.0,
+    "hallucinated_tool_names_observed": [],
+    "operation_accuracy": 1.0,
+    "operation_accuracy_n": 16
+  },
+  "parameter_quality": {
+    "total_calls_with_recognized_tool_name": 16,
+    "arguments_json_invalid_count": 0,
+    "schema_invalid_count": 0,
+    "registry_error_count_after_schema_valid": 0,
+    "schema_valid_count": 16,
+    "schema_valid_rate": 1.0,
+    "malformed_calls_reaching_executor_count": 0,
+    "clinical_trials_status_mapping_accuracy": {
+      "correct": 16,
+      "scored": 16,
+      "accuracy": 1.0,
+      "note": "Exact match to gold canonical status when explicit in query; RECRUITING (schema default) or omission accepted when no status was requested."
+    },
+    "clinical_trials_phase_mapping_accuracy": {
+      "correct": 14,
+      "scored": 16,
+      "accuracy": 0.875,
+      "note": "Exact match to gold canonical phase when explicit/derivable; for SUP-CT-011 (deliberately ambiguous 'late-stage'), PHASE3/PHASE4/omitted all accepted per documented gold reasoning; omission accepted (not counted as error, but flagged) when the phase was requested but no explicit gold phase existed (e.g. NA/device cases where model chose to omit rather than emit NA)."
+    },
+    "phase_acceptable_but_inexact_detail": [
+      {
+        "case_id": "SUP-CT-006",
+        "call_id": "89f39bd00",
+        "gold_phase": "NA",
+        "model_phase": null,
+        "note": "model omitted phase instead of emitting the canonical value; not a hallucination/wrong-value error, but not an exact match either"
+      }
+    ],
+    "clinical_trials_phase_status_detail": [
+      {
+        "case_id": "SUP-CT-001",
+        "call_id": "d20903ca2",
+        "gold_status": "RECRUITING",
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": "PHASE2",
+        "model_phase": "PHASE2",
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-002",
+        "call_id": "75e6bbeb8",
+        "gold_status": "NOT_YET_RECRUITING",
+        "model_status": "NOT_YET_RECRUITING",
+        "status_correct": true,
+        "gold_phase": "PHASE1",
+        "model_phase": "PHASE1",
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-003",
+        "call_id": "8022fc652",
+        "gold_status": "ACTIVE_NOT_RECRUITING",
+        "model_status": "ACTIVE_NOT_RECRUITING",
+        "status_correct": true,
+        "gold_phase": "PHASE3",
+        "model_phase": "PHASE3",
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-004",
+        "call_id": "dbe48b552",
+        "gold_status": "COMPLETED",
+        "model_status": "COMPLETED",
+        "status_correct": true,
+        "gold_phase": "PHASE4",
+        "model_phase": "PHASE4",
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-005",
+        "call_id": "1cbf2976b",
+        "gold_status": "SUSPENDED",
+        "model_status": "SUSPENDED",
+        "status_correct": true,
+        "gold_phase": "EARLY_PHASE1",
+        "model_phase": "PHASE1",
+        "phase_correct": false
+      },
+      {
+        "case_id": "SUP-CT-005",
+        "call_id": "ba810ab05",
+        "gold_status": "SUSPENDED",
+        "model_status": "SUSPENDED",
+        "status_correct": true,
+        "gold_phase": "EARLY_PHASE1",
+        "model_phase": "EARLY_PHASE1",
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-006",
+        "call_id": "89f39bd00",
+        "gold_status": "TERMINATED",
+        "model_status": "TERMINATED",
+        "status_correct": true,
+        "gold_phase": "NA",
+        "model_phase": null,
+        "phase_correct": false
+      },
+      {
+        "case_id": "SUP-CT-007",
+        "call_id": "30d6b49a9",
+        "gold_status": "WITHDRAWN",
+        "model_status": "WITHDRAWN",
+        "status_correct": true,
+        "gold_phase": "PHASE2",
+        "model_phase": "PHASE2",
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-008",
+        "call_id": "63ed13a65",
+        "gold_status": "RECRUITING",
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": null,
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-009",
+        "call_id": "6b22d2165",
+        "gold_status": null,
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": null,
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-009",
+        "call_id": "993abbe33",
+        "gold_status": null,
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": null,
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-010",
+        "call_id": "de5101f50",
+        "gold_status": null,
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": null,
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-011",
+        "call_id": "4de38bb31",
+        "gold_status": null,
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": "AMBIGUOUS(accept ['PHASE3', 'PHASE4', None])",
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-011",
+        "call_id": "ad20fc84b",
+        "gold_status": null,
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": "AMBIGUOUS(accept ['PHASE3', 'PHASE4', None])",
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-011",
+        "call_id": "67c1ac832",
+        "gold_status": null,
+        "model_status": "RECRUITING",
+        "status_correct": true,
+        "gold_phase": "AMBIGUOUS(accept ['PHASE3', 'PHASE4', None])",
+        "model_phase": null,
+        "phase_correct": true
+      },
+      {
+        "case_id": "SUP-CT-012",
+        "call_id": "943d59422",
+        "gold_status": "COMPLETED",
+        "model_status": "COMPLETED",
+        "status_correct": true,
+        "gold_phase": "PHASE2",
+        "model_phase": "PHASE2",
+        "phase_correct": true
+      }
+    ],
+    "semantically_invalid_parameter_rate": "NOT MEASURED - requires a semantic judge, out of scope, same convention as prior Phase 3 measurements."
+  },
+  "execution_safety_hard_gates": {
+    "unregistered_tool_execution": {
+      "required": 0,
+      "measured": 0,
+      "pass": true
+    },
+    "arbitrary_model_generated_callable_execution": {
+      "required": 0,
+      "measured": 0,
+      "pass": true,
+      "note": "execute_validated_call() only calls DEFAULT_REGISTRY.get_execution_fn(tool_name, operation); code-audited, unchanged from the frozen module used for the original heldout run."
+    },
+    "arbitrary_model_generated_url_execution": {
+      "required": 0,
+      "measured": 0,
+      "pass": true,
+      "note": "All 3 tools use fixed hardcoded base URLs; the model never supplies a URL."
+    },
+    "schema_invalid_call_reaching_executor": {
+      "required": 0,
+      "measured": 0,
+      "pass": true,
+      "note": "0 schema-invalid call(s) occurred this run; none reached execute_validated_call (only registry_valid outcomes are executed by this harness)."
+    },
+    "secret_or_auth_header_in_trace": {
+      "required": 0,
+      "measured": 0,
+      "pass": true
+    },
+    "call_without_traceable_call_id": {
+      "required": 0,
+      "measured": 0,
+      "pass": true
+    },
+    "unknown_tool_silent_fallback": {
+      "required": 0,
+      "measured": 0,
+      "pass": true,
+      "note": "Every rejected call recorded with a failure_category, never substituted or silently executed."
+    }
+  },
+  "execution_reliability": {
+    "real_executions_total": 16,
+    "simulated_executions_total": 0,
+    "successful_executions": 16,
+    "failed_executions": 0,
+    "success_rate": 1.0,
+    "note": "Some individual ClinicalTrials.gov HTTP attempts logged a transient error during the run (visible in stdout) but were automatically recovered by utils/retry_handler.py's RetrySession before this harness recorded the execution outcome -- every recorded execution_record in this run is status=success, consistent with the retry-recovery convention documented in docs/v2/PHASE3_HELDOUT_RESULTS.md Section 2."
+  },
+  "multi_source": {
+    "n_multi_source_gold_cases": 0,
+    "note": "This supplement is deliberately clinicaltrials_only in category (per the task's scope: ClinicalTrials phase/status filtering specifically) -- 0 multi-source gold cases, so this metric is N/A here by design, not a gap."
+  },
+  "cost": {
+    "model_calls_per_case": {
+      "mean": 1.0,
+      "note": "Exactly 1 Cerebras call per case, no retry."
+    },
+    "input_tokens_total": 14712,
+    "output_tokens_total": 2538,
+    "measured_total_spend_usd": 0.0183465,
+    "measured_dollar_cost_per_query": 0.001528875,
+    "pricing_used": {
+      "input_usd_per_million_tokens": 0.99,
+      "output_usd_per_million_tokens": 1.49,
+      "source": "Frozen Phase-2 Cerebras qwen-3.8-27b pricing, reused verbatim."
+    },
+    "spend_cap_note": "Trivially small against any Phase-3 spend cap; well under the original heldout run's $0.0233 for 15 cases on a per-case basis."
+  },
+  "traceability": {
+    "valid_call_id_rate": 1.0,
+    "execution_result_linked_to_call_rate": 1.0,
+    "error_category_completeness": 1.0,
+    "sanitized_trace_completeness": 1.0
+  },
+  "per_case_results": [
+    {
+      "case_id": "SUP-CT-001",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Are there phase 2 trials still enrolling patients for an SGLT2 inhibitor in heart failure with preserved ejection fraction?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "heart failure with preserved ejection fraction",
+            "intervention": "SGLT2 inhibitor",
+            "status": "RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE2"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 586.958208004944,
+      "cerebras_usage": {
+        "input_tokens": 1230,
+        "output_tokens": 185,
+        "total_tokens": 1415
+      },
+      "cerebras_call_cost_usd": 0.00149335,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "d20903ca2",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"heart failure with preserved ejection fraction\", \"intervention\": \"SGLT2 inhibitor\", \"phase\": \"PHASE2\", \"status\": \"RECRUITING\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "heart failure with preserved ejection fraction",
+            "intervention": "SGLT2 inhibitor",
+            "status": "RECRUITING",
+            "phase": "PHASE2",
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-001-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 119.06162509694695
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-002",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "List phase 1 trials of a novel BTK inhibitor for chronic lymphocytic leukemia that haven't opened enrollment yet.",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "chronic lymphocytic leukemia",
+            "intervention": "BTK inhibitor",
+            "status": "NOT_YET_RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE1"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 354.66279194224626,
+      "cerebras_usage": {
+        "input_tokens": 1228,
+        "output_tokens": 187,
+        "total_tokens": 1415
+      },
+      "cerebras_call_cost_usd": 0.00149435,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "75e6bbeb8",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"chronic lymphocytic leukemia\", \"intervention\": \"BTK inhibitor\", \"phase\": \"PHASE1\", \"status\": \"NOT_YET_RECRUITING\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "chronic lymphocytic leukemia",
+            "intervention": "BTK inhibitor",
+            "status": "NOT_YET_RECRUITING",
+            "phase": "PHASE1",
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-002-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 41.64170799776912
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-003",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Show phase 3 trials of a bispecific antibody for diffuse large B-cell lymphoma that are ongoing but no longer taking new participants.",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "diffuse large B-cell lymphoma",
+            "intervention": "bispecific antibody",
+            "status": "ACTIVE_NOT_RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE3"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 354.64416595641524,
+      "cerebras_usage": {
+        "input_tokens": 1231,
+        "output_tokens": 194,
+        "total_tokens": 1425
+      },
+      "cerebras_call_cost_usd": 0.0015077500000000002,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "8022fc652",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"Diffuse Large B-Cell Lymphoma\", \"intervention\": \"bispecific antibody\", \"phase\": \"PHASE3\", \"status\": \"ACTIVE_NOT_RECRUITING\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "Diffuse Large B-Cell Lymphoma",
+            "intervention": "bispecific antibody",
+            "status": "ACTIVE_NOT_RECRUITING",
+            "phase": "PHASE3",
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-003-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 35.602667019702494
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-004",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "What phase 4 trials of an ACE inhibitor for chronic kidney disease have already finished?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "chronic kidney disease",
+            "intervention": "ACE inhibitor",
+            "status": "COMPLETED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE4"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 1093.8552909065038,
+      "cerebras_usage": {
+        "input_tokens": 1221,
+        "output_tokens": 146,
+        "total_tokens": 1367
+      },
+      "cerebras_call_cost_usd": 0.0014263300000000002,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "dbe48b552",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"chronic kidney disease\", \"intervention\": \"ACE inhibitor\", \"phase\": \"PHASE4\", \"status\": \"COMPLETED\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "chronic kidney disease",
+            "intervention": "ACE inhibitor",
+            "status": "COMPLETED",
+            "phase": "PHASE4",
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-004-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 36.1583330668509
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-005",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Are there any early phase 1 trials of a gene therapy for sickle cell disease that have been put on hold?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "sickle cell disease",
+            "intervention": "gene therapy",
+            "status": "SUSPENDED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "EARLY_PHASE1"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 590.3603329788893,
+      "cerebras_usage": {
+        "input_tokens": 1228,
+        "output_tokens": 400,
+        "total_tokens": 1628
+      },
+      "cerebras_call_cost_usd": 0.0018117200000000002,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "1cbf2976b",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"sickle cell disease\", \"intervention\": \"gene therapy\", \"phase\": \"PHASE1\", \"status\": \"SUSPENDED\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "sickle cell disease",
+            "intervention": "gene therapy",
+            "status": "SUSPENDED",
+            "phase": "PHASE1",
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        },
+        {
+          "provider_tool_call_id": "ba810ab05",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"sickle cell disease\", \"intervention\": \"gene therapy\", \"phase\": \"EARLY_PHASE1\", \"status\": \"SUSPENDED\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "sickle cell disease",
+            "intervention": "gene therapy",
+            "status": "SUSPENDED",
+            "phase": "EARLY_PHASE1",
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-005-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 40.606040973216295
+        },
+        {
+          "call_id": "SUP-CT-005-1",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 38.0644160322845
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-006",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Find trials of a continuous glucose monitoring device for type 1 diabetes that were stopped early and never completed.",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "type 1 diabetes",
+            "intervention": "continuous glucose monitoring device",
+            "status": "TERMINATED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "NA"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 473.27004093676805,
+      "cerebras_usage": {
+        "input_tokens": 1225,
+        "output_tokens": 224,
+        "total_tokens": 1449
+      },
+      "cerebras_call_cost_usd": 0.0015465099999999999,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "89f39bd00",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"Type 1 Diabetes\", \"intervention\": \"continuous glucose monitoring\", \"status\": \"TERMINATED\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "Type 1 Diabetes",
+            "intervention": "continuous glucose monitoring",
+            "status": "TERMINATED",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-006-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 152.14166708756238
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-007",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "What phase 2 trials of a new antibiotic for drug-resistant tuberculosis were withdrawn before starting?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "drug-resistant tuberculosis",
+            "intervention": "novel antibiotic",
+            "status": "WITHDRAWN"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE2"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 499.48574998416007,
+      "cerebras_usage": {
+        "input_tokens": 1222,
+        "output_tokens": 159,
+        "total_tokens": 1381
+      },
+      "cerebras_call_cost_usd": 0.0014466899999999998,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "30d6b49a9",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"drug-resistant tuberculosis\", \"phase\": \"PHASE2\", \"status\": \"WITHDRAWN\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "drug-resistant tuberculosis",
+            "intervention": null,
+            "status": "WITHDRAWN",
+            "phase": "PHASE2",
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-007-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 36.54904197901487
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-008",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Are there any trials currently recruiting patients for a CAR-NK cell therapy in acute myeloid leukemia?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "acute myeloid leukemia",
+            "intervention": "CAR-NK cell therapy",
+            "status": "RECRUITING"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 383.91145796049386,
+      "cerebras_usage": {
+        "input_tokens": 1225,
+        "output_tokens": 143,
+        "total_tokens": 1368
+      },
+      "cerebras_call_cost_usd": 0.00142582,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "63ed13a65",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"acute myeloid leukemia\", \"intervention\": \"CAR-NK cell\", \"status\": \"RECRUITING\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "acute myeloid leukemia",
+            "intervention": "CAR-NK cell",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-008-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 72.5640420569107
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-009",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "What clinical trials exist for a GLP-2 analog in short bowel syndrome?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "short bowel syndrome",
+            "intervention": "GLP-2 analog"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "status": "RECRUITING",
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 459.8370000021532,
+      "cerebras_usage": {
+        "input_tokens": 1220,
+        "output_tokens": 265,
+        "total_tokens": 1485
+      },
+      "cerebras_call_cost_usd": 0.00160265,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 2,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "6b22d2165",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"short bowel syndrome\", \"intervention\": \"GLP-2\", \"status\": \"RECRUITING\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "short bowel syndrome",
+            "intervention": "GLP-2",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        },
+        {
+          "provider_tool_call_id": "993abbe33",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"short bowel syndrome\", \"intervention\": \"teduglutide\", \"status\": \"RECRUITING\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "short bowel syndrome",
+            "intervention": "teduglutide",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-009-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 60.81354198977351
+        },
+        {
+          "call_id": "SUP-CT-009-1",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 55.58520799968392
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-010",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Is anyone studying fecal microbiota transplantation for recurrent Clostridioides difficile infection in a clinical trial?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "recurrent Clostridioides difficile infection",
+            "intervention": "fecal microbiota transplantation"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "status": "RECRUITING",
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 516.9175830669701,
+      "cerebras_usage": {
+        "input_tokens": 1226,
+        "output_tokens": 107,
+        "total_tokens": 1333
+      },
+      "cerebras_call_cost_usd": 0.00137317,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "de5101f50",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"Clostridioides difficile infection\", \"intervention\": \"fecal microbiota transplantation\", \"status\": \"RECRUITING\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "Clostridioides difficile infection",
+            "intervention": "fecal microbiota transplantation",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": null,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-010-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 88.7629589997232
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-011",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "Are there any late-stage trials of an oral factor XI inhibitor for stroke prevention in atrial fibrillation?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "atrial fibrillation stroke prevention",
+            "intervention": "oral factor XI inhibitor"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "status": "RECRUITING",
+            "phase": null
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false,
+        "gold_ambiguous_phase_acceptable_values": [
+          "PHASE3",
+          "PHASE4",
+          null
+        ],
+        "gold_ambiguous_phase_note": "'late-stage' is colloquial trial-industry shorthand commonly used for Phase 3 and/or Phase 4 trials, but it has NO single unambiguous mapping onto exactly one VALID_TRIAL_PHASES member -- unlike 'phase 3' or 'completed', it names no canonical value directly, and reasonable readers disagree whether it includes Phase 4. Gold-label judgment call (documented, not concealed): the CORRECT model behavior on this specific parameter is either (a) omit phase entirely (safest, avoids guessing), or (b) supply PHASE3 or PHASE4 specifically -- both scored as acceptable/non-hallucinating outcomes for the phase field on this case; any OTHER phase value (e.g. PHASE1, EARLY_PHASE1, NA) or any non-enum string is scored as a mapping failure. This deliberately differs from the malformed-parameter cases (FL-001/FL-002 in the main benchmark), which test a value with NO valid mapping at all -- here a *range* of plausible values exists, and the interesting question is whether the model abstains or narrows to a defensible choice rather than inventing a non-canonical string like 'late-stage' or 'Phase 3/4'."
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 594.7355829412118,
+      "cerebras_usage": {
+        "input_tokens": 1225,
+        "output_tokens": 354,
+        "total_tokens": 1579
+      },
+      "cerebras_call_cost_usd": 0.0017402099999999998,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 3,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "4de38bb31",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"atrial fibrillation\", \"intervention\": \"factor XI inhibitor\", \"status\": \"RECRUITING\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "atrial fibrillation",
+            "intervention": "factor XI inhibitor",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        },
+        {
+          "provider_tool_call_id": "ad20fc84b",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"atrial fibrillation\", \"intervention\": \"asundexian\", \"status\": \"RECRUITING\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "atrial fibrillation",
+            "intervention": "asundexian",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        },
+        {
+          "provider_tool_call_id": "67c1ac832",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"atrial fibrillation\", \"intervention\": \"milvexian\", \"status\": \"RECRUITING\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "atrial fibrillation",
+            "intervention": "milvexian",
+            "status": "RECRUITING",
+            "phase": null,
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-011-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 38.92679198179394
+        },
+        {
+          "call_id": "SUP-CT-011-1",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 46.40245798509568
+        },
+        {
+          "call_id": "SUP-CT-011-2",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 40.888290968723595
+        }
+      ]
+    },
+    {
+      "case_id": "SUP-CT-012",
+      "category": "clinicaltrials_only",
+      "split": "phase3_heldout_supplement",
+      "original_query": "What can you tell me about phase 2 trials of a topical JAK inhibitor for atopic dermatitis that have already wrapped up?",
+      "gold": {
+        "gold_required_sources": [
+          "clinical_trials"
+        ],
+        "gold_permitted_sources": [
+          "clinical_trials"
+        ],
+        "gold_operation_per_source": {
+          "clinical_trials": "search_trials"
+        },
+        "gold_required_params": {
+          "clinical_trials": {
+            "condition": "atopic dermatitis",
+            "intervention": "topical JAK inhibitor",
+            "status": "COMPLETED"
+          }
+        },
+        "gold_optional_params": {
+          "clinical_trials": {
+            "max_results": null,
+            "phase": "PHASE2"
+          }
+        },
+        "gold_query_must_contain_concepts": {},
+        "abstention_expected": false
+      },
+      "failure_injection": null,
+      "cerebras_error": null,
+      "cerebras_latency_ms": 381.1112919356674,
+      "cerebras_usage": {
+        "input_tokens": 1231,
+        "output_tokens": 174,
+        "total_tokens": 1405
+      },
+      "cerebras_call_cost_usd": 0.00147795,
+      "message_content": "\n\n",
+      "n_raw_tool_calls": 1,
+      "parsed_outcomes": [
+        {
+          "provider_tool_call_id": "943d59422",
+          "declared_function_name": "clinical_trials_search_trials",
+          "raw_arguments_text": "{\"condition\": \"atopic dermatitis\", \"intervention\": \"topical JAK inhibitor\", \"phase\": \"PHASE2\", \"status\": \"COMPLETED\", \"max_results\": \"20\"}",
+          "recognized_tool": true,
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "arguments_json_valid": true,
+          "schema_valid": true,
+          "registry_valid": true,
+          "failure_category": null,
+          "failure_detail": null,
+          "arguments": {
+            "condition": "atopic dermatitis",
+            "intervention": "topical JAK inhibitor",
+            "status": "COMPLETED",
+            "phase": "PHASE2",
+            "max_results": 20,
+            "sponsor": null,
+            "country": null
+          }
+        }
+      ],
+      "execution_records": [
+        {
+          "call_id": "SUP-CT-012-0",
+          "tool_name": "clinical_trials",
+          "operation": "search_trials",
+          "simulated": false,
+          "status": "success",
+          "error_category": null,
+          "error_detail": null,
+          "records_count": null,
+          "latency_ms": 37.64183400198817
+        }
+      ]
+    }
+  ]
+}

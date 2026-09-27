@@ -7,7 +7,7 @@ including API endpoints, rate limits, retry policies, and logging settings.
 import os
 from typing import Optional
 from pydantic_settings import BaseSettings
-from pydantic import Field
+from pydantic import Field, SecretStr
 
 
 class Settings(BaseSettings):
@@ -86,9 +86,33 @@ class Settings(BaseSettings):
     )
 
     # NVIDIA NIM (for Day 2+)
-    NVIDIA_API_KEY: Optional[str] = Field(
+    NVIDIA_API_KEY: Optional[SecretStr] = Field(
         default=None,
         description="NVIDIA NIM API key"
+    )
+
+    # Cloudflare Workers AI (Phase 2 latency experiment)
+    # CLOUDFLARE_API_TOKEN is a genuine auth secret -> SecretStr, never
+    # printed/logged/repr'd. CLOUDFLARE_ACCOUNT_ID is an account identifier
+    # (not a bearer credential; it appears in the Workers AI URL path, not
+    # an Authorization header) -> plain str, safe to include in logs/URLs.
+    CLOUDFLARE_API_TOKEN: Optional[SecretStr] = Field(
+        default=None,
+        description="Cloudflare API token (Workers AI). Unwrap only at the "
+                     "HTTP Authorization header boundary via get_secret_value()."
+    )
+    CLOUDFLARE_ACCOUNT_ID: Optional[str] = Field(
+        default=None,
+        description="Cloudflare account ID (identifier, not a secret)."
+    )
+
+    # Cerebras (Phase 2 latency experiment candidate)
+    # Genuine auth secret -> SecretStr, never printed/logged/repr'd. Unwrap
+    # only at the HTTP Authorization header boundary via get_secret_value().
+    CEREBRAS_API_KEY: Optional[SecretStr] = Field(
+        default=None,
+        description="Cerebras API key. Unwrap only at the HTTP Authorization "
+                     "header boundary via get_secret_value()."
     )
 
     # PubMed Specific
@@ -98,7 +122,17 @@ class Settings(BaseSettings):
     )
     PUBMED_DEFAULT_DATE_RANGE: int = Field(
         default=2,
-        description="Default date range in years for PubMed searches"
+        description="Recency window (years) available for an EXPLICIT "
+                     "recency-constrained PubMed search. As of the Phase 4 "
+                     "fix (docs/v2/PHASE4_PUBMED_CANDIDATE_COMPARISON.md), "
+                     "tools/pubmed_tool.py's search_pubmed() no longer "
+                     "applies this implicitly when a caller passes neither "
+                     "years_back nor date_from - doing so silently excluded "
+                     "most gold-relevant (often >2-year-old) articles and "
+                     "measured Recall@10=0.045 vs RAG's 0.773 on the same "
+                     "22-case benchmark. No date filter is applied by "
+                     "default now; this constant is kept only for callers "
+                     "that explicitly opt into a recency-limited search."
     )
 
     # ClinicalTrials Specific
@@ -108,10 +142,25 @@ class Settings(BaseSettings):
     )
 
     class Config:
-        """Pydantic configuration."""
+        """Pydantic configuration.
+
+        extra = "ignore": unrecognized .env keys (e.g. a provider var added
+        to .env before its Settings field exists yet, or an unrelated var a
+        developer keeps in their local .env) are silently ignored rather
+        than raising ValidationError. This is a deliberate security fix:
+        pydantic-settings' default ("forbid") raises a ValidationError whose
+        traceback can include the *value* of the offending env var, which
+        previously caused a Cloudflare token/account ID to leak into tool
+        output. "ignore" means unknown vars never reach a validation error
+        path in the first place. This does not weaken validation of any
+        KNOWN field (type coercion/requiredness for declared fields is
+        unaffected) and does not suppress errors for fields that ARE
+        declared but fail to parse.
+        """
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
+        extra = "ignore"
 
     def __init__(self, **kwargs):
         """Initialize settings and ensure log directory exists."""

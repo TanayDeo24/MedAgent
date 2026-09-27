@@ -1,0 +1,267 @@
+{
+  "migration": "v1.0.0 -> v1.1.0",
+  "reason": "H_insufficient_evidence removal, Phase 2 closure item 5",
+  "changes": [
+    {
+      "query_id": "nlu_v1_0123",
+      "split": "dev",
+      "query_text": "What Phase 3 trial data supports using metformin as a treatment for progeria?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "B_clinical_trial_landscape",
+      "old_required_sources": [
+        "clinicaltrials"
+      ],
+      "old_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ],
+      "new_required_sources": [
+        "clinicaltrials"
+      ],
+      "new_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE3"
+        }
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0130",
+      "split": "dev",
+      "query_text": "Is vemurafenib approved anywhere in the world for treating tooth decay?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "C_compound_target",
+      "old_required_sources": [
+        "chembl"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "chembl"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0132",
+      "split": "dev",
+      "query_text": "Does published research show JAK2 inhibition is effective for hair regrowth?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "A_literature_evidence",
+      "old_required_sources": [
+        "pubmed"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "pubmed"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0134",
+      "split": "dev",
+      "query_text": "Are there recruiting trials studying BTK inhibitors for treating the flu?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "B_clinical_trial_landscape",
+      "old_required_sources": [
+        "clinicaltrials"
+      ],
+      "old_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ],
+      "new_required_sources": [
+        "clinicaltrials"
+      ],
+      "new_constraints": [
+        {
+          "field": "trial_statuses",
+          "value": "RECRUITING"
+        }
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0127",
+      "split": "test",
+      "query_text": "What published literature supports pembrolizumab as a treatment for the common cold?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "A_literature_evidence",
+      "old_required_sources": [
+        "pubmed"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "pubmed"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0131",
+      "split": "test",
+      "query_text": "What trials have investigated 'Compound QQ-000' for any indication?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "B_clinical_trial_landscape",
+      "old_required_sources": [
+        "clinicaltrials"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "clinicaltrials"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0133",
+      "split": "test",
+      "query_text": "What is the reported bioactivity of the non-existent compound 'Placebolex-9'?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "C_compound_target",
+      "old_required_sources": [
+        "chembl"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "chembl"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0125",
+      "split": "test",
+      "query_text": "What ChEMBL bioactivity data exists for the compound 'Zenithrocaine'?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "C_compound_target",
+      "old_required_sources": [
+        "chembl"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "chembl"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0121",
+      "split": "test",
+      "query_text": "What clinical trials exist for compound XR-9917-alpha in treating Kleinberg-Farsi syndrome?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "B_clinical_trial_landscape",
+      "old_required_sources": [],
+      "old_constraints": [],
+      "new_required_sources": [
+        "clinicaltrials"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0135",
+      "split": "test",
+      "query_text": "What published evidence links HER2 status to improved eyesight?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "A_literature_evidence",
+      "old_required_sources": [
+        "pubmed"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "pubmed"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0126",
+      "split": "test",
+      "query_text": "Are there any completed Phase 4 trials proving osimertinib cures baldness?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "G_constraint_heavy",
+      "old_required_sources": [
+        "clinicaltrials"
+      ],
+      "old_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE4"
+        }
+      ],
+      "new_required_sources": [
+        "clinicaltrials"
+      ],
+      "new_constraints": [
+        {
+          "field": "trial_phases",
+          "value": "PHASE4"
+        },
+        {
+          "field": "trial_statuses",
+          "value": "COMPLETED"
+        }
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0129",
+      "split": "test",
+      "query_text": "What clinical evidence exists for using adagrasib to treat seasonal allergies?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "D_cross_source_synthesis",
+      "old_required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0122",
+      "split": "test",
+      "query_text": "Is there published evidence that vitamin C injections cure stage 4 glioblastoma?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "A_literature_evidence",
+      "old_required_sources": [
+        "pubmed"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "pubmed"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0128",
+      "split": "test",
+      "query_text": "Does sotorasib have documented activity against a target called 'FICTIONALKINASE1'?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "C_compound_target",
+      "old_required_sources": [
+        "chembl"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "chembl"
+      ],
+      "new_constraints": []
+    },
+    {
+      "query_id": "nlu_v1_0124",
+      "split": "test",
+      "query_text": "Has ibrutinib been studied for treating the common cold?",
+      "old_intent_class": "H_insufficient_evidence",
+      "new_intent_class": "D_cross_source_synthesis",
+      "old_required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "old_constraints": [],
+      "new_required_sources": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "new_constraints": []
+    }
+  ]
+}

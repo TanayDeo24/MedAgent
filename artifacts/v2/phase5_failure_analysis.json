@@ -1,0 +1,27 @@
+{
+  "step": "Phase 5 Step 38 -- failure analysis",
+  "cases_evaluated": 58,
+  "cases_scoring_imperfectly": 0,
+  "taxonomy_used": [
+    "MISSING_SOURCE_ID",
+    "MISSING_SUPPORT_TEXT",
+    "MISSING_FIELD_PATH",
+    "BAD_URL",
+    "TRACE_BREAK",
+    "WRONG_PARENT",
+    "DUPLICATE_COLLISION",
+    "ACCIDENTAL_MERGE",
+    "SERIALIZATION_LOSS",
+    "SOURCE_METADATA_LOSS",
+    "UNSUPPORTED_RECORD"
+  ],
+  "classified_failures": [],
+  "genuine_implementation_defects_found_in_evidence_package": [],
+  "defects_fixed": [],
+  "honest_summary": "Across all 58 development+validation real-data cases (152 real Evidence records produced from 152 successful adapter calls, plus 10 correctly-skipped input records with no Evidence produced), every case matched its independently-authored gold label exactly: evidence_id, source_url, evidence_type, content (byte-for-byte verbatim/exact-field-match), provenance completeness, and produce-vs-skip decisions all scored 100%. Zero cases fell into any of the 11 failure categories above. No genuine implementation defect was found in evidence/adapters.py or evidence/models.py against this real-data benchmark, so no code changes were made to the evidence/ package -- fabricating a defect to fix, or hand-tuning the adapters to this specific benchmark's answers, would itself violate the 'do not hardcode benchmark answers' instruction. This is an honest null result, not an unexamined one: the benchmark deliberately included edge cases designed to surface exactly this class of bug (5 real PubMed placeholder-abstract PMIDs, real ChEMBL no_match/ambiguous_match/fuzzy/exact_synonym/exact_id_passthrough cases, a real molecule with pref_name=null+mechanism_of_action='Not available', a real ClinicalTrials 500-char-truncated brief_summary) and the adapters handled every one of them per the contract.",
+  "out_of_scope_real_finding_not_fixed": {
+    "location": "tools/chembl_tool.py (NOT evidence/ -- outside this task's editable scope)",
+    "finding": "search_by_target('EGFR') and search_by_target('ALK') both returned the identical 5-molecule set (CHEMBL6329, CHEMBL6328, CHEMBL265667, CHEMBL6362, CHEMBL267864), all 5 with pref_name=None and mechanism_of_action='Not available' from the live ChEMBL API (raw_chembl.json captured in this session). This suggests tools/chembl_tool.py's _search_targets()/search_by_target() may be resolving to an unintended or overly-generic target_chembl_id for one or both target names, or there is a caching/parameter bug in how target_chembl_id is passed to _search_molecules(). evidence/adapters.py's OWN behavior on these records is correct per contract (it refuses to fabricate content from the placeholder values and raises/skips, exactly matching the gold label) -- the adapter is not at fault, the upstream tool's target resolution is the more likely locus, but this is out of this task's scope (only evidence/ may be edited) and is reported here rather than fixed.",
+    "action_taken": "None -- reported only, per task scope restriction (evidence/ package only)."
+  }
+}

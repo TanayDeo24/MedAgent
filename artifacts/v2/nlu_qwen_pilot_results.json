@@ -1,0 +1,244 @@
+{
+  "load_time_sec": 6.841087818145752,
+  "device": "mps",
+  "results": [
+    {
+      "query_id": "nlu_v1_0083",
+      "intent_class_gold": "F_mechanism",
+      "query_text": "How does metformin work at the molecular level?",
+      "latency_ms": 15426.973819732666,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1358,
+        "output_tokens": 160,
+        "total_tokens": 1518
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"F_mechanism\",\n  \"intent_confidence\": 0.0,\n  \"entities\": [\n    {\n      \"entity_type\": \"compound\",\n      \"surface_form\": \"metformin\"\n    }\n  ],\n  \"constraints\": {},\n  \"requested_evidence_types\": [\"pubmed\"],\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the mechanism of action.\",\n    \"candidate_interpretations\": [\n      \"Metformin works at the cellular level by inhibiting gluconeogenesis.\",\n      \"Metformin affects insulin sensitivity through altering glucose metabolism.\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [
+        {
+          "text": "metformin",
+          "type": "compound",
+          "canonical_id": "ChEMBL:CHEMBL1431",
+          "semantic_roles": []
+        }
+      ],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the mechanism of action."
+      },
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0112",
+      "intent_class_gold": "G_constraint_heavy",
+      "query_text": "Find recruiting Phase 1 trials in adults with multiple myeloma using JAK2 inhibitors",
+      "latency_ms": 17457.46898651123,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1366,
+        "output_tokens": 186,
+        "total_tokens": 1552
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"I_ambiguous\",\n  \"intent_confidence\": 0.95,\n  \"entities\": [\n    {\n      \"entity_type\": \"disease\",\n      \"surface_form\": \"multiple myeloma\"\n    }\n  ],\n  \"constraints\": {},\n  \"requested_evidence_types\": [\"pubmed\"],\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease, population, and referent context.\",\n    \"candidate_interpretations\": [\n      \"Find recruiting Phase 1 trials in adults with multiple myeloma using JAK2 inhibitors\",\n      \"Determine eligibility criteria for adult patients with multiple myeloma who are eligible for Phase 1 trials using JAK2 inhibitors\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [
+        {
+          "text": "multiple myeloma",
+          "type": "disease",
+          "canonical_id": "MeSH:D009101",
+          "semantic_roles": []
+        }
+      ],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease, population, and referent context."
+      },
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0099",
+      "intent_class_gold": "E_multi_hop_research",
+      "query_text": "Starting from compounds that inhibit EGFR, which ones progressed to trials in non-small cell lung cancer and what do published studies report on their outcomes?",
+      "latency_ms": 17973.841905593872,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1376,
+        "output_tokens": 192,
+        "total_tokens": 1568
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"A_literature_evidence\",\n  \"intent_confidence\": 0.0,\n  \"entities\": [\n    {\n      \"entity_type\": \"compound\",\n      \"surface_form\": \"EGFR\"\n    }\n  ],\n  \"constraints\": {\n    \"trial_phases\": [],\n    \"trial_statuses\": [],\n    \"population\": [],\n    \"age\": [],\n    \"geography\": [],\n    \"temporal\": [],\n    \"study_type\": [],\n    \"outcomes\": []\n  },\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease, patient population, or outcome measures.\",\n    \"candidate_interpretations\": [\n      \"Non-small cell lung cancer\",\n      \"Patients with non-small cell lung cancer\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [
+        {
+          "text": "EGFR",
+          "type": "compound",
+          "canonical_id": null,
+          "semantic_roles": []
+        }
+      ],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease, patient population, or outcome measures."
+      },
+      "requested_evidence_types": []
+    },
+    {
+      "query_id": "nlu_v1_0067",
+      "intent_class_gold": "D_cross_source_synthesis",
+      "query_text": "Is metformin supported by both peer-reviewed literature and an active clinical trial for multiple myeloma?",
+      "latency_ms": 14396.990060806274,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1368,
+        "output_tokens": 149,
+        "total_tokens": 1517
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"A_literature_evidence\",\n  \"intent_confidence\": 0.0,\n  \"entities\": [\n    {\n      \"entity_type\": \"drug\",\n      \"surface_form\": \"metformin\"\n    }\n  ],\n  \"constraints\": {},\n  \"requested_evidence_types\": [\"pubmed\"],\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease or patient population.\",\n    \"candidate_interpretations\": [\n      \"multiple myeloma\",\n      \"patients with multiple myeloma\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease or patient population."
+      },
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0148",
+      "intent_class_gold": "I_ambiguous",
+      "query_text": "What does the literature say about the treatment?",
+      "latency_ms": 15051.020622253418,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1356,
+        "output_tokens": 158,
+        "total_tokens": 1514
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"I_ambiguous\",\n  \"intent_confidence\": 0.95,\n  \"entities\": [\n    {\n      \"entity_type\": \"disease\",\n      \"surface_form\": \"treatment\"\n    }\n  ],\n  \"constraints\": {},\n  \"requested_evidence_types\": [\"pubmed\"],\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease, patient population, or specific treatment method.\",\n    \"candidate_interpretations\": [\n      \"What treatments are available for [specific disease]\",\n      \"What treatments are effective against [specific disease]\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [
+        {
+          "text": "treatment",
+          "type": "disease",
+          "canonical_id": null,
+          "semantic_roles": []
+        }
+      ],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease, patient population, or specific treatment method."
+      },
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0036",
+      "intent_class_gold": "C_compound_target",
+      "query_text": "Which compounds target HER2 and what activity is reported?",
+      "latency_ms": 13711.333990097046,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1358,
+        "output_tokens": 141,
+        "total_tokens": 1499
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"A_literature_evidence\",\n  \"intent_confidence\": 0.0,\n  \"entities\": [\n    {\n      \"entity_type\": \"compound\",\n      \"surface_form\": \"HER2\"\n    }\n  ],\n  \"constraints\": {},\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease or condition targeted by the compounds.\",\n    \"candidate_interpretations\": [\n      \"Her2\",\n      \"Human epidermal growth factor receptor 2\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [
+        {
+          "text": "HER2",
+          "type": "compound",
+          "canonical_id": null,
+          "semantic_roles": []
+        }
+      ],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease or condition targeted by the compounds."
+      },
+      "requested_evidence_types": []
+    },
+    {
+      "query_id": "nlu_v1_0018",
+      "intent_class_gold": "B_clinical_trial_landscape",
+      "query_text": "What Phase 3 trials are evaluating sotorasib in type 2 diabetes?",
+      "latency_ms": 16410.935163497925,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1364,
+        "output_tokens": 172,
+        "total_tokens": 1536
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"I_ambiguous\",\n  \"intent_confidence\": 0.95,\n  \"entities\": [\n    {\n      \"entity_type\": \"drug\",\n      \"surface_form\": \"sotorasib\"\n    }\n  ],\n  \"constraints\": {},\n  \"requested_evidence_types\": [\"pubmed\"],\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease type (type 2 diabetes) and the exact nature of the trial evaluation.\",\n    \"candidate_interpretations\": [\n      \"Type 2 Diabetes Trials Evaluating Sotorasib\",\n      \"Sotorasib Trials in Type 2 Diabetes Patients\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease type (type 2 diabetes) and the exact nature of the trial evaluation."
+      },
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    },
+    {
+      "query_id": "nlu_v1_0109",
+      "intent_class_gold": "G_constraint_heavy",
+      "query_text": "Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors",
+      "latency_ms": 21897.475004196167,
+      "schema_valid": true,
+      "parse_error": null,
+      "llm_calls": 1,
+      "token_usage": {
+        "input_tokens": 1364,
+        "output_tokens": 237,
+        "total_tokens": 1601
+      },
+      "raw_output": "```json\n{\n  \"intent\": \"A_literature_evidence\",\n  \"intent_confidence\": 0.0,\n  \"entities\": [\n    {\n      \"entity_type\": \"disease\",\n      \"surface_form\": \"breast cancer\"\n    }\n  ],\n  \"constraints\": {\n    \"trial_phases\": [\"Phase 1\"],\n    \"trial_statuses\": [],\n    \"population\": [\"adults\"],\n    \"age\": [null],\n    \"geography\": [],\n    \"temporal\": [],\n    \"study_type\": [],\n    \"outcomes\": []\n  },\n  \"requested_evidence_types\": [\"pubmed\"],\n  \"ambiguity\": {\n    \"is_ambiguous\": true,\n    \"ambiguity_reason\": \"The query lacks specificity regarding the disease, population, and geographic location.\",\n    \"candidate_interpretations\": [\n      \"Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors globally\",\n      \"Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors in North America\"\n    ]\n  },\n  \"extraction_confidence\": 0.0\n}\n```",
+      "pred_intent": [],
+      "pred_entities": [
+        {
+          "text": "breast cancer",
+          "type": "disease",
+          "canonical_id": "MeSH:D001943",
+          "semantic_roles": []
+        }
+      ],
+      "pred_constraints": [],
+      "ambiguity": {
+        "is_ambiguous": true,
+        "reason": "The query lacks specificity regarding the disease, population, and geographic location."
+      },
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    }
+  ]
+}

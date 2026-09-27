@@ -1,0 +1,107 @@
+{
+  "phase": 5,
+  "status": "FROZEN",
+  "frozen_at": "2026-09-25",
+  "post_freeze_amendment": "2026-09-25: fixed an internal API-consistency inconsistency found via the held-out run (docs/v2/PHASE5_HELDOUT_RESULTS.md) - chembl_target_or_indication_result_to_evidence raised ValueError for a well-formed record with no real content to cite, unlike every other adapter's None-return skip convention. Changed to return None (signature updated to Optional[Evidence]); the two genuine caller-error cases (empty chembl_id, unrecognized operation) still raise ValueError, unchanged. This is behavior-preserving at the evidence/registry.py::normalize() boundary - the same records that were already correctly scored as skips in both validation and held-out runs remain skips; only the internal signaling mechanism changed, not any measured outcome (coverage, completeness, or gate results). Does not invalidate or require re-running the held-out set. One new regression test added (tests/test_evidence_adapters.py::test_chembl_molecule_result_with_no_real_content_returns_none). Full suite: 327 passed (was 326), 0 failed, 7 skipped.",
+  "freeze_rationale": "All 7 (of 10 listed) applicable hard safety gates in docs/v2/PHASE5_GATE_PLAN.md Section 3 measured 0 violations empirically against 58 real development+validation records (152 produced Evidence objects) from artifacts/v2/phase5_benchmark_manifest.json; overall and per-source provenance completeness measured 100% (docs/v2/PHASE5_GATE_PLAN.md Section 1 definition); content fidelity measured 100% exact (verbatim text / exact field-value match, 152/152); source ID integrity measured 0 fabricated / 0 corrupted; coverage (produce-or-correctly-skip decision matching independently authored gold) measured 100% (58/58); serialization roundtrip measured 100% (152/152). See artifacts/v2/phase5_validation_results.json for full metrics and artifacts/v2/phase5_failure_analysis.json for the failure taxonomy (0 cases in any category). No code changes were required or made to evidence/adapters.py or evidence/models.py during this validation pass.",
+  "evidence_schema": {
+    "module": "evidence.models",
+    "class": "Evidence",
+    "version": "1.0.0",
+    "fields": ["evidence_id", "source_type", "source_record_id", "source_url", "evidence_type", "content", "content_format", "title", "source_metadata", "provenance"],
+    "pydantic_version": "2.9.0",
+    "config": "ConfigDict(extra='forbid')"
+  },
+  "provenance_schema": {
+    "module": "evidence.models",
+    "class": "Provenance",
+    "version": "1.0.0",
+    "fields": ["call_id", "retrieval_method", "retrieval_rank", "retrieval_score", "corpus_index_version", "chunk_index", "num_chunks", "field_path", "retrieved_at"]
+  },
+  "source_metadata_schemas": {
+    "pubmed": {"class": "evidence.models.PubMedEvidenceMetadata", "version": "1.0.0"},
+    "clinical_trials": {"class": "evidence.models.ClinicalTrialEvidenceMetadata", "version": "1.0.0"},
+    "chembl": {"class": "evidence.models.ChemblEvidenceMetadata", "version": "1.0.0"}
+  },
+  "source_adapters": {
+    "pubmed_rag_chunk": {
+      "module_path": "evidence.adapters.pubmed_rag_document_to_evidence",
+      "input_type": "retrieval.retriever.Document",
+      "registry_key": "(SourceType.PUBMED, 'rag')",
+      "version": "1.0.0"
+    },
+    "pubmed_live_article": {
+      "module_path": "evidence.adapters.pubmed_live_result_to_evidence",
+      "input_type": "dict (tools.pubmed_tool.PubMedTool._parse_xml_article output)",
+      "registry_key": "(SourceType.PUBMED, 'live')",
+      "version": "1.0.0"
+    },
+    "clinical_trials": {
+      "module_path": "evidence.adapters.clinical_trial_to_evidence_records",
+      "input_type": "dict (tools.clinical_trials_tool.ClinicalTrialsTool._parse_study output)",
+      "registry_key": "(SourceType.CLINICAL_TRIALS, 'trial')",
+      "version": "1.0.0"
+    },
+    "chembl_molecule_indication": {
+      "module_path": "evidence.adapters.chembl_target_or_indication_result_to_evidence",
+      "input_type": "dict (tools.chembl_tool.ChEMBLTool._parse_molecule / _parse_drug_indication output)",
+      "registry_keys": ["(SourceType.CHEMBL, 'search_by_target')", "(SourceType.CHEMBL, 'search_by_indication')", "(SourceType.CHEMBL, 'get_drug_info')"],
+      "version": "1.0.0"
+    },
+    "chembl_resolve_compound_name": {
+      "module_path": "evidence.adapters.chembl_resolve_compound_name_to_evidence",
+      "input_type": "dict (tools.chembl_tool.ChEMBLTool.resolve_compound_name output)",
+      "registry_key": "(SourceType.CHEMBL, 'resolve_compound_name')",
+      "version": "1.0.0"
+    },
+    "registry_module": "evidence.registry.DEFAULT_ADAPTER_REGISTRY"
+  },
+  "evidence_id_strategy": {
+    "function": "evidence.models.make_evidence_id",
+    "rule": "deterministic, source-namespaced, pure function (no randomness/uuid)",
+    "schemes": {
+      "pubmed_rag_chunk": "pubmed:<pmid>:chunk:<chunk_index>",
+      "pubmed_live_article": "pubmed:<pmid>",
+      "clinical_trials": "nct:<nct_id>",
+      "chembl": "chembl:<chembl_id>"
+    },
+    "empirical_stability_confirmed": "same real input reproduced identical evidence_id across repeated adapter invocations in this validation run (152/152 records)"
+  },
+  "source_url_strategy": {
+    "function": "evidence.models.make_source_url",
+    "rule": "deterministic from verified source_record_id only, never model-generated",
+    "patterns": {
+      "pubmed": "https://pubmed.ncbi.nlm.nih.gov/<pmid>/",
+      "clinical_trials": "https://clinicaltrials.gov/study/<nct_id>",
+      "chembl": "https://www.ebi.ac.uk/chembl/compound_report_card/<chembl_id>/"
+    },
+    "empirically_verified_against_real_data": "100% of 152 produced Evidence records' source_url matched the gold-computed URL exactly (independently derived, not copied from the adapter)"
+  },
+  "benchmark_version": {
+    "artifact": "artifacts/v2/phase5_benchmark_manifest.json",
+    "benchmark_name": "phase5_evidence_benchmark",
+    "benchmark_version": "1.0.0",
+    "total_cases": 72,
+    "splits": {"development": 43, "validation": 15, "phase5_heldout": 14},
+    "note": "phase5_heldout (14 cases) was never used to validate or tune the frozen adapters -- reserved for a later independent check."
+  },
+  "contract_version_referenced": {
+    "artifact": "artifacts/v2/phase5_evidence_contract.json",
+    "contract_version": "1.0.0"
+  },
+  "gate_plan_referenced": "docs/v2/PHASE5_GATE_PLAN.md",
+  "hard_safety_gates_at_freeze_time": {
+    "Fabricated source IDs": 0,
+    "Corrupted source IDs": 0,
+    "Source mislabeling": 0,
+    "Model-generated unsourced content inside Evidence": 0,
+    "Secret/auth header leaks": 0,
+    "Evidence without evidence_id": 0,
+    "Evidence without source_type": 0,
+    "Silently missing required provenance": 0,
+    "Cross-source ID collision": 0,
+    "Trace link to a nonexistent call/retrieval": 0
+  },
+  "not_weakened_after_seeing_results": true,
+  "scope_note": "Phase 5 freezes the Evidence[] normalization boundary only. Per contract Section 10, it does NOT touch report generation, citation numbering, or agent/nodes.py -- those remain Phase 6/7's job, now unblocked by this typed, provenance-complete Evidence layer."
+}

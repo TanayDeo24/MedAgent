@@ -1,0 +1,28 @@
+{
+  "phase": "2_qwen_latency_experiment",
+  "purpose": "Predeclared 8-case pilot (task Step 7-8) for candidate_d_local_qwen (Qwen/Qwen2.5-1.5B-Instruct, local, Apache 2.0) BEFORE any pilot result is seen - selection criteria and pass/fail gate fixed in advance so results cannot bias them.",
+  "written_before_any_pilot_run_this_round": true,
+  "human_approval_scope": "Exactly one new action approved: download and evaluate Qwen/Qwen2.5-1.5B-Instruct as an NLU-stage latency candidate. No other model, no mlx-lm, no Phase 3 work.",
+  "predeclared_pilot_set": [
+    {"slot": "simple_entity_extraction", "query_id": "nlu_v1_0083", "intent_class": "F_mechanism", "query_text": "How does metformin work at the molecular level?"},
+    {"slot": "constraint_heavy_trial_query", "query_id": "nlu_v1_0112", "intent_class": "G_constraint_heavy", "query_text": "Find recruiting Phase 1 trials in adults with multiple myeloma using JAK2 inhibitors"},
+    {"slot": "multi_entity_query", "query_id": "nlu_v1_0099", "intent_class": "E_multi_hop_research", "query_text": "Starting from compounds that inhibit EGFR, which ones progressed to trials in non-small cell lung cancer and what do published studies report on their outcomes?"},
+    {"slot": "cross_source_query", "query_id": "nlu_v1_0067", "intent_class": "D_cross_source_synthesis", "query_text": "Is metformin supported by both peer-reviewed literature and an active clinical trial for multiple myeloma?"},
+    {"slot": "ambiguous_abbreviation", "query_id": "nlu_v1_0148", "intent_class": "I_ambiguous", "query_text": "What does the literature say about the treatment?", "note": "nlu_benchmark_v1.1.0's dev split contains NO example with a genuinely ambiguous ABBREVIATION (checked: no gold entity text is 'MS'/'RA'/etc. and no normalized_id is null in dev - the deliberately-ambiguous abbreviation cases live only in nlu/normalization.py's DISEASE_TABLE sentinels, not as benchmark gold examples). Closest available proxy: an I_ambiguous example with a missing referent ('the treatment') - documented substitution, not silently mislabeled."},
+    {"slot": "gene_protein_target_ambiguity", "query_id": "nlu_v1_0036", "intent_class": "C_compound_target", "query_text": "Which compounds target HER2 and what activity is reported?", "note": "HER2/ERBB2 is a canonical gene/protein/target-ambiguous mention; semantic_roles has no gold annotation in this benchmark (documented Phase 2 closure limitation) so this is scored as representation-only, same as candidate_b's own evaluation."},
+    {"slot": "class_B_example", "query_id": "nlu_v1_0018", "intent_class": "B_clinical_trial_landscape", "query_text": "What Phase 3 trials are evaluating sotorasib in type 2 diabetes?"},
+    {"slot": "class_G_example", "query_id": "nlu_v1_0109", "intent_class": "G_constraint_heavy", "query_text": "Find recruiting Phase 1 trials in adults with breast cancer using PD-1 inhibitors", "note": "Distinct example from the constraint_heavy_trial_query slot (nlu_v1_0112) to get two independent G-class checks, since B/G confusion was the project's single most common historical intent defect."}
+  ],
+  "data_discipline": "All 8 examples drawn from evaluation/v2/nlu_benchmark_v1.json's 'dev' split (n=45) only. The consumed 105-example test split and any Phase-10 held-out data are NOT touched by this pilot or by any later full-dev run in this experiment.",
+  "predeclared_pass_gate": {
+    "fabricated_canonical_ids": "must be 0",
+    "systematic_bg_confusion": "must not reappear (neither of the 2 G-class pilot examples classified as B_clinical_trial_landscape, and the 1 B-class pilot example not classified as G_constraint_heavy)",
+    "catastrophic_entity_extraction_errors": "none - the clearly-named entity in each query (drug/target/disease) must be extracted with a plausible type",
+    "major_constraint_loss": "none - the 2 G-class pilot examples' 3 constraint dimensions (phase, status, population/age) must not be dropped wholesale",
+    "valid_ambiguity_handling": "the I_ambiguous pilot example must set ambiguity.is_ambiguous=true (intent=I_ambiguous is a bonus, not a hard requirement at pilot scale of n=1)",
+    "valid_researchquery_schema_output": "all 8 examples must produce a Pydantic-valid ResearchQuery (schema_valid=True) - allowing up to 2 bounded prompt/schema adaptations per Step 9 if failures are FORMATTING issues, not semantic ones",
+    "recoverable_structured_output_behavior": "the existing 1-retry-then-explicit-NLU_FAILURE path (reused verbatim from candidate_b) must be exercised correctly on any failure, never a fabricated fallback",
+    "latency_materially_below_control": "steady-state (warm) per-query latency must be visibly, not marginally, faster than the Nemotron control's P50 19150ms/P95 66983ms - a local model with no network round-trip is expected to win decisively on latency; if it does not, that alone is grounds to stop and reconsider before a full 45-example run"
+  },
+  "predeclared_stop_rule": "If the pilot obviously fails (e.g. fabricated IDs appear, B/G confusion reappears systematically, or JSON is unrecoverable across attempts even after up to 2 bounded prompt adaptations), STOP - do not run the full 45-example dev evaluation, do not spend further time trying to salvage a clearly-failing small model."
+}

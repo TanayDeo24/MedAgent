@@ -1,0 +1,5 @@
+{
+  "status": "NOT RUN",
+  "reason": "Experiment stopped at the pre-call neuron budget/risk gate before the 8-case pilot was executed. See artifacts/v2/nlu_cloudflare_budget_plan.json for the full reasoning (unresolved ~37x neuron/billing anomaly reported for the primary candidate model @cf/google/gemma-4-26b-a4b-it).",
+  "date": "2026-09-24"
+}

@@ -1,0 +1,60 @@
+{
+  "phase": "2_alternate_inference_closure",
+  "hardware": "Apple M3, 8 cores (4P+4E), 16GB RAM, macOS Darwin 24.6.0",
+  "installed_ml_runtime": {
+    "torch": "2.14.0 (installed, used today for sentence-transformers embeddings)",
+    "transformers": "5.17.0 (HuggingFace, installed)",
+    "mlx / mlx-lm": "NOT installed",
+    "ollama": "NOT installed",
+    "llama-cpp": "NOT installed"
+  },
+  "huggingface_cache_check_performed_first": {
+    "path": "~/.cache/huggingface/hub",
+    "contents_relevant": [
+      {"repo": "mlx-community/Qwen2.5-3B-Instruct-4bit", "size_on_disk": "1.6GB", "format": "MLX (safetensors, 4-bit quantized)", "cached_at": "2026-08-21 (predates this session, from unrelated prior local work on this machine)"},
+      {"repo": "mlx-community/defog-sqlcoder-7b-2", "size_on_disk": "13GB", "format": "MLX", "note": "SQL-generation-specialized model, not a general instruction/JSON-extraction model - not a fit for NLU regardless of caching"},
+      {"repo": "defog/sqlcoder-7b-2", "size_on_disk": "8.0K (metadata only, no weight blobs cached)", "note": "same model family, non-MLX repo - effectively not cached"},
+      {"repo": "BAAI/bge-base-en-v1.5, sentence-transformers/*, cross-encoder/ms-marco-MiniLM-L-6-v2, roberta-large", "note": "embedding/reranking/classification models already used by this project's retrieval stack - not instruction-tuned generative LLMs, not candidates for NLU extraction"}
+    ],
+    "conclusion": "Exactly one cached model is a plausible NLU candidate: mlx-community/Qwen2.5-3B-Instruct-4bit. No download is required to obtain its weights."
+  },
+  "candidates_identified": [
+    {
+      "rank": 1,
+      "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+      "base_model": "Qwen/Qwen2.5-3B-Instruct (Alibaba)",
+      "parameter_count": "~3.09B (hidden_size 2048, 36 layers, qwen2 architecture, verified from cached config.json)",
+      "quantization": "4-bit (group_size 64), MLX-native quantization - already applied, not a choice to be made",
+      "format_runtime_required": "MLX (Apple's own array/ML framework) via the `mlx-lm` Python package - NOT loadable through the already-installed torch/transformers stack directly (different weight format, different loader)",
+      "download_required": "NO - already fully cached on disk (1.6GB), verified present in ~/.cache/huggingface/hub with a resolved `refs/main` and complete blob set (config, tokenizer, safetensors, merges, vocab all present)",
+      "new_dependency_required": "YES - `mlx-lm` is not installed in the venv (`pip list` shows no mlx* package). This is a small, pure pip-installable Python package (MLX itself is Apple's answer to numpy/torch for Apple Silicon, actively maintained, MIT-licensed), not a system daemon or elevated-privilege install like `ollama` - but it IS a new runtime dependency not currently present, and per this round's explicit safety gate, installing it was NOT done without approval.",
+      "expected_ram_footprint": "~2-3GB resident (4-bit quant of a 3B model; MLX uses Apple's unified memory efficiently) - comfortably fits in 16GB alongside the rest of this project's process (FAISS index + embeddings already loaded)",
+      "license": "\"qwen-research\" (Qwen Research License, NOT Apache 2.0) - confirmed by reading the cached repo's README.md frontmatter directly (`license: other`, `license_name: qwen-research`, linking to Qwen/Qwen2.5-3B-Instruct's LICENSE on HuggingFace). This is a non-commercial / research-use-oriented license, materially more restrictive than the Apache-2.0 license carried by other Qwen2.5 sizes (0.5B/1.5B/7B/14B/32B). This is a genuine adoption concern independent of the install-approval gate and should be weighed by whoever approves this candidate.",
+      "why_otherwise_suitable": "Qwen2.5-Instruct is a non-reasoning instruction-tuned chat model (no chain-of-thought preamble by default, unlike nemotron-3-super-120b-a12b), well-documented strong JSON/structured-output following in its family, 3B is squarely in the small/fast class appropriate for this task, and running fully offline/local eliminates network+queue latency and the reasoning-token cost entirely by construction.",
+      "status": "IDENTIFIED, NOT TESTED - blocked at the mlx-lm install-approval gate (Step 14)"
+    },
+    {
+      "rank": 2,
+      "model": "Qwen/Qwen2.5-1.5B-Instruct (standard HF safetensors, non-MLX)",
+      "parameter_count": "~1.54B",
+      "quantization_options": "fp16 (~3.1GB), int8 via bitsandbytes (~1.6GB, bitsandbytes not currently installed), or a pre-quantized GGUF/AWQ variant from the community (would require locating and verifying one from an appropriate source)",
+      "format_runtime_required": "Standard HuggingFace transformers/torch - already installed, no new runtime dependency needed",
+      "download_required": "YES - not cached anywhere on this machine; fp16 weights are approximately 3GB",
+      "expected_ram_footprint": "~3.5-4GB resident at fp16, comfortably within 16GB",
+      "license": "Apache 2.0 - fully permissive, no commercial-use restriction (verified as the documented license for the 1.5B size specifically, unlike the 3B/72B sizes which use the more restrictive Qwen Research license)",
+      "why_suitable": "Same instruction-tuned, non-reasoning family as candidate 1 with a materially cleaner license and a runtime that needs zero new dependencies - the tradeoff is a required ~3GB download and a smaller model (more risk to extraction quality than the already-cached 3B) which would need pilot verification.",
+      "status": "IDENTIFIED, NOT TESTED - blocked at the download-approval gate (Step 14); no weights fetched"
+    }
+  ],
+  "candidates_considered_and_not_pursued": [
+    {"model": "microsoft/Phi-3.5-mini-instruct", "reason_not_pursued_as_primary": "MIT-licensed and well-suited by size (3.8B) and structured-output reputation, but not cached locally (would require a ~7.6GB fp16 download, the largest of the three considered) and not obviously superior to the two ranked candidates above for this task - kept as a fallback option only, not separately detailed to avoid recommending a third download path when two smaller-footprint options already cover the license-clean and already-cached cases."},
+    {"model": "meta-llama/Llama-3.2-3B-Instruct", "reason_not_pursued": "Gated on HuggingFace (requires accepting Meta's Llama 3.2 Community License and requesting access, tied to a specific HF account) - an additional access-approval step beyond a plain download, and not cached locally. Lower priority than the two ranked candidates given equivalent size class."}
+  ],
+  "safety_gate_conclusion": {
+    "downloads_performed": 0,
+    "pip_installs_performed": 0,
+    "system_runtime_installs_performed": 0,
+    "models_actually_loaded_or_run": 0,
+    "rationale": "Per the explicit Step 14 instruction, evaluating either ranked candidate requires an action (installing mlx-lm for candidate 1, or downloading ~3GB for candidate 2) that the directive requires human approval for before proceeding. Reaching this identification point with two concrete, well-justified candidates and stopping here is the correct, complete outcome for this round - not a shortfall."
+  }
+}

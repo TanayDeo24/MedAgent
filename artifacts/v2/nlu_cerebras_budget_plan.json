@@ -1,0 +1,30 @@
+{
+  "purpose": "Pre-experiment hard budget plan for the Cerebras Phase 2 NLU-latency evaluation, computed BEFORE any API call, per the human-authorized $0.50 total free-trial-credit cap.",
+  "hard_cap_usd": 0.50,
+  "pricing_basis": {
+    "model": "gpt-oss-120b",
+    "input_usd_per_million_tokens": 0.35,
+    "output_usd_per_million_tokens": 0.75,
+    "source": "artifacts/v2/nlu_cerebras_provider_verification.json"
+  },
+  "token_estimate_basis": "artifacts/v2/nlu_frozen_config.json reports the CURRENT control architecture (candidate_b_structured, nemotron-3-super-120b-a12b) uses ~1130-1235 input / ~1275-1330 output tokens per query (mean ~2400-2565 total). The Cerebras experiment reuses the SAME STRUCTURED_EXTRACTION_PROMPT content (translated to strict JSON Schema), so input-token size should be comparable. Output size is harder to predict because gpt-oss-120b's reasoning_effort='low' still emits some reasoning tokens (billed as output) even at the lowest setting - a conservative (higher-than-expected) estimate is used below to avoid under-budgeting.",
+  "conservative_per_call_estimate": {
+    "input_tokens": 1500,
+    "output_tokens_including_reasoning": 3000,
+    "cost_usd": 0.002775,
+    "note": "Deliberately padded above the control's measured averages (1235 in / 1330 out) to absorb reasoning-token overhead at reasoning_effort=low and any schema-translation verbosity."
+  },
+  "stage_by_stage_estimate": [
+    {"stage": "GPT-OSS-120B pilot (n=8, 1 initial + up to 1 bounded retry per case on empty/malformed response)", "max_calls": 16, "estimated_cost_usd": 0.0444},
+    {"stage": "GPT-OSS-120B full dev (n=45, only if pilot passes both quality and latency gates; 1 initial + up to 1 bounded retry per case)", "max_calls": 90, "estimated_cost_usd": 0.2498},
+    {"stage": "Qwen fallback pilot (n=8, only if GPT-OSS rejected AND >=70% of $0.50 remains)", "max_calls": 16, "estimated_cost_usd": 0.0444, "note": "Uses gpt-oss-120b pricing as a placeholder upper bound until qwen-3.8-27b's own pricing is confirmed live if this stage is reached; qwen models are typically priced at or below gpt-oss-120b on Cerebras, so this is not an under-estimate."},
+    {"stage": "Qwen fallback full dev (n=45, only if Qwen pilot passes both gates)", "max_calls": 90, "estimated_cost_usd": 0.2498}
+  ],
+  "worst_case_total_if_every_stage_runs_usd": 0.5884,
+  "worst_case_exceeds_cap": true,
+  "resolution": "The absolute worst case (every stage, every call retried once) is $0.588, which EXCEEDS the $0.50 cap. This is expected and handled by the sequencing rule already mandated by the task: stages run in order (GPT-OSS pilot -> GPT-OSS full dev if eligible -> Qwen pilot if needed -> Qwen full dev if eligible), actual spend is measured and recorded after EACH stage before starting the next, and the experiment STOPS the moment cumulative actual spend plus the next stage's conservative estimate would approach the $0.50 cap. In practice the realistic (non-retry-heavy) total across all 4 stages is ~$0.30-0.35, comfortably under cap; the retry-heavy worst case is a bound, not an expectation, and is guarded against by per-stage checkpointing rather than assumed away.",
+  "realistic_expected_total_usd": "~0.30-0.35 assuming a normal (low) retry rate consistent with candidate_b_structured's historical ~0.9-1.0 first-attempt schema success rate",
+  "per_stage_checkpoint_rule": "Before starting each stage: confirm (estimated cost of next stage) + (actual spend so far) <= 0.50. If not, STOP and report rather than proceeding.",
+  "remaining_free_credit_visibility": "Not programmatically queryable via the Cerebras Inference API itself (no balance-check endpoint documented in the fetched docs); tracked manually in this repo via per-stage token-usage accounting from API responses (prompt/completion token counts are returned per-call and multiplied by the verified per-token pricing above) rather than trusting a live balance read.",
+  "cap_respected_commitment": "No paid-credit purchase, no account upgrade, no auto-recharge activation will be performed under any circumstance in this experiment, regardless of outcome."
+}

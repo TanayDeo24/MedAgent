@@ -1,0 +1,54 @@
+{
+  "verification_date": "2026-09-24",
+  "model_id": "qwen-3.8-27b",
+  "status": "active",
+  "provider": "Cerebras (public inference endpoint)",
+  "context_length": {
+    "free_trial_tokens": 65536,
+    "paid_tier_tokens": 131072
+  },
+  "max_completion_tokens": {
+    "free_trial_tokens": 32768,
+    "paid_tier_tokens": 40960
+  },
+  "structured_outputs": {
+    "supported": true,
+    "strict_json_schema_mode": true,
+    "notes": "Supported via Chat Completions response_format json_schema with strict:true, same mechanism already implemented in nlu/extractor.py::CEREBRAS_RESEARCH_QUERY_JSON_SCHEMA for candidate_f (gpt-oss); no schema changes needed for qwen since the identical strict-mode constraints apply (additionalProperties:false, all-required, nullable via type union)."
+  },
+  "reasoning_effort": {
+    "model_specific_page_states": ["none", "high"],
+    "general_reasoning_capabilities_page_states": ["none", "low", "medium", "high"],
+    "default": "high",
+    "none_supported": true,
+    "resolution": "Model-specific doc page (inference-docs.cerebras.ai/models/qwen-3.8-27b.md) is treated as authoritative over the general reasoning capabilities page for this exact model, since it is model-scoped; both sources agree reasoning_effort='none' is accepted and is the documented mechanism to disable reasoning for qwen-3.8-27b. If the API rejects 'low'/'medium' with an explicit error at smoke-test time, that would confirm the model page (2 values) over the general page (4 values) empirically -- see nlu_cerebras_qwen_frozen_config.json for the smoke-test-confirmed outcome.",
+    "note_vs_gpt_oss": "gpt-oss-120b does NOT support reasoning_effort='none' (confirmed in the prior GPT-OSS round, docs/v2/PHASE2_CEREBRAS_EXPERIMENT.md). qwen-3.8-27b is documented differently -- this is model-specific, not a provider-wide constant, so it was independently re-verified here rather than assumed."
+  },
+  "pricing_per_million_tokens_usd": {
+    "input": 0.99,
+    "output": 1.49,
+    "source_agreement": "Official inference-docs.cerebras.ai model page states $0.99 input / $1.49 output; independent third-party pricing aggregator (aipricing.guru, checked as of early September 2026) states the same figures. www.cerebras.ai/pricing itself is client-side rendered and did not yield static figures to automated fetch (same limitation noted for gpt-oss in the prior round)."
+  },
+  "rate_limits_free_trial_tier": {
+    "rpm": 5,
+    "tpm_uncached": 30000,
+    "tpm_total": 90000,
+    "tph": 1000000,
+    "tpd": 1000000,
+    "requests_per_day": "not specified in docs",
+    "note": "Identical RPM/TPM/TPD envelope to gpt-oss-120b's previously-verified Free Trial limits; NOT assumed equal here -- independently re-fetched and confirmed equal by coincidence of Cerebras' tier-wide (not model-specific) Free Trial policy."
+  },
+  "image_input_limits_free_trial": "2 images/request, 10 MiB total request payload (not relevant to this text-only NLU extraction use case)",
+  "sources": [
+    "https://inference-docs.cerebras.ai/models/qwen-3.8-27b.md",
+    "https://inference-docs.cerebras.ai/capabilities/reasoning.md",
+    "https://inference-docs.cerebras.ai/capabilities/structured-outputs.md",
+    "https://inference-docs.cerebras.ai/support/rate-limits.md",
+    "https://inference-docs.cerebras.ai/support/pricing.md (redirects to www.cerebras.ai/pricing, client-side rendered)",
+    "https://www.aipricing.guru/news/qwen3-8-27b-open-weights-local-ai-costs-august-2026/ (cross-check only, not authoritative)"
+  ],
+  "caveats": [
+    "www.cerebras.ai/pricing did not yield pricing figures via automated fetch (JS-rendered), same limitation as the GPT-OSS round; pricing here relies on the inference-docs.cerebras.ai model page plus one independent third-party cross-check, not the marketing pricing page itself.",
+    "The two official-doc-derived reasoning_effort value lists disagree (2-value vs 4-value); both agree 'none' is valid, which is the only value this experiment plans to use per Step 8, so the disagreement does not block proceeding, but is disclosed rather than silently resolved."
+  ]
+}

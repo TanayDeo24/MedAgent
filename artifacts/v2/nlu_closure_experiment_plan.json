@@ -1,0 +1,87 @@
+{
+  "phase": "2_closure",
+  "written_during": "closure pass, priority-1/2 rounds",
+  "data_discipline": "All diagnostic re-runs and any future bounded experiments in this plan use the dev split (45 examples) only. The 105-example test split remains CONSUMED from the original Phase 2 pass and is not re-run or tuned against in this closure pass, except the single final Phase-2-local check this plan itself authorizes at the end (see 'final_check' below), consistent with V2_PHASE_GATES.md's Phase 2 exit gate ('test-split metrics reported ... dev is for iteration only'). Phase 10's real held-out benchmark (a different, not-yet-built artifact per BENCHMARK_PLAN.md) is untouched.",
+  "open_defects_at_start_of_this_plan": [
+    "entity extraction regressed B vs A baseline (0.886 -> 0.767 dev / 0.745 test), not yet root-caused beyond 'recall-driven, stable dev->test' (PHASE2_REOPEN_ANALYSIS.md)",
+    "100% G->B intent confusion on both splits",
+    "H_insufficient_evidence never predicted",
+    "constraint F1 0.453 (test), no per-field breakdown existed",
+    "no trial phase/status canonicalization",
+    "no gene/protein/target ambiguity representation",
+    "3 empty LLM responses on test split unexplained",
+    "P50 15.9s / P95 51.7s latency",
+    "2 flaky/mis-targeted rate-limit tests (FIXED prior round, see docs/v2/PHASE2_REOPEN_ANALYSIS.md and tests/test_rate_limiter.py)"
+  ],
+  "fixes_already_applied_this_plan_before_any_new_measurement": [
+    {
+      "item": 4,
+      "change": "Added nlu/taxonomy.py::B_VS_G_RULE (reverse-engineered from the benchmark's own already-built examples: B has <=1 constraint dimension, G has >=2) and injected it into nlu/extractor.py's STRUCTURED_EXTRACTION_PROMPT (previously the model was scored on a distinction it was never told).",
+      "type": "prompt/taxonomy fix, no model/hyperparameter change"
+    },
+    {
+      "item": 5,
+      "change": "Removed H_insufficient_evidence from the query-time IntentClass enum (nlu/taxonomy.py) per PRODUCT_CONTRACT.md's own definition of H as a post-retrieval evidence-sufficiency outcome, not a query-text-determinable intent. Bumped nlu/schemas.py SCHEMA_VERSION 2.0.0 -> 2.1.0. Migrated nlu_benchmark_v1.0.0 -> v1.1.0 (evaluation/v2/nlu_benchmark_v1.json), relabeling the 15 examples gold-labeled H to their query-time surface class; original archived at evaluation/v2/nlu_benchmark_v1.0.0_archive.json; full per-example diff at artifacts/v2/nlu_closure_benchmark_migration.json.",
+      "type": "taxonomy/schema/benchmark versioning fix, no model/hyperparameter change"
+    },
+    {
+      "item": 7,
+      "change": "Added nlu/normalization.py::canonicalize_trial_phase / canonicalize_trial_status (deterministic, regex-based, no LLM) and wired into nlu/extractor.py::extract_candidate_b via _canonicalize_constraint_fields before ConstraintSet validation. Combined phases (e.g. 'Phase I/II') expand to multiple canonical codes, never collapsed to one. Dedicated tests in tests/test_nlu.py.",
+      "type": "deterministic code fix, no model/hyperparameter change"
+    },
+    {
+      "item": 8,
+      "change": "Added BiomedicalEntity.semantic_roles (nlu/schemas.py): optional list of additional valid EntityType readings alongside the required primary entity_type, for genuine gene/protein/target multi-role ambiguity. Wired into the extraction prompt and _coerce_entities parsing (nlu/extractor.py). Evaluation-side scoring that CONSUMES semantic_roles to distinguish 'wrong type' from 'valid alternate role' is NOT yet implemented, because nlu_benchmark_v1.1.0 does not yet carry gold semantic_roles annotations - flagged as a known limitation, not silently closed.",
+      "type": "schema fix, no model/hyperparameter change"
+    },
+    {
+      "item": 3,
+      "change": "Added evaluation/v2/nlu_metrics.py::entity_prf_by_type / aggregate_entity_by_type (per-entity-type P/R/F1/FP/FN + text-level type-confusion counts) and evaluation/v2/nlu_metrics.py::constraint_prf_by_field / aggregate_constraint_by_field (per-constraint-field P/R/F1 + formatting-vs-semantic-miss split), wired into evaluation/v2/run_nlu_eval.py's per-example and aggregate output. Diagnostic-only code change (adds measurement, does not change what either candidate extracts).",
+      "type": "instrumentation, no model/hyperparameter change"
+    }
+  ],
+  "bounded_new_measurements_this_plan_authorizes": [
+    {
+      "id": "dev_rerun_a_entitytype",
+      "purpose": "item 3: per-type entity P/R/F1 for Candidate A on dev, using the new instrumentation (no raw per-example predictions had been saved from the original Phase 2 run).",
+      "architecture": "candidate_a_baseline",
+      "split": "dev",
+      "hyperparameters_changed": "none - Candidate A is measurement-only per nlu_experiment_plan.json, not modified",
+      "status": "DONE - artifacts/v2/nlu_closure_entitytype_a_dev.json"
+    },
+    {
+      "id": "dev_rerun_b_entitytype_constraintfield",
+      "purpose": "items 3, 4, 6, 7: per-type entity P/R/F1, per-field constraint P/R/F1, and the effect of the B_VS_G_RULE prompt fix + phase/status canonicalization, for Candidate B on dev, post-fix.",
+      "architecture": "candidate_b_structured",
+      "split": "dev",
+      "hyperparameters_changed": "prompt now includes B_VS_G_RULE and DI_VS_E_RULE text and semantic_roles instructions; constraints now pass through canonicalize_trial_phase/canonicalize_trial_status. temperature/model unchanged (0.0, nvidia/nemotron-3-super-120b-a12b).",
+      "status": "IN_PROGRESS - artifacts/v2/nlu_closure_entitytype_b_dev.json"
+    }
+  ],
+  "max_experiment_count_this_plan": {
+    "note": "Bounded per item 17's requirement. The two dev reruns above count as 2. Any further ROUND (priority 2/3 items 9-14: empty-response handling, structured-output audit, latency profiling, a smaller-model comparison, a biomedical-NER/dictionary entity-extraction candidate, token accounting) that requires a NEW live dev-split run must be added to this file as a new entry BEFORE it is run, and is capped at 4 additional bounded runs total (one per: latency/empty-response instrumentation pass, one smaller-model comparison run, one biomedical-extraction-candidate comparison run, one final post-all-fixes dev confirmation run) to prevent unbounded prompt tweaking. No hyperparameter grid search is authorized - each run changes one identified, documented thing.",
+    "cap": 4,
+    "used_so_far": 3,
+    "runs_used": [
+      "dev rerun post B_VS_G_RULE/canonicalization/retry fixes, pre-entity-typing-fix (artifacts/v2/nlu_closure_entitytype_b_dev_run1_preentityfix.json) - surfaced an unintended entity-type regression from the semantic_roles prompt addition",
+      "dev rerun post target-default-entity-typing fix (artifacts/v2/nlu_closure_entitytype_b_dev_run2_entityfixed.json) - entity F1 recovered to 0.837, surfaced I_ambiguous 0/5 recall",
+      "dev rerun post I_ambiguous intent-mapping fix (artifacts/v2/nlu_closure_entitytype_b_dev.json, FINAL/FROZEN) - I_ambiguous F1 0.0->0.889, intent accuracy 0.556->0.867"
+    ],
+    "remaining_budget": 1,
+    "note_on_remaining_budget": "1 bounded rerun remains available under this plan's cap, reserved for a latency-optimization attempt (item 11) if pursued in a future round - not used this round given time constraints."
+  },
+  "architecture_selection_rule_item_18": {
+    "rule": "Multi-objective gate, NOT a single composite score (this is itself the fix for PHASE2_REOPEN_ANALYSIS.md's finding that the original composite hid the entity regression). A candidate architecture (which may be a hybrid: e.g. Candidate A/dictionary-based entity extraction + Candidate B's intent/constraint/source handling) is acceptable ONLY if ALL of the following hold simultaneously on the dev split, each reported individually, then reconfirmed once on the untouched test split at the very end:",
+    "gates": [
+      "Entity F1 (micro) does not materially regress from the strongest verified Phase-2 baseline (0.886, Candidate A dev) - 'materially' defined as no more than 2 points absolute, matching this benchmark's n=45-105 confidence-interval scale; any larger gap must be quantitatively explained, not waived.",
+      "Normalization: fabricated_id_count == 0 always; accuracy@1 reported with n.",
+      "Intent: no systematic (>=80% of a class's examples) single-class confusion remains in the confusion matrix; every one of the 8 query-time classes has measurable, non-zero support and a non-zero recall attempt.",
+      "Constraints: no individual constraint field's F1 is 'systematically broken' (defined as F1 < 0.3 with support >= 5); phase/status fields specifically must round-trip canonicalize_trial_phase/canonicalize_trial_status correctly, verified by tests/test_nlu.py.",
+      "Structured output: schema-parse success rate measured and reported (not assumed 100%); empty responses get one deterministic retry then an explicit NLU_FAILURE outcome, never fabricated content.",
+      "Latency: P50 appropriate for an interactive upstream stage (target: P50 well under 10s; P95 reported honestly even if it doesn't hit that target, with a stated reason).",
+      "Ambiguity: gene/protein/target multi-role cases use semantic_roles rather than forced single-type certainty; genuinely ambiguous queries set AmbiguityState.is_ambiguous=true rather than guessing."
+    ],
+    "explicitly_allowed": "A hybrid/decomposed final architecture (best entity extractor + best intent/constraint component + deterministic normalization/canonicalization + a validated merge step) if no single architecture clears every gate above. This is the current working hypothesis pending the dev_rerun_b_entitytype_constraintfield results.",
+    "not_yet_decided": "Whether Candidate A's entity extraction is actually reusable/mergeable with Candidate B's intent/constraint/source output, or whether Candidate B's entity extraction can close the gap on its own now that the B/G and canonicalization fixes are in - this is exactly what the in-progress dev rerun is measuring before any hybrid-architecture code is written."
+  }
+}

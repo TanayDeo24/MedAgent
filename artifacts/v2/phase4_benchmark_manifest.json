@@ -1,0 +1,2181 @@
+{
+  "benchmark_name": "phase4_retrieval_benchmark",
+  "benchmark_version": "1.0.0",
+  "created": "2026-09-25",
+  "seed": 20260925,
+  "seed_note": "Fixed seed (today's date, 2026-09-25) used for shuffling group_keys before split assignment. Re-running the generator (script preserved at artifacts/v2/../../ -- see docs/v2/PHASE4_BENCHMARK.md for the generation-script pointer) with this seed reproduces an identical split.",
+  "grouping_method": "Every case carries a group_key, usually a drug/target/disease-family tag (e.g. 'family_osimertinib_egfr'). Cases about the same drug/entity family across different sources (e.g. a PubMed case, a ClinicalTrials case, a ChEMBL case, and a multi-source case all about tirzepatide) share one group_key so they are never split across development/validation/phase4_heldout -- this follows the same discipline as artifacts/v2/phase3_benchmark_manifest.json's grouping_method (group_key-based splitting, never splitting a group across splits). Because group sizes here are uneven (a multi-source drug family can hold up to 6 cases, a single-fact case is its own 1-case group), splitting is done by randomly shuffling the list of DISTINCT group_keys with the fixed seed above, then greedily assigning each group in that shuffled order to whichever of development/validation/phase4_heldout is currently furthest below its 60%/20%/20% CASE-count target -- this keeps the no-group-ever-split-across-splits guarantee while landing close to a 60/20/20 case-count split despite uneven group sizes (a plain group-count cut, as used unmodified, produced a skewed 37/18/6 split here and was rejected in favor of this case-count-aware variant).",
+  "gold_label_process": "Every case's gold relevance judgment was produced by direct human (author) verification against a real, checkable source record -- never by asking an LLM 'is this relevant' and accepting the answer. Three verification methods were used, each recorded per-case in that case's `verification` field: (1) local_corpus_inspection -- for PubMed RAG cases, the actual title+abstract text of the candidate PMID was read directly out of data/corpus/abstracts.jsonl (the exact corpus retrieval/retriever.py indexes) to judge genuine topical relevance before labeling it gold; (2) live_pubmed_api / live_clinicaltrials_v2_api / live_chembl_api -- for cases needing content not in (or not confirmably in) the local corpus, and for all ClinicalTrials/ChEMBL cases (which have no local index per docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md Sections B/C), the real public API was called during benchmark construction (2026-09-25) and the actual returned record (title, condition list, phase, status, pref_name, max_phase, mechanism fields) was read to judge relevance -- e.g. CHEMBL-COMPOUND-02's osimertinib ID: an initial guess (CHEMBL1743081) was checked live, found to actually be TRALOKINUMAB (an unrelated drug), and discarded before the correct ID (CHEMBL3353410) was found via a live name search -- a concrete record of rejecting a wrong guess rather than asserting it; (3) tool_signature_inspection / orchestration_models_inspection -- for abstention/unsupported-operation cases, the real tool method signatures (tools/pubmed_tool.py, tools/clinical_trials_tool.py, tools/chembl_tool.py) and typed argument schemas (orchestration/models.py) were read in full to confirm no operation exists to serve the query, rather than assuming. Two of ChEMBL's cases (CHEMBL-TARGET-02, CHEMBL-AMBIG-01, and NEG-AMBIG-COMPOUND-01) additionally document a real, live-observed WRONG_ENTITY failure mode (the tool's search_by_target first-hit heuristic returning an unrelated protein-protein-interaction or wrong-organism/wrong-gene record ahead of the correct target) -- this was discovered empirically during verification, not hypothesized in advance, and is recorded with the literal API response order as evidence.",
+  "protected_data_not_touched": {
+    "phase2_consumed_test_split": {
+      "location": "evaluation/v2/nlu_benchmark_v1.json (and evaluation/v2/nlu_benchmark_v1.0.0_archive.json)",
+      "note": "Not read for case content or gold labels; this benchmark's query text is entirely new and does not reuse or paraphrase any Phase 2 benchmark item."
+    },
+    "phase3_spent_heldout": {
+      "location": "artifacts/v2/phase3_benchmark_manifest.json (phase3_heldout split), artifacts/v2/phase3_heldout_results.json, artifacts/v2/phase3_heldout_supplement.json, artifacts/v2/phase3_heldout_supplement_results.json",
+      "note": "phase3_benchmark_manifest.json was read ONLY to learn its case-format convention and grouping/split methodology (Section C of the governing directive explicitly permits this); no Phase 3 query text, group_key, or gold label was copied, reused, or paraphrased into this file. All 61 query strings in this file were newly authored for Phase 4 and independently checked against Phase 3's original_query strings for verbatim/near-verbatim overlap -- none found."
+    },
+    "phase10_not_touched": {
+      "note": "Phase 10 does not exist yet in this repository (no docs/v2/PHASE10_*, no artifacts/v2/phase10_*) -- confirmed by directory listing; nothing under any Phase-10 name was read, created, or modified."
+    }
+  },
+  "retrieval_contract_reference": "docs/v2/PHASE4_RETRIEVAL_CONTRACT.md, artifacts/v2/phase4_retrieval_contract.json -- gold labels here are expressed against RetrievalCandidate.source_record_id (PMID | NCT ID | ChEMBL ID), never a fabricated identifier, per that contract's Section 3 source-specific contracts.",
+  "gate_plan_reference": "docs/v2/PHASE4_GATE_PLAN.md -- category field values and expected_failure_category fields on individual cases map onto that document's Section 1 failure taxonomy (NO_RESULTS, RELEVANT_ITEM_MISSED, WRONG_ENTITY, WRONG_SOURCE, OVER_FILTERED, UNDER_FILTERED, STALE_INDEX, etc.); no new failure category was invented for this benchmark -- every expected_failure_category value used below already appears in that taxonomy.",
+  "split_sizes": {
+    "development": 37,
+    "validation": 12,
+    "phase4_heldout": 12
+  },
+  "total_cases": 61,
+  "category_coverage": {
+    "chembl_ambiguous": 2,
+    "chembl_compound": 6,
+    "chembl_exact_identifier": 2,
+    "chembl_indication": 2,
+    "chembl_target": 1,
+    "chembl_zero_result": 1,
+    "clinicaltrials_condition": 3,
+    "clinicaltrials_intervention": 2,
+    "clinicaltrials_low_result": 2,
+    "clinicaltrials_multi_filter": 3,
+    "clinicaltrials_phase": 1,
+    "clinicaltrials_status": 2,
+    "clinicaltrials_zero_result": 1,
+    "multi_source": 7,
+    "negative_absent_information": 1,
+    "negative_ambiguous_entity": 2,
+    "negative_unsupported_operation": 2,
+    "negative_wrong_source_trap": 1,
+    "pubmed_exact_entity": 2,
+    "pubmed_lexical_gap": 2,
+    "pubmed_live_api": 2,
+    "pubmed_mechanism": 2,
+    "pubmed_multi_concept": 2,
+    "pubmed_narrow_constraint": 5,
+    "pubmed_topical": 4,
+    "pubmed_zero_result": 1
+  },
+  "source_coverage_case_counts": {
+    "pubmed": 28,
+    "clinical_trials": 21,
+    "chembl": 24
+  },
+  "gold_label_type_coverage": {
+    "exact_id": 37,
+    "concept_based": 17,
+    "no_results_expected": 4,
+    "abstention_expected": 3
+  },
+  "distinct_group_keys": 29,
+  "case_format_fields": [
+    "case_id",
+    "category",
+    "group_key",
+    "query",
+    "target_sources",
+    "gold.gold_relevance_type",
+    "gold.gold_relevant_ids",
+    "gold.gold_relevance_rationale",
+    "gold.gold_query_must_contain_concepts",
+    "gold.gold_required_sources",
+    "gold.expected_structured_filters",
+    "gold.expected_retrieval_method",
+    "gold_label_rationale",
+    "verification",
+    "expected_failure_category",
+    "split"
+  ],
+  "cases": [
+    {
+      "case_id": "PM-EXACT-01",
+      "category": "pubmed_exact_entity",
+      "group_key": "family_brigatinib",
+      "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "29119148",
+            "31109722",
+            "31331844"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "brigatinib",
+            "ALK",
+            "non-small cell lung cancer"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Exact-entity query naming the drug (brigatinib) and disease (ALK+ NSCLC) directly; three corpus PMIDs are on-topic articles specifically about brigatinib in ALK+ NSCLC.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "grep/python scan of data/corpus/abstracts.jsonl confirmed PMID 29119148 ('Brigatinib for the treatment of ALK-positive advanced non-small cell lung cancer patients') and PMID 31109722 ('Brigatinib: New-generation ALK inhibitor for nonsmall cell lung cancer') are direct brigatinib/ALK/NSCLC articles by title+abstract read; PMID 31331844 ('Management of CNS disease in ALK-positive non-small cell lung cancer') discusses ALK-inhibitor (brigatinib-class) CNS management, genuinely on-topic."
+      },
+      "expected_failure_category": null,
+      "case_index": 0,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-EXACT-02",
+      "category": "pubmed_exact_entity",
+      "group_key": "family_cart_ball_cd22",
+      "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "40306957"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "CD22",
+            "CAR-T",
+            "CD19",
+            "acute lymphoblastic leukemia"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Query is a near-verbatim paraphrase of a single corpus article's exact topic (a very narrow, specific combination unlikely to have more than one true match in a 9,000-abstract corpus).",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 40306957 title 'CD22 CAR-T cells secreting CD19 T-cell engagers for improved control of B-cell acute lymphoblastic leukemia progression' read directly from data/corpus/abstracts.jsonl -- exact match to query topic."
+      },
+      "expected_failure_category": null,
+      "case_index": 1,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-LEX-01",
+      "category": "pubmed_lexical_gap",
+      "group_key": "family_osimertinib_egfr",
+      "query": "What causes tumor cells to stop responding to a third-generation EGFR-blocking pill used as first-line therapy for lung adenocarcinoma with an EGFR mutation?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "35883645"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "EGFR",
+            "resistance",
+            "lung adenocarcinoma"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Deliberately avoids the word 'osimertinib' (uses 'third-generation EGFR-blocking pill') and avoids 'mechanisms of resistance' (uses 'stop responding') -- tests whether dense/rerank recovers the article a pure BM25/lexical match would likely miss.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 35883645 title 'Diverse Mechanisms of Resistance against Osimertinib, a Third-Generation EGFR-TKI, in Lung Adenocarcinoma Cells' -- abstract confirms osimertinib is first-line for EGFR-mutant NSCLC/adenocarcinoma, read directly from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 2,
+      "split": "validation"
+    },
+    {
+      "case_id": "PM-LEX-02",
+      "category": "pubmed_lexical_gap",
+      "group_key": "family_hiv_immunomodulatory",
+      "query": "Is it safe to give drugs that dampen the immune system to people who are HIV positive?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "32310901"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "immunomodulatory",
+            "HIV"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "'Drugs that dampen the immune system' is a lay paraphrase of 'immunomodulatory/biologic therapy' -- no lexical overlap with the corpus article's actual terminology beyond 'HIV'.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 32310901 title 'Outcomes of immunomodulatory and biologic therapy in people living with HIV' -- abstract confirms it directly studies immunomodulatory drug safety in PLWH, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 3,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-MECH-01",
+      "category": "pubmed_mechanism",
+      "group_key": "family_cml_imatinib",
+      "query": "What are the mechanisms of resistance to imatinib in chronic myeloid leukemia?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "31646577",
+            "30332954",
+            "30504658"
+          ]
+        },
+        "gold_relevance_rationale": "Any of these 3 verified-relevant PMIDs counts as a hit; all three are substantively about imatinib/BCR-ABL TKI resistance mechanisms in CML.",
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "imatinib",
+            "resistance",
+            "chronic myeloid leukemia"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Classic mechanism question; corpus contains a documented cluster of CML/imatinib-resistance articles, so this is treated as multi-answer concept-based gold rather than a single exact ID.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 31646577 ('MiRNA-409-5p dysregulation promotes imatinib resistance...'), PMID 30332954 ('Chronic Myeloid Leukemia: Existing Therapeutic Options and Strategies to Overcome Drug Resistance' -- abstract: Bcr-Abl fusion, imatinib resistance discussed), PMID 30504658 ('MET/ERK and MET/JNK Pathway Activation Is Involved in BCR-ABL Inhibitor-resistance...' -- abstract explicitly names imatinib) all confirmed on-topic by reading title+abstract in data/corpus/abstracts.jsonl."
+      },
+      "expected_failure_category": null,
+      "case_index": 4,
+      "split": "validation"
+    },
+    {
+      "case_id": "PM-MECH-02",
+      "category": "pubmed_mechanism",
+      "group_key": "family_metformin",
+      "query": "How do a patient's genetics influence how well metformin works for type 2 diabetes?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "28770331",
+            "41031844",
+            "37317976"
+          ]
+        },
+        "gold_relevance_rationale": "Any of these 3 verified-relevant PMIDs counts as a hit.",
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "metformin",
+            "genetics",
+            "type 2 diabetes"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Mechanism/pharmacogenetics question with three genuinely on-topic corpus articles (two explicitly about metformin pharmacogenetics, one about metformin genetics+response).",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 28770331 'The pharmacogenetics of metformin' (title is an exact match), PMID 41031844 'Genetics and response to treatment with metformin for type 2 diabetes' (exact match), PMID 37317976 'Role of metformin in the management of type 2 diabetes: recent advances' (mechanism-of-action article, read as topically relevant support) -- all read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 5,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-MULTI-01",
+      "category": "pubmed_multi_concept",
+      "group_key": "family_cart_dlbcl_cd19",
+      "query": "Why does CD19-targeted CAR-T cell therapy fail in some patients with relapsed or refractory diffuse large B cell lymphoma?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "38336529"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "CD19",
+            "CAR-T",
+            "diffuse large B cell lymphoma"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Multi-concept query combining a specific target antigen (CD19), a therapy modality (CAR-T), a failure/relapse angle, and a specific disease (DLBCL) -- all four concepts must co-occur.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 38336529 title 'CD19 CAR-T cell therapy for relapsed or refractory diffuse large B cell lymphoma: Why does it fail?' -- near-verbatim match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 6,
+      "split": "validation"
+    },
+    {
+      "case_id": "PM-MULTI-02",
+      "category": "pubmed_multi_concept",
+      "group_key": "family_bcma_cart_myeloma",
+      "query": "What molecular mechanisms cause long-term low blood-cell counts after BCMA CAR-T therapy in multiple myeloma patients?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "39058976"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "BCMA",
+            "CAR-T",
+            "cytopenia",
+            "multiple myeloma"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Multi-concept + lexical-gap combo: 'low blood-cell counts' paraphrases 'cytopenia' while BCMA/CAR-T/multiple myeloma remain literal, testing combined lexical+semantic matching.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 39058976 title 'Molecular mechanisms promoting long-term cytopenia after BCMA CAR-T therapy in multiple myeloma' -- confirmed exact topical match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 7,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "PM-NARROW-01",
+      "category": "pubmed_narrow_constraint",
+      "group_key": "family_gefitinib_t790m",
+      "query": "Does combining AT-101 with gefitinib improve drug sensitivity in EGFR T790M-mutant non-small cell lung cancer specifically?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "27431492"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "AT-101",
+            "gefitinib",
+            "EGFR T790M"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Narrow-constraint query naming an exact compound pair (AT-101 + gefitinib) and an exact resistance mutation (T790M) -- only one corpus article plausibly matches this specific combo.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 27431492 title 'AT-101 enhances gefitinib sensitivity in non-small cell lung cancer with EGFR T790M mutations' -- exact match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 8,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "PM-NARROW-02",
+      "category": "pubmed_narrow_constraint",
+      "group_key": "family_almonertinib",
+      "query": "How does the third-generation EGFR inhibitor almonertinib trigger cell death via reactive oxygen species in lung cancer cells?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "34219533"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "almonertinib",
+            "reactive oxygen species",
+            "apoptosis"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Narrow constraint on a specific, less-common compound (almonertinib) and mechanism (ROS-mediated apoptosis/autophagy) -- distinguishes it from the far more common osimertinib cases.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 34219533 title 'EGFR tyrosine kinase inhibitor Almonertinib induces apoptosis and autophagy mediated by reactive oxygen species in non-small cell lung cancer cells' -- exact match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 9,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-NARROW-03",
+      "category": "pubmed_narrow_constraint",
+      "group_key": "family_parp_ovarian",
+      "query": "What is the role of PARP inhibitors in treating ovarian carcinomas with defective homologous recombination repair?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "22591423"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "PARP inhibitor",
+            "ovarian carcinoma",
+            "homologous recombination"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Narrow mechanistic constraint (HR-deficiency, not just 'ovarian cancer' generally).",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 22591423 title 'The role of PARP inhibitors in the treatment of ovarian carcinomas' -- abstract opens on homologous recombination (HR) DSB repair defects and BRCA1/2, confirmed on-topic, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 10,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "PM-NARROW-04",
+      "category": "pubmed_narrow_constraint",
+      "group_key": "family_dexmedetomidine_sepsis",
+      "query": "Do randomized controlled trials show dexmedetomidine improves outcomes in sepsis patients?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "31045827"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "dexmedetomidine",
+            "sepsis",
+            "randomized controlled trials"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Narrow constraint on study design (RCT/meta-analysis) plus drug+condition.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 31045827 title 'Efficacy of dexmedetomidine for treatment of patients with sepsis: A meta-analysis of randomized controlled trials' -- exact match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 11,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-NARROW-05",
+      "category": "pubmed_narrow_constraint",
+      "group_key": "family_upadacitinib",
+      "query": "Is the JAK inhibitor upadacitinib effective for Crohn's disease patients who failed prior therapy?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "38362641"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "upadacitinib",
+            "Crohn's disease",
+            "JAK"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Narrow constraint on patient subgroup (prior-therapy failure) plus drug+disease; group_key shared with the ClinicalTrials/ChEMBL upadacitinib cases below to keep the whole drug family in one split.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 38362641 title 'Upadacitinib for the treatment of moderate-to-severe Crohn's disease' -- abstract opens on patients who 'do not respond to initial treatment or lose response over time,' confirming the prior-therapy-failure angle, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 12,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-TOPICAL-01",
+      "category": "pubmed_topical",
+      "group_key": "family_statin_cv",
+      "query": "What does the evidence say about using statins to prevent cardiovascular disease in people who have not yet had a cardiac event?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "31015265"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "statin",
+            "primary prevention",
+            "cardiovascular disease"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "'Not yet had a cardiac event' paraphrases 'primary prevention' -- tests concept mapping.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 31015265 title 'Statins for the primary prevention of cardiovascular disease: an overview of systematic reviews' -- exact match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 13,
+      "split": "validation"
+    },
+    {
+      "case_id": "PM-TOPICAL-02",
+      "category": "pubmed_topical",
+      "group_key": "family_her2_breast",
+      "query": "What are the current treatment updates for HER2-positive metastatic breast cancer?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "39520520"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "HER2",
+            "metastatic breast cancer"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Direct topical/entity query.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 39520520 title 'Updates in Treatment of HER2-positive Metastatic Breast Cancer' -- exact match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 14,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "PM-TOPICAL-03",
+      "category": "pubmed_topical",
+      "group_key": "family_trop2_breast",
+      "query": "Are TROP2-targeted antibody-drug conjugates a promising option for HER2-negative metastatic breast cancer patients with brain metastases?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "40359710"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "TROP2",
+            "antibody-drug conjugate",
+            "HER2-negative",
+            "brain metastases"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Near-verbatim query against a distinctively titled article.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 40359710 title 'Novel TROP2 antibody-drug conjugates for treatment of HER2-negative metastatic breast cancer patients with brain metastases: a promising option' -- exact match, read from corpus file."
+      },
+      "expected_failure_category": null,
+      "case_index": 15,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-TOPICAL-04",
+      "category": "pubmed_topical",
+      "group_key": "family_pembrolizumab_tnbc",
+      "query": "What is the current status of immune checkpoint inhibitor therapy and response biomarkers for triple-negative breast cancer?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "40324951"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "immune checkpoint inhibitor",
+            "triple-negative breast cancer",
+            "biomarkers"
+          ]
+        },
+        "expected_retrieval_method": "hybrid_rrf_rerank"
+      },
+      "gold_label_rationale": "Direct topical query; group_key shared with the ClinicalTrials pembrolizumab-TNBC case and ChEMBL pembrolizumab-ID case (same drug-class/disease family) to prevent split leakage.",
+      "verification": {
+        "method": "local_corpus_inspection",
+        "evidence": "PMID 40324951 title 'Current Status of Immune Checkpoint Inhibitors and Treatment Responsive Biomarkers for Triple-Negative Breast Cancer' -- full title read directly from corpus file (title was truncated in an earlier grep preview; confirmed by re-reading the untruncated record) -- exact match, and abstract opens on ICIs in TNBC."
+      },
+      "expected_failure_category": null,
+      "case_index": 16,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-LIVE-01",
+      "category": "pubmed_live_api",
+      "group_key": "family_tirzepatide",
+      "query": "What do recent real-world studies show about long-term effectiveness of tirzepatide for weight management in adults with overweight or obesity?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "42769739"
+          ]
+        },
+        "gold_relevance_rationale": "This 2026 article postdates the local RAG corpus build and is not expected to be present in data/corpus/abstracts.jsonl -- it is gold ONLY for the live PubMed API path, not the local RAG index; a RAG-only system is expected to miss it (this is intentional: exercises the STALE_INDEX failure category from the gate plan).",
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "tirzepatide",
+            "obesity",
+            "real-world effectiveness"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Deliberately chosen because the local corpus is known-stale (per docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md's 13,115->9,000 subsample gap and general corpus age); confirmed absent from the local index below, present via the live API.",
+      "verification": {
+        "method": "live_pubmed_api_and_local_corpus_absence_check",
+        "evidence": "Live esearch (eutils.ncbi.nlm.nih.gov, term='tirzepatide obesity weight loss') returned PMID 42769739 with esummary title 'Long-Term Clinical Outcomes and Real-World Effectiveness of Tirzepatide in Adults With Overweight or Obesity' -- exact topical match, called live 2026-09-25. Confirmed PMID 42769739 does NOT appear in data/corpus/abstracts.jsonl (python scan for the PMID string returned no match)."
+      },
+      "expected_failure_category": null,
+      "case_index": 17,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-LIVE-02",
+      "category": "pubmed_live_api",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "What is known about lecanemab and donanemab as anti-amyloid monoclonal antibodies for early Alzheimer's disease?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "42784125"
+          ]
+        },
+        "gold_relevance_rationale": "Also gold only for the live PubMed API path (2026 article, post-dates the local corpus build); a RAG-only system missing this is an expected, correctly-categorized STALE_INDEX case, not a genuine retrieval failure.",
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "lecanemab",
+            "donanemab",
+            "amyloid",
+            "Alzheimer"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Same rationale as PM-LIVE-01 -- a recent, live-API-only, verified-real article; group_key shared with the ClinicalTrials/ChEMBL lecanemab cases.",
+      "verification": {
+        "method": "live_pubmed_api_and_local_corpus_absence_check",
+        "evidence": "Live esearch (term='lecanemab Alzheimer amyloid') returned PMID 42784125, esummary title 'Anti-Amyloid Monoclonal Antibodies in Early Alzheimer Disease: Lecanemab and Donanemab' -- exact topical match, called live 2026-09-25. Confirmed PMID 42784125 does NOT appear in data/corpus/abstracts.jsonl."
+      },
+      "expected_failure_category": null,
+      "case_index": 18,
+      "split": "development"
+    },
+    {
+      "case_id": "PM-ZERO-01",
+      "category": "pubmed_zero_result",
+      "group_key": "family_nonsense_zero",
+      "query": "What does the literature say about xyzxyzqqnonexistentdrugname12345 for treating disease?",
+      "target_sources": [
+        "pubmed"
+      ],
+      "gold": {
+        "gold_relevance_type": "no_results_expected",
+        "gold_relevant_ids": {
+          "pubmed": []
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": []
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Fabricated, non-existent drug token; the live PubMed API genuinely returns zero results, so the correct system behavior is NO_RESULTS, never a hallucinated/fuzzy-matched citation.",
+      "verification": {
+        "method": "live_pubmed_api",
+        "evidence": "Live esearch (term='xyzxyzqqnonexistentdrugname12345') returned idlist=[] (0 results), called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 19,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "CT-COND-01",
+      "category": "clinicaltrials_condition",
+      "group_key": "family_crispr_sickle_cell",
+      "query": "What clinical trials are evaluating CRISPR-based gene editing therapy for sickle cell disease?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT05329649",
+            "NCT03745287"
+          ]
+        },
+        "gold_relevance_rationale": "Any of the verified NCT IDs counts (exa-cel/CTX001 trials in sickle cell disease).",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "sickle cell disease"
+          ]
+        },
+        "expected_structured_filters": {
+          "condition": "sickle cell disease"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Condition-driven query (search_trials(condition=...)); CTX001/exa-cel is the real, well-known CRISPR-based sickle cell therapy with multiple registered trials.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET clinicaltrials.gov/api/v2/studies?query.term=CRISPR gene editing sickle cell disease returned NCT05329649 (PHASE3, ACTIVE_NOT_RECRUITING, conditions include 'Sickle Cell Disease') and NCT03745287 (PHASE2/PHASE3, COMPLETED, 'Sickle Cell Disease') among top results, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 20,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-STATUS-02",
+      "category": "clinicaltrials_status",
+      "group_key": "family_crispr_sickle_cell",
+      "query": "Which exa-cel (CTX001) trials in sickle cell disease were withdrawn?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT05951205"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "exa-cel",
+            "sickle cell disease"
+          ]
+        },
+        "expected_structured_filters": {
+          "status": "WITHDRAWN",
+          "intervention": "exa-cel/CTX001"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Status-filtered query on the same drug family, tests status-filter fidelity distinct from CT-COND-01's unfiltered condition query.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.term=exagamglogene autotemcel sickle cell returned NCT05951205 with overallStatus='WITHDRAWN', briefTitle 'Evaluation of Efficacy and Safety of a Single Dose of Exa-cel in Participants With...', called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 21,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-AMBIG-01",
+      "category": "clinicaltrials_condition",
+      "group_key": "family_crispr_sickle_cell",
+      "query": "Find trials for the investigational compound CTX001 in sickle cell disease patients.",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT05329649",
+            "NCT05951205",
+            "NCT04208529",
+            "NCT03745287",
+            "NCT05477563"
+          ]
+        },
+        "gold_relevance_rationale": "CTX001 is the same compound later renamed exagamglogene autotemcel (exa-cel) -- a system must resolve the older code-name to find the same trial family as CT-COND-01/CT-STATUS-02; any of these 5 verified NCT IDs counts.",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "CTX001",
+            "sickle cell disease"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Tests whether an older compound code-name (CTX001) still resolves to the trial family found under the newer generic name (exa-cel) -- an entity-naming robustness check.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.term=CTX001 sickle cell disease returned the same 5 NCT IDs (NCT05329649, NCT05951205, NCT04208529, NCT03745287, NCT05477563) as the exa-cel-worded query, confirming both terms resolve to the same trial family live, called 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 22,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-INTR-01",
+      "category": "clinicaltrials_intervention",
+      "group_key": "family_osimertinib_egfr",
+      "query": "What actively recruiting osimertinib trials exist for non-small cell lung cancer?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT07323641",
+            "NCT07329322",
+            "NCT04322890"
+          ]
+        },
+        "gold_relevance_rationale": "Any of these 3 verified NCT IDs counts.",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "osimertinib",
+            "non-small cell lung cancer"
+          ]
+        },
+        "expected_structured_filters": {
+          "status": "RECRUITING",
+          "intervention": "osimertinib",
+          "condition": "NSCLC"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Intervention+status-filtered query; group_key shared with the PubMed/ChEMBL osimertinib cases and the MS-01 multi-source case.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=non-small cell lung cancer&query.intr=osimertinib&filter.overallStatus=RECRUITING returned NCT07323641, NCT07329322, NCT04322890 as top hits, all overallStatus='RECRUITING', conditions containing NSCLC, called 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 23,
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-OVERFILTER-01",
+      "category": "clinicaltrials_multi_filter",
+      "group_key": "family_osimertinib_egfr",
+      "query": "Are there recruiting osimertinib trials for non-small cell lung cancer patients with brain metastases?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT06296745"
+          ]
+        },
+        "gold_relevance_rationale": "NCT06296745 is a genuinely relevant CNS-involvement trial (intrathecal pemetrexed for leptomeningeal metastasis from lung adenocarcinoma, RECRUITING) but its ClinicalTrials.gov condition field literally says 'Leptomeningeal Metastasis', not the query's literal phrase 'brain metastases' -- a naive exact-substring condition filter would silently drop it (OVER_FILTERED per the gate plan's taxonomy) even though a clinician would recognize CNS/leptomeningeal spread as within scope of a 'brain metastases' query.",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "osimertinib",
+            "NSCLC",
+            "brain metastases OR leptomeningeal"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Over-filtering trap: tests whether the system recognizes a clinically-synonymous condition term instead of literal-substring-only matching.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "Same live query as CT-INTR-01 (osimertinib + NSCLC + RECRUITING) returned NCT06296745 'Intrathecal Pemetrexed for Leptomeningeal Metastasis From Lung Adenocarcinoma' with conditions=['Leptomeningeal Metastasis'], overallStatus='RECRUITING' -- confirmed the literal condition string does not contain 'brain metastases', called live 2026-09-25."
+      },
+      "expected_failure_category": "OVER_FILTERED",
+      "case_index": 24,
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-PHASE-01",
+      "category": "clinicaltrials_phase",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "Which Phase 3 trials are testing lecanemab in Alzheimer's disease?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT04468659"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "lecanemab",
+            "Alzheimer",
+            "Phase 3"
+          ]
+        },
+        "expected_structured_filters": {
+          "phase": "PHASE3",
+          "intervention": "lecanemab"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Phase-filtered query.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=Alzheimer's Disease&query.intr=lecanemab returned NCT04468659 with phases=['PHASE3'], briefTitle 'AHEAD 3-45 Study...Lecanemab', called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 25,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-LOW-01",
+      "category": "clinicaltrials_low_result",
+      "group_key": "family_tirzepatide",
+      "query": "What trial is studying tirzepatide's effect on bone health?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT07094568"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "tirzepatide",
+            "bone"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Low-result-count case: narrow intervention+outcome combination genuinely returns very few trials (a good test that a single-digit result set is handled correctly, not padded/mixed with irrelevant tirzepatide trials).",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=obesity&query.intr=tirzepatide top result was NCT07094568 'Tirzepatide vs Liraglutide in Bone', overallStatus='RECRUITING', called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 26,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-LOW-02",
+      "category": "clinicaltrials_low_result",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "Is there a trial combining near-infrared light therapy with lecanemab for mild Alzheimer's disease?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT06992804"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "near-infrared",
+            "lecanemab",
+            "Alzheimer"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Very narrow, likely-single-hit combination query.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=Alzheimer's Disease&query.intr=lecanemab returned NCT06992804 'Near-Infrared Light Therapy Combined With Lecanemab for Mild Alzheimer's Disease', EARLY_PHASE1, RECRUITING, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 27,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-COND-02",
+      "category": "clinicaltrials_condition",
+      "group_key": "family_tirzepatide",
+      "query": "Is tirzepatide being studied in women with obesity and endometrial pre-cancer conditions?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT07078838"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "tirzepatide",
+            "obesity",
+            "endometrial"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Condition-driven, narrow patient-population query.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=obesity&query.intr=tirzepatide returned NCT07078838 'Tirzepatide in Women With Obesity and Endometrial Intra-epithelial Neoplasia or...', conditions include 'Endometrial Cancer'/'Endometrial Intraepithelial Neoplasia', NOT_YET_RECRUITING, PHASE2, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 28,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-INTR-02",
+      "category": "clinicaltrials_intervention",
+      "group_key": "family_tirzepatide",
+      "query": "What Phase 3 trials studied tirzepatide for weight management?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT06918405",
+            "NCT04184622"
+          ]
+        },
+        "gold_relevance_rationale": "Either verified NCT ID counts.",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "tirzepatide",
+            "weight management"
+          ]
+        },
+        "expected_structured_filters": {
+          "phase": "PHASE3",
+          "intervention": "tirzepatide"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Intervention+phase query on the same drug family as CT-LOW-01/CT-COND-02.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=obesity&query.intr=tirzepatide returned NCT06918405 'Efficacy and Safety of Tirzepatide for Weight Management' (PHASE3, ACTIVE_NOT_RECRUITING) and NCT04184622 'A Study of Tirzepatide (LY3298176) in Participants With Obesity or Overweight' (PHASE3, COMPLETED), called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 29,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-STATUS-01",
+      "category": "clinicaltrials_status",
+      "group_key": "family_pembrolizumab_tnbc",
+      "query": "What completed pembrolizumab trials exist for triple-negative breast cancer?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT03213041",
+            "NCT03012230",
+            "NCT01676753",
+            "NCT02648477"
+          ]
+        },
+        "gold_relevance_rationale": "Any of these 4 verified, COMPLETED NCT IDs counts.",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "pembrolizumab",
+            "triple-negative breast cancer"
+          ]
+        },
+        "expected_structured_filters": {
+          "status": "COMPLETED",
+          "intervention": "pembrolizumab",
+          "condition": "TNBC"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Status-filtered query; group_key shared with PM-TOPICAL-04's checkpoint-inhibitor/TNBC pubmed case and the ChEMBL pembrolizumab-ID case.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=triple negative breast cancer&query.intr=pembrolizumab&filter.overallStatus=COMPLETED returned all 4 NCT IDs with overallStatus='COMPLETED' and conditions containing Triple-Negative Breast Carcinoma, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 30,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-MULTI-01",
+      "category": "clinicaltrials_multi_filter",
+      "group_key": "family_cml_imatinib",
+      "query": "Is there an early-phase trial comparing nilotinib to imatinib in newly diagnosed chronic myeloid leukemia?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT03228303"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "nilotinib",
+            "imatinib",
+            "chronic myeloid leukemia"
+          ]
+        },
+        "expected_structured_filters": {
+          "phase": "EARLY_PHASE1",
+          "intervention": "imatinib/nilotinib",
+          "condition": "CML"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Multi-filter (two named interventions + phase + newly-diagnosed population); group_key shared with the PubMed/ChEMBL imatinib-CML cases and MS-02.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=chronic myeloid leukemia&query.intr=imatinib top result NCT03228303 'Nilotinib Versus Imatinib in Treatment of Patients With Newly Diagnosed Chronic...', phases=['EARLY_PHASE1'], called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 31,
+      "split": "validation"
+    },
+    {
+      "case_id": "CT-MULTI-02",
+      "category": "clinicaltrials_multi_filter",
+      "group_key": "family_upadacitinib",
+      "query": "What recruiting Phase 4 trials of upadacitinib exist for rheumatoid arthritis?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "clinical_trials": [
+            "NCT02714634",
+            "NCT06687551"
+          ]
+        },
+        "gold_relevance_rationale": "Either verified NCT ID counts. Included specifically because an earlier check confirmed status+phase combined filtering genuinely returns non-empty results here (ruling out a false NO_RESULTS assumption before labeling gold).",
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": [
+            "upadacitinib",
+            "rheumatoid arthritis"
+          ]
+        },
+        "expected_structured_filters": {
+          "status": "RECRUITING",
+          "phase": "PHASE4",
+          "intervention": "upadacitinib",
+          "condition": "rheumatoid arthritis"
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Multi-filter (status+phase+intervention+condition all combined) -- exercises UNDER_FILTERED/OVER_FILTERED distinctions from the gate plan taxonomy; group_key shared with the PubMed upadacitinib case.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.cond=rheumatoid arthritis&query.intr=upadacitinib&filter.overallStatus=RECRUITING (10 results) showed NCT02714634 (phases=['PHASE4']) and NCT06687551 (phases=['PHASE4']) among them -- confirmed live before labeling as gold, called 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 32,
+      "split": "development"
+    },
+    {
+      "case_id": "CT-ZERO-01",
+      "category": "clinicaltrials_zero_result",
+      "group_key": "family_nonsense_zero",
+      "query": "Are there any clinical trials for xyzxyz-nonexistent-condition-zzz-12345?",
+      "target_sources": [
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "no_results_expected",
+        "gold_relevant_ids": {
+          "clinical_trials": []
+        },
+        "gold_query_must_contain_concepts": {
+          "clinical_trials": []
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Fabricated condition token; live API genuinely returns zero studies.",
+      "verification": {
+        "method": "live_clinicaltrials_v2_api",
+        "evidence": "GET .../studies?query.term=xyzxyz-nonexistent-condition-zzz-12345 returned studies=[] (0 results), called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 33,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "CHEMBL-EXACT-01",
+      "category": "chembl_exact_identifier",
+      "group_key": "family_cml_imatinib",
+      "query": "What is the ChEMBL record and approval phase for the compound with ID CHEMBL941?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL941"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "CHEMBL941"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Exact-identifier lookup (get_drug_info); tool must return the record for exactly this ID, never a fuzzy-matched different compound.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET ebi.ac.uk/chembl/api/data/molecule/CHEMBL941.json returned pref_name='IMATINIB', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 34,
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-EXACT-02",
+      "category": "chembl_exact_identifier",
+      "group_key": "family_metformin",
+      "query": "What is the ChEMBL record for the compound with ID CHEMBL1431?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL1431"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "CHEMBL1431"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Exact-identifier lookup; group_key shared with the PubMed metformin-pharmacogenetics case (same drug family, different source-facet).",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=METFORMIN returned molecule_chembl_id='CHEMBL1431', pref_name='METFORMIN', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 35,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-01",
+      "category": "chembl_compound",
+      "group_key": "family_brigatinib",
+      "query": "What is the ChEMBL identifier and development phase for brigatinib?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3545311"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "brigatinib"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Name-based compound lookup, same drug family as PM-EXACT-01.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=BRIGATINIB returned molecule_chembl_id='CHEMBL3545311', pref_name='BRIGATINIB', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 36,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-02",
+      "category": "chembl_compound",
+      "group_key": "family_osimertinib_egfr",
+      "query": "What is the correct ChEMBL identifier for osimertinib?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3353410"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "osimertinib"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Name-based compound lookup; the correct ID was found by live name search, NOT assumed -- an initial guess (CHEMBL1743081) was checked live and found to actually be TRALOKINUMAB, a completely different (unrelated antibody) drug, and was discarded rather than used. This is recorded explicitly as evidence that gold IDs here come from verification, not recall/prediction.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "First attempt: GET .../molecule/CHEMBL1743081.json returned pref_name='TRALOKINUMAB' -- NOT osimertinib, so this guessed ID was rejected. Correct ID found via GET .../molecule.json?pref_name__iexact=OSIMERTINIB, which returned molecule_chembl_id='CHEMBL3353410', pref_name='OSIMERTINIB', max_phase=4.0. Both calls made live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 37,
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-03",
+      "category": "chembl_compound",
+      "group_key": "family_tirzepatide",
+      "query": "What is the ChEMBL identifier for tirzepatide, and what modality (small molecule/protein/antibody) is it?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL4297839"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "tirzepatide"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Name-based compound lookup with a modality-type sub-question (tests source_metadata fidelity, not just ID correctness).",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=TIRZEPATIDE returned molecule_chembl_id='CHEMBL4297839', pref_name='TIRZEPATIDE', molecule_type='Protein', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 38,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-04",
+      "category": "chembl_compound",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "What is the ChEMBL identifier for lecanemab?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3833321"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "lecanemab"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Name-based compound lookup, same drug family as PM-LIVE-02/CT-PHASE-01.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=LECANEMAB returned molecule_chembl_id='CHEMBL3833321', pref_name='LECANEMAB', molecule_type='Antibody', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 39,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-05",
+      "category": "chembl_compound",
+      "group_key": "family_pembrolizumab_tnbc",
+      "query": "What is the ChEMBL identifier for pembrolizumab?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3137343"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "pembrolizumab"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Name-based compound lookup, same drug family as PM-TOPICAL-04/CT-STATUS-01.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=PEMBROLIZUMAB returned molecule_chembl_id='CHEMBL3137343', pref_name='PEMBROLIZUMAB', molecule_type='Antibody', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 40,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-COMPOUND-06",
+      "category": "chembl_compound",
+      "group_key": "family_upadacitinib",
+      "query": "What is the ChEMBL identifier for upadacitinib?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3622821"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "upadacitinib"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Name-based compound lookup, same drug family as PM-NARROW-05/CT-MULTI-02.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=UPADACITINIB returned molecule_chembl_id='CHEMBL3622821', pref_name='UPADACITINIB', molecule_type='Small molecule', max_phase=4.0, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 41,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-TARGET-01",
+      "category": "chembl_target",
+      "group_key": "family_alk_target_search",
+      "query": "What compounds target the ALK (anaplastic lymphoma kinase) protein in humans?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL4247"
+          ]
+        },
+        "gold_relevance_rationale": "CHEMBL4247 ('ALK tyrosine kinase receptor', SINGLE PROTEIN, Homo sapiens) is the correct human ALK target and was confirmed as the actual first hit of the live target-search endpoint the tool calls -- a clean control case (contrast with CHEMBL-AMBIG-MET/CHEMBL-TARGET-EGFR below, where the first hit is wrong).",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "ALK"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "search_by_target()'s first-hit heuristic (per docs/v2/PHASE4_INITIAL_RETRIEVAL_AUDIT.md) happens to resolve correctly for 'ALK' -- included as a positive control alongside the wrong-entity traps below, to avoid implying the heuristic always fails.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../target/search.json?q=ALK returned target[0]=CHEMBL4247 ('ALK tyrosine kinase receptor', SINGLE PROTEIN, Homo sapiens) -- the correct human ALK target as the literal first hit, called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 42,
+      "split": "validation"
+    },
+    {
+      "case_id": "CHEMBL-TARGET-02",
+      "category": "chembl_ambiguous",
+      "group_key": "family_egfr_ppi_wrongentity",
+      "query": "What compounds target the EGFR protein?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL203"
+          ]
+        },
+        "gold_relevance_rationale": "CHEMBL203 ('Epidermal growth factor receptor', SINGLE PROTEIN, Homo sapiens) is the correct target for a plain 'EGFR' query, but is NOT the first hit ChEMBLTool.search_by_target()'s target/search.json?q=EGFR call actually returns live -- the real first hit is CHEMBL4523747, an 'EGFR/PPP1CA PROTEIN-PROTEIN INTERACTION' entity, a different (and much less useful) record than the single human EGFR protein. Labeling CHEMBL203 as gold while noting the tool's real observed behavior documents a genuine WRONG_ENTITY risk, not a hypothetical one.",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "EGFR"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Directly exercises the WRONG_ENTITY failure category the gate plan predeclares for ChEMBL ('search_by_target resolves to a different, similarly-named target than intended -- audit noted the tool's first-hit heuristic').",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../target/search.json?q=EGFR&limit=5 returned, in order: target[0]=CHEMBL4523747 ('EGFR/PPP1CA PROTEIN-PROTEIN INTERACTION', Homo sapiens), target[1]=CHEMBL5465557 ('CCN2-EGFR PROTEIN-PROTEIN INTERACTION'), target[2]=CHEMBL3608 ('Epidermal growth factor receptor', Mus musculus -- wrong organism), target[4]=CHEMBL203 ('Epidermal growth factor receptor', Homo sapiens -- the actually-correct target) appearing only 5th. Called live 2026-09-25."
+      },
+      "expected_failure_category": "WRONG_ENTITY",
+      "case_index": 43,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-AMBIG-01",
+      "category": "chembl_ambiguous",
+      "group_key": "family_met_wrongentity",
+      "query": "What ChEMBL compounds are being developed against the MET oncogene target for cancer treatment?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3717"
+          ]
+        },
+        "gold_relevance_rationale": "CHEMBL3717 ('Hepatocyte growth factor receptor', i.e. the MET oncogene protein, Homo sapiens) is the biologically correct target for 'MET' in an oncology context, but is NOT the tool's live first hit for q='MET' -- the real first hit is an unrelated bacterial transcriptional repressor. A short, ambiguous 3-letter gene symbol ('MET') is a realistic and severe case of the WRONG_ENTITY risk.",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "MET",
+            "oncogene"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Most severe verified WRONG_ENTITY example found during construction: the tool's real first-hit heuristic returns a completely unrelated organism/protein (E. coli Met repressor) for a common short oncology gene symbol.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../target/search.json?q=MET&limit=6 returned, in order: target[0]=CHEMBL1938227 ('Met repressor', SINGLE PROTEIN, Escherichia coli -- an unrelated bacterial methionine-biosynthesis repressor, NOT the human oncogene), target[1]=CHEMBL4523234 ('Granzyme M' -- also wrong), target[2]=CHEMBL3717 ('Hepatocyte growth factor receptor', Homo sapiens -- the correct MET oncogene target) appearing only 3rd. Also confirmed GET .../molecule.json?pref_name__iexact=MET returns molecules=[] (no drug is literally named 'MET'), ruling out a molecule-name-match shortcut. Called live 2026-09-25."
+      },
+      "expected_failure_category": "WRONG_ENTITY",
+      "case_index": 44,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-INDICATION-01",
+      "category": "chembl_indication",
+      "group_key": "family_nsclc_indication_chembl",
+      "query": "What drugs have an indication for non-small-cell lung carcinoma, and which have reached max development phase (approved)?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL2105712",
+            "CHEMBL1201583",
+            "CHEMBL601719"
+          ]
+        },
+        "gold_relevance_rationale": "These 3 verified ChEMBL IDs each carry a 'Carcinoma, Non-Small-Cell Lung' drug_indication record with max_phase_for_ind=4.0 (approved); any counts as a correct hit for an 'approved NSCLC indication' query.",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "non-small-cell lung carcinoma",
+            "indication"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Indication-driven search (search_by_indication); tests structured-filter fidelity on disease-indication + phase, distinct from name/target lookups.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../drug_indication.json?mesh_heading__icontains=Carcinoma, Non-Small-Cell Lung&limit=8 returned 8 records; CHEMBL2105712, CHEMBL1201583, CHEMBL601719 each had max_phase_for_ind=4.0 (approved), confirmed live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 45,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-INDICATION-02",
+      "category": "chembl_indication",
+      "group_key": "family_melanoma_indication_chembl",
+      "query": "Which approved drugs are indicated for melanoma?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL1201438",
+            "CHEMBL467",
+            "CHEMBL1789844",
+            "CHEMBL1229517"
+          ]
+        },
+        "gold_relevance_rationale": "Any of these 4 verified ChEMBL IDs (each with mesh_heading='Melanoma', max_phase_for_ind=4.0) counts as a correct hit.",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "melanoma",
+            "approved"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Indication-driven search restricted to approved (phase 4) drugs only.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../drug_indication.json?mesh_heading__icontains=Melanoma&limit=8 returned 8 records; CHEMBL1201438, CHEMBL467, CHEMBL1789844, CHEMBL1229517 each had max_phase_for_ind=4.0, confirmed live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 46,
+      "split": "development"
+    },
+    {
+      "case_id": "CHEMBL-ZERO-01",
+      "category": "chembl_zero_result",
+      "group_key": "family_nonsense_zero",
+      "query": "What is the ChEMBL record for the drug ZZZNOTADRUGNAME123?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "no_results_expected",
+        "gold_relevant_ids": {
+          "chembl": []
+        },
+        "gold_query_must_contain_concepts": {
+          "chembl": []
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Fabricated drug name; live ChEMBL API genuinely returns zero molecules -- correct behavior is NO_RESULTS, never a fuzzy match presented as canonical.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule.json?pref_name__iexact=ZZZNOTADRUGNAME123 returned molecules=[] (0 results), called live 2026-09-25."
+      },
+      "expected_failure_category": null,
+      "case_index": 47,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "MS-01",
+      "category": "multi_source",
+      "group_key": "family_osimertinib_egfr",
+      "query": "For osimertinib in EGFR-mutant NSCLC: what does the literature say about resistance mechanisms, what is its ChEMBL compound record, and are there currently recruiting clinical trials?",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "35883645"
+          ],
+          "chembl": [
+            "CHEMBL3353410"
+          ],
+          "clinical_trials": [
+            "NCT07323641",
+            "NCT07329322",
+            "NCT04322890"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "osimertinib",
+            "resistance",
+            "EGFR"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl",
+          "clinical_trials"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "Explicitly asks for all three source facets (literature mechanism, compound identity, live trials) about one entity family -- requires non-empty, correct contribution from each source per the gate plan's cross-source coverage metric.",
+      "verification": {
+        "method": "combined (local_corpus_inspection + live_chembl_api + live_clinicaltrials_v2_api)",
+        "evidence": "Reuses independently-verified gold from PM-LEX-01 (corpus), CHEMBL-COMPOUND-02 (live ChEMBL, including the rejected-wrong-guess check), and CT-INTR-01 (live ClinicalTrials) -- each already verified per its own case above."
+      },
+      "expected_failure_category": null,
+      "case_index": 48,
+      "split": "validation"
+    },
+    {
+      "case_id": "MS-02",
+      "category": "multi_source",
+      "group_key": "family_cml_imatinib",
+      "query": "For imatinib in chronic myeloid leukemia: summarize resistance mechanisms from the literature, give its ChEMBL identifier, and name a clinical trial comparing it to another TKI.",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "31646577",
+            "30332954",
+            "30504658"
+          ],
+          "chembl": [
+            "CHEMBL941"
+          ],
+          "clinical_trials": [
+            "NCT03228303"
+          ]
+        },
+        "gold_relevance_rationale": "Any of the 3 listed PMIDs counts for the literature facet.",
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "imatinib",
+            "resistance",
+            "CML"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl",
+          "clinical_trials"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "Same three-source pattern as MS-01, different drug family.",
+      "verification": {
+        "method": "combined (local_corpus_inspection + live_chembl_api + live_clinicaltrials_v2_api)",
+        "evidence": "Reuses independently-verified gold from PM-MECH-01, CHEMBL-EXACT-01, and CT-MULTI-01."
+      },
+      "expected_failure_category": null,
+      "case_index": 49,
+      "split": "validation"
+    },
+    {
+      "case_id": "MS-03",
+      "category": "multi_source",
+      "group_key": "family_brigatinib",
+      "query": "What is brigatinib's ChEMBL identifier, and what does the literature say about its use in ALK-positive NSCLC?",
+      "target_sources": [
+        "pubmed",
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "29119148",
+            "31109722"
+          ],
+          "chembl": [
+            "CHEMBL3545311"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "brigatinib",
+            "ALK"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "Two-source (pubmed+chembl) case -- multi-source does not require all three sources every time, only genuinely 2+.",
+      "verification": {
+        "method": "combined (local_corpus_inspection + live_chembl_api)",
+        "evidence": "Reuses independently-verified gold from PM-EXACT-01 and CHEMBL-COMPOUND-01."
+      },
+      "expected_failure_category": null,
+      "case_index": 50,
+      "split": "development"
+    },
+    {
+      "case_id": "MS-04",
+      "category": "multi_source",
+      "group_key": "family_tirzepatide",
+      "query": "For tirzepatide: what does the live literature say about its real-world effectiveness for obesity, what is its ChEMBL record, and what Phase 3 weight-management trials exist?",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "42769739"
+          ],
+          "chembl": [
+            "CHEMBL4297839"
+          ],
+          "clinical_trials": [
+            "NCT06918405",
+            "NCT04184622"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "tirzepatide",
+            "obesity"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl",
+          "clinical_trials"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "The PubMed facet here is live-API-only gold (recent article, absent from local RAG corpus) -- this case specifically tests whether the system falls back to/combines with the live PubMed path rather than relying solely on a stale local index.",
+      "verification": {
+        "method": "combined (live_pubmed_api + live_chembl_api + live_clinicaltrials_v2_api)",
+        "evidence": "Reuses independently-verified gold from PM-LIVE-01, CHEMBL-COMPOUND-03, and CT-INTR-02."
+      },
+      "expected_failure_category": null,
+      "case_index": 51,
+      "split": "development"
+    },
+    {
+      "case_id": "MS-05",
+      "category": "multi_source",
+      "group_key": "family_lecanemab_alzheimer",
+      "query": "For lecanemab in early Alzheimer's disease: what recent literature discusses it, what is its ChEMBL record, and what Phase 3 trial is evaluating it in preclinical/early disease?",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "42784125"
+          ],
+          "chembl": [
+            "CHEMBL3833321"
+          ],
+          "clinical_trials": [
+            "NCT04468659"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "lecanemab",
+            "Alzheimer"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl",
+          "clinical_trials"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "Same live-API-PubMed-facet pattern as MS-04, different drug family.",
+      "verification": {
+        "method": "combined (live_pubmed_api + live_chembl_api + live_clinicaltrials_v2_api)",
+        "evidence": "Reuses independently-verified gold from PM-LIVE-02, CHEMBL-COMPOUND-04, and CT-PHASE-01."
+      },
+      "expected_failure_category": null,
+      "case_index": 52,
+      "split": "development"
+    },
+    {
+      "case_id": "MS-06",
+      "category": "multi_source",
+      "group_key": "family_upadacitinib",
+      "query": "For upadacitinib: what does the literature say about its use in Crohn's disease, what is its ChEMBL identifier, and are there recruiting rheumatoid arthritis trials?",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "38362641"
+          ],
+          "chembl": [
+            "CHEMBL3622821"
+          ],
+          "clinical_trials": [
+            "NCT02714634",
+            "NCT06687551"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "upadacitinib",
+            "Crohn's disease"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl",
+          "clinical_trials"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "Cross-source case where each source targets a DIFFERENT disease indication for the same drug (Crohn's for pubmed/literature, RA for the trial) -- tests that the system doesn't incorrectly conflate or cross-contaminate the two indications across sources.",
+      "verification": {
+        "method": "combined (local_corpus_inspection + live_chembl_api + live_clinicaltrials_v2_api)",
+        "evidence": "Reuses independently-verified gold from PM-NARROW-05, CHEMBL-COMPOUND-06, and CT-MULTI-02."
+      },
+      "expected_failure_category": null,
+      "case_index": 53,
+      "split": "development"
+    },
+    {
+      "case_id": "MS-07",
+      "category": "multi_source",
+      "group_key": "family_pembrolizumab_tnbc",
+      "query": "For pembrolizumab in triple-negative breast cancer: what does the literature say about checkpoint-inhibitor biomarkers, what is pembrolizumab's ChEMBL identifier, and what completed trials tested it in TNBC?",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "pubmed": [
+            "40324951"
+          ],
+          "chembl": [
+            "CHEMBL3137343"
+          ],
+          "clinical_trials": [
+            "NCT03213041",
+            "NCT03012230",
+            "NCT01676753",
+            "NCT02648477"
+          ]
+        },
+        "gold_query_must_contain_concepts": {
+          "pubmed": [
+            "checkpoint inhibitor",
+            "triple-negative breast cancer"
+          ]
+        },
+        "gold_required_sources": [
+          "pubmed",
+          "chembl",
+          "clinical_trials"
+        ],
+        "expected_retrieval_method": "cross_source"
+      },
+      "gold_label_rationale": "Three-source case; note the pubmed gold article discusses ICIs broadly in TNBC (not pembrolizumab by name) -- documented explicitly as a concept-level literature match, distinct from the exact-ID chembl/clinical_trials facets of the same case.",
+      "verification": {
+        "method": "combined (local_corpus_inspection + live_chembl_api + live_clinicaltrials_v2_api)",
+        "evidence": "Reuses independently-verified gold from PM-TOPICAL-04, CHEMBL-COMPOUND-05, and CT-STATUS-01."
+      },
+      "expected_failure_category": null,
+      "case_index": 54,
+      "split": "development"
+    },
+    {
+      "case_id": "NEG-ABSENT-01",
+      "category": "negative_absent_information",
+      "group_key": "family_nonsense_zero",
+      "query": "What is the ChEMBL ID, mechanism of action, and clinical trial status of the compound Zorblatinix-9X?",
+      "target_sources": [
+        "pubmed",
+        "chembl",
+        "clinical_trials"
+      ],
+      "gold": {
+        "gold_relevance_type": "no_results_expected",
+        "gold_relevant_ids": {
+          "pubmed": [],
+          "chembl": [],
+          "clinical_trials": []
+        },
+        "gold_query_must_contain_concepts": {},
+        "expected_retrieval_method": "n/a_no_results"
+      },
+      "gold_label_rationale": "Fabricated compound name (does not exist in any source) -- correct behavior across all three sources is NO_RESULTS / abstention, never an invented ChEMBL ID or fabricated trial.",
+      "verification": {
+        "method": "live_chembl_api + live_clinicaltrials_v2_api + live_pubmed_api",
+        "evidence": "GET chembl .../molecule.json?pref_name__iexact=ZORBLATINIX-9X -> molecules=[]; GET clinicaltrials.gov .../studies?query.term=Zorblatinix-9X -> studies=[]; PubMed esearch term='Zorblatinix-9X' -> idlist=[]. All three checked live 2026-09-25, all confirmed zero."
+      },
+      "expected_failure_category": null,
+      "case_index": 55,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "NEG-UNSUPPORTED-01",
+      "category": "negative_unsupported_operation",
+      "group_key": "family_unsupported_ops",
+      "query": "What is the current US retail market price of imatinib?",
+      "target_sources": [],
+      "gold": {
+        "gold_relevance_type": "abstention_expected",
+        "gold_relevant_ids": {},
+        "gold_query_must_contain_concepts": {},
+        "expected_retrieval_method": "n/a_abstention"
+      },
+      "gold_label_rationale": "None of PubMedTool, ClinicalTrialsTool, or ChEMBLTool expose any pricing/cost data field -- correct behavior is abstention (per PHASE4_GATE_PLAN's QUERY_COMPILATION_FAILURE avoidance: a system must not silently fabricate a price from an unsupported source).",
+      "verification": {
+        "method": "tool_signature_inspection",
+        "evidence": "Read tools/pubmed_tool.py (search_pubmed/get_paper_details), tools/clinical_trials_tool.py (search_trials/get_trial_details), tools/chembl_tool.py (search_by_target/get_drug_info/search_by_indication) in full -- no method, parameter, or returned field anywhere references price/cost."
+      },
+      "expected_failure_category": null,
+      "case_index": 56,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "NEG-UNSUPPORTED-02",
+      "category": "negative_unsupported_operation",
+      "group_key": "family_unsupported_ops",
+      "query": "Show me the full genomic DNA sequence of the human EGFR gene.",
+      "target_sources": [],
+      "gold": {
+        "gold_relevance_type": "abstention_expected",
+        "gold_relevant_ids": {},
+        "gold_query_must_contain_concepts": {},
+        "expected_retrieval_method": "n/a_abstention"
+      },
+      "gold_label_rationale": "None of the three tools wrap a sequence database (e.g. NCBI nuccore) -- ChEMBL exposes target/molecule metadata, not raw genomic sequence; correct behavior is abstention.",
+      "verification": {
+        "method": "tool_signature_inspection",
+        "evidence": "Same inspection as NEG-UNSUPPORTED-01 -- confirmed no sequence-returning method exists in any of the three tool files or their orchestration/models.py Args schemas."
+      },
+      "expected_failure_category": null,
+      "case_index": 57,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "NEG-CROSSSOURCE-01",
+      "category": "negative_wrong_source_trap",
+      "group_key": "family_aspirin",
+      "query": "What clinical trial identifier corresponds to aspirin's mechanism of action?",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "exact_id",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL25"
+          ]
+        },
+        "gold_relevance_rationale": "'Mechanism of action' is a ChEMBL molecule-record field (mechanism_of_action), not something a ClinicalTrials.gov NCT ID encodes -- the query's surface phrasing ('clinical trial identifier') is a deliberate WRONG_SOURCE trap; the genuinely correct source is ChEMBL alone, not clinical_trials.",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "aspirin",
+            "mechanism of action"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Directly exercises the gate plan's WRONG_SOURCE failure category ('a query needing PubMed got only ClinicalTrials results or vice versa') applied to ChEMBL vs ClinicalTrials.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "GET .../molecule/CHEMBL25.json confirmed pref_name='ASPIRIN'; ChEMBL molecule records carry a mechanism_of_action sub-resource, called live 2026-09-25 -- clinical_trials has no equivalent, confirmed by tools/clinical_trials_tool.py's method list (search_trials/get_trial_details only, no mechanism-of-action field returned per its parse_results)."
+      },
+      "expected_failure_category": "WRONG_SOURCE",
+      "case_index": 58,
+      "split": "phase4_heldout"
+    },
+    {
+      "case_id": "NEG-AMBIG-COMPOUND-01",
+      "category": "negative_ambiguous_entity",
+      "group_key": "family_met_wrongentity",
+      "query": "Tell me about MET inhibitors.",
+      "target_sources": [
+        "chembl"
+      ],
+      "gold": {
+        "gold_relevance_type": "concept_based",
+        "gold_relevant_ids": {
+          "chembl": [
+            "CHEMBL3717"
+          ]
+        },
+        "gold_relevance_rationale": "Same underlying ambiguity as CHEMBL-AMBIG-01 (the 3-letter symbol 'MET' collides with an unrelated E. coli repressor in live ChEMBL target search), phrased here as a bare, maximally ambiguous entity mention with no disambiguating context (no 'oncogene'/'cancer' qualifier) -- a harder ambiguity case than CHEMBL-AMBIG-01's more qualified phrasing.",
+        "gold_query_must_contain_concepts": {
+          "chembl": [
+            "MET"
+          ]
+        },
+        "expected_retrieval_method": "live_api"
+      },
+      "gold_label_rationale": "Ambiguous-entity case with zero disambiguating context, distinct from CHEMBL-AMBIG-01's more qualified version of the same underlying entity confusion.",
+      "verification": {
+        "method": "live_chembl_api",
+        "evidence": "Same live evidence as CHEMBL-AMBIG-01's target/search.json?q=MET call (target[0]=E. coli Met repressor, correct human target CHEMBL3717 only 3rd), called live 2026-09-25."
+      },
+      "expected_failure_category": "WRONG_ENTITY",
+      "case_index": 59,
+      "split": "development"
+    },
+    {
+      "case_id": "NEG-ABSTAIN-AMBIG-01",
+      "category": "negative_ambiguous_entity",
+      "group_key": "family_ambiguous_query_scope",
+      "query": "What's the best treatment?",
+      "target_sources": [],
+      "gold": {
+        "gold_relevance_type": "abstention_expected",
+        "gold_relevant_ids": {},
+        "gold_query_must_contain_concepts": {},
+        "expected_retrieval_method": "n/a_abstention"
+      },
+      "gold_label_rationale": "No disease, drug, target, or condition named at all -- genuinely underspecified for any of the three sources' required arguments (PubMedSearchArgs needs a query string with content; ClinicalTrialsSearchArgs/ChEMBL*Args need a condition/target/disease); correct behavior is abstention/clarification, not a guessed retrieval against any source.",
+      "verification": {
+        "method": "orchestration_models_inspection",
+        "evidence": "Read orchestration/models.py's PubMedSearchArgs/ClinicalTrialsSearchArgs/ChEMBLSearchByTargetArgs/ChEMBLSearchByIndicationArgs/ChEMBLGetDrugInfoArgs field requirements -- none can be populated with a non-empty, meaningful value from this query text alone."
+      },
+      "expected_failure_category": null,
+      "case_index": 60,
+      "split": "phase4_heldout"
+    }
+  ]
+}

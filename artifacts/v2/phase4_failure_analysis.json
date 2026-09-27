@@ -1,0 +1,59 @@
+{
+  "analysis_version": "1.0.0",
+  "generated_at": "2026-09-25",
+  "scope": "development+validation splits (49 cases), post-fix state (ClinicalTrials phase filter fixed, PubMed date-default fixed + compiler built, ChEMBL resolve_compound_name added)",
+  "clusters": [
+    {
+      "cluster": "PubMed live-API implicit 2-year date filter",
+      "category": "QUERY_COMPILATION_FAILURE / STALE_INDEX-adjacent",
+      "status": "FIXED",
+      "evidence": "tools/pubmed_tool.py no longer injects PUBMED_DEFAULT_DATE_RANGE implicitly; regression tests added (tests/test_pubmed.py)",
+      "measured_effect": "Isolated causal contribution: +0.000 Recall@10 on its own (B1->B2) - the fix is real and correct, but was not the dominant cause of the live-API path's weakness on this benchmark. See phase4_pubmed_candidate_comparison.json."
+    },
+    {
+      "cluster": "PubMed live-API raw-NL-text query quality",
+      "category": "LEXICAL_MISS / SEMANTIC_MISS",
+      "status": "FIXED (compiler built) but architecture NOT SELECTED (RAG wins instead)",
+      "evidence": "retrieval/pubmed_query_compiler.py built and tested (21 unit tests); B2->C causal contribution +0.091 Recall@10, but Candidate C (0.136 Recall@10, 0.059 MRR) still loses decisively to existing RAG (0.773 Recall@10, 0.636 MRR).",
+      "resolution": "Local RAG hybrid pipeline (retrieval/retriever.py) selected as the PubMed retrieval architecture. The compiler remains available for any future caller needing a real live-PubMed query (e.g. an explicit freshness check outside the indexed corpus), but is not the primary retrieval path Phase 4 freezes."
+    },
+    {
+      "cluster": "ClinicalTrials filter.phase invalid API parameter",
+      "category": "QUERY_COMPILATION_FAILURE",
+      "status": "FIXED",
+      "evidence": "tools/clinical_trials_tool.py now builds AREA[Phase]<value> into query.term instead of the invalid filter.phase parameter. Live-verified (8/8 fresh blind cases succeed, 0 HTTP 400s). Required-trial recall on affected dev/validation cases: 0.737->0.895 (14/19->17/19).",
+      "note": "This defect predated Phase 3 and Phase 4; found during Phase 4 baseline measurement. Phase 3's own held-out supplement had a separate measurement-harness bug that masked this defect during what was meant to be Phase 3's final blind confirmation - documented in docs/v2/PHASE3_FINAL_GATE_AUDIT.md addendum and docs/v2/CLINICALTRIALS_PHASE_FILTER_DEFECT_FIX.md."
+    },
+    {
+      "cluster": "ChEMBL missing drug-name-to-ID resolution",
+      "category": "QUERY_COMPILATION_FAILURE / UNSUPPORTED_OPERATION",
+      "status": "FIXED",
+      "evidence": "ChEMBLTool.resolve_compound_name() added, wired through orchestration/models.py + registry.py + Cerebras native tool declarations (6th registered operation). Live-verified against 7 real drug names including the previously-confirmed osimertinib->CHEMBL3353410. ChEMBL Recall@10: 0.381->1.000, MRR 0.279->0.898 (n=21). Multi-source coverage: 0.0->0.571 (4/7 - see below for remaining 3)."
+    },
+    {
+      "cluster": "ChEMBL search_by_target first-hit WRONG_ENTITY heuristic",
+      "category": "WRONG_ENTITY",
+      "status": "ACCEPTED LIMITATION OUTSIDE GATE",
+      "evidence": "3 of 21 dev/validation ChEMBL cases (CHEMBL-TARGET-02, CHEMBL-AMBIG-01, NEG-AMBIG-COMPOUND-01) - search_by_target's first-hit heuristic can return a real-but-not-intended target (e.g. 'EGFR' resolving to a protein-protein-interaction record before the human EGFR receptor). Predicted during benchmark construction, empirically confirmed in the Phase-4 baseline.",
+      "rationale_for_not_blocking": "No hard safety gate is violated - the returned record is a real, valid ChEMBL entity (not fabricated, not corrupted), just not the best match for an ambiguous name. This is a pre-existing behavior of search_by_target (not something resolve_compound_name's scope covers - resolve_compound_name itself has no such defect, verified in its own tests) affecting 14% of ChEMBL cases. Fixing it properly (e.g. preferring target_type='SINGLE PROTEIN' + organism='Homo sapiens' matches) is a real, separately-scoped engineering task, not a quick patch alongside this work. Named explicitly here rather than concealed; recommended as a follow-up, does not block Phase 4 closure."
+    },
+    {
+      "cluster": "Multi-source: MS-04/MS-05 PubMed leg missed",
+      "category": "RELEVANT_ITEM_MISSED",
+      "status": "EXPECTED TO RESOLVE UNDER FINAL ARCHITECTURE - reverify at held-out/integration",
+      "evidence": "These two cases' PubMed leg was scored against the live-API path (0.136 Recall@10 architecture), not the winning RAG path (0.773 Recall@10). Since Phase 4 freezes RAG as the PubMed architecture, these legs are expected to have a substantially higher chance of resolving once the integrated pipeline actually uses RAG for these queries - not re-measured here to avoid re-running the same 7 multi-source cases a third time before the freeze; will be visible in the held-out run and live integration check."
+    },
+    {
+      "cluster": "Multi-source: MS-06 ClinicalTrials ranking miss",
+      "category": "RANKING_FAILURE",
+      "status": "ACCEPTED LIMITATION OUTSIDE GATE",
+      "evidence": "Unrelated to the filter.phase fix (case does not use a phase filter) - the gold trial exists in ClinicalTrials.gov's result set for this query but is not ranked within the structured-filter-narrowed top results returned. Single case, 1/19 clinicaltrials-relevant cases, not a systemic pattern (per-source miss rate 1/19 = 5.3%, well below any 'systematic' threshold)."
+    }
+  ],
+  "hard_gate_violations_found": 0,
+  "blocking_defects_remaining": 0,
+  "accepted_limitations_outside_gate": [
+    "ChEMBL search_by_target first-hit heuristic on ambiguous target names (3/21 cases)",
+    "ClinicalTrials MS-06 single ranking miss (1/19 cases)"
+  ]
+}

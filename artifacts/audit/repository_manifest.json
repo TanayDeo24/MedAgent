@@ -1,0 +1,87 @@
+{
+  "audit_date": "2026-09-23",
+  "note": "Two file sets are distinguished throughout: WORKING_TREE (what is physically on disk right now, per `find` from the repo root) and GIT_HISTORY_14a59b9 (the last complete tracked commit before the in-progress rebase reset HEAD to an empty root, read via `git archive 14a59b9`, never checked out). See docs/audit/INITIAL_STATE.md section 1.",
+  "working_tree": {
+    "python_source_files_present": 0,
+    "python_bytecode_only_dirs": ["agent/__pycache__", "config/__pycache__", "evaluation/__pycache__", "retrieval/__pycache__", "tests/__pycache__", "tools/__pycache__", "utils/__pycache__"],
+    "untracked_root_narrative_docs": [
+      "AUDIT_CURRENT_STATE.md", "CHEMBL_BACKFILL_COMPLETE.md", "CITATIONS_BUG_INVESTIGATION.md",
+      "EVAL_HANG_FIX_COMPLETE.md", "PHASE1_COMPLETE.md", "PHASE2_COMPLETE.md",
+      "PHASE3_CONCURRENCY_VALIDATION.md", "PHASE3_RETRIEVAL_LAYER_COMPLETE.md",
+      "PHASE3_RETRIEVAL_QUALITY_COMPLETE.md", "PHASE3_WIRING_COMPLETE.md",
+      "REPORT_TABLE_DETERMINISM_COMPLETE.md"
+    ],
+    "data_files": [
+      {"path": "data/corpus/abstracts.jsonl", "lines": 9000, "type": "biomedical abstract corpus, filtered"},
+      {"path": "data/corpus/abstracts_raw_all.jsonl", "lines": 13115, "type": "pre-filter raw abstract pull"},
+      {"path": "data/index/faiss.index", "type": "FAISS IndexFlatIP, binary"},
+      {"path": "data/index/chunks.jsonl", "lines": 22674, "type": "chunk records aligned to FAISS row order"},
+      {"path": "data/index/bm25.pkl", "type": "pickled rank_bm25 index"},
+      {"path": "data/index/bm25_meta.json", "type": "BM25 build metadata"},
+      {"path": "data/index/index_meta.json", "type": "index build metadata (embedding model, dims, counts)"},
+      {"path": "data/index/variants/bge_base_180_30/*", "type": "alternate embedding-model (BGE-base) index build, same 5-file structure"},
+      {"path": "data/index/variants/chunk_256_50/*", "type": "alternate chunk-size (256/50) index build"},
+      {"path": "data/index/variants/chunk_384_64/*", "type": "alternate chunk-size (384/64) index build"}
+    ],
+    "logs": [{"path": "logs/medagent.log", "lines": 19159, "note": "structured JSON-line log; content described in AUDIT_REPORT.md section 21"}],
+    "env_file": {"path": ".env", "keys_only": ["NVIDIA_API_KEY", "LOG_LEVEL", "LOG_FILE"], "values_inspected": false},
+    "venv_present": true,
+    "venv_size_mb": 1229
+  },
+  "git_history_14a59b9_files": {
+    "source_of_truth_for": "all agent/config/tools/retrieval/evaluation/utils .py code cited in this audit",
+    "top_level_docs": ["README.md", "PROJECT_SUMMARY.md", "PHASE3_STATUS.md", "RESULTS.md", "RESULTS_RAG_COMPARISON.md", ".env.example", "requirements.txt", "main.py", "setup.py", "setup.sh", "validate.py", "test_phase1.py", "test_phase2.py"],
+    "agent": ["agent/__init__.py", "agent/graph.py (429 lines)", "agent/nodes.py (1111 lines)", "agent/prompts.py (445 lines)", "agent/state.py (267 lines)"],
+    "config": ["config/__init__.py", "config/settings.py (126 lines, pydantic-settings)", "config/llm_config.py (391 lines, NVIDIA NIM ChatNVIDIA wrapper)"],
+    "tools": ["tools/__init__.py", "tools/base_tool.py (311 lines)", "tools/pubmed_tool.py (324 lines)", "tools/clinical_trials_tool.py (338 lines)", "tools/chembl_tool.py (377 lines)"],
+    "retrieval": [
+      "retrieval/retriever.py (486 lines, hybrid dense+BM25+RRF+cross-encoder)",
+      "retrieval/build_corpus.py", "retrieval/chunking.py", "retrieval/build_bm25.py", "retrieval/build_index.py",
+      "retrieval/build_eval_set.py", "retrieval/build_eval_set_grounding.py", "retrieval/build_eval_set_strict.py",
+      "retrieval/measure_recall.py", "retrieval/hyde.py", "retrieval/query_expansion.py", "retrieval/verify.py",
+      "retrieval/experiment_grounding_optimization.py", "retrieval/README.md",
+      "19 x retrieval/eval_results_*.json (measured recall/latency sweeps)",
+      "4 x retrieval/eval_set*.json (labeled eval sets)"
+    ],
+    "evaluation": ["evaluation/__init__.py", "evaluation/evaluator.py (877 lines)", "evaluation/metrics.py (470 lines)", "evaluation/test_cases.py (836 lines, 60 test cases)", "evaluation/hallucination_judge.py (301 lines)", "evaluation/reconstruct_from_logs.py (241 lines)"],
+    "utils": ["utils/__init__.py", "utils/logger.py (178 lines)", "utils/rate_limiter.py (163 lines, token bucket)", "utils/retry_handler.py (265 lines)"],
+    "tests": ["tests/__init__.py", "tests/test_chembl.py (315 lines)", "tests/test_clinical_trials.py (307 lines)", "tests/test_nodes.py (187 lines)", "tests/test_pubmed.py (220 lines)"],
+    "examples": ["examples/demo_agent.py", "examples/test_chembl.py", "examples/test_clinical_trials.py", "examples/test_pubmed.py"],
+    "experiments_results": "10 x evaluation_*.json aggregate reports + 8 x incremental_*.jsonl per-case logs + judge_fix_test_captures.json + reconstructed_cases_1-31_from_hang.json",
+    "docs": ["docs/api_documentation.md", "docs/architecture.md", "docs/phase1_architecture.md", "docs/phase2_architecture.md", "docs/tool_specifications.md"],
+    "total_python_loc_core_modules": 9847
+  },
+  "classification_summary": {
+    "active_real_implementation": [
+      "agent/graph.py", "agent/nodes.py", "agent/prompts.py", "agent/state.py",
+      "config/settings.py", "config/llm_config.py",
+      "tools/base_tool.py", "tools/pubmed_tool.py", "tools/clinical_trials_tool.py", "tools/chembl_tool.py",
+      "retrieval/retriever.py", "retrieval/build_bm25.py", "retrieval/build_index.py", "retrieval/build_corpus.py", "retrieval/chunking.py",
+      "evaluation/evaluator.py", "evaluation/metrics.py", "evaluation/test_cases.py", "evaluation/hallucination_judge.py",
+      "utils/logger.py", "utils/rate_limiter.py", "utils/retry_handler.py",
+      "main.py"
+    ],
+    "experimental_one_off_scripts": [
+      "retrieval/hyde.py", "retrieval/query_expansion.py", "retrieval/experiment_grounding_optimization.py",
+      "retrieval/build_eval_set*.py", "retrieval/measure_recall.py", "retrieval/verify.py",
+      "evaluation/reconstruct_from_logs.py (one-time incident recovery script, see EVAL_HANG_FIX_COMPLETE.md)"
+    ],
+    "narrative_self_report_docs_treated_as_unverified_claims": [
+      "PHASE1_COMPLETE.md", "PHASE2_COMPLETE.md", "PHASE3_CONCURRENCY_VALIDATION.md",
+      "PHASE3_RETRIEVAL_LAYER_COMPLETE.md", "PHASE3_RETRIEVAL_QUALITY_COMPLETE.md",
+      "PHASE3_WIRING_COMPLETE.md", "CHEMBL_BACKFILL_COMPLETE.md", "CITATIONS_BUG_INVESTIGATION.md",
+      "EVAL_HANG_FIX_COMPLETE.md", "REPORT_TABLE_DETERMINISM_COMPLETE.md", "AUDIT_CURRENT_STATE.md"
+    ],
+    "machine_generated_artifacts_higher_evidence_tier": [
+      "data/index/index_meta.json", "data/corpus/abstracts.jsonl", "data/index/chunks.jsonl",
+      "retrieval/eval_results_*.json (19 files)", "experiments/results/evaluation_*.json (10 files)",
+      "experiments/results/incremental_*.jsonl (8 files)", "logs/medagent.log"
+    ],
+    "dead_or_superseded": [
+      "test_phase1.py, test_phase2.py at repo root (superseded by tests/ package)",
+      "examples/test_*.py (superseded/duplicated by tests/test_*.py)",
+      "retrieval/eval_set_strict_buggy_v1.json (explicitly named as a superseded buggy version)",
+      "AUDIT_CURRENT_STATE.md (dated 2026-09-08, describes a pre-Phase-3 state with no RAG and 2 broken tool integrations; contradicted by later commits/RESULTS.md which fixed those bugs and built RAG - stale relative to 14a59b9)"
+    ]
+  }
+}

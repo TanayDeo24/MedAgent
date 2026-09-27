@@ -236,6 +236,13 @@ class ClinicalTrialsTool(BaseTool):
             query_parts.append(f"AREA[LeadSponsorName]{sponsor}")
         if country:
             query_parts.append(f"AREA[LocationCountry]{country}")
+        if phase and phase in self.VALID_PHASES:
+            # NOTE: ClinicalTrials.gov v2 API has no `filter.phase` query
+            # parameter (it returns HTTP 400 "`filter.phase` is unknown
+            # parameter"). Phase filtering must be expressed as an
+            # AREA[Phase]<value> term inside query.term, following the same
+            # pattern as condition/intervention/sponsor/country above.
+            query_parts.append(f"AREA[Phase]{phase}")
 
         query = " AND ".join(query_parts) if query_parts else "AREA[StudyType]INTERVENTIONAL"
 
@@ -244,17 +251,9 @@ class ClinicalTrialsTool(BaseTool):
             "query.term": query,
         }
 
-        # Add filters
-        filters = []
+        # Add status filter (filter.overallStatus is a valid v2 API parameter)
         if status and status in self.VALID_STATUSES:
-            filters.append(f"overallStatus:{status}")
-
-        if phase and phase in self.VALID_PHASES:
-            filters.append(f"phase:{phase}")
-
-        if filters:
-            query_params["filter.overallStatus"] = status if status else None
-            query_params["filter.phase"] = phase if phase else None
+            query_params["filter.overallStatus"] = status
 
         # Remove None values
         query_params = {k: v for k, v in query_params.items() if v is not None}

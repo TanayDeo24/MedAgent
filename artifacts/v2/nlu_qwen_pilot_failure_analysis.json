@@ -1,0 +1,56 @@
+{
+  "phase": "2_qwen_latency_experiment",
+  "verdict": "PILOT FAILED - full 45-example dev evaluation NOT run, per the predeclared stop rule",
+  "source_data": "artifacts/v2/nlu_qwen_pilot_results.json (8/8 examples, evaluation/v2/nlu_benchmark_v1.json dev split only)",
+  "predeclared_plan": "artifacts/v2/nlu_qwen_pilot_plan.json",
+  "attempts": "1 attempt (no prompt/schema adaptation performed) - per Step 9, bounded adaptation is reserved for FORMATTING-only issues on an otherwise-close pilot; this pilot's failures are dominated by SEMANTIC defects (see below), which the directive explicitly says not to chase.",
+  "per_example_gold_vs_predicted_intent": [
+    {"query_id": "nlu_v1_0083", "gold": "F_mechanism", "raw_string_predicted": "F_mechanism", "coerced_pred_intent_list": [], "note": "semantically correct class chosen, but emitted as a bare JSON string, not an array - _coerce_intent() iterates the raw value assuming a list, so a bare string silently produces intent=[] (a MISS), not a crash. Reproduced identically on ALL 8/8 examples - systematic formatting defect."},
+    {"query_id": "nlu_v1_0112", "gold": "G_constraint_heavy", "raw_string_predicted": "I_ambiguous", "coerced_pred_intent_list": [], "note": "semantic miss - a well-formed, unambiguous G-class query misclassified as needing clarification"},
+    {"query_id": "nlu_v1_0099", "gold": "E_multi_hop_research", "raw_string_predicted": "A_literature_evidence", "coerced_pred_intent_list": [], "note": "semantic miss - multi-hop chain structure not recognized"},
+    {"query_id": "nlu_v1_0067", "gold": "D_cross_source_synthesis", "raw_string_predicted": "A_literature_evidence", "coerced_pred_intent_list": [], "note": "semantic miss - cross-source requirement (literature AND trial) collapsed to literature-only"},
+    {"query_id": "nlu_v1_0148", "gold": "I_ambiguous", "raw_string_predicted": "I_ambiguous", "coerced_pred_intent_list": [], "note": "semantically correct class chosen, same formatting bug as 0083"},
+    {"query_id": "nlu_v1_0036", "gold": "C_compound_target", "raw_string_predicted": "A_literature_evidence", "coerced_pred_intent_list": [], "note": "semantic miss - a compound/target-activity question misread as literature-evidence"},
+    {"query_id": "nlu_v1_0018", "gold": "B_clinical_trial_landscape", "raw_string_predicted": "I_ambiguous", "coerced_pred_intent_list": [], "note": "semantic miss - a well-formed, unambiguous B-class query misclassified as needing clarification"},
+    {"query_id": "nlu_v1_0109", "gold": "G_constraint_heavy", "raw_string_predicted": "A_literature_evidence", "coerced_pred_intent_list": [], "note": "semantic miss - constraint-heavy trial query misread as a literature question, losing the entire clinicaltrials.gov framing"}
+  ],
+  "intent_accuracy_ignoring_the_list_vs_string_formatting_bug": "2/8 = 25% (0083, 0148 correct by raw string; all 6 others wrong) - a severe SEMANTIC degradation on top of the formatting bug, not explained by formatting alone. For comparison, the Nemotron control's dev-split intent accuracy is 0.733.",
+  "systematic_findings": {
+    "1_intent_field_format": {
+      "severity": "high, but FORMATTING (a legitimate Step-9 adaptation candidate in isolation)",
+      "finding": "8/8 pilot examples emitted \"intent\" as a bare JSON string (e.g. \"F_mechanism\") instead of the array the prompt's own JSON example shows (e.g. [\"A_literature_evidence\"]). candidate_b_structured's identical prompt/postprocessing never showed this failure mode in any prior closure round - specific to this smaller model's weaker adherence to the exact example shape."
+    },
+    "2_universal_false_ambiguity_flagging": {
+      "severity": "CRITICAL, SEMANTIC",
+      "finding": "8/8 pilot examples (100%) were flagged ambiguity.is_ambiguous=true - including clearly well-formed, unambiguous queries like 'How does metformin work at the molecular level?' (F_mechanism) and 'Which compounds target HER2 and what activity is reported?' (C_compound_target), which have no missing referent or underspecification by any reasonable reading. This is not a formatting issue - the model appears to treat nearly every query as ambiguous by default, which would make the ambiguity/clarification signal useless for real product behavior. Directly fails the predeclared 'valid ambiguity handling' pilot gate."
+    },
+    "3_entity_type_and_loss_errors": {
+      "severity": "CRITICAL, SEMANTIC",
+      "finding": "4/8 examples show serious entity problems: (a) nlu_v1_0067 and nlu_v1_0018 both emit entity_type='drug', which is NOT a member of nlu/schemas.py::EntityType (disease/gene/protein/target/compound/intervention) - _coerce_entities() silently drops any entity with an invalid type, so 'metformin' and 'sotorasib' are entirely LOST from both extractions despite being clearly named in the query text; (b) nlu_v1_0099 and nlu_v1_0036 both type EGFR/HER2 as entity_type='compound', directly violating the prompt's explicit, capitalized instruction to default gene/protein/target mentions to entity_type='target'. Candidate B (nvidia/nemotron) never showed either failure mode in any post-fix dev rerun. This is catastrophic entity extraction on the directive's own terms."
+    },
+    "4_constraint_loss_on_both_G_class_examples": {
+      "severity": "CRITICAL, SEMANTIC",
+      "finding": "Both G_constraint_heavy pilot examples (each with 3 gold constraint dimensions: phase+status+population) ended with pred_constraints=[] (zero constraints) after postprocessing. nlu_v1_0112's raw JSON emitted an empty constraints object entirely. nlu_v1_0109's raw JSON DID capture trial_phases and population correctly, but also emitted \"age\": [null] (a literal JSON null inside a List[str] field) - ConstraintSet(**constraints_raw) raises a ValidationError on this single malformed field and the except-handler discards the ENTIRE constraint set (including the two fields that were captured correctly), per nlu/extractor.py's existing (shared, unmodified) fallback behavior. Directly fails the predeclared 'major constraint loss: none' pilot gate on 2/2 constraint-heavy examples tested."
+    },
+    "5_requested_evidence_types_systematically_wrong_for_trial_queries": {
+      "severity": "moderate, SEMANTIC",
+      "finding": "Every B/G-class example (clinical-trial questions) predicted requested_evidence_types=['pubmed'] or [] - never 'clinicaltrials', even though every one of these queries is explicitly and exclusively about trial data (e.g. 'What Phase 3 trials are evaluating sotorasib...'). Not scored as a hard pilot-gate item, but consistent with the intent-collapse pattern above (finding 2) and would materially harm downstream source routing if adopted."
+    },
+    "6_latency_not_a_decisive_win": {
+      "severity": "disqualifying on its own",
+      "finding": "Pilot per-query latency (steady-state, post-warm-up): min 13.71s, max 21.90s, mean 16.54s, n=8 (artifacts/v2/nlu_qwen_pilot_results.json). The Nemotron control's OWN P50 is 19150ms - so Qwen's mean is only moderately below the control's P50, and Qwen's own WORST case this pilot (21.90s) exceeds the control's P50 entirely. This machine (Apple M3, 16GB RAM) showed heavy memory pressure while running the model (Qwen fp32 resident ~8.3GB alongside this project's own RAG/FAISS stack, system free RAM dropped to ~95MB, process observed in uninterruptible-sleep/swap-wait state during generation) - a real, reportable hardware constraint, not a measurement artifact. Even taking the numbers at face value, this pilot does NOT show the 'materially, not marginally faster' win the directive's Step 12 selection rule requires; it shows a modest, inconsistent improvement at P50 and a REGRESSION at Qwen's own worst observed case versus the control's P50."
+    }
+  },
+  "predeclared_pass_gate_result": {
+    "fabricated_canonical_ids": "PASS (0 observed - every canonical_id emitted matched a correct table entry: metformin ChEMBL:CHEMBL1431, breast cancer MeSH:D001943, multiple myeloma MeSH:D009101)",
+    "systematic_bg_confusion_classic_form": "PASS in the narrow sense (no B->G or G->B specific misclassification reappeared) - but superseded by finding 2 (a new, broader collapse-to-A/I pathology)",
+    "catastrophic_entity_extraction_errors": "FAIL (finding 3)",
+    "major_constraint_loss": "FAIL (finding 4, 2/2 G-class examples)",
+    "valid_ambiguity_handling": "FAIL (finding 2, 8/8 false-positive rate)",
+    "valid_researchquery_schema_output": "PASS in the narrow Pydantic-validity sense (8/8 schema_valid=True) - but this narrow pass is exactly the 'silent failure disguised as success' pattern this project's own Phase 2 closure standards warn against: empty/wrong content still validates because empty lists and dropped fields are valid defaults, not validation errors",
+    "recoverable_structured_output_behavior": "NOT EXERCISED (no example hit the empty/unparseable retry path this pilot)",
+    "latency_materially_below_control": "FAIL (finding 6)"
+  },
+  "overall_pilot_verdict": "FAIL - 4 of 7 scorable predeclared gates fail outright (catastrophic entity errors, major constraint loss, invalid ambiguity handling, no decisive latency win), and the schema-validity 'pass' is a false positive that does not reflect real extraction quality. These are SEMANTIC failures (wrong entity types, dropped entities, near-universal false ambiguity flagging, wholesale constraint loss), not merely formatting - per the directive's Step 9, bounded prompt adaptation is reserved for formatting-only issues on an otherwise-close pilot, and per the directive's explicit instruction not to over-invest in salvaging a clearly-failing small model, no adaptation attempt was made. The full 45-example dev evaluation was correctly NOT run.",
+  "why_no_bounded_adaptation_attempted": "The single genuinely formatting-shaped defect (intent-as-string instead of intent-as-array) is real and fixable in one prompt revision, but fixing it would not touch the four independent semantic failure modes (findings 2-4, 6) that are the actual disqualifying evidence. Spending a revision cycle on the formatting nit while the model still shows near-universal false ambiguity flagging, systematic entity mistyping/loss, and near-total constraint loss on constraint-heavy queries would be exactly the kind of over-investment in salvaging a clearly-failing small model the directive instructs against."
+}

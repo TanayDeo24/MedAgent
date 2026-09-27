@@ -1,0 +1,67 @@
+{
+  "phase": "2_alternate_inference_closure",
+  "purpose": "Determine whether NLU-stage latency (P50 19150ms / P95 66983ms on candidate_b_structured / nvidia/nemotron-3-super-120b-a12b) can be resolved via a hosted alternate-provider model or a local model, without beginning Phase 3.",
+  "written_before_any_new_experiment_this_round": true,
+  "context_inherited": "docs/v2/PHASE2_FINAL_GATE_AUDIT.md row 18/22 (sole failing gates, both latency-caused); artifacts/v2/nlu_latency_experiment_plan.json families A-D already tried and rejected in a prior round (A: thinking_mode param, unreliable; B: alternate provider, blocked - no credential; C: decomposed architecture, rejected on quality regression; D: more deterministic fields, not viable).",
+  "model_selection_requirements": [
+    "Non-reasoning or controllably-low-reasoning (task is constrained structured extraction, not open-ended reasoning)",
+    "Low latency (target: materially below current P50 19.15s / P95 66.98s)",
+    "Strong structured/schema (JSON) output following",
+    "Adequate biomedical entity extraction and intent+constraint classification capability",
+    "No requirement for frontier reasoning, huge context, tool calling, or multimodality",
+    "Permissive, unambiguous license appropriate for the project (flagged explicitly per candidate below - not assumed)"
+  ],
+  "step_1_2_credential_and_sdk_recheck": {
+    "env_vars_present_names_only": ["NVIDIA_API_KEY", "LOG_LEVEL", "LOG_FILE"],
+    "provider_credential_present": {
+      "nvidia": "YES",
+      "openai": "NO",
+      "anthropic": "NO",
+      "google": "NO",
+      "groq": "NO",
+      "together": "NO",
+      "fireworks": "NO",
+      "cerebras": "NO",
+      "mistral": "NO"
+    },
+    "installed_provider_sdks": ["langchain-nvidia-ai-endpoints (0.3.19)"],
+    "other_relevant_installed_packages": ["torch 2.14.0", "transformers 5.17.0", "sentence-transformers 6.0.1", "huggingface_hub 1.31.0"],
+    "local_runtime_availability": {
+      "ollama": "NOT installed (which ollama -> not found)",
+      "llama-cpp": "NOT installed (which llama-cpp -> not found)",
+      "mlx / mlx-lm": "NOT installed (pip list has no mlx* package)",
+      "transformers/torch": "installed and usable for a HF-format model without any new runtime install"
+    },
+    "hardware": "Apple M3, 8 cores (4P+4E), 16GB RAM, macOS/Darwin (Darwin 24.6.0)",
+    "disk_free": "54Gi available on / at time of check"
+  },
+  "step_3_4_hosted_candidates": {
+    "conclusion": "NO HOSTED ALTERNATIVE AVAILABLE - confirmed, not pursued further",
+    "reasoning": "Exactly one provider credential exists (NVIDIA_API_KEY) and exactly one provider SDK is installed (langchain-nvidia-ai-endpoints). This is unchanged from the prior latency-closure round's family B finding. A hosted alternate-provider candidate would require a new API key from the user, which this round's directive explicitly disallows obtaining unilaterally. No further search performed - this was already exhaustively confirmed in the prior round and re-confirmed here rather than re-litigated."
+  },
+  "step_13_15_local_candidates_identification": {
+    "search_method": "Checked ~/.cache/huggingface/hub for already-cached model weights BEFORE assuming any download was needed (per directive's explicit instruction), then considered what would be needed for a not-yet-cached but genuinely suitable small instruct model.",
+    "cache_check_result": "FOUND an already-cached small instruct model requiring NO download: mlx-community/Qwen2.5-3B-Instruct-4bit (1.6GB on disk, cached 2026-08-21, unrelated to this project's own work - evidently downloaded for a different local project on this machine). See nlu_local_model_assessment.json for full candidate detail including license and runtime caveats."
+  },
+  "step_14_safety_gate_applied": {
+    "rule": "Do NOT download any model weights without explicit human approval, regardless of size. Do NOT install ollama or any system-level runtime without explicit human approval. If evaluation requires a new provider key OR a large model download OR system-level runtime installation, STOP with a precise BLOCKED report rather than proceeding.",
+    "applied_this_round": true,
+    "outcome": "STOPPED before installing mlx-lm (new pip dependency required to run the already-cached MLX candidate) and before downloading any weights for a fully-permissively-licensed alternative. No model was run, no pip install was executed, no download occurred. See nlu_local_model_assessment.json and nlu_final_model_selection.json for the precise, minimal remaining blocker."
+  },
+  "steps_18_24_26_pilot_and_full_eval_plan_not_yet_executed": {
+    "status": "NOT EXECUTED - blocked at step 14's safety gate before any candidate became runnable",
+    "planned_pilot_set_if_unblocked": [
+      "1 simple entity question",
+      "1 constraint-heavy trial question",
+      "1 multi-entity question",
+      "1 cross-source question",
+      "1 ambiguous-abbreviation question",
+      "1 gene/protein/target ambiguity question",
+      "1 class-B example",
+      "1 class-G example"
+    ],
+    "planned_pilot_rejection_criteria": ["repeated schema violations", "fabricated IDs", "systematic B/G confusion", "lost constraints", "no material latency win"],
+    "planned_full_eval_data": "dev split only (45 examples) - test split (105, consumed) and Phase-10 data explicitly excluded",
+    "latency_acceptance_bar_reused_from_prior_round": "P50 <= 8000ms AND P95 <= 20000ms (artifacts/v2/nlu_latency_experiment_plan.json)"
+  }
+}

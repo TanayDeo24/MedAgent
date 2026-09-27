@@ -1,0 +1,109 @@
+{
+  "phase": "2_nvidia_fastmodel_review",
+  "trigger": "Phase 2 is open for exactly one reason: NLU latency (candidate_b_structured / nvidia/nemotron-3-super-120b-a12b, P50=19150ms, P95=66983ms per artifacts/v2/nlu_frozen_config.json's gate_results_dev_split_post_fix.latency). Human approved testing whether NVIDIA currently exposes a fast, non-reasoning (or reliably reasoning-disableable) model through the existing NVIDIA_API_KEY credential.",
+  "constraints": [
+    "No paid provider added",
+    "No new local model downloaded",
+    "No unrelated packages installed",
+    "Phase 3 not begun regardless of outcome",
+    "Only NVIDIA_API_KEY credential used"
+  ],
+  "model_discovery_method": "Live GET https://integrate.api.nvidia.com/v1/models with the existing NVIDIA_API_KEY (82 models returned, 2026-09-24), followed by live single-call tests of each promising candidate. A previously-discussed candidate name ('nvidia/nemotron-3.5-lightning-30b-a3b') was explicitly NOT trusted from memory - it was independently found in the live model listing, then live-tested for callability, latency, reasoning behavior, and structured-output support.",
+  "candidates_discovered": [
+    {
+      "model_id": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "callable": true,
+      "architecture": "hybrid Mamba-2 + MoE with select attention layers; native Multi-Token-Prediction speculative decoding",
+      "active_params": "3B active of 30B total (documented on HF/NVIDIA blog - developer.nvidia.com/blog/nvidia-nemotron-3-5-lightning-delivers-fast-accurate-specialized-task-execution-for-long-running-agents)",
+      "structured_output": "response_format={'type':'json_object'} documented (JSON mode); this experiment used strict Pydantic post-validation over free JSON text, matching candidate_b's existing mechanism, since ChatNVIDIA's LangChain wrapper does not expose response_format cleanly for this model in the installed SDK version",
+      "reasoning_behavior": "reasoning-capable by default - live test with default settings produced response.additional_kwargs['reasoning_content'] of 1187-1269 chars and 11.7-27.8s single-call latency",
+      "reasoning_disable_mechanism": "OFFICIAL, documented: chat_template_kwargs={'enable_thinking': False} passed as an OpenAI-compatible chat-completions request field (confirmed against https://docs.nvidia.com/nim/large-language-models/2.0.10/get-started/advanced/get-started-nemotron-3.5-lightning.html). NOT a prompt-text convention like the prior round's '/no_think' or 'detailed thinking off' system message (both previously found unreliable - the system-message form was re-tested this round and again failed to suppress reasoning, latency 27.8s, reasoning_content 1267 chars). The documented API-level parameter, once correctly routed through langchain_nvidia_ai_endpoints as an invoke()-time kwarg (llm.invoke(prompt, chat_template_kwargs={'enable_thinking': False})), reliably produced reasoning_content='' and 1.30s single-call latency in this round's live test. Passing it via LangChain's own `extra_body=` invoke kwarg failed with a 400 'Unsupported parameter(s): extra_body' - it must be passed as a direct top-level invoke() kwarg, which ChatNVIDIA forwards into the request body.",
+      "free_endpoint_status": "NOT PUBLISHED as free/paid tier explicitly in fetched docs; empirically reachable and billing to the same account as the existing frozen nvidia/nemotron-3-super-120b-a12b model, which the frozen config's own comment documents as free-tier (40 RPM cap, no daily cap)",
+      "quota_documented": "DOCUMENTED (shared account-level, not model-specific): NVIDIA NIM free tier caps requests at 40 RPM with no published daily cap, per config/llm_config.py's existing comment (same account, same header used for both models)",
+      "quota_account_specific_observed": "NOT SEPARATELY OBSERVED this round beyond the existing 35 RPM client-side limiter already in config/llm_config.py, which applies uniformly to any model called through get_llm()",
+      "quota_not_published": "Model-specific RPM/RPD/TPM/TPD ceilings distinct from the account-level 40 RPM figure are NOT PUBLISHED for this specific model in any fetched official source"
+    },
+    {
+      "model_id": "nvidia/nemotron-nano-3-30b-a3b",
+      "callable": false,
+      "note": "Listed in the live /v1/models response but returns 404 Not Found ('Function ... Not found for account ...') on actual invocation - listed but not currently servable to this account/key. Not usable regardless of its other properties."
+    },
+    {
+      "model_id": "openai/gpt-oss-20b",
+      "callable": true,
+      "structured_output": "not tested in depth (candidate rejected on latency before this was needed)",
+      "reasoning_behavior": "reasoning-capable by default; live test produced reasoning_content=465 chars",
+      "reasoning_disable_mechanism": "OpenAI gpt-oss models officially support a 'reasoning_effort' chat param (low/medium/high) per OpenAI's own gpt-oss docs, but this was NOT tested live this round because the model's default-setting single-call latency (42.95s) was already worse than the current frozen model's P50, making it a weak candidate regardless of a reasoning-disable option; DEPRIORITIZED in favor of the clearly faster nemotron-3.5-lightning result obtained first",
+      "free_endpoint_status": "NOT PUBLISHED distinctly from account-level tier",
+      "quota_documented": "same account-level 40 RPM figure as above; no model-specific published figure found"
+    }
+  ],
+  "selected_experimental_candidate": {
+    "model_id": "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "reasoning_setting": "chat_template_kwargs={'enable_thinking': False}, passed as a direct invoke()-time kwarg (nlu/extractor.py::extract_candidate_e_nvidia_fast)",
+    "response_format": "free JSON text (identical mechanism to candidate_b_structured: STRUCTURED_EXTRACTION_PROMPT + strict Pydantic ResearchQuery validation), not provider JSON-schema mode - chosen for parity with the frozen architecture so latency/quality differences are attributable to the model swap and reasoning setting alone, not a simultaneously-changed response-format mechanism",
+    "reason_selected": "Only currently-callable candidate that is (a) explicitly documented as configurable-reasoning by NVIDIA itself, (b) verified live to actually suppress reasoning_content to empty via an OFFICIAL API parameter (not a prompt trick), and (c) shows a clearly material latency improvement (single-call ~1.3s vs. current architecture's ~19s P50) rather than a marginal one"
+  },
+  "control": {
+    "architecture": "candidate_b_structured",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "source": "artifacts/v2/nlu_frozen_config.json (authoritative, exact values)",
+    "entity_f1_micro": 0.9008,
+    "normalization_accuracy_at_1": 0.8551,
+    "fabricated_id_count": 0,
+    "intent_systematic_confusion": "resolved (no >=80% one-directional class confusion)",
+    "constraint_f1_micro": "0.788-0.818 across clean reruns",
+    "schema_parse_success_rate": 1.0,
+    "p50_ms": 19150,
+    "p95_ms": 66983
+  },
+  "task_preserved_unchanged": [
+    "ResearchQuery/BiomedicalEntity/ConstraintSet/AmbiguityState Pydantic schema (schema_version 2.1.0)",
+    "IntentClass taxonomy (8 values) including B_VS_G_RULE and DI_VS_E_RULE",
+    "EntityType enum and semantic_roles field",
+    "nlu/normalization.py curated lookup tables + deterministic trial phase/status canonicalization (LLM never proposes a canonical_id - fabricated-ID protection is structural, unchanged)",
+    "STRUCTURED_EXTRACTION_PROMPT text (verbatim, including the EXHAUSTIVE ENTITY SCAN and target-default-entity-typing rules)",
+    "Postprocessing/coercion functions (_coerce_intent, _coerce_entities, _coerce_evidence_types, _canonicalize_constraint_fields)",
+    "evaluation/v2/nlu_metrics.py metric formulas"
+  ],
+  "only_change": "The model identifier passed to get_llm() and one additional invoke()-time kwarg (chat_template_kwargs) - implemented as nlu/extractor.py::extract_candidate_e_nvidia_fast, a duplicate of extract_candidate_b_structured's body (not a shared-code refactor) so this experimental path can be cleanly deleted if rejected without touching the frozen candidate_b code.",
+  "pilot_examples_predeclared": [
+    {"query_id": "nlu_v1_0013", "intent_class": "A_literature_evidence", "reason": "simple entity extraction (PD-1, breast cancer)"},
+    {"query_id": "nlu_v1_0106", "intent_class": "G_constraint_heavy", "reason": "constraint-heavy trial question / class G example"},
+    {"query_id": "nlu_v1_0048", "intent_class": "D_cross_source_synthesis", "reason": "cross-source question, multi-entity (BTK inhibitors, type 2 diabetes)"},
+    {"query_id": "nlu_v1_0017", "intent_class": "B_clinical_trial_landscape", "reason": "class B example"},
+    {"query_id": "nlu_v1_0136", "intent_class": "I_ambiguous", "reason": "ambiguous / bare-topic-mention query (Tell me about KRAS inhibitors)"},
+    {"query_id": "nlu_v1_0071", "intent_class": "F_mechanism", "reason": "gene/protein/target semantic-role ambiguity (BTK as target/protein)"},
+    {"query_id": "nlu_v1_0100", "intent_class": "E_multi_hop_research", "reason": "multi-entity, multi-hop question"},
+    {"query_id": "nlu_v1_0031", "intent_class": "C_compound_target", "reason": "multi-entity compound-target question (EGFR)"}
+  ],
+  "pilot_examples_selected_before_seeing_any_candidate_output": true,
+  "pilot_source_split": "evaluation/v2/nlu_benchmark_v1.json 'dev' split (45 examples) - the allowed Phase-2 dev split, never the consumed 105-example test split, never Phase-10 data",
+  "quality_gates": {
+    "reject_immediately_if": [
+      "any fabricated canonical ID",
+      "catastrophic entity loss",
+      "systematic entity mistyping",
+      "B/G intent confusion returns",
+      "important constraints disappear",
+      "broad false ambiguity",
+      "semantic_roles not preserved",
+      "frequent malformed/unparseable output",
+      "schema-valid-but-semantically-empty output (valid JSON shape with hollow/near-empty field values - the exact Qwen-1.5B failure mode)"
+    ]
+  },
+  "latency_gate": {
+    "rule": "P50 must be unambiguously, materially better than the control's 19150ms - not a marginal reduction like ~15s. No frozen hard numeric threshold exists in the contract; the bar is 'clearly material, ideally low-single-digit-second typical latency with a drastically tighter tail', per this round's directive.",
+    "pilot_single_call_evidence": "1.30s observed on one live call with reasoning disabled, vs 11.7-27.8s for the same prompt/model with reasoning enabled, vs 19.15s P50 for the control - qualifies as unambiguously material if reproduced across the pilot set"
+  },
+  "max_prompt_schema_revisions_allowed": 2,
+  "revision_rules": [
+    "Only if pilot failures are purely formatting/schema-integration issues (not semantic)",
+    "Never add exact failed benchmark questions as few-shot examples",
+    "Never alter gold labels",
+    "Never change the taxonomy to suit the model"
+  ],
+  "full_dev_criteria": "Run the full 45-example dev split ONLY if the 8-example pilot passes every quality gate AND the latency gate.",
+  "rejection_rule": "Reject if either quality or latency fails on the pilot, or if full-dev quality regresses materially against the control's hard gates (entity F1 near 0.9008 with no per-type collapse; fabricated IDs always 0; no systematic B/G or other >=80% single-class confusion; constraint F1 near 0.788-0.818 with no important field collapse; semantic_roles preserved; ambiguous abbreviations handled safely; structured output highly reliable and semantically valid).",
+  "selection_rule": "HARD quality gates decide eligibility first (pass/fail, not a composite score). Only among candidates passing every quality gate does latency decide. No single weighted/composite score is used for the accept/reject decision, per the explicit Phase 2 reopening lesson (see docs/v2/PHASE2_REOPEN_ANALYSIS.md)."
+}

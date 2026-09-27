@@ -1,0 +1,53 @@
+{
+  "purpose": "Phase 2 latency-closure Step 1: profile the FROZEN Candidate B architecture (candidate_b_structured, prompt v4, benchmark v1.1.0) on the dev split only (n=45) before any architecture change, per artifacts/v2/nlu_frozen_config.json.",
+  "architecture_profiled": "candidate_b_structured",
+  "prompt_version": "candidate_b_structured_v4_closure",
+  "benchmark_version": "1.1.0",
+  "split": "dev",
+  "n_examples": 45,
+  "data_source": "artifacts/v2/nlu_closure_entitytype_b_dev.json (run 4, FINAL/frozen dev run, same session as this closure round's own frozen config) - re-used rather than re-run to avoid an unnecessary extra 45-call rate-limited/paid API batch; this run's per-example latencies and token usage are the same numbers artifacts/v2/nlu_frozen_config.json's gate_results_dev_split_post_fix already cites as authoritative for this exact frozen prompt version.",
+  "total_latency_ms": {
+    "p50": 19150.11,
+    "p90": 51118.11,
+    "p95": 66982.66,
+    "max": 76479.67,
+    "mean": 25975.94,
+    "min": 3888.06,
+    "method": "statistics.quantiles(latencies, n=20) indices [17]/[18] for p90/p95, matching evaluation/v2/run_nlu_eval.py's own methodology"
+  },
+  "cold_start_vs_steady_state": {
+    "first_5_examples_mean_ms": 29209.9,
+    "remaining_40_examples_mean_ms": 25571.7,
+    "finding": "No material cold-start effect - the first 5 calls are not consistently slower than steady-state; the dominant variance source is per-query reasoning length (see component_breakdown below), not connection warm-up."
+  },
+  "component_breakdown": {
+    "method": "Live instrumented re-implementation of extract_candidate_b's call path (prompt build -> llm.invoke() -> parse/normalize/validate) with time.perf_counter() checkpoints around each stage, run against 8 dev examples this session (2 hit the 503-overloaded retry path, 1 request never got a clean response within the sample and is excluded).",
+    "n_sampled": 8,
+    "prompt_build_ms": {"typical": "<0.03ms", "fraction_of_total": "~0.0001%"},
+    "llm_call_ms": {"observed_range": "11150-30941", "fraction_of_total": "~99.99%"},
+    "postprocess_ms_parse_normalize_validate": {"typical": "0.05-0.6ms", "fraction_of_total": "~0.002%"},
+    "finding": "Total latency is, for all practical purposes, entirely LLM request latency. Prompt construction, JSON parsing, Pydantic validation, constraint canonicalization, and normalization-table lookups (all pure in-process Python, no I/O) are each sub-millisecond and together contribute a negligible fraction (<0.01%) of total latency. There is no retry latency in this sample (no 503s survived past the wrapper's transparent retry into the measured span) and no separate 'terminology lookup latency' worth measuring apart from postprocess - normalize_entity() is an in-memory dict lookup."
+  },
+  "reasoning_token_correlation": {
+    "method": "Same 8-example live sample: captured response.additional_kwargs['reasoning_content'] (the model's separate chain-of-thought field, distinct from the JSON answer in response.content) alongside llm_call_ms and usage_metadata.output_tokens.",
+    "raw_samples": [
+      {"query_id": "nlu_v1_0107", "llm_call_ms": 23736.6, "reasoning_chars": 9180, "output_tokens": 2048, "note": "hit max_tokens=2048 cap - JSON answer entirely displaced by reasoning, resulting in a parse failure downstream (Expecting value: line 1 column 1)"},
+      {"query_id": "nlu_v1_0123", "llm_call_ms": 11149.7, "reasoning_chars": 4960, "output_tokens": 1436},
+      {"query_id": "nlu_v1_0018", "llm_call_ms": 20506.5, "reasoning_chars": 4846, "output_tokens": 1452},
+      {"query_id": "nlu_v1_0111", "llm_call_ms": 27005.3, "reasoning_chars": 6690, "output_tokens": 1851},
+      {"query_id": "nlu_v1_0130", "llm_call_ms": 17628.1, "reasoning_chars": 4577, "output_tokens": 1343},
+      {"query_id": "nlu_v1_0048", "llm_call_ms": 30940.9, "reasoning_chars": 9254, "output_tokens": 2048, "note": "hit max_tokens=2048 cap - same truncation failure mode"},
+      {"query_id": "nlu_v1_0013", "llm_call_ms": 13214.5, "reasoning_chars": 3139, "output_tokens": 979}
+    ],
+    "finding": "Reasoning length (chars) and llm_call_ms move together (Spearman-consistent monotonic trend across all 7 clean samples: 3139->13.2s, 4577->17.6s, 4846->20.5s, 4960->11.1s [outlier, likely queueing variance], 6690->27.0s, 9180->23.7s [truncated, capped output], 9254->30.9s). The 2 examples that hit the 2048-token cap had the longest reasoning chains, which ALSO explains 2 of the schema_parse_success failures reported in nlu_frozen_config.json's dev run 4 (4/45 failures) - reasoning-chain length is not just a latency cost, it is a genuine reliability risk (truncates the JSON answer entirely on long reasoning).",
+    "conclusion": "The dominant latency cause is confirmed: the underlying reasoning-tuned model (nvidia/nemotron-3-super-120b-a12b) generates an internal chain-of-thought (exposed via response.additional_kwargs['reasoning_content'], billed as output_tokens) before every structured answer, and BOTH its length and the resulting latency scale with the apparent complexity/breadth of the prompt's task, not a fixed per-call constant."
+  },
+  "token_accounting_baseline": {
+    "source": "artifacts/v2/nlu_closure_entitytype_b_dev.json token_accounting block (same dev run 4)",
+    "coverage": "45/45 (100%) - provider returns usage_metadata on every call in this run",
+    "mean_input_tokens": "~1130-1235 (per nlu_frozen_config.json's cited range for clean reruns)",
+    "mean_output_tokens": "~1275-1330 (per nlu_frozen_config.json's cited range; this INCLUDES reasoning_content tokens - the NVIDIA usage_metadata output_tokens field does not separate reasoning tokens from answer tokens)",
+    "reasoning_tokens_separately_exposed": "NOT EXPOSED BY PROVIDER as a distinct numeric field - only the raw reasoning_content STRING is exposed via additional_kwargs; its token count must be inferred (not directly reported) from output_tokens minus an estimate of the JSON answer's own token count. Reported honestly as not directly measurable, not estimated-and-presented-as-measured."
+  },
+  "determination": "Root cause is model-internal chain-of-thought generation, not retries, not network/connection setup, not schema/prompt token bloat (input tokens are a small, stable ~1.4K regardless of latency), and not postprocessing. The model is reasoning-tuned and applies unpredictable-length internal reasoning to a task (constrained structured extraction) that does not need it. This directly motivates Candidate Family C (decompose into simpler, single-purpose calls, each of which empirically produces materially shorter reasoning chains - see artifacts/v2/nlu_latency_experiment_plan.json and nlu_frozen_config.json v2)."
+}

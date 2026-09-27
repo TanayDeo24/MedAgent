@@ -1,0 +1,55 @@
+{
+  "phase": "2 (latency-closure resume)",
+  "status": "PLANNED, NOT EXECUTED - blocked at pre-call budget/risk gate",
+  "date": "2026-09-24",
+  "scope_authorized": {
+    "allowed": [
+      "Official Workers AI REST endpoint only (https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{MODEL})",
+      "Bearer token constructed in memory at the request boundary only",
+      "Provider-neutral adapter, isolated from agent/ and nlu/ core logic"
+    ],
+    "forbidden": [
+      "Wrangler install / Worker creation or deployment",
+      "AI Gateway creation",
+      "DNS/Pages/billing changes",
+      "Any real inference call before the neuron budget plan was written and checked"
+    ]
+  },
+  "primary_candidate_verification_done_this_session": {
+    "model_id_confirmed": "@cf/google/gemma-4-26b-a4b-it",
+    "free_tier_eligible": true,
+    "structured_output_supported": true,
+    "reasoning_disable_mechanism_confirmed": "chat_template_kwargs: {enable_thinking: false}",
+    "sources": [
+      "https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/",
+      "https://developers.cloudflare.com/workers-ai/platform/pricing/"
+    ]
+  },
+  "pilot_design_predeclared_style": {
+    "n": 8,
+    "case_categories": [
+      "simple entity",
+      "constraint-heavy trial question",
+      "multi-entity",
+      "cross-source",
+      "ambiguous abbreviation",
+      "gene/protein/target ambiguity",
+      "class B",
+      "class G"
+    ],
+    "source_split": "dev (n=45), never the consumed test split (n=105) or Phase-10 data",
+    "note": "Specific example IDs were intentionally NOT selected/pinned this session, because the budget gate (see nlu_cloudflare_budget_plan.json) stopped the experiment before pilot execution. Selecting concrete example IDs without running them serves no purpose and this file avoids implying a pilot was designed down to case level and then abandoned mid-flight."
+  },
+  "control_baseline_for_comparison": {
+    "architecture": "candidate_b_structured (Nemotron, frozen)",
+    "p50_ms": 19150,
+    "p95_ms": 66983,
+    "source": "artifacts/v2/nlu_frozen_config.json"
+  },
+  "success_bar": {
+    "latency": "~60% P50 reduction AND ~60% P95 reduction from control, ideally P50<=5s / P95<=15s",
+    "quality_gates": "entity F1 drop <=0.02 absolute, no per-type collapse, 0 fabricated IDs, no B/G confusion or generic-intent collapse, constraint F1 drop <=0.03 absolute, ambiguity/semantic_roles preserved"
+  },
+  "outcome": "STOPPED before pilot execution. See nlu_cloudflare_budget_plan.json for the specific reason (unresolved, credibly-sourced ~37x neuron/billing anomaly reported for this exact model, making the 5000-neuron experiment cap unsafe to rely on without human review). No Cloudflare inference call, pilot, or full-dev run occurred this session.",
+  "next_step": "Human review of the budget plan's recommendation before any real call is attempted."
+}

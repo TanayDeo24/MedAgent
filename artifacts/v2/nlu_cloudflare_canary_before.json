@@ -1,0 +1,23 @@
+{
+  "phase": "2 (Cloudflare neuron canary review round)",
+  "status": "NOT ESTABLISHED — not attempted",
+  "date": "2026-09-24",
+  "reason": "Step 3's anomaly investigation (see artifacts/v2/nlu_cloudflare_canary_plan.json) classified the Gemma-4-26b-a4b-it neuron/billing anomaly as CONFIRMED CURRENT ISSUE before this step was reached. Per the task's own instructions ('the canary must not run without a credible BEFORE baseline'; 'if anything is unclear or you're unsure whether an action would spend quota unexpectedly, STOP and report'), the decision to stop was already made and reported at the end of Step 3 — establishing a BEFORE baseline was judged pointless and potentially itself a scope-creep risk (the only credible programmatic option found, Cloudflare's GraphQL Analytics API `aiInferenceAdaptiveGroups` dataset, would require an additional authenticated account-level API call using CLOUDFLARE_API_TOKEN that was not part of this round's pre-authorized scope, which was limited to the Workers AI REST run endpoint only).",
+  "candidate_measurement_sources_identified_but_not_used": [
+    {
+      "source": "Cloudflare dashboard — Workers AI usage/analytics page",
+      "type": "human-observed only",
+      "would_require": "Human operator to read and report the current neuron counter; not usable by this agent directly."
+    },
+    {
+      "source": "Cloudflare GraphQL Analytics API, `aiInferenceAdaptiveGroups` dataset",
+      "type": "programmatic, authenticated",
+      "would_require": "An additional API call with CLOUDFLARE_API_TOKEN beyond this round's pre-authorized scope (Workers AI REST run endpoint only) — not attempted, would need explicit authorization before use even if the anomaly finding had not already stopped the round."
+    }
+  ],
+  "usage_before": null,
+  "remaining_free_neurons_before": null,
+  "timestamp_before": null,
+  "measurement_source_used": "NONE — no baseline was established",
+  "credentials_in_this_file": "none"
+}
