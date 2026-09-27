@@ -40,6 +40,9 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 from evidence.models import Evidence, SourceType
 from evidence.registry import DEFAULT_ADAPTER_REGISTRY, EvidenceAdapterError
+from generation.generator import GenerationProviderError
+from generation.pipeline import generate_grounded_answer
+from generation.validation import GenerationValidationError
 
 logger = get_logger(__name__)
 
@@ -1139,6 +1142,60 @@ def evidence_normalization_node(state: AgentState) -> AgentState:
         + (f", {len(normalization_errors)} record(s) skipped (malformed/unsupported)"
            if normalization_errors else "")
     )
+
+    return state
+
+
+# =============================================================================
+# PHASE 6: GROUNDED GENERATION
+# =============================================================================
+
+
+def grounded_generation_node(state: AgentState) -> AgentState:
+    """Phase 6 boundary: transform this run's `state["evidence"]` (Phase 5's
+    canonical Evidence[], and ONLY that - never `tool_results`/
+    `retrieved_context` directly) into a structurally-grounded, citation-
+    compiled `GroundedAnswer`, via `generation.pipeline.generate_grounded_answer`.
+
+    See docs/v2/PHASE6_GROUNDED_GENERATION_CONTRACT.md. Runs immediately
+    after evidence_normalization_node (the point where this iteration's
+    Evidence[] is final) and before verification_node.
+
+    Uses the frozen Phase-2 production Cerebras model (qwen-3.8-27b,
+    candidate_b_structured architecture) - a SEPARATE call from Phase 2's
+    own NLU extraction and from Phase 3's tool-orchestration call; this is
+    a new, distinct Cerebras round trip specific to answer generation.
+
+    Deliberately does NOT touch `state["citations"]`/`state["final_report"]`
+    - those remain report_generation_node's existing, structurally-
+    disconnected legacy path (Phase 5 audit Section 0), unchanged. A
+    provider failure or a deterministic validation failure here is caught
+    and logged to `state["errors"]`; `state["grounded_answer"]` is left
+    `None` rather than ever storing a partially-valid or unsafely-
+    fallback-generated answer object (directive Step 33's no-unsafe-
+    fallback requirement)."""
+
+    evidence = state.get("evidence", []) or []
+    query = state["query"]
+
+    try:
+        answer = generate_grounded_answer(query, evidence, architecture="candidate_b_structured")
+        state["grounded_answer"] = answer
+        state["intermediate_thoughts"].append(
+            f"Grounded generation: {len(answer.claims)} claim(s), "
+            f"{len(answer.citations)} citation(s), "
+            f"{len(answer.references)} reference(s), "
+            f"abstained={answer.abstained}, conflict_detected={answer.conflict_detected}"
+        )
+        logger.info(
+            f"[GROUNDED GENERATION] Produced GroundedAnswer with "
+            f"{len(answer.claims)} claims, {len(answer.citations)} citations"
+        )
+    except (GenerationProviderError, GenerationValidationError) as e:
+        state["grounded_answer"] = None
+        state["errors"].append(f"Grounded generation failed: {e}")
+        state["intermediate_thoughts"].append(f"⚠ Grounded generation error: {e}")
+        logger.error(f"[GROUNDED GENERATION] Failed: {e}")
 
     return state
 

@@ -405,4 +405,7 @@ def test_graph_includes_evidence_normalization_node():
 
     edges = {(e.source, e.target) for e in graph.get_graph().edges}
     assert ("synthesis", "evidence_normalization") in edges
-    assert ("evidence_normalization", "verification") in edges
+    # Phase 6 inserted grounded_generation between evidence_normalization
+    # and verification - the direct edge is intentionally no longer
+    # present; evidence_normalization's node itself is still unconditional.
+    assert ("evidence_normalization", "grounded_generation") in edges

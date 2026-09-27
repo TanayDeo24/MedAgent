@@ -1,0 +1,68 @@
+{
+  "analysis_name": "phase6_failure_analysis",
+  "created": "2026-09-27",
+  "taxonomy_used": [
+    "UNKNOWN_EVIDENCE_ID", "UNCITED_FACTUAL_UNIT", "MISSING_REQUIRED_FACT",
+    "FORBIDDEN_UNSUPPORTED_FACT", "BAD_ABSTENTION", "CONFLICT_COLLAPSED",
+    "BAD_CITATION_GROUPING", "MISSING_REFERENCE_ENTRY", "DUPLICATE_REFERENCE",
+    "BAD_SOURCE_METADATA", "SCHEMA_FAILURE", "PROVIDER_ERROR", "TIMEOUT",
+    "OVERLY_VERBOSE", "ANSWER_NOT_DIRECT", "UNSERIALIZABLE_OUTPUT",
+    "BENCHMARK_GOLD_AUTHORING_ERROR"
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "category": "MISSING_REQUIRED_FACT",
+      "root_cause": "REAL, IN-SCOPE GENERATION DEFECT: generation/generator.py's _evidence_prompt_block only rendered Evidence.content in the prompt, silently discarding Evidence.source_metadata entirely. Several real EvidenceType assignments store the factually-relevant value in source_metadata (e.g. a ChEMBL COMPOUND_IDENTITY record's max_phase, molecule_type) rather than in .content (which holds only the compound name for that type). The model therefore correctly reported it had no data for max_phase/molecule_type questions, because it genuinely never saw that data - a real prompt-construction gap, not a hallucination-avoidance success.",
+      "cases_affected": ["P6-D7 (round 1)", "P6-D8 (round 1)"],
+      "detection": "development-split run, round 1 (10 cases, 7/10 passed)",
+      "fix": "generation/generator.py::_evidence_prompt_block now renders every non-empty field of Evidence.source_metadata (excluding the 'kind' discriminator) alongside .content, verbatim from the real Evidence object - never invented, never paraphrased.",
+      "fix_scope": "generation/generator.py only - no change to evidence/ (frozen Phase 5) or to any Phase-2/3/4 code.",
+      "regression_check": "development split rerun after the fix: 10/10 passed (up from 7/10); validation split (fresh cases, never touched during the fix): 3/3 passed.",
+      "status": "FIXED, verified on fresh re-run"
+    },
+    {
+      "id": "F2",
+      "category": "BENCHMARK_GOLD_AUTHORING_ERROR",
+      "root_cause": "MY OWN benchmark case P6-D5's forbidden_substrings included the bare word 'dosing' - but the question itself asked about 'pediatric dosing', so any correct abstention necessarily echoes that word back ('...does not contain information regarding the recommended pediatric dosing schedule...'). This penalized CORRECT abstention behavior, not a generation defect.",
+      "cases_affected": ["P6-D5 (round 1)"],
+      "detection": "development-split run, round 1",
+      "fix": "Narrowed forbidden_substrings to concrete dosage-value patterns ('mg/kg', 'mg twice daily', 'mg once daily') that would indicate a fabricated numeric dose, rather than the topic word itself.",
+      "fix_scope": "benchmark case definition only - no generation code changed for this finding.",
+      "status": "FIXED (benchmark authoring, not generation code)"
+    },
+    {
+      "id": "F3",
+      "category": "BENCHMARK_GOLD_AUTHORING_ERROR",
+      "root_cause": "MY OWN benchmark case P6-V3 (validation split) asked 'What molecular weight is recorded for imatinib in ChEMBL?' - but molecular_weight is NOT one of ChemblEvidenceMetadata's fields (only molecule_type/max_phase/mechanism_of_action/match_type are captured by frozen Phase-5 code). The model correctly and safely abstained on a field that genuinely does not exist in the Evidence it received - the CORRECT, contract-compliant behavior, not a defect.",
+      "cases_affected": ["P6-V3 (round 1)"],
+      "detection": "validation-split run, round 1",
+      "fix": "Rewrote the question to ask about fields ChemblEvidenceMetadata actually carries (molecule_type, max_phase).",
+      "fix_scope": "benchmark case definition only.",
+      "status": "FIXED (benchmark authoring, not generation code)"
+    },
+    {
+      "id": "F4",
+      "category": "BENCHMARK_GOLD_AUTHORING_ERROR",
+      "root_cause": "Phase-6 held-out case P6-H2 asked 'According to ChEMBL, what alogp value is recorded for imatinib?' - alogp is likewise NOT a ChemblEvidenceMetadata field. The model correctly abstained: 'The provided ChEMBL evidence for imatinib (CHEMBL941) does not contain a recorded alogp value.' This is the identical root cause as F3, discovered AFTER architecture freeze, in the single held-out run.",
+      "cases_affected": ["P6-H2 (held-out, spent)"],
+      "detection": "phase6_heldout split, single frozen run",
+      "classification_rationale": "Per directive Step 36/37: a genuine architectural/generation DEFECT would keep Phase 6 OPEN and require root-cause + fix + fresh supplement. This is NOT that - the generation system's behavior (honest abstention on genuinely absent data, zero fabrication) is EXACTLY the contract-required safe behavior (Section 7). The failure is entirely in this held-out case's own gold label (expected_abstain=False when the correct expectation was True, or the question should never have been asked against this schema). No code in generation/ or evidence/ was touched to 'fix' this - fixing it would mean editing already-spent held-out gold, which is not done; the case is left as a documented, spent, non-representative failure.",
+      "fix": "NONE - no code change. This finding is recorded as an accepted limitation (see docs/v2/PHASE6_GROUNDED_GENERATION.md) of the frozen Phase-5 ChemblEvidenceMetadata schema (a Phase-5, not Phase-6, boundary) and a lesson for future benchmark authoring, not a Phase-6 defect.",
+      "held_out_reused": false,
+      "fresh_supplement_required": false,
+      "status": "DOCUMENTED, NOT a blocking Phase-6 defect - hard safety gates (no fabricated value, no unknown Evidence ID) held throughout"
+    }
+  ],
+  "overall_hard_gate_status_across_all_16_real_cases": {
+    "unknown_evidence_ids_referenced": 0,
+    "fabricated_source_ids": 0,
+    "fabricated_source_urls": 0,
+    "reference_entries_without_evidence": 0,
+    "zero_evidence_cases_producing_factual_claim": 0,
+    "model_assigned_citation_numbers": 0,
+    "unserializable_answers": 0,
+    "uncaught_invalid_structured_output": 0,
+    "secret_leaks": 0
+  }
+}

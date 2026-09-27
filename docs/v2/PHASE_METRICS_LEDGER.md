@@ -602,3 +602,91 @@ No code change was required or made.
 - Any claim that the original 14-case `phase5_heldout` split was rerun as
   blind evidence in this session — it was not; only current *code* was
   inspected for the adapter consistency check.
+
+## Phase 6: Grounded Generation
+
+Final architecture: `generation/pipeline.py::generate_grounded_answer`
+(Candidate B, structured factual-unit generation) - one Cerebras
+`qwen-3.8-27b` strict-JSON-schema call per query, deterministic
+post-generation validation + citation compilation. Wired into the graph
+as `agent.nodes.grounded_generation_node`,
+`synthesis → evidence_normalization → grounded_generation → verification`.
+Frozen config: `artifacts/v2/phase6_frozen_config.json`.
+
+Benchmark: 16 real cases (10 dev, 3 validation, 3 held-out) built from
+real Evidence via `evidence/adapters.py` against Phase-5's already-
+captured real raw records — deliberately smaller scale than Phase 5's 72,
+a first Phase-6 benchmark.
+
+| Metric | Result | n | Comparability | Resume-safe |
+|---|---|---|---|---|
+| Dev+validation gold-match pass rate | 13/13 = 100% | 13 | NEW (no prior baseline) | YES |
+| Held-out gold-match pass rate | 2/3 = 67% | 3 | NEW | YES, with the F4 caveat below |
+| Held-out hard-safety-gate compliance | 3/3 = 100% | 3 | NEW | YES |
+| Unknown Evidence IDs referenced | 0 | 16 | NEW | YES |
+| Fabricated source IDs/URLs | 0/0 | 16 | NEW | YES |
+| Zero-Evidence cases producing a factual claim | 0 | 2 | NEW | YES |
+| Deterministic citation compilation success | 100% | 16 | NEW | YES |
+| Answer serialization success | 100% | 16 | NEW | YES |
+| Mean generation latency | 8409.7ms (rate-limit dominated, see caveat) | 16 | NEW | YES, with caveat |
+| Mean cost/query | $0.0017 | 16 | NEW | YES |
+
+Full detail: `artifacts/v2/phase_metrics_ledger.json`'s `phase_6_grounded_generation` key.
+
+### Real defect found and fixed: evidence prompt dropping source_metadata
+
+`generation/generator.py::_evidence_prompt_block` originally rendered
+only `Evidence.content`, silently discarding `Evidence.source_metadata`
+(e.g. ChEMBL `max_phase`, `molecule_type`) — real data the model never
+saw, causing avoidable abstentions. Fixed to render all non-empty
+`source_metadata` fields. Dev split: 7/10 → 10/10 after the fix;
+validation: 3/3. Full account: `artifacts/v2/phase6_failure_analysis.json`.
+
+### Candidate selection
+
+Candidate A (direct prose) vs. Candidate B (structured JSON) measured on
+4 real dev cases. Candidate A leaked an internal `evidence_id` string
+into user-facing prose on one case and failed to preserve a raw
+ClinicalTrials field value verbatim on another — both real, reproducible
+defects Candidate B's schema makes structurally impossible/less likely.
+Candidate B selected; Candidate C (claim-plan + composition) not built —
+no Candidate B defect motivated the added cost of a second LLM call.
+Full detail: `artifacts/v2/phase6_candidate_comparison.json`.
+
+### Held-out finding (non-blocking) and supplement
+
+P6-H2 asked about a ChEMBL `alogp` value not present in frozen Phase-5's
+`ChemblEvidenceMetadata` schema. The system correctly abstained rather
+than fabricate a number — classified as a benchmark gold-authoring error
+(identical root cause to a pre-freeze validation fix, P6-V3), not a
+generation defect. No code changed; the original 3-case held-out was NOT
+reused, relabeled, or rerun.
+
+A fresh, independent, pre-frozen blind supplement (`P6-SUPP-01`,
+`artifacts/v2/phase6_heldout_supplement_manifest.json`/`_results.json`)
+was subsequently run on a genuinely unused real ClinicalTrials.gov record
+(`NCT05549297`) to confirm the underlying generation system on a
+gold-valid case: **PASS** — 4/4 required facts (recruitment status, trial
+phase, enrollment count, sponsor), 0 forbidden/unsupported content, 0
+invalid/unknown Evidence IDs, 10/10 hard gates, 0 code changes.
+
+**Correct combined statement:** the original blind held-out achieved 2/3
+required-fact coverage (one miss = invalid gold, not fabrication); the
+fresh blind supplement subsequently passed 1/1. These are NOT combined
+into "4/4" or "100%" — they are reported as two separate, honestly-scoped
+results.
+
+### NOT resume-safe / explicitly non-comparable
+
+- Any claim of citation faithfulness, claim-to-evidence entailment
+  accuracy, unsupported-claim rate, or hallucination reduction — none of
+  these are measured by Phase 6; that is explicitly Phase 7's job.
+- Any claim that Phase 6 fixed the legacy citation/reference detachment —
+  it did not; `report_generation_node` is unmodified and still
+  structurally disconnected, by design (deferred to a future phase).
+- Any latency number without the rate-limit-dominated caveat — most of
+  the measured ~8-12s per call is the Cerebras Free Trial 5RPM rate
+  limiter's enforced wait, not true model inference time.
+- Any claim that Phase 6 ran a nonzero-Evidence real end-to-end pipeline
+  in this cloud session — it did not (CTL-009); only a zero-Evidence
+  real-graph run and a mocked-Evidence unit-level pipeline were verified.

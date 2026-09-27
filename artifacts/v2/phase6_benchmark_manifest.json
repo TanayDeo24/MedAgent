@@ -1,0 +1,461 @@
+{
+  "benchmark_name": "phase6_grounded_generation_benchmark",
+  "benchmark_version": "1.0.0",
+  "created": "2026-09-27",
+  "purpose": "Phase 6 structural-grounding correctness benchmark: tests whether generation/pipeline.py transforms (ResearchQuery, Evidence[]) into a structurally-grounded GroundedAnswer whose claims/citations satisfy independently-authored gold expectations. NOT a Phase-7 semantic-faithfulness benchmark.",
+  "methodology_notes": [
+    "Evidence objects were built via evidence/adapters.py from REAL raw records already captured in artifacts/v2/phase5_benchmark_manifest.json's development/validation splits (real NCBI/ClinicalTrials.gov/EBI ChEMBL API responses and real local RAG retrieve() output, fetched during Phase-5 benchmark construction) - no synthetic/fabricated Evidence content anywhere in this benchmark.",
+    "Gold expectations (required_fact_substrings, forbidden_substrings, expected_abstain, expect_conflict, min_factual_claims, required_source_types) were authored independently by inspecting each real Evidence object's actual content BEFORE running any candidate - never copied from a candidate's output.",
+    "Scale is deliberately smaller than Phase 5's 72-case benchmark (16 total cases) - this is a first Phase-6 benchmark, not a claim of equivalent statistical power; see docs/v2/PHASE6_GROUNDED_GENERATION.md for the explicit scope caveat.",
+    "The phase6_heldout split (3 cases) reuses the same underlying real Evidence pool as development/validation (same brigatinib/imatinib/melanoma real records) under fresh query framings and independently-authored gold never inspected before the single held-out run - consistent with the Phase 4/5 precedent of reusing real source material across splits while keeping gold labels and scoring genuinely untouched until freeze.",
+    "One held-out case (P6-H2) asked about a ChEMBL 'alogp' value that does not exist in the frozen Phase-5 ChemblEvidenceMetadata schema (only molecule_type/max_phase/mechanism_of_action/match_type are captured) - this was a gold-authoring error discovered via the held-out run, not a generation-system defect; see docs/v2/PHASE6_GATE_PLAN.md failure analysis and PHASE6_FINAL_GATE_AUDIT.md for the full accounting. The held-out split is SPENT and was not rerun."
+  ],
+  "split_sizes": {
+    "development": 10,
+    "validation": 3,
+    "phase6_heldout": 3
+  },
+  "total_cases": 16,
+  "category_coverage": [
+    "chembl_only",
+    "clinicaltrials_only",
+    "concise_query",
+    "conflicting_or_varying_evidence",
+    "duplicate_redundant_evidence",
+    "evidence_multiple_source_records",
+    "insufficient_evidence",
+    "missing_optional_metadata",
+    "multi_source",
+    "numeric_claim",
+    "pubmed_only",
+    "same_source_record_multi_evidence",
+    "synthesis_across_units",
+    "uncertainty_qualification",
+    "zero_evidence"
+  ],
+  "cases": [
+    {
+      "case_id": "P6-D1",
+      "split": "development",
+      "categories": [
+        "pubmed_only",
+        "evidence_multiple_source_records"
+      ],
+      "query": "What clinical evidence supports brigatinib for ALK-positive advanced NSCLC?",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1",
+        "pubmed:39368244:chunk:0"
+      ],
+      "evidence_count": 2,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "brigatinib",
+          "ALK"
+        ],
+        "forbidden_substrings": [
+          "NCT03535740",
+          "CHEMBL"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-D2",
+      "split": "development",
+      "categories": [
+        "clinicaltrials_only",
+        "same_source_record_multi_evidence"
+      ],
+      "query": "What is the status and phase of the brigatinib trial NCT03535740?",
+      "evidence_ids": [
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740"
+      ],
+      "evidence_count": 9,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "COMPLETED",
+          "PHASE2"
+        ],
+        "forbidden_substrings": [
+          "CHEMBL",
+          "pubmed"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-D3",
+      "split": "development",
+      "categories": [
+        "chembl_only",
+        "duplicate_redundant_evidence"
+      ],
+      "query": "What is imatinib's ChEMBL identifier?",
+      "evidence_ids": [
+        "chembl:CHEMBL941",
+        "chembl:CHEMBL941"
+      ],
+      "evidence_count": 2,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "CHEMBL941",
+          "IMATINIB"
+        ],
+        "forbidden_substrings": [
+          "NCT",
+          "pubmed"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-D4",
+      "split": "development",
+      "categories": [
+        "multi_source",
+        "synthesis_across_units"
+      ],
+      "query": "Summarize what published literature and clinical trials say about brigatinib for ALK-positive NSCLC.",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740"
+      ],
+      "evidence_count": 10,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "brigatinib"
+        ],
+        "forbidden_substrings": [
+          "CHEMBL"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 2,
+        "required_source_types": [
+          "pubmed",
+          "clinical_trials"
+        ]
+      }
+    },
+    {
+      "case_id": "P6-D5",
+      "split": "development",
+      "categories": [
+        "insufficient_evidence"
+      ],
+      "query": "What is the recommended pediatric dosing schedule for brigatinib?",
+      "evidence_ids": [
+        "pubmed:29119148:chunk:1"
+      ],
+      "evidence_count": 1,
+      "gold": {
+        "expected_abstain": true,
+        "required_fact_substrings": [],
+        "forbidden_substrings": [
+          "mg/kg",
+          "mg twice daily",
+          "mg once daily"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 0
+      }
+    },
+    {
+      "case_id": "P6-D6",
+      "split": "development",
+      "categories": [
+        "zero_evidence"
+      ],
+      "query": "What compounds inhibit the fictional target XYZ-9000?",
+      "evidence_ids": [],
+      "evidence_count": 0,
+      "gold": {
+        "expected_abstain": true,
+        "required_fact_substrings": [],
+        "forbidden_substrings": [],
+        "expect_conflict": false,
+        "min_factual_claims": 0
+      }
+    },
+    {
+      "case_id": "P6-D7",
+      "split": "development",
+      "categories": [
+        "conflicting_or_varying_evidence",
+        "missing_optional_metadata"
+      ],
+      "query": "What is the clinical development landscape for melanoma therapies recorded in ChEMBL?",
+      "evidence_ids": [
+        "chembl:CHEMBL1789844",
+        "chembl:CHEMBL2105704",
+        "chembl:CHEMBL428647"
+      ],
+      "evidence_count": 3,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "Melanoma"
+        ],
+        "forbidden_substrings": [],
+        "expect_conflict": null,
+        "min_factual_claims": 2
+      }
+    },
+    {
+      "case_id": "P6-D8",
+      "split": "development",
+      "categories": [
+        "numeric_claim"
+      ],
+      "query": "What is the maximum clinical trial phase reached by imatinib?",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "evidence_count": 1,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "4"
+        ],
+        "forbidden_substrings": [],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-D9",
+      "split": "development",
+      "categories": [
+        "uncertainty_qualification",
+        "concise_query"
+      ],
+      "query": "Is there more than one completed trial of brigatinib in ALK-positive NSCLC?",
+      "evidence_ids": [
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740"
+      ],
+      "evidence_count": 9,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [],
+        "forbidden_substrings": [
+          "multiple trials",
+          "several trials"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-D10",
+      "split": "development",
+      "categories": [
+        "concise_query"
+      ],
+      "query": "What is imatinib?",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "evidence_count": 1,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "IMATINIB"
+        ],
+        "forbidden_substrings": [],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-V1",
+      "split": "validation",
+      "categories": [
+        "pubmed_only"
+      ],
+      "query": "What did the ALTA-1L trial publication report about brigatinib versus crizotinib?",
+      "evidence_ids": [
+        "pubmed:30280657"
+      ],
+      "evidence_count": 1,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "brigatinib"
+        ],
+        "forbidden_substrings": [
+          "CHEMBL",
+          "NCT"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-V2",
+      "split": "validation",
+      "categories": [
+        "clinicaltrials_only",
+        "multi_source"
+      ],
+      "query": "What sponsor ran the completed Phase 2 brigatinib trial, and what does the literature say about brigatinib's activity against resistance mutations?",
+      "evidence_ids": [
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "pubmed:29119148:chunk:1"
+      ],
+      "evidence_count": 10,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "Ariad",
+          "resistance"
+        ],
+        "forbidden_substrings": [
+          "CHEMBL"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 2,
+        "required_source_types": [
+          "pubmed",
+          "clinical_trials"
+        ]
+      }
+    },
+    {
+      "case_id": "P6-V3",
+      "split": "validation",
+      "categories": [
+        "chembl_only",
+        "numeric_claim"
+      ],
+      "query": "What molecule type is imatinib classified as in ChEMBL, and what is its maximum trial phase?",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "evidence_count": 1,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "small molecule",
+          "4"
+        ],
+        "forbidden_substrings": [],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-H1",
+      "split": "phase6_heldout",
+      "categories": [
+        "multi_source",
+        "synthesis_across_units"
+      ],
+      "query": "Bring together everything known about brigatinib's mechanism from the literature and its clinical trial record.",
+      "evidence_ids": [
+        "pubmed:39368244:chunk:0",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740",
+        "nct:NCT03535740"
+      ],
+      "evidence_count": 10,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "brigatinib"
+        ],
+        "forbidden_substrings": [
+          "CHEMBL"
+        ],
+        "expect_conflict": false,
+        "min_factual_claims": 2,
+        "required_source_types": [
+          "pubmed",
+          "clinical_trials"
+        ]
+      }
+    },
+    {
+      "case_id": "P6-H2",
+      "split": "phase6_heldout",
+      "categories": [
+        "chembl_only",
+        "numeric_claim"
+      ],
+      "query": "According to ChEMBL, what alogp value is recorded for imatinib?",
+      "evidence_ids": [
+        "chembl:CHEMBL941"
+      ],
+      "evidence_count": 1,
+      "gold": {
+        "expected_abstain": false,
+        "required_fact_substrings": [
+          "4.59"
+        ],
+        "forbidden_substrings": [],
+        "expect_conflict": false,
+        "min_factual_claims": 1
+      }
+    },
+    {
+      "case_id": "P6-H3",
+      "split": "phase6_heldout",
+      "categories": [
+        "zero_evidence"
+      ],
+      "query": "What is the mechanism of action of compound QRX-4471?",
+      "evidence_ids": [],
+      "evidence_count": 0,
+      "gold": {
+        "expected_abstain": true,
+        "required_fact_substrings": [],
+        "forbidden_substrings": [],
+        "expect_conflict": false,
+        "min_factual_claims": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "supplement_name": "phase6_heldout_supplement",
+  "supplement_version": "1.0.0",
+  "created": "2026-09-27",
+  "reason_supplement_exists": "The original Phase-6 held-out (artifacts/v2/phase6_heldout_results.json, n=3) contained one case (P6-H2) whose gold expectation asked about a ChEMBL 'alogp' value not present in frozen Phase-5's ChemblEvidenceMetadata schema (fields: kind, molecule_type, max_phase, mechanism_of_action, match_type - re-verified directly against evidence/models.py this session, alogp confirmed absent). The model correctly abstained rather than fabricate a value - a benchmark gold-authoring error, not a Phase-6 generation defect (see artifacts/v2/phase6_failure_analysis.json finding F4). The original held-out is preserved exactly as run and is NOT modified, relabeled, or rerun. This supplement is a fresh, independent blind case testing the same broad quality dimension with a gold expectation verified against real Evidence BEFORE execution.",
+  "case_id": "P6-SUPP-01",
+  "source_type": "clinical_trials",
+  "source_record_id": "NCT05549297",
+  "source_record_origin": "artifacts/v2/phase5_benchmark_manifest.json case CT-NCT05549297, development split - a REAL ClinicalTrials.gov record (Tebentafusp/pembrolizumab melanoma trial) never used anywhere in the Phase-6 benchmark (dev, validation, or the original held-out all used NCT03535740 - a different trial - or ChEMBL/PubMed records about brigatinib/imatinib; this is a genuinely fresh source record and topic).",
+  "freshness_confirmation": {
+    "used_in_original_heldout": false,
+    "used_in_phase6_dev_or_validation": false,
+    "distinct_nct_id_from_all_16_original_cases": true
+  },
+  "evidence_ids": [
+    "nct:NCT05549297"
+  ],
+  "evidence_id_note": "All 11 field-level Evidence records produced by evidence.adapters.clinical_trial_to_evidence_records share the single evidence_id 'nct:NCT05549297' (contract-correct grouping - disambiguated internally by evidence_type + provenance.field_path). All 11 are supplied to the generator as the full Evidence[] list for this case.",
+  "query": "What is the recruitment status and trial phase of the tebentafusp study NCT05549297, how many participants are being enrolled, and who is the trial sponsor?",
+  "gold": {
+    "required_fact_substrings": ["recruiting", "540", "immunocore"],
+    "required_fact_substrings_flexible": {
+      "phase": "either 'phase3' or 'phase 3' (case-insensitive) - both are faithful renderings of the raw PHASE3 enum value"
+    },
+    "forbidden_substrings": ["imatinib", "brigatinib", "chembl", "pubmed"],
+    "expected_abstain": false,
+    "expected_conflict": false,
+    "min_factual_claims": 3,
+    "required_source_types": ["clinical_trials"]
+  },
+  "pre_run_gold_audit": {
+    "recruiting_present_in_evidence": "YES - Evidence content 'RECRUITING' (evidence_type=trial_status, field_path=protocolSection.statusModule.overallStatus)",
+    "phase3_present_in_evidence": "YES - Evidence content 'PHASE3' (evidence_type=trial_phase)",
+    "enrollment_540_present_in_evidence": "YES - Evidence content '540' (evidence_type=trial_field, field_path=protocolSection.designModule.enrollmentInfo.count)",
+    "sponsor_immunocore_present_in_evidence": "YES - Evidence content 'Immunocore Ltd' (evidence_type=trial_field, field_path=protocolSection.sponsorCollaboratorsModule.leadSponsor.name)",
+    "all_evidence_ids_valid": "YES - all 11 records verified produced by the real, unmodified evidence.adapters.clinical_trial_to_evidence_records against the real raw_record",
+    "query_answerable_solely_from_evidence": "YES - every required fact traces to a specific real Evidence record listed above, verified by direct inspection BEFORE this manifest was frozen",
+    "no_hidden_model_world_knowledge_dependency": "YES - all four required facts (status, phase, enrollment count, sponsor name) are verbatim structured field values already present in Evidence, not something the model must know independently",
+    "no_alogp_style_unavailable_field_problem": "YES - confirmed no required fact depends on any field outside ClinicalTrialEvidenceMetadata/Evidence.content's actual real coverage; every required fact was inspected in the real adapter output above BEFORE writing this gold",
+    "audit_passed": true
+  },
+  "architecture_config_at_freeze": {
+    "candidate": "candidate_b_structured",
+    "provider": "Cerebras",
+    "model": "qwen-3.8-27b",
+    "reasoning_effort": "none",
+    "prompt_version": "_CANDIDATE_B_SYSTEM_PROMPT v1 (generation/generator.py, unchanged since original Phase-6 freeze)",
+    "schema_version": "_CLAIMS_JSON_SCHEMA v1 (generation/generator.py, unchanged since original Phase-6 freeze)",
+    "citation_compiler_version": "generation/citation_compiler.py v1 (unchanged)",
+    "validation_layer_version": "generation/validation.py v1 (unchanged)",
+    "frozen_config_reference": "artifacts/v2/phase6_frozen_config.json (config_version 1)",
+    "code_changed_since_original_freeze": false
+  },
+  "timestamp_frozen": "2026-09-27T00:00:00Z",
+  "confirmation_original_heldout_untouched": true,
+  "status": "FROZEN - no semantic/gold changes permitted after this point; the case is now ready for exactly one blind run."
+}

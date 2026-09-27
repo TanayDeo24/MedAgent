@@ -6,7 +6,8 @@
     "phase_2_biomedical_nlu",
     "phase_3_tool_orchestration",
     "phase_4_heterogeneous_retrieval",
-    "phase_5_evidence_provenance"
+    "phase_5_evidence_provenance",
+    "phase_6_grounded_generation"
   ],
   "phase_4_heterogeneous_retrieval": {
     "final_winner": {
@@ -663,5 +664,152 @@
       "Any claim that Phase 5 improved retrieval quality, API latency, or LLM/Cerebras latency - Phase 5 is a pure normalization layer downstream of Phase 3/4",
       "Any claim that the original 14-case phase5_heldout split was reused as blind evidence after the ChEMBL adapter consistency check - it was not; that check inspected CURRENT CODE, not a held-out rerun"
     ]
+  },
+  "phase_6_grounded_generation": {
+    "final_winner": {
+      "architecture": "candidate_b_structured (generation/pipeline.py)",
+      "frozen_config_path": "artifacts/v2/phase6_frozen_config.json",
+      "provider": "Cerebras",
+      "model": "qwen-3.8-27b",
+      "langgraph_integration": "agent.nodes.grounded_generation_node, wired synthesis -> evidence_normalization -> grounded_generation -> verification"
+    },
+    "benchmark": {
+      "manifest": "artifacts/v2/phase6_benchmark_manifest.json",
+      "total_cases": 16,
+      "development": 10,
+      "validation": 3,
+      "phase6_heldout": 3,
+      "note": "Deliberately smaller scale than Phase 5's 72-case benchmark - a first Phase-6 benchmark, not equivalent statistical power."
+    },
+    "metrics": [
+      {
+        "metric": "dev_validation_gold_match_pass_rate",
+        "value": "13/13 = 100%",
+        "n": 13,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "no prior baseline for this new metric",
+        "resume_safe": true
+      },
+      {
+        "metric": "heldout_gold_match_pass_rate",
+        "value": "2/3 = 67%",
+        "n": 3,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "the 1 miss (P6-H2) is a benchmark gold-authoring error, not a generation defect - see failure analysis finding F4",
+        "resume_safe": true
+      },
+      {
+        "metric": "heldout_hard_gate_compliance",
+        "value": "3/3 = 100%",
+        "n": 3,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "unknown_evidence_ids_referenced",
+        "value": 0,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "fabricated_source_ids",
+        "value": 0,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "fabricated_source_urls",
+        "value": 0,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "zero_evidence_producing_factual_claim",
+        "value": 0,
+        "n": 2,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "deterministic_citation_compilation_success",
+        "value": "100%",
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "answer_serialization_success",
+        "value": "100%",
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "mean_generation_latency_ms",
+        "value": 8409.7,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": "rate-limit (5RPM) dominated, not true model inference time - mirrors Phase 2's identical Cerebras measurement caveat",
+        "resume_safe": true
+      },
+      {
+        "metric": "mean_cost_per_query_usd",
+        "value": 0.001706,
+        "n": 16,
+        "comparability": "NON_COMPARABLE",
+        "caveat": null,
+        "resume_safe": true
+      },
+      {
+        "metric": "legacy_baseline_citation_linkage",
+        "value": "structurally disconnected (confirmed by code trace)",
+        "n": null,
+        "comparability": "COMPARABLE (structural property, not live-model-dependent)",
+        "caveat": "legacy path's live latency/token numbers NOT measured this session - see CTL-010",
+        "resume_safe": true
+      }
+    ],
+    "hard_safety_gates": {
+      "count": 10,
+      "passed": 10,
+      "failed": 0,
+      "source": "docs/v2/PHASE6_GATE_PLAN.md Section 2, verified in docs/v2/PHASE6_FINAL_GATE_AUDIT.md"
+    },
+    "real_defect_found_and_fixed": "generation/generator.py::_evidence_prompt_block dropped Evidence.source_metadata entirely; fixed to render it. Dev 7/10 -> 10/10 after fix. See artifacts/v2/phase6_failure_analysis.json finding F1.",
+    "candidate_comparison": {
+      "artifact": "artifacts/v2/phase6_candidate_comparison.json",
+      "selected": "candidate_b_structured",
+      "not_built": "candidate_c_claim_plan_composition (no defect in B motivated it)"
+    },
+    "cloud_deferred_verification": [
+      "CTL-009 (true nonzero-Evidence real Phase-2->6 pipeline)",
+      "CTL-010 (legacy path live latency/cost baseline)"
+    ],
+    "resume_unsafe_claims": [
+      "Any claim of citation faithfulness, claim-to-evidence entailment, unsupported-claim rate, or hallucination reduction - Phase 7's job",
+      "Any claim that Phase 6 fixed the legacy citation/reference detachment - report_generation_node is unmodified, structurally disconnected by design",
+      "Any latency figure quoted without the rate-limit-dominated qualifier",
+      "Any claim of a nonzero-Evidence real end-to-end Phase-2->6 pipeline run in this cloud session - not achieved (CTL-009)"
+    ],
+    "heldout_supplement": {
+      "case_id": "P6-SUPP-01",
+      "manifest": "artifacts/v2/phase6_heldout_supplement_manifest.json",
+      "results": "artifacts/v2/phase6_heldout_supplement_results.json",
+      "reason": "Original held-out's P6-H2 gold-authoring error (alogp not in ChemblEvidenceMetadata) confirmed via a fresh, independent, pre-frozen blind supplement rather than reusing spent held-out data.",
+      "source_record": "NCT05549297 (real ClinicalTrials.gov record, never used in any of the original 16 Phase-6 benchmark cases)",
+      "result": "PASS - 4/4 required facts (100%), 0 forbidden content, 0 invalid/unknown Evidence IDs, 10/10 hard gates, 0 code changes before or after",
+      "original_heldout_modified": false,
+      "combined_reporting_rule": "Original held-out (2/3 required-fact coverage, 1 invalid-gold miss) and supplement (1/1 pass) are reported SEPARATELY, never combined into a single misleading ratio."
+    }
   }
 }

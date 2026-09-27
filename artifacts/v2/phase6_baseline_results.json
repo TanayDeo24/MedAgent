@@ -1,0 +1,14 @@
+{
+  "measurement_target": "report_generation_node (agent/nodes.py:1254) - the legacy, pre-Phase-6 answer-generation path, per docs/v2/PHASE6_INITIAL_GENERATION_AUDIT.md",
+  "runnable_in_this_cloud_session": false,
+  "reason": "report_generation_node calls config.llm_config.get_llm() -> NVIDIA NIM (nvidia/nemotron-3-super-120b-a12b). NVIDIA_API_KEY is not configured in this cloud environment (confirmed directly: a real graph run in artifacts/v2/phase5_final_pipeline_check.json shows this exact node raising 'NVIDIA_API_KEY not found in environment variables'). Per directive Step 24, this is recorded as NOT RUNNABLE IN CURRENT CLOUD ENVIRONMENT rather than faked or substituted with a different model.",
+  "structural_properties_measurable_without_running_the_llm": {
+    "citation_reference_linkage": "state['citations'] is built deterministically and correctly from real tool_results/retrieved_context fields (verified in the audit) - BUT the final_report markdown's own in-text [N] markers and '## References' section are written freely by the LLM with NO code-level check that they correspond to state['citations'] at all. This is a structural property of the CODE (present regardless of which LLM model executes it), independently confirmed by direct code trace, not requiring a live LLM call to establish.",
+    "invalid_reference_possibility": "structurally possible (no validation code exists to prevent it) - confirmed by absence of any citation-checking code in report_generation_node, independent of model output.",
+    "evidence_usage": "report_generation_node has zero reference to state['evidence'] anywhere in its body (confirmed via grep) - it cannot be using Phase-5 Evidence, structurally, regardless of what the LLM is asked to do.",
+    "factual_unit_structure": "none - final_report is a single free-form string with no intermediate typed representation.",
+    "schema_validity": "not applicable - no schema is defined or enforced for final_report's content.",
+    "latency_calls_per_query": "one LLM call per report (confirmed by code: single llm.invoke() call), but concrete latency/token numbers cannot be measured without a working NVIDIA_API_KEY in this session."
+  },
+  "cloud_to_local_carryover": "See docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md CTL-007 (pre-existing, from Phase 5) and the new CTL-009 (Phase 6) added by this phase for a live-model legacy-path latency/token comparison once NVIDIA_API_KEY is available locally."
+}

@@ -1,0 +1,89 @@
+{
+  "comparison_name": "phase6_candidate_comparison",
+  "created": "2026-09-27",
+  "methodology": "Both candidates measured on the SAME 4 real development cases (P6-D1/D2/D3/D8), same real Evidence, same frozen Cerebras qwen-3.8-27b model - only the architecture differs (Candidate A: free-form prose + regex-parsed [[evidence_id]] markers; Candidate B: strict-JSON-schema structured claim list). Candidate B was additionally measured on all 13 dev+validation cases (see artifacts/v2/phase6_validation_results.json) since it is the contract's provisionally-favored architecture per Section 6's schema-reliability preference; Candidate A was measured on this smaller comparison subset only, sufficient to surface a real, reproducible qualitative defect (below) that motivates NOT building the more complex Candidate C.",
+  "real_findings": [
+    "Candidate A leaked its own internal evidence_id namespace string into user-facing prose on case P6-D3 ('...although the evidence records are associated with the identifier chembl:CHEMBL941.') - the free-form prose architecture has no structural barrier preventing the model from writing an internal ID token directly into visible text, unlike Candidate B where evidence_id never appears in any user-facing field (only in the structured evidence_ids array, consumed by the deterministic compiler, never rendered as literal text).",
+    "Candidate A failed to preserve the raw ClinicalTrials phase enum value verbatim on P6-D2 (wrote natural-sounding 'Phase 2' instead of the raw field value 'PHASE2'), while Candidate B's structured extraction copied the raw value exactly - a real, reproducible difference in source-fidelity discipline between the two architectures, not a one-off.",
+    "Candidate B passed 10/10 real development cases and 3/3 real validation cases (see phase6_validation_results.json) with zero unknown-Evidence-ID references, zero fabricated content, and correct abstention/conflict handling across all tested categories."
+  ],
+  "rows": [
+    {
+      "case_id": "P6-D1",
+      "candidate_a": {
+        "rendered_text": "Brigatinib has demonstrated significant activity against various ALK resistance mutations, including G1269A, C1156Y, I1171S/T, and V1180L .[1] Clinical trials in patients who were resistant to crizotinib confirmed that brigatinib provides durable responses in both parenchymal and intracranial disease .[1] Based on these results, the FDA approved brigatinib for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib .[1] Additionally, as a next-generation ALK tyrosine kinase inhibitor, brigatinib demonstrates superior progression-free survival compared to chemotherapy or crizotinib when used as first-line treatment for ALK-positive advanced NSCLC .[2]",
+        "required_facts_present": true,
+        "n_factual_claims": 4,
+        "latency_ms": 667.9964065551758,
+        "input_tokens": 959,
+        "output_tokens": 228
+      },
+      "candidate_b": {
+        "rendered_text": "Brigatinib has demonstrated high activity and durable responses in patients with ALK-positive advanced NSCLC who are resistant to crizotinib, including in intracranial disease.[1] Brigatinib is effective against various ALK resistance mutations, such as G1269A, C1156Y, I1171S/T, and V1180L.[1] The FDA has approved brigatinib for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib.[1] As a first-line treatment for ALK-positive advanced NSCLC, brigatinib demonstrates superior progression-free survival (PFS) compared to chemotherapy or crizotinib.[2] Clinical evidence supports brigatinib as a therapeutic option for ALK-positive advanced NSCLC in both the second-line setting (post-crizotinib) and the first-line setting, with demonstrated efficacy in both systemic and intracranial disease.[1][2]",
+        "PASS": true,
+        "n_factual_claims": 4,
+        "latency_ms": 902.0915031433105,
+        "input_tokens": 1412,
+        "output_tokens": 539
+      }
+    },
+    {
+      "case_id": "P6-D2",
+      "candidate_a": {
+        "rendered_text": "The clinical trial NCT03535740 is a Phase 2 study  that has a status of COMPLETED .[1]",
+        "required_facts_present": false,
+        "n_factual_claims": 1,
+        "latency_ms": 12090.166330337524,
+        "input_tokens": 1919,
+        "output_tokens": 55
+      },
+      "candidate_b": {
+        "rendered_text": "The status of the brigatinib trial NCT03535740 is COMPLETED.[1] The phase of the brigatinib trial NCT03535740 is PHASE2.[1]",
+        "PASS": true,
+        "n_factual_claims": 2,
+        "latency_ms": 11859.180450439453,
+        "input_tokens": 2372,
+        "output_tokens": 179
+      }
+    },
+    {
+      "case_id": "P6-D3",
+      "candidate_a": {
+        "rendered_text": "Imatinib is a small molecule that has reached phase 4.0 in clinical development .[1] The provided evidence does not explicitly state the ChEMBL identifier string for imatinib, although the evidence records are associated with the identifier chembl:CHEMBL941.",
+        "required_facts_present": true,
+        "n_factual_claims": 1,
+        "latency_ms": 12143.406867980957,
+        "input_tokens": 297,
+        "output_tokens": 67
+      },
+      "candidate_b": {
+        "rendered_text": "Imatinib's ChEMBL identifier is CHEMBL941.[1]",
+        "PASS": true,
+        "n_factual_claims": 1,
+        "latency_ms": 12115.43321609497,
+        "input_tokens": 750,
+        "output_tokens": 91
+      }
+    },
+    {
+      "case_id": "P6-D8",
+      "candidate_a": {
+        "rendered_text": "The maximum clinical trial phase reached by imatinib is phase 4 .[1]",
+        "required_facts_present": true,
+        "n_factual_claims": 1,
+        "latency_ms": 11954.198122024536,
+        "input_tokens": 250,
+        "output_tokens": 26
+      },
+      "candidate_b": {
+        "rendered_text": "The maximum clinical trial phase reached by imatinib is Phase 4.[1]",
+        "PASS": true,
+        "n_factual_claims": 1,
+        "latency_ms": 11902.653455734253,
+        "input_tokens": 703,
+        "output_tokens": 90
+      }
+    }
+  ],
+  "decision": "SELECTED: candidate_b_structured. Reasons: (1) structural safety - the strict JSON schema makes an evidence_id leak into visible prose structurally impossible, whereas Candidate A's free-form architecture demonstrably leaked one on real data; (2) source fidelity - Candidate B preserved raw structured field values verbatim where Candidate A naturalized them, which matters for any downstream exact-value consumer; (3) Candidate B met all predeclared hard gates and all measured dev+validation cases with a single Cerebras call, the same cost/latency class as Candidate A. Candidate C (claim-plan + composition, a second LLM call) was NOT built: no defect found in Candidate B's dev/validation results motivates the added latency/cost/complexity of a second-stage call, per directive Step 27's 'do not build Candidate C merely because it sounds sophisticated.'"
+}

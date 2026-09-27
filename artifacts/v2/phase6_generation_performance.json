@@ -1,0 +1,35 @@
+{
+  "benchmark_name": "phase6_generation_performance",
+  "created": "2026-09-27",
+  "methodology": "Measures generate_grounded_answer() end-to-end latency (Cerebras network round trip + local validation/compilation/rendering, all real calls, no mocking) across all 16 real Phase-6 benchmark cases (10 dev + 3 validation + 3 held-out, round-2/frozen results only). Explicitly SEPARATE from and NOT blended with: Phase-4 retrieval latency, Phase-5 Evidence-normalization latency, or any other network-source latency - those are not part of this measurement at all (this benchmark's Evidence[] was pre-built from already-captured raw records, not freshly retrieved).",
+  "caveat_rate_limit_dominated": "Cerebras Free Trial tier is 5 RPM (capacity=1, no burst) - the SAME rate-limit bucket used by Phase 2's frozen NLU path. Most of the ~12s per-call wall time below is the rate-limiter's enforced wait, not actual model inference time (mirrors the exact same measurement caveat documented in artifacts/v2/nlu_frozen_config.json for the Phase-2 Cerebras candidate) - this is NOT a claim about true model latency.",
+  "overall": {
+    "n": 16,
+    "mean_ms": 8409.7,
+    "p50_ms": 11862.8,
+    "p90_ms": 12120.1,
+    "p95_ms": 12149.0,
+    "max_ms": 12221.5
+  },
+  "calls_and_tokens": {
+    "total_llm_calls": 14,
+    "total_cases": 16,
+    "mean_calls_per_query": 0.875,
+    "mean_input_tokens_per_call": 1521.1,
+    "mean_output_tokens_per_call": 297.5,
+    "total_input_tokens": 21296,
+    "total_output_tokens": 4165
+  },
+  "cost": {
+    "pricing_source": "artifacts/v2/phase5_frozen_config.json's pricing_per_million_tokens_usd (same frozen Cerebras qwen-3.8-27b model/account)",
+    "input_price_per_million_usd": 0.99,
+    "output_price_per_million_usd": 1.49,
+    "total_benchmark_cost_usd": 0.0273,
+    "mean_cost_per_query_usd": 0.001706
+  },
+  "explicit_non_claims": [
+    "This does not measure or improve retrieval latency.",
+    "This does not measure or improve Evidence-normalization latency.",
+    "Zero-Evidence cases (2 of 16) made 0 LLM calls by design and are included in the per-case latency distribution at their true near-zero cost, not excluded."
+  ]
+}

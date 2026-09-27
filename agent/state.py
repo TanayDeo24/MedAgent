@@ -11,6 +11,7 @@ from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 
 from evidence.models import Evidence
+from generation.models import GroundedAnswer
 
 
 class AgentState(TypedDict):
@@ -209,6 +210,17 @@ class AgentState(TypedDict):
     since tool_results/tool_call_history/rag_documents only grow across the
     verification self-reflection loop's iterations."""
 
+    grounded_answer: Optional[GroundedAnswer]
+    """Phase 6's canonical structurally-grounded answer (see
+    docs/v2/PHASE6_GROUNDED_GENERATION_CONTRACT.md), produced by
+    agent.nodes.grounded_generation_node from `evidence` (never from
+    tool_results/retrieved_context directly - see that node's docstring).
+    Distinct from and does not replace `final_report`/`citations` (the
+    pre-existing, structurally-disconnected legacy report path - see the
+    Phase 5 audit's Section 0 finding). None until grounded_generation_node
+    runs; recomputed (not appended) each time that node runs, mirroring
+    `evidence`'s own recompute-from-scratch convention."""
+
     # ═══════════════════════════════════════════════════════════
     # METADATA FIELDS
     # ═══════════════════════════════════════════════════════════
@@ -293,6 +305,7 @@ def create_initial_state(
         retrieved_context=[],
         rag_documents=[],
         evidence=[],
+        grounded_answer=None,
 
         # Metadata
         start_time=datetime.now(),

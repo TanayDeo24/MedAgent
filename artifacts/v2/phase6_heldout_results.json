@@ -1,0 +1,115 @@
+{
+  "run_type": "ONE-TIME, FINAL - frozen architecture (config_version 1), run exactly once against phase6_heldout split",
+  "run_date": "2026-09-27",
+  "architecture_frozen_before_run": true,
+  "n": 3,
+  "gold_match_pass": 2,
+  "gold_match_total": 3,
+  "hard_gate_compliant_count": 3,
+  "hard_gate_compliant_total": 3,
+  "hard_gates": {
+    "unknown_evidence_ids_referenced": 0,
+    "fabricated_source_ids": 0,
+    "fabricated_source_urls": 0,
+    "reference_entries_without_evidence": 0,
+    "zero_evidence_cases_producing_factual_claim": 0,
+    "model_assigned_citation_numbers": 0,
+    "unserializable_answers": 0,
+    "secret_leaks": 0,
+    "all_gates_pass": true
+  },
+  "defect_discovered": "P6-H2: gold-authoring error (asked about a ChEMBL field - alogp - not present in frozen Phase-5's ChemblEvidenceMetadata schema). See artifacts/v2/phase6_failure_analysis.json finding F4 for full classification. NOT a generation-system defect - the system correctly abstained rather than fabricate a value.",
+  "original_held_out_reused_as_blind_after_fix": false,
+  "fresh_supplement_required": false,
+  "fresh_supplement_rationale": "No code in generation/ or evidence/ was changed as a result of P6-H2 - there is nothing to re-validate with a supplement. The held-out split remains spent and undisturbed.",
+  "per_case_results": [
+    {
+      "case_id": "P6-H1",
+      "categories": [
+        "multi_source",
+        "synthesis_across_units"
+      ],
+      "elapsed_s": 0.96,
+      "error": null,
+      "rendered_text": "Brigatinib is a next-generation anaplastic lymphoma kinase (ALK) tyrosine kinase inhibitor (TKI).[1] Brigatinib demonstrates superior progression-free survival (PFS) over chemotherapy or crizotinib as first-line treatment for ALK-positive advanced non-smallcell lung cancer (NSCLC).[1] A completed Phase 2 clinical trial (NCT03535740) evaluated brigatinib in patients with ALK-positive advanced NSCLC who had progressed on alectinib or ceritinib.[2] The primary purpose of the Phase 2 trial NCT03535740 was to determine the efficacy of brigatinib by confirmed objective response rate (ORR) using RECIST criteria in participants with ALK+ locally advanced or metastatic NSCLC whose disease had progressed on alectinib or ceritinib.[2] The clinical trial record for brigatinib includes both first-line efficacy data in ALK-positive NSCLC and second-line efficacy data in patients who have progressed on prior ALK TKIs such as alectinib or ceritinib.[1][2]",
+      "n_claims": 5,
+      "n_factual": 4,
+      "n_citations": 2,
+      "n_references": 2,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 2827,
+      "output_tokens": 557,
+      "latency_ms": 958.2040309906006,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-H2",
+      "categories": [
+        "chembl_only",
+        "numeric_claim"
+      ],
+      "elapsed_s": 11.72,
+      "error": null,
+      "rendered_text": "The provided ChEMBL evidence for imatinib (CHEMBL941) does not contain a recorded alogp value.[1]",
+      "n_claims": 1,
+      "n_factual": 0,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": true,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 708,
+      "output_tokens": 104,
+      "latency_ms": 11723.623991012573,
+      "required_facts_present": false,
+      "forbidden_hits": [],
+      "abstain_correct": false,
+      "min_factual_met": false,
+      "source_types_present": [
+        "chembl"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": false
+    },
+    {
+      "case_id": "P6-H3",
+      "categories": [
+        "zero_evidence"
+      ],
+      "elapsed_s": 0.0,
+      "error": null,
+      "rendered_text": "Available evidence is insufficient to support a conclusion for this question.",
+      "n_claims": 1,
+      "n_factual": 0,
+      "n_citations": 0,
+      "n_references": 0,
+      "abstained": true,
+      "conflict_detected": false,
+      "llm_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "latency_ms": 0.0247955322265625,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    }
+  ]
+}

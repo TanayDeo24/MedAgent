@@ -1,0 +1,30 @@
+{
+  "contract_name": "phase6_grounded_generation_contract",
+  "contract_version": "1.0.0",
+  "created": "2026-09-27",
+  "doc": "docs/v2/PHASE6_GROUNDED_GENERATION_CONTRACT.md",
+  "input": {"research_query": "Phase-2 NLU output", "evidence": "Phase-5 Evidence[] only, no raw tool_results, no retrieved_context"},
+  "output_models": {
+    "GroundedClaim": ["claim_id", "text", "evidence_ids", "claim_type", "qualifier"],
+    "claim_type_enum": ["FACTUAL", "INFERENCE", "ABSTENTION", "TRANSITION"],
+    "GroundedAnswer": ["answer_id", "query", "claims", "rendered_text", "citations", "references", "used_evidence_ids", "unused_evidence_ids", "abstained", "conflict_detected", "generation_metadata"],
+    "CitationEntry": ["number", "evidence_ids", "source_reference_index"],
+    "SourceReference": ["number", "source_type", "grouped_evidence_ids", "display_fields"]
+  },
+  "hard_rules": [
+    "FACTUAL claim requires evidence_ids length >= 1",
+    "evidence_ids must exactly match a supplied Evidence.evidence_id",
+    "citation numbers are never model-assigned, only compiled deterministically post-generation",
+    "no chain-of-thought field anywhere in output objects",
+    "no invented numeric confidence",
+    "source appendix built only from Evidence.source_metadata/source_url, never LLM-authored bibliography"
+  ],
+  "abstention_policy": {
+    "zero_evidence": "abstained=True, exactly one ABSTENTION claim, zero FACTUAL claims, zero citations",
+    "insufficient_evidence": "FACTUAL claims only for what Evidence supports plus one ABSTENTION claim naming the gap"
+  },
+  "conflict_policy": "both sides cited, conflict_detected=True, qualification language required, no averaged middle claim",
+  "source_grouping_policy": "reference-level grouping by source_record_id; evidence-level distinctness preserved internally via grouped_evidence_ids",
+  "provider": {"name": "Cerebras", "model": "qwen-3.8-27b", "reasoning_effort": "none", "reused_from": "frozen Phase-2 production config"},
+  "non_goals": ["semantic citation faithfulness", "claim-to-evidence entailment", "unsupported-claim-rate via judge", "citation precision/recall", "hallucination evaluation"]
+}

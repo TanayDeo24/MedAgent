@@ -1,0 +1,444 @@
+{
+  "validation_target": "generation/pipeline.py::generate_grounded_answer, architecture=candidate_b_structured (frozen)",
+  "cases_run": 13,
+  "cases_by_split": {
+    "development": 10,
+    "validation": 3
+  },
+  "overall_pass_rate": {
+    "pass": 13,
+    "total": 13,
+    "pct": 100.0
+  },
+  "per_metric": {
+    "required_gold_fact_coverage": {
+      "met": 13,
+      "total": 13,
+      "pct": 100.0
+    },
+    "forbidden_unsupported_fact_clean": {
+      "met": 13,
+      "total": 13,
+      "pct": 100.0
+    },
+    "abstention_correctness": {
+      "met": 13,
+      "total": 13,
+      "pct": 100.0
+    },
+    "min_factual_claim_requirement_met": {
+      "met": 13,
+      "total": 13,
+      "pct": 100.0
+    },
+    "required_source_types_present": {
+      "met": 13,
+      "total": 13,
+      "pct": 100.0
+    },
+    "conflict_handling_correctness": {
+      "met": 13,
+      "total": 13,
+      "pct": 100.0
+    },
+    "provider_errors": 0,
+    "unknown_evidence_id_hard_failures": 0
+  },
+  "hard_gates": {
+    "unknown_evidence_ids_referenced": 0,
+    "fabricated_source_ids": 0,
+    "fabricated_source_urls": 0,
+    "reference_entries_without_evidence": 0,
+    "zero_evidence_cases_producing_factual_claim": 0,
+    "model_assigned_citation_numbers": 0,
+    "unserializable_answers": 0,
+    "secret_leaks": 0,
+    "all_gates_pass": true
+  },
+  "per_case_results": [
+    {
+      "case_id": "P6-D1",
+      "categories": [
+        "pubmed_only",
+        "evidence_multiple_source_records"
+      ],
+      "elapsed_s": 0.9,
+      "error": null,
+      "rendered_text": "Brigatinib has demonstrated high activity and durable responses in patients with ALK-positive advanced NSCLC who are resistant to crizotinib, including in intracranial disease.[1] Brigatinib is effective against various ALK resistance mutations, such as G1269A, C1156Y, I1171S/T, and V1180L.[1] The FDA has approved brigatinib for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib.[1] As a first-line treatment for ALK-positive advanced NSCLC, brigatinib demonstrates superior progression-free survival (PFS) compared to chemotherapy or crizotinib.[2] Clinical evidence supports brigatinib as a therapeutic option for ALK-positive advanced NSCLC in both the second-line setting (post-crizotinib) and the first-line setting, with demonstrated efficacy in both systemic and intracranial disease.[1][2]",
+      "n_claims": 5,
+      "n_factual": 4,
+      "n_citations": 2,
+      "n_references": 2,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 1412,
+      "output_tokens": 539,
+      "latency_ms": 902.0915031433105,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "pubmed"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D2",
+      "categories": [
+        "clinicaltrials_only",
+        "same_source_record_multi_evidence"
+      ],
+      "elapsed_s": 11.86,
+      "error": null,
+      "rendered_text": "The status of the brigatinib trial NCT03535740 is COMPLETED.[1] The phase of the brigatinib trial NCT03535740 is PHASE2.[1]",
+      "n_claims": 2,
+      "n_factual": 2,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 2372,
+      "output_tokens": 179,
+      "latency_ms": 11859.180450439453,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "clinical_trials"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D3",
+      "categories": [
+        "chembl_only",
+        "duplicate_redundant_evidence"
+      ],
+      "elapsed_s": 12.12,
+      "error": null,
+      "rendered_text": "Imatinib's ChEMBL identifier is CHEMBL941.[1]",
+      "n_claims": 1,
+      "n_factual": 1,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 750,
+      "output_tokens": 91,
+      "latency_ms": 12115.43321609497,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "chembl"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D4",
+      "categories": [
+        "multi_source",
+        "synthesis_across_units"
+      ],
+      "elapsed_s": 12.22,
+      "error": null,
+      "rendered_text": "Brigatinib is active against various ALK resistance mutations, including G1269A, C1156Y, I1171S/T, and V1180L.[1] Clinical trials have confirmed that brigatinib has high activity and durable response in crizotinib-resistant patients, including in intracranial disease.[1] Brigatinib received FDA approval for the treatment of patients with ALK-positive metastatic NSCLC who have progressed on or are intolerant to crizotinib.[1] A completed Phase 2 clinical trial (NCT03535740) evaluated brigatinib in 103 patients with ALK-positive advanced NSCLC who had progressed on alectinib or ceritinib.[2] The primary purpose of the NCT03535740 trial was to determine the efficacy of brigatinib by confirmed objective response rate (ORR) using RECIST criteria.[2] The literature and clinical trials indicate that brigatinib is being evaluated and utilized in multiple lines of therapy for ALK-positive NSCLC, including after crizotinib, alectinib, and ceritinib.[1][2]",
+      "n_claims": 6,
+      "n_factual": 5,
+      "n_citations": 2,
+      "n_references": 2,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 2674,
+      "output_tokens": 629,
+      "latency_ms": 12221.508741378784,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D5",
+      "categories": [
+        "insufficient_evidence"
+      ],
+      "elapsed_s": 11.87,
+      "error": null,
+      "rendered_text": "The provided evidence does not contain information regarding the recommended pediatric dosing schedule for brigatinib.",
+      "n_claims": 1,
+      "n_factual": 0,
+      "n_citations": 0,
+      "n_references": 0,
+      "abstained": true,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 950,
+      "output_tokens": 79,
+      "latency_ms": 11866.430521011353,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D6",
+      "categories": [
+        "zero_evidence"
+      ],
+      "elapsed_s": 0.0,
+      "error": null,
+      "rendered_text": "Available evidence is insufficient to support a conclusion for this question.",
+      "n_claims": 1,
+      "n_factual": 0,
+      "n_citations": 0,
+      "n_references": 0,
+      "abstained": true,
+      "conflict_detected": false,
+      "llm_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "latency_ms": 0.01430511474609375,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D7",
+      "categories": [
+        "conflicting_or_varying_evidence",
+        "missing_optional_metadata"
+      ],
+      "elapsed_s": 12.13,
+      "error": null,
+      "rendered_text": "ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 4.0.[1] ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 3.0.[2] ChEMBL records indicate that melanoma therapies have reached a maximum clinical development phase of 1.0.[3] The clinical development landscape for melanoma therapies in ChEMBL spans early-stage (Phase 1) to approved (Phase 4) clinical trials.[1][2][3]",
+      "n_claims": 4,
+      "n_factual": 3,
+      "n_citations": 3,
+      "n_references": 3,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 802,
+      "output_tokens": 378,
+      "latency_ms": 12124.792337417603,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "chembl"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D8",
+      "categories": [
+        "numeric_claim"
+      ],
+      "elapsed_s": 11.9,
+      "error": null,
+      "rendered_text": "The maximum clinical trial phase reached by imatinib is Phase 4.[1]",
+      "n_claims": 1,
+      "n_factual": 1,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 703,
+      "output_tokens": 90,
+      "latency_ms": 11902.653455734253,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "chembl"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D9",
+      "categories": [
+        "uncertainty_qualification",
+        "concise_query"
+      ],
+      "elapsed_s": 11.94,
+      "error": null,
+      "rendered_text": "The provided evidence identifies one completed trial of brigatinib in ALK-positive NSCLC (NCT03535740).[1] Based on the supplied evidence, it is not possible to confirm whether there is more than one completed trial of brigatinib in ALK-positive NSCLC, as only a single trial is listed.",
+      "n_claims": 2,
+      "n_factual": 1,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 2368,
+      "output_tokens": 187,
+      "latency_ms": 11936.319589614868,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "clinical_trials"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-D10",
+      "categories": [
+        "concise_query"
+      ],
+      "elapsed_s": 12.03,
+      "error": null,
+      "rendered_text": "The provided evidence identifies the chemical entity as IMATINIB.[1] The supplied evidence does not contain a definition, description, or pharmacological classification for imatinib.",
+      "n_claims": 2,
+      "n_factual": 1,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 689,
+      "output_tokens": 146,
+      "latency_ms": 12026.646614074707,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "chembl"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-V1",
+      "categories": [
+        "pubmed_only"
+      ],
+      "elapsed_s": 1.66,
+      "error": null,
+      "rendered_text": "The ALTA-1L trial was an open-label, phase 3 study that randomly assigned 275 patients with advanced ALK-positive non-small-cell lung cancer who had not previously received an ALK inhibitor to receive either brigatinib or crizotinib.[1] The primary end point of the trial was progression-free survival as assessed by blinded independent central review.[1] At the first interim analysis, the estimated 12-month progression-free survival was 67% for the brigatinib group and 43% for the crizotinib group.[1] The hazard ratio for disease progression or death was 0.49 (95% CI, 0.33 to 0.74) in favor of brigatinib, with a P-value of less than 0.001 by the log-rank test.[1] The confirmed objective response rate was 71% with brigatinib and 60% with crizotinib.[1] Among patients with measurable intracranial lesions, the confirmed rate of intracranial response was 78% with brigatinib and 29% with crizotinib.[1] No new safety concerns were noted in the trial.[1] The study concluded that progression-free survival was significantly longer among patients who received brigatinib than among those who received crizotinib.[1]",
+      "n_claims": 8,
+      "n_factual": 8,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 1648,
+      "output_tokens": 735,
+      "latency_ms": 1662.8780364990234,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "pubmed"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-V2",
+      "categories": [
+        "clinicaltrials_only",
+        "multi_source"
+      ],
+      "elapsed_s": 11.27,
+      "error": null,
+      "rendered_text": "The completed Phase 2 trial of brigatinib in ALK-positive advanced NSCLC was sponsored by Ariad Pharmaceuticals.[1] Brigatinib is active against various ALK resistance mutations, including G1269A, C1156Y, I1171S/T, and V1180L.[2] Clinical trials have confirmed that brigatinib has high activity and durable response in crizotinib-resistant patients, including in intracranial disease.[2]",
+      "n_claims": 3,
+      "n_factual": 3,
+      "n_citations": 2,
+      "n_references": 2,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 2681,
+      "output_tokens": 295,
+      "latency_ms": 11271.808862686157,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "clinical_trials",
+        "pubmed"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    },
+    {
+      "case_id": "P6-V3",
+      "categories": [
+        "chembl_only",
+        "numeric_claim"
+      ],
+      "elapsed_s": 11.98,
+      "error": null,
+      "rendered_text": "Imatinib is classified as a small molecule in ChEMBL.[1] The maximum trial phase for imatinib is 4.0.[1]",
+      "n_claims": 2,
+      "n_factual": 2,
+      "n_citations": 1,
+      "n_references": 1,
+      "abstained": false,
+      "conflict_detected": false,
+      "llm_calls": 1,
+      "input_tokens": 712,
+      "output_tokens": 156,
+      "latency_ms": 11983.535289764404,
+      "required_facts_present": true,
+      "forbidden_hits": [],
+      "abstain_correct": true,
+      "min_factual_met": true,
+      "source_types_present": [
+        "chembl"
+      ],
+      "source_types_ok": true,
+      "conflict_ok": true,
+      "PASS": true
+    }
+  ],
+  "note": "This is round 2 (post-fix) - round 1 (7/10 dev, 2/3 validation before the P6-V3 gold fix) is preserved in artifacts/v2/phase6_failure_analysis.json, not overwritten or hidden."
+}

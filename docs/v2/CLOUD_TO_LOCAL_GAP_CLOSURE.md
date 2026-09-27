@@ -84,10 +84,106 @@ docs/artifacts/code before writing this ledger (see each CTL item's
 | CTL-006 | 5 | True real Phase-2→3→4→5 pipeline (nonzero source-backed) | OPEN | YES |
 | CTL-007 | 5 | NVIDIA-dependent legacy node verification | OPEN / CONDITIONAL | Decision required (see item) |
 | CTL-008 | 5 | Final local regression after all carryover checks | OPEN | YES (last, depends on all above) |
+| CTL-009 | 6 | True real Phase-2→3→4→5→6 pipeline (nonzero-Evidence grounded answer) | OPEN | YES |
+| CTL-010 | 6 | Legacy report_generation_node baseline latency/token measurement (needs NVIDIA_API_KEY) | OPEN | NO (see item - informational baseline only, not a Phase-6 blocker) |
 
-**No additional CTL items (CTL-009+) were identified.** Step 1's audit
-searched `docs/v2/PHASE5_*.md`, `artifacts/v2/phase5_*.json`,
-`docs/v2/PHASE_METRICS_LEDGER.md`, `artifacts/v2/phase_metrics_ledger.json`,
+### CTL-009 — True real Phase-2→3→4→5→6 pipeline (nonzero-Evidence grounded answer)
+
+- **ID:** CTL-009
+- **Phase:** 6 (discovered while extending Phase 5's final-pipeline-check
+  pattern to the new grounded-generation boundary)
+- **Status:** OPEN
+- **Why it could not be fully verified:** identical root cause to CTL-002/
+  003/004/001 - `artifacts/v2/phase6_final_pipeline_check.json` shows a
+  real graph run reaching Phase 2 NLU (PASS) and Phase 3 orchestration
+  (PASS), then Phase 4 retrieval failing at the network layer (ChEMBL
+  call blocked, same `ProxyError`/403 as Phase 5's check), so Phase 5
+  correctly produced 0 Evidence and Phase 6 correctly abstained with 0
+  LLM calls - the SAFE, contract-compliant behavior, but not a
+  nonzero-Evidence, non-abstaining grounded answer produced end-to-end
+  through the real graph.
+- **Environment where limitation occurred:** this Claude Cloud session.
+- **Original intended verification:** at least one real, source-backed
+  query executing successfully through Phase 2 NLU → Phase 3
+  orchestration → Phase 4 retrieval (real success) → Phase 5 Evidence
+  normalization (nonzero) → Phase 6 grounded generation (nonzero claims,
+  nonzero citations, non-abstained `GroundedAnswer`).
+- **What cloud actually verified instead:** the full 7-node graph
+  executes in order without crashing under a zero-Evidence condition, and
+  `grounded_generation_node` correctly abstains safely (0 fabricated
+  claims, 0 wasted LLM calls) rather than masking the retrieval failure.
+- **Exact local action required:** with real network access (ideally
+  satisfying CTL-001/002/003/004 together) and `CEREBRAS_API_KEY`
+  available, run `agent.graph.MedAgent(max_iterations=1).run(<a real
+  query likely to produce a nonzero ChEMBL/ClinicalTrials/PubMed hit>)`
+  and inspect `state["grounded_answer"]`.
+- **PASS criteria:** at least one real query completes through Phase 6
+  with successful Phase-4 retrieval (nonzero tool results and/or RAG
+  documents), nonzero Phase-5 Evidence, and a `GroundedAnswer` with
+  `abstained=False`, >=1 citation, >=1 reference, all Evidence IDs intact,
+  0 fabricated IDs, 0 secret leakage, frozen `qwen-3.8-27b` confirmed used.
+- **Required credentials/data/network/artifacts:** same as CTL-006, plus
+  `CEREBRAS_API_KEY` (already available in this session, so this item is
+  purely blocked on the retrieval-side network/index constraints, not on
+  Cerebras access).
+- **Evidence/artifact to update after execution:** update
+  `artifacts/v2/phase6_final_pipeline_check.json` with a "local rerun"
+  section, or create `artifacts/v2/phase6_final_pipeline_check_local.json`.
+- **Result:** _(pending)_
+- **Closure date:** _(pending)_
+- **Closure commit SHA:** _(pending)_
+- **Notes/caveats:** this item cannot close before CTL-001/002/003/004
+  (or at least one of them) close, since it needs real Phase-4 retrieval
+  success as a precondition.
+
+### CTL-010 — Legacy `report_generation_node` baseline latency/token measurement
+
+- **ID:** CTL-010
+- **Phase:** 6
+- **Status:** OPEN (non-blocking - informational baseline only)
+- **Why it could not be fully verified:** `artifacts/v2/phase6_baseline_results.json`
+  records the legacy path's *structural* properties (all confirmed by
+  direct code trace, no LLM call needed) but explicitly could not measure
+  its *live* latency/token/cost numbers, since `report_generation_node`
+  requires `NVIDIA_API_KEY` (CTL-007's same root cause), unavailable in
+  this cloud session.
+- **Environment where limitation occurred:** this Claude Cloud session.
+- **Original intended verification:** run `report_generation_node` for
+  real (with a working `NVIDIA_API_KEY`) on the same/comparable queries
+  used for Phase 6's benchmark, to get a genuine before/after latency and
+  token-cost comparison between the legacy free-form path and the new
+  grounded-generation path.
+- **What cloud actually verified instead:** only the structural
+  (citation-disconnection, Evidence-blindness) properties, which do not
+  depend on live model output.
+- **Exact local action required:** with a real `NVIDIA_API_KEY`, run
+  `report_generation_node` (or `MedAgent.run()` end-to-end) on a few real
+  queries and record latency/tokens/cost for direct comparison against
+  `artifacts/v2/phase6_generation_performance.json`.
+- **PASS criteria:** a real legacy-path latency/token/cost measurement
+  exists and is recorded alongside the Phase-6 numbers for an honest
+  comparison.
+- **Required credentials/data/network/artifacts:** `NVIDIA_API_KEY`.
+- **Evidence/artifact to update after execution:** update
+  `artifacts/v2/phase6_baseline_results.json`'s `runnable_in_this_cloud_session`
+  field and add the measured numbers.
+- **Result:** _(pending)_
+- **Closure date:** _(pending)_
+- **Closure commit SHA:** _(pending)_
+- **Notes/caveats:** this is explicitly NON-BLOCKING for Phase-6 closure
+  - it is a nice-to-have comparison, not a correctness requirement, since
+  Phase 6's own structural/safety gates do not depend on the legacy path's
+  performance numbers.
+
+Step 1's audit for this Phase-6 continuation searched
+`docs/v2/PHASE6_*.md` and `artifacts/v2/phase6_*.json` for the same
+language/concepts as Phase 5's audit and found exactly these two new
+items - both directly traceable to the same underlying, already-recorded
+environment constraints (network policy, missing local index, missing
+NVIDIA credential), not new kinds of limitation.
+
+**No additional CTL items beyond CTL-001 through CTL-010 were
+identified.** Step 1's audit
 and `tests/` for the specified terms (network blocked, unavailable,
 captured, skipped, gated, not built, missing credential, proxy, fallback,
 etc.). Everything found traces to the eight items above; nothing else

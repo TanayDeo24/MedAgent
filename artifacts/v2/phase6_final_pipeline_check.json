@@ -1,0 +1,29 @@
+{
+  "run_date": "2026-09-27",
+  "purpose": "Bounded real V2 pipeline check through the Phase-6 boundary (directive Step 45), one source-focused real query, via the actual compiled LangGraph (agent.graph.MedAgent).",
+  "query": "What is the mechanism of action of imatinib?",
+  "results": {
+    "phase2_nlu_success": true,
+    "phase3_orchestration_success": true,
+    "phase4_retrieval_success": false,
+    "phase4_retrieval_note": "Same pre-existing, already-documented environment constraint as Phase 5's final pipeline check (artifacts/v2/phase5_final_pipeline_check.json): www.ebi.ac.uk is not allowlisted in this cloud session's network policy. The selected ChEMBL resolve_compound_name call failed with a ProxyError (403 Forbidden), same as before.",
+    "phase5_evidence_success": true,
+    "phase5_evidence_note": "evidence_normalization_node correctly produced 0 Evidence records - the honest outcome given no real source data reached it.",
+    "phase6_generation_success": true,
+    "phase6_generation_note": "grounded_generation_node correctly abstained: 1 ABSTENTION claim, 0 citations, 0 references, 0 LLM calls (per contract Section 7 - zero-Evidence must never call the model). No exception escaped, no fake claim was fabricated to compensate for the missing network access.",
+    "nonzero_evidence": false,
+    "grounded_answer_produced": true,
+    "inline_citations": 0,
+    "source_appendix_entries": 0,
+    "secrets_leaked": false,
+    "secrets_leaked_note": "All logged errors contain only hostnames/status codes and an env-var NAME (NVIDIA_API_KEY), never a value - reviewed directly.",
+    "unrelated_pre_existing_failure_observed": "synthesis_node/verification_node/report_generation_node (Phase-1 legacy nodes, NVIDIA NIM) failed with 'NVIDIA_API_KEY not found' - identical, already-documented, unrelated-to-Phase-6 constraint (CTL-007)."
+  },
+  "cloud_limitations": [
+    "www.ebi.ac.uk / clinicaltrials.gov / eutils.ncbi.nlm.nih.gov not allowlisted in this cloud session (CTL-002/003/004, pre-existing from Phase 5)",
+    "data/index/ (local RAG) absent in this cloud checkout (CTL-001, pre-existing from Phase 5)",
+    "NVIDIA_API_KEY not configured (CTL-007, pre-existing from Phase 5)"
+  ],
+  "conclusion": "The Phase-6 wiring is proven correct and safe under a real, adverse (zero-Evidence) condition through the actual graph: no crash, no fabrication, 0 wasted LLM calls. A TRUE nonzero-Evidence real Phase-2->6 pipeline run could not be performed in this cloud session for the same reasons Phase 5 could not achieve one - this is recorded as a new CTL item (CTL-009, extending the existing carryover ledger) rather than substituted or hidden.",
+  "cloud_to_local_carryover_new_item": "CTL-009 - see docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md"
+}

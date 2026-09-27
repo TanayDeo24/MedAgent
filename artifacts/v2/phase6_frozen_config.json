@@ -1,0 +1,28 @@
+{
+  "phase": "6_grounded_generation",
+  "config_version": 1,
+  "frozen_date": "2026-09-27",
+  "selected_architecture": "candidate_b_structured",
+  "selected_architecture_note": "Structured factual-unit generation via one Cerebras strict-JSON-Schema call. Selected over candidate_a_direct_prose after real measured comparison (artifacts/v2/phase6_candidate_comparison.json) found Candidate A leaked an internal evidence_id string into user-facing prose and failed to preserve a raw ClinicalTrials field value verbatim, both real defects Candidate B's structured schema makes structurally impossible/less likely. candidate_c_claim_plan_composition was not built - no Candidate B defect found in dev/validation motivated the added cost/complexity of a second-stage LLM call.",
+  "provider": "Cerebras",
+  "model": "qwen-3.8-27b",
+  "reasoning_effort": "none",
+  "rate_limit_key": "cerebras_free_trial",
+  "rate_limit_rps": 0.0833,
+  "prompt_version": "_CANDIDATE_B_SYSTEM_PROMPT v1 (generation/generator.py) - includes source_metadata rendering fix from failure F1",
+  "claims_json_schema_version": "_CLAIMS_JSON_SCHEMA v1 (generation/generator.py)",
+  "answer_schema_version": "generation/models.py: GroundedClaim, GroundedAnswer, CitationEntry, SourceReference, GenerationMetadata - v1",
+  "validation_rules": "generation/validation.py: validate_claims (unknown Evidence ID rejection, FACTUAL-requires-support), zero_evidence_guard (no factual claim when Evidence[] is empty)",
+  "citation_compiler_version": "generation/citation_compiler.py v1 - deterministic first-use numbering grouped by (source_type, source_record_id)",
+  "source_grouping_strategy": "reference-level grouping by source_record_id; evidence-level distinctness preserved via SourceReference.grouped_evidence_ids",
+  "abstention_behavior": "Evidence[]==[] -> 0 LLM calls, single deterministic ABSTENTION claim, abstained=True. Evidence non-empty but insufficient for part of the question -> model emits an ABSTENTION claim alongside any FACTUAL claims the Evidence does support.",
+  "conflict_behavior": "model self-reports conflict_detected via a top-level JSON field; both sides of a disagreement must be cited as separate FACTUAL claims, never averaged.",
+  "benchmark_version": "phase6_grounded_generation_benchmark 1.0.0 (artifacts/v2/phase6_benchmark_manifest.json)",
+  "dev_validation_result": "13/13 real cases passed (artifacts/v2/phase6_validation_results.json)",
+  "held_out_result": "2/3 gold-match; 3/3 hard-safety-gate-compliant; the 1 gold-match failure (P6-H2) was a benchmark gold-authoring error, not a generation defect (artifacts/v2/phase6_failure_analysis.json finding F4)",
+  "known_accepted_limitations": [
+    "ChemblEvidenceMetadata (frozen Phase 5) does not carry molecular_weight or alogp - a query asking for either will correctly abstain rather than fabricate a value; this is a Phase-5 schema boundary, not fixable within Phase 6's scope",
+    "Conflict detection relies on model self-report (a JSON field), not an independent structural signal - Candidate A has no conflict-detection capability at all (documented limitation)",
+    "Benchmark scale (16 cases) is smaller than Phase 5's (72 cases) - a first Phase-6 benchmark, not claimed as equivalent statistical power"
+  ]
+}

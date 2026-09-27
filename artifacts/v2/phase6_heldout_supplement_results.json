@@ -1,0 +1,95 @@
+{
+  "supplement_name": "phase6_heldout_supplement",
+  "supplement_version": "1.0.0",
+  "run_date": "2026-09-27",
+  "case_id": "P6-SUPP-01",
+  "manifest_reference": "artifacts/v2/phase6_heldout_supplement_manifest.json",
+  "first_run_blind": true,
+  "run_notes": "Executed exactly once. No output inspection/retry loop, no prompt/gold/Evidence changes between manifest freeze and this run. generation.pipeline.generate_grounded_answer's own bounded 1-retry provider policy applies as normal production behavior; 0 retries were actually triggered (succeeded on the first Cerebras call).",
+  "frozen_config": {
+    "candidate": "candidate_b_structured",
+    "provider": "Cerebras",
+    "model": "qwen-3.8-27b",
+    "prompt_version": "_CANDIDATE_B_SYSTEM_PROMPT v1",
+    "schema_version": "_CLAIMS_JSON_SCHEMA v1",
+    "citation_compiler_version": "generation/citation_compiler.py v1",
+    "validation_layer_version": "generation/validation.py v1",
+    "code_changed_since_original_freeze": false
+  },
+  "generated_answer": {
+    "rendered_text": "The recruitment status of the tebentafusp study NCT05549297 is RECRUITING.[1] The trial phase of the tebentafusp study NCT05549297 is Phase 3.[1] The study NCT05549297 is enrolling 540 participants.[1] The trial sponsor for study NCT05549297 is Immunocore Ltd.[1]",
+    "n_claims": 4,
+    "n_factual_claims": 4,
+    "n_citations": 1,
+    "n_references": 1,
+    "used_evidence_ids": ["nct:NCT05549297"],
+    "unused_evidence_ids": [],
+    "abstained": false,
+    "conflict_detected": false
+  },
+  "required_fact_coverage": {
+    "required_facts_total": 4,
+    "required_facts_present": 4,
+    "coverage_pct": 100.0,
+    "detail": {
+      "recruiting": true,
+      "trial_phase_3": true,
+      "enrollment_540": true,
+      "sponsor_immunocore": true
+    }
+  },
+  "unsupported_content": {
+    "forbidden_substrings_checked": ["imatinib", "brigatinib", "chembl", "pubmed"],
+    "forbidden_hits": [],
+    "count": 0
+  },
+  "structural_grounding": {
+    "factual_claims_total": 4,
+    "claims_with_evidence_support": 4,
+    "unsupported_factual_claims": 0,
+    "invalid_evidence_ids": 0,
+    "unknown_evidence_ids": 0
+  },
+  "citation_structure": {
+    "citation_compilation_success": true,
+    "citations_adjacent_to_supported_claims": true,
+    "reference_entries": 1,
+    "reference_without_evidence_count": 0,
+    "citation_without_reference_count": 0,
+    "source_grouping_correct": true
+  },
+  "source_integrity": {
+    "fabricated_source_ids": 0,
+    "fabricated_urls": 0
+  },
+  "output": {
+    "schema_valid": true,
+    "answer_serialization": true,
+    "generation_completion": true
+  },
+  "provider": {
+    "calls": 1,
+    "retries": 0,
+    "latency_ms": 902.35,
+    "input_tokens": 3905,
+    "output_tokens": 339,
+    "cost_usd": 0.004371
+  },
+  "hard_gates": {
+    "unknown_evidence_ids_referenced": 0,
+    "fabricated_source_ids": 0,
+    "fabricated_source_urls": 0,
+    "reference_entries_without_evidence": 0,
+    "zero_evidence_case_producing_factual_claim": "N/A - this is a nonzero-Evidence case",
+    "model_assigned_citation_numbers": 0,
+    "secret_auth_leaks": 0,
+    "factual_units_without_support_binding": 0,
+    "unserializable_answer": 0,
+    "uncaught_invalid_structured_output": 0,
+    "total_applicable_gates": 10,
+    "passed": 10,
+    "failed": 0
+  },
+  "PASS": true,
+  "failure_classification": "NONE - supplement passed on the first blind run"
+}

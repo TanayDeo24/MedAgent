@@ -226,3 +226,58 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   as blind evidence in this session.** It was not — only current *code*
   was inspected for the documented ChEMBL adapter consistency item; no
   code change was needed since the fix was already present.
+
+## Resume-safe claims (Phase 6)
+
+- Built a structured, grounded natural-language generation layer over
+  heterogeneous Phase-5 Evidence, replacing free-form LLM prose with a
+  typed `GroundedClaim`/`GroundedAnswer` model whose citations are
+  deterministically compiled, never model-numbered.
+- **Zero invalid/unknown Evidence-ID citations** across all 16 real
+  benchmark cases (dev + validation + held-out).
+- **100% deterministic citation-compilation success** and **100% answer
+  serialization success**, measured on real Cerebras-generated output.
+- **Zero reference entries without real Evidence**, **zero fabricated
+  source IDs/URLs** - Evidence data flows through unmodified from Phase 5.
+- **Zero-Evidence abstention correctness**: 0 factual claims ever produced
+  when Evidence[] is empty, verified both in isolated tests and in a real
+  graph run.
+- Found and fixed one real generation defect (evidence prompt silently
+  dropping `source_metadata`) via genuine development-split iteration -
+  dev pass rate 7/10 → 10/10 after the fix, validation 3/3.
+- Measured a real, reproducible qualitative advantage of the selected
+  structured architecture (Candidate B) over a simpler free-form
+  baseline (Candidate A): Candidate A leaked an internal evidence-ID
+  string into user-facing prose on real data; Candidate B did not.
+
+## Not resume-safe (Phase 6)
+
+- **Any citation-faithfulness, claim-to-evidence entailment, unsupported-
+  claim-rate, or hallucination-reduction claim.** Phase 6 measures
+  structural grounding only (does a citation resolve to a real Evidence
+  object) - not whether the claim's content is semantically true of that
+  Evidence. That is Phase 7's job entirely.
+- **Any claim that the legacy citation/reference detachment is fixed.**
+  `report_generation_node` is unmodified and remains structurally
+  disconnected from Evidence - Phase 6 built a new, separate,
+  Evidence-authoritative path alongside it, not a replacement.
+- **Any generation-latency number without noting it is dominated by the
+  Cerebras Free Trial 5RPM rate limit**, not true model inference time.
+- **Any claim of a nonzero-Evidence, real, end-to-end Phase-2→6 pipeline
+  run in this cloud session.** Only a zero-Evidence real-graph run (safe,
+  correct abstention) and a mocked-Evidence unit-level pipeline test were
+  achieved - see CTL-009 in `docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md`.
+- **The 2/3 held-out gold-match rate as a quality regression.** The one
+  miss is a benchmark gold-authoring error (asked about a ChEMBL field -
+  `alogp` - the frozen Phase-5 Evidence schema doesn't capture), not a
+  generation defect; the underlying safety behavior (correct abstention,
+  zero fabrication) was exactly contract-compliant on that case. A fresh,
+  independent, pre-frozen blind supplement (`P6-SUPP-01`, on a genuinely
+  unused real ClinicalTrials.gov record) subsequently passed 1/1 with all
+  10 hard gates intact and zero code changes - confirming the generation
+  system itself, not the invalid gold, was the issue.
+- **"100% held-out required-fact coverage" as a blended claim across the
+  original held-out and the supplement.** Never state this. The correct,
+  resume-safe phrasing is: original held-out 2/3 (one invalid-gold miss,
+  zero fabrication), fresh independent supplement 1/1 - reported
+  separately, never combined into a single ratio.

@@ -15,6 +15,7 @@ from agent.nodes import (
     tool_orchestration_node,
     synthesis_node,
     evidence_normalization_node,
+    grounded_generation_node,
     verification_node,
     report_generation_node
 )
@@ -89,6 +90,12 @@ def build_agent_graph() -> StateGraph:
                              model-free, no LLM call, does not touch
                              citations/final_report)
       ↓
+    grounded_generation (Phase 6: Evidence[] -> structurally-grounded,
+                          citation-compiled GroundedAnswer, via
+                          generation.pipeline - one Cerebras
+                          qwen-3.8-27b call, deterministic post-validation,
+                          does not touch citations/final_report)
+      ↓
     verification (self-reflect on quality)
       ↓
     [CONDITIONAL ROUTING]
@@ -111,13 +118,15 @@ def build_agent_graph() -> StateGraph:
     # Initialize the state graph
     workflow = StateGraph(AgentState)
 
-    # Add all 6 reasoning nodes (planning + tool_execution are now one
+    # Add all 7 reasoning nodes (planning + tool_execution are now one
     # combined tool_orchestration node - see docstring above -
-    # evidence_normalization is Phase 5's added node)
+    # evidence_normalization is Phase 5's added node, grounded_generation
+    # is Phase 6's added node)
     workflow.add_node("query_analysis", query_analysis_node)
     workflow.add_node("tool_orchestration", tool_orchestration_node)
     workflow.add_node("synthesis", synthesis_node)
     workflow.add_node("evidence_normalization", evidence_normalization_node)
+    workflow.add_node("grounded_generation", grounded_generation_node)
     workflow.add_node("verification", verification_node)
     workflow.add_node("report_generation", report_generation_node)
 
@@ -135,8 +144,13 @@ def build_agent_graph() -> StateGraph:
     # docstring in agent/nodes.py)
     workflow.add_edge("synthesis", "evidence_normalization")
 
-    # After evidence normalization, always verify (self-reflect)
-    workflow.add_edge("evidence_normalization", "verification")
+    # After evidence normalization, generate the Phase-6 grounded answer
+    # from Evidence[] (never from tool_results/retrieved_context directly -
+    # see grounded_generation_node's docstring in agent/nodes.py)
+    workflow.add_edge("evidence_normalization", "grounded_generation")
+
+    # After grounded generation, always verify (self-reflect)
+    workflow.add_edge("grounded_generation", "verification")
 
     # CONDITIONAL ROUTING: verification decides next step
     # This is where the agent becomes autonomous!
@@ -155,7 +169,7 @@ def build_agent_graph() -> StateGraph:
     # Compile the graph
     compiled_graph = workflow.compile()
 
-    logger.info("Agent graph compiled successfully with 6 nodes and conditional routing")
+    logger.info("Agent graph compiled successfully with 7 nodes and conditional routing")
 
     return compiled_graph
 
