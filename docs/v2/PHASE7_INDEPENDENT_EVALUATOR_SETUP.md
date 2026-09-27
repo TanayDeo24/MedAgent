@@ -50,32 +50,103 @@ not re-asserted from an earlier session.
 ## Conclusion
 
 No genuinely independent evaluator can be built in this cloud session.
-This is an environment/credential limitation, not a code or effort gap.
+This is a pure credential gap, not a network-policy gap and not a code or
+effort gap - see the network re-audit below.
 
-## Exact remedy
+## Zero-caveat pass network re-audit (this session, more precise than before)
 
-- **What would satisfy CTL-011:** any of:
-  - A second LLM provider API key for a model from a different family
-    than Cerebras qwen (e.g. an OpenAI, Google, Mistral, or Anthropic API
-    key used for direct API calls, not this agent's own reasoning).
-  - A working `NVIDIA_API_KEY` (the NVIDIA/langchain integration already
-    exists in this codebase from the legacy path - only the credential is
-    missing).
-  - Network access to `huggingface.co` (or an equivalent model-weight
-    host) so a local NLI/entailment model can be downloaded and run
-    entirely offline, no credential needed.
-- **Exact environment variable name(s):** `NVIDIA_API_KEY` (already read
-  by `config/settings.py`), or a new provider key such as `OPENAI_API_KEY`
-  / `GEMINI_API_KEY` (would require adding matching client code, since
-  none exists in this repo today).
-- **Exact host/domain to allowlist (if going the local-model route):**
-  `huggingface.co` (and its CDN, typically `cdn-lfs.huggingface.co`).
-- **How to add it:** via this Claude Cloud environment's settings (cloud
+Beyond the earlier huggingface.co check, this pass tested every candidate
+provider host directly, to distinguish "network blocked" (403
+`connect_rejected` from the egress proxy) from "network open but no
+credential":
+
+| Host | Result | Meaning |
+|---|---|---|
+| `huggingface.co` | 403 (policy denial) | blocked |
+| `api.openai.com` | 403 (policy denial) | blocked |
+| `api.mistral.ai` | 403 (policy denial) | blocked |
+| `api.cohere.ai` | 403 (policy denial) | blocked |
+| `api.groq.com` | 403 (policy denial) | blocked |
+| `api.together.xyz` | 403 (policy denial) | blocked |
+| `generativelanguage.googleapis.com` (Google Gemini) | **404** | **network OPEN** (404 = reachable, wrong bare path) |
+| `api.anthropic.com` | **404** | **network OPEN** (expected - this is the host platform) |
+| `bedrock-runtime.us-east-1.amazonaws.com` | **404** | **network OPEN** |
+
+Boolean credential presence check (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`,
+`GEMINI_API_KEY`, `GOOGLE_API_KEY`, `MISTRAL_API_KEY`, `COHERE_API_KEY`,
+`GROQ_API_KEY`, `TOGETHER_API_KEY`, `AZURE_OPENAI_API_KEY`,
+`NVIDIA_API_KEY`, `HUGGINGFACE_API_KEY`, `HF_TOKEN`,
+`REPLICATE_API_TOKEN`): **all absent.** No value was printed; only
+presence/absence was checked.
+
+This session does carry `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` (which
+is why Bedrock is reachable) and internal Anthropic-platform session
+plumbing (which is why `api.anthropic.com` is reachable) - both are this
+session's own infrastructure credentials, not a model-provider key
+provisioned for LLM-judge use, and repurposing either without explicit
+authorization was deliberately not attempted (see the earlier rejection
+of both AWS Bedrock and "use this agent itself" as invalid shortcuts).
+
+**Conclusion: the blocker is the credential, not the network, for at least
+one strong candidate (Google Gemini).** Gemini's API host is already
+reachable from this session with zero network-policy changes needed - only
+a `GEMINI_API_KEY` is missing.
+
+## Recommended provider: Google Gemini (Gemini 2.5 Flash or 2.0 Flash)
+
+Selection reasoning: strong entailment/structured-reasoning ability;
+native structured-JSON-schema output support (matches this project's
+existing strict-schema pattern); genuinely different model family/
+provider from Cerebras qwen; already network-reachable in this session
+(no egress-policy change needed, only credential); low per-call cost;
+minimal new code (one HTTP client function, mirroring the existing
+`grounding_eval/judge.py` pattern).
+
+## Exact remedy (HUMAN ACTION REQUIRED)
+
+- **Provider:** Google (Gemini API, `generativelanguage.googleapis.com`)
+- **Exact model:** `gemini-2.0-flash` (or `gemini-2.5-flash` if available
+  on the account) - verify current model id/pricing at time of setup
+  since these change.
+- **Required environment variable name:** `GEMINI_API_KEY`
+- **Exact API host (already allowlisted, no policy change needed):**
+  `generativelanguage.googleapis.com`
+- **Credential type:** a Google AI Studio / Gemini API key (not an OAuth
+  client, not a service account by default).
+- **Authorization:** Gemini's REST API takes the key as a `?key=` query
+  parameter or an `x-goog-api-key` header, not a Bearer token (different
+  from Cerebras's `Authorization: Bearer` pattern - the new client code
+  must not assume Bearer).
+- **How to add it:** this Claude Cloud environment's settings (cloud
   environment menu in the session's title bar → Edit → API credentials /
-  environment variables) - not by pasting a key into chat.
-- **Fresh session required?** Yes - environment variable and network-
-  policy changes take effect on a new session's container, not this
-  running one.
+  environment variables) - never by pasting the key into chat.
+- **Fresh session required:** Yes - a new environment variable takes
+  effect on a new session's container, not this running one.
+- **Expected call volume:** ~72 benchmark cases (dev+validation+both
+  held-out splits) + 66 system-evaluation claims (re-evaluating the
+  already-frozen Phase-6 answers, not regenerating them) ≈ **138 calls**,
+  plus a small number of bounded retries.
+- **Expected rough cost:** Gemini Flash-tier pricing is typically
+  sub-$0.01 per call at this prompt size (a few hundred to ~1,500 tokens
+  each way, similar order of magnitude to the Cerebras calls measured in
+  `artifacts/v2/phase7_performance_v2.json`) - i.e. very roughly on the
+  order of $0.50-$2 for the full 138-call run. **This is a rough estimate
+  only** - exact current Gemini pricing should be verified at setup time,
+  the same discipline already applied to the Cerebras pricing figure in
+  `grounding_eval/judge.py`.
+
+**Fallback options, in order, if Gemini is not preferred:**
+1. `NVIDIA_API_KEY` - the `langchain-nvidia-ai-endpoints` integration
+   already exists in this codebase from the legacy path; only the
+   credential is missing. Network reachability to NVIDIA's API host was
+   not separately re-tested this pass (not previously found blocked).
+2. Any other provider host confirmed OPEN above (`api.anthropic.com` via
+   a genuinely separate, stateless, non-session API key - NOT this
+   agent's own reasoning - or AWS Bedrock via a dedicated, newly-
+   provisioned credential scoped for this purpose, not the session's
+   existing infrastructure credentials).
+3. `huggingface.co` access (for a fully local, no-credential NLI model) -
+   requires an egress-policy change, not just a credential.
 
 Until one of these is provisioned, CTL-011 remains **OPEN**, and Phase 7
 cannot be closed with a genuinely independent evaluator - it can only be

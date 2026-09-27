@@ -164,6 +164,20 @@ docs/artifacts/code before writing this ledger (see each CTL item's
   independent evaluator) was **not built** - correctly recorded as BLOCKED,
   not silently worked around with "same model, different prompt."
   CTL-011 **remains OPEN**; this is a genuine, actively-confirmed
+- **Second zero-caveat pass re-audit (this session, more precise):**
+  directly tested every candidate provider host through the egress proxy,
+  distinguishing "network blocked" (403 policy denial) from "network open,
+  no credential" (404 - reachable, just no bare-path route). Result:
+  `huggingface.co`, `api.openai.com`, `api.mistral.ai`, `api.cohere.ai`,
+  `api.groq.com`, `api.together.xyz` are all explicitly policy-blocked;
+  `generativelanguage.googleapis.com` (Google Gemini), `api.anthropic.com`,
+  and AWS Bedrock are all network-reachable. A boolean-only credential
+  check (`GEMINI_API_KEY` included, no values printed) found none of these
+  configured. **The blocker for Gemini specifically is a missing
+  credential only, not network policy** - recorded as the primary
+  recommended remedy in `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md`
+  (exact model, env var name, auth scheme, expected call volume/cost).
+  CTL-011 remains OPEN.
   environment limitation, not a weakened or abandoned check.
 
 ### CTL-012 — Phase-7 evaluator token/cost measurement

@@ -1085,6 +1085,45 @@
         "skipped": 7
       },
       "phase_7_closure_status": "ENGINEERING COMPLETE EXCEPT FOR CTL-011 - NOT closed, NOT frozen"
+    },
+    "zero_remaining_caveat_pass_final": {
+      "audit_doc": "docs/v2/PHASE7_FINAL_GATE_AUDIT.md (Addendum 3)",
+      "multi_source_count_final": 6,
+      "unsupported_label_count_final": 12,
+      "benchmark_total_final": 72,
+      "system_eval_final_answers": 20,
+      "system_eval_final_claims": 66,
+      "system_eval_final_support_rate": 1.0,
+      "fresh_heldout_supplement_2": {
+        "n": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      },
+      "new_finding_F4": "temporal/status-inference false-contradiction defect, found+fixed+fully regression-verified (zero collateral damage across all prior frozen gold)",
+      "candidate_d_status": "NOT BUILT - no provider credential available",
+      "network_reaudit": {
+        "blocked_403": [
+          "huggingface.co",
+          "api.openai.com",
+          "api.mistral.ai",
+          "api.cohere.ai",
+          "api.groq.com",
+          "api.together.xyz"
+        ],
+        "network_open_404": [
+          "generativelanguage.googleapis.com (Gemini)",
+          "api.anthropic.com",
+          "bedrock-runtime.us-east-1.amazonaws.com"
+        ],
+        "credentials_present": [],
+        "conclusion": "Gemini blocked by missing credential only, not network policy - primary recommended remedy",
+        "remedy_doc": "docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md"
+      },
+      "b_vs_d_agreement": "N/A - Candidate D not built",
+      "independent_system_crosscheck": "N/A - Candidate D not built",
+      "ctl_011_status": "OPEN - precisely re-characterized this pass (credential-only blocker for Gemini specifically)",
+      "ctl_012_status": "CLOSED (unchanged)",
+      "phase_7_closure_status": "ENGINEERING COMPLETE EXCEPT FOR CTL-011 - NOT closed, NOT frozen"
     }
   }
 }

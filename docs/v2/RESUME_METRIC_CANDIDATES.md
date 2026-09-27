@@ -464,3 +464,39 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   pushed unreviewed closure work.** Only the interim durability checkpoint
   was committed and pushed, per explicit authorization for that step
   alone; no further commit/push has been made since.
+
+## Resume-safe claims (Phase 7 zero-remaining-caveat pass, final)
+
+- Every avoidable Phase-7 engineering/evaluation caveat has been resolved:
+  benchmark balance (multi-source 6, unsupported-label 12, both targets
+  met), system evaluation at the full 20-answer/66-claim target (100%
+  supported), a clean fresh blind held-out replacement (2/2), and a
+  second real evaluator defect (F4) found, fixed, and fully regression-
+  verified against all prior frozen gold with zero collateral damage.
+- Performed a precise, host-by-host network re-audit of the independent-
+  evaluator blocker rather than repeating a vague "environment-limited"
+  conclusion: confirmed most candidate provider hosts are explicitly
+  policy-blocked, but identified that Google Gemini's API host is already
+  reachable from this session - the blocker there is a missing credential
+  only, not network policy - and documented the exact remedy (model, env
+  var, auth scheme, expected cost).
+- Explicitly considered and rejected two invalid shortcuts to "close"
+  CTL-011: repurposing this session's own AWS/Anthropic-platform
+  infrastructure credentials for an unauthorized new purpose, and using
+  this agent's own reasoning as a "different model family" judge (which
+  would be contaminated by having authored the gold labels itself).
+
+## Not resume-safe (Phase 7 zero-remaining-caveat pass, final)
+
+- **Any claim that a Candidate D independent evaluator was built,
+  validated, or compared against Candidate B.** None of this happened -
+  no credential was available. Every metric that would require Candidate
+  D (its own accuracy/F1, B-vs-D agreement/kappa, disagreement
+  adjudication, independent system cross-check) is explicitly N/A this
+  session, not omitted-but-implied.
+- **Any claim that CTL-011 is closed or that Phase 7 is closed/frozen.**
+  Both remain false. Phase 7 is ENGINEERING COMPLETE EXCEPT FOR CTL-011.
+- **Any claim that the Gemini network-reachability finding means Gemini
+  access is already usable.** It means only that no egress-policy change
+  is needed IF a credential is later provided - the credential itself is
+  still entirely absent this session.

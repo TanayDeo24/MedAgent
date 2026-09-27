@@ -885,3 +885,28 @@ failed, 7 skipped** (unchanged count from the hardening pass - only
 `grounding_eval/judge.py`'s prompt text changed this round, verified via
 live re-runs rather than a new unit test, since prompt wording isn't
 something a unit test meaningfully pins).
+
+## Phase 7 Zero-Remaining-Caveat Pass Addendum (final, this session)
+
+Full audit: `docs/v2/PHASE7_FINAL_GATE_AUDIT.md` Addendum 3. All prior
+Phase 7 results (original, hardening pass, zero-caveat pass) preserved
+unmodified above; nothing retroactively altered.
+
+**Result:** every avoidable Phase-7 caveat is now resolved. The one
+remaining item - a genuinely independent, distinct-provider evaluator
+(CTL-011) - is a real, precisely-characterized external credential
+blocker, not an engineering gap: this pass's host-by-host network audit
+found Google Gemini's API host already reachable from this session (no
+egress-policy change needed), with only a `GEMINI_API_KEY` credential
+missing. Full remedy: `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md`.
+
+Because Candidate D cannot be built without that credential, the
+following remain explicitly **NOT AVAILABLE THIS SESSION** (not silently
+skipped, not faked): Candidate D dev/validation/held-out metrics, B-vs-D
+agreement/kappa, disagreement adjudication, and an independent Phase-6
+system cross-check.
+
+**Phase 7 status: ENGINEERING COMPLETE EXCEPT FOR CTL-011.** Not closed,
+not frozen. Full regression: 418 passed, 0 failed, 7 skipped (unchanged -
+no new test-relevant code this pass beyond the F4 prompt fix, already
+verified in the prior addendum).

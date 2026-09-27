@@ -163,3 +163,72 @@ called CLOSED if, in addition to every other item, "the Phase-7 contract's
 independence requirement is satisfied." It is not. Phase 7 is therefore:
 
 **ENGINEERING COMPLETE EXCEPT FOR CTL-011** - not frozen, not closed.
+
+## Addendum 3: Phase 7 zero-remaining-caveat closure pass
+
+A third follow-up directive required resolving every dependent item from
+Addendum 2's two BLOCKED rows (items #3 and #6/#7 as originally numbered
+across passes: multi-source count, unsupported-label count, system-eval
+answer count) and re-auditing CTL-011 from scratch, explicitly forbidding
+using this agent itself or a same-model call as a substitute for genuine
+independence.
+
+**Resolved this pass:**
+- Multi-source claim-level count: 5 -> **6** (target met) via `P7V3-MS6-S`
+  (chembl osimertinib phase/type + pubmed resistance-mechanism review, a
+  genuinely distinct source-type pairing not used by any prior
+  multi-source case).
+- Unsupported-label count: 11 -> **12** (target met) via `P7V3-MEL-U`
+  (after an initial draft claim was gold-audited and rejected for the
+  same reason as the earlier BT3-U defect - see below).
+- System-evaluation answer count: 16 -> **20** (target met exactly), 66
+  total factual claims, 100% supported, 19/19 fully-grounded, 1/1 correct
+  abstention.
+- A genuinely fresh, blind, 2-case held-out replacement supplement (for
+  the 2 gold-authoring misses in the original 12-case supplement, which
+  remains preserved unmodified): **2/2 = 100%**.
+- A second real Candidate-B evaluator defect (F4: temporal/status-
+  inference false contradiction - inferring "a RECRUITING trial can't
+  have reported results" from a status field, when the Evidence never
+  states that) was found, fixed, and the fix was regression-verified
+  against the ENTIRE prior frozen gold (36-case original benchmark: 22/22
+  dev + 5/5 validation + 9/9 held-out; 20-case hardening-pass dev+
+  validation) - zero regressions, not just the one affected case.
+
+**NOT resolved this pass - genuine external blocker, re-confirmed with
+more precision than before:**
+- Independent evaluator (Candidate D): still **NOT BUILT**. A fresh,
+  host-by-host network re-audit this pass found that most candidate
+  provider hosts (`huggingface.co`, OpenAI, Mistral, Cohere, Groq,
+  Together) are explicitly policy-blocked, but `generativelanguage.
+  googleapis.com` (Google Gemini), `api.anthropic.com`, and AWS Bedrock
+  are all network-reachable - the blocker for at least Gemini is a
+  **missing credential only, not network policy**. No `GEMINI_API_KEY` or
+  any other provider key exists in this session. Full exact remedy (model,
+  env var, auth scheme, expected call volume/cost, fallback options) is
+  recorded in `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md`.
+- Using AWS Bedrock via this session's existing AWS credentials, or a
+  direct Anthropic API call via this session's existing platform
+  plumbing, were both considered and NOT attempted - those are this
+  session's own infrastructure credentials, not a model-provider key
+  provisioned for LLM-judge use, and repurposing them without explicit
+  authorization would be an out-of-scope credential use.
+- Consequently: Candidate D validation, B-vs-D agreement, disagreement
+  adjudication, and the independent Phase-6 system cross-check are all
+  **N/A** - none can be performed without Candidate D existing.
+
+### Final caveat-matrix status
+
+All items EXCEPT the independent-evaluator chain (CTL-011 and its direct
+dependents: Candidate D existence, B-vs-D agreement, independent system
+cross-check) are now **CLOSED** with real, measured evidence. The
+independent-evaluator chain remains **BLOCKED (external)** - a genuine
+missing-credential blocker, precisely characterized (Gemini is the
+cheapest, fastest path to closing it), not a vague "environment
+limitation."
+
+Per the zero-remaining-caveat directive's own rule, Phase 7 cannot be
+called CLOSED while this requirement is unmet. It remains:
+
+**ENGINEERING COMPLETE EXCEPT FOR CTL-011** - awaiting a provisioned
+independent-evaluator credential (Gemini recommended) before it can close.
