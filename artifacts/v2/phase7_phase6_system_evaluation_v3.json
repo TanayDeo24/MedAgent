@@ -1,0 +1,917 @@
+{
+  "artifact_name": "phase7_phase6_system_evaluation_v3",
+  "purpose": "Zero-caveat pass (Step 3): the frozen Phase-6 generator's system evaluation, expanded to meet the >=20-answer target. COMBINES v1 (8 answers, original hardening-pass-predecessor) + v2 (8 answers) + v3 (4 answers) = 20 answers total. All three source artifacts (phase7_phase6_system_evaluation.json / _v2.json / this file's own v3-only section) preserved/reported, never silently merged into a misleading single number without disclosure.",
+  "manifests": [
+    "artifacts/v2/phase7_phase6_system_eval_manifest.json",
+    "artifacts/v2/phase7_phase6_system_eval_v2_manifest.json",
+    "artifacts/v2/phase7_phase6_system_eval_v3_manifest.json"
+  ],
+  "generator": {
+    "architecture": "candidate_b_structured",
+    "model": "qwen-3.8-27b",
+    "frozen": true,
+    "generated_exactly_once": true,
+    "no_phase6_tuning_based_on_phase7_results": true
+  },
+  "evaluator": {
+    "architecture": "candidate_b_semantic_judge",
+    "prompt_version": "v1/v2 measured under prompt v2 (pre-F4-fix); v3 measured under prompt v3 (post-F4-fix) - the F4 fix does not change any v1/v2 system-eval claim's correct label (all were already SUPPORTED, no CONTRADICTED cases existed to be affected)",
+    "same_model_as_generator_caveat": true
+  },
+  "combined_totals": {
+    "total_answer_cases": 20,
+    "answers_with_factual_claims": 19,
+    "answers_abstained": 1,
+    "meets_target_of_20_answers": true,
+    "total_factual_claims": 66,
+    "supported_claims": 66,
+    "partially_supported_claims": 0,
+    "unsupported_claims": 0,
+    "contradicted_claims": 0,
+    "claim_support_rate": 1.0,
+    "answer_level_fully_grounded_rate": "19/19"
+  },
+  "claims_level_source_breakdown": {
+    "pubmed": {
+      "claims": 17,
+      "supported": 17
+    },
+    "clinical_trials": {
+      "claims": 24,
+      "supported": 24
+    },
+    "chembl": {
+      "claims": 9,
+      "supported": 9
+    },
+    "multi_source": {
+      "claims": 16,
+      "supported": 16
+    },
+    "n/a_abstained": {
+      "claims": 0,
+      "supported": 0
+    }
+  },
+  "v3_only_new_answers": {
+    "n": 4,
+    "claims": 26,
+    "supported": 26,
+    "case_level_detail": [
+      {
+        "case_id": "P7SYS3-Q9",
+        "abstained": false,
+        "evaluation": {
+          "answer_id": "ans-b7de8c393ed4",
+          "claim_judgments": [
+            {
+              "claim_id": "c-0",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07130032",
+                  "relation": "supports",
+                  "reason_code": "Phase and status match exactly"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07130032"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects trial phase and status",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11024.223083999914,
+                "provider_call_ms": 630.7949250001457,
+                "parsing_validation_ms": 0.06981699993957591,
+                "end_to_end_ms": 11655.087825999999,
+                "prompt_tokens": 1385,
+                "completion_tokens": 94,
+                "total_tokens": 1479,
+                "cost_usd": 0.0006292
+              }
+            },
+            {
+              "claim_id": "c-1",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07130032",
+                  "relation": "supports",
+                  "reason_code": "Title and metadata match all claim details."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07130032"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects trial title and metadata.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11440.008124000087,
+                "provider_call_ms": 652.6771640001243,
+                "parsing_validation_ms": 0.04588799993143766,
+                "end_to_end_ms": 12092.731176000143,
+                "prompt_tokens": 1431,
+                "completion_tokens": 96,
+                "total_tokens": 1527,
+                "cost_usd": 0.0006492000000000001
+              }
+            },
+            {
+              "claim_id": "c-2",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07130032",
+                  "relation": "supports",
+                  "reason_code": "Sponsor and enrollment match exactly"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07130032"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim matches evidence fields",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11428.220092999936,
+                "provider_call_ms": 757.0523829999729,
+                "parsing_validation_ms": 0.050544000032459735,
+                "end_to_end_ms": 12185.323019999942,
+                "prompt_tokens": 1383,
+                "completion_tokens": 92,
+                "total_tokens": 1475,
+                "cost_usd": 0.0006268000000000001
+              }
+            },
+            {
+              "claim_id": "c-3",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07130032",
+                  "relation": "supports",
+                  "reason_code": "Dates match exactly"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07130032"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim matches evidence dates",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11327.784973000007,
+                "provider_call_ms": 812.0224930000859,
+                "parsing_validation_ms": 0.06342899996525375,
+                "end_to_end_ms": 12139.870895000058,
+                "prompt_tokens": 1392,
+                "completion_tokens": 89,
+                "total_tokens": 1481,
+                "cost_usd": 0.0006280000000000001
+              }
+            },
+            {
+              "claim_id": "c-4",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07130032",
+                  "relation": "supports",
+                  "reason_code": "Exact regimen details match"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07130032"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects cited trial intervention",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11225.163122999902,
+                "provider_call_ms": 603.2636830000229,
+                "parsing_validation_ms": 0.11124399998152512,
+                "end_to_end_ms": 11828.538049999906,
+                "prompt_tokens": 1429,
+                "completion_tokens": 92,
+                "total_tokens": 1521,
+                "cost_usd": 0.0006452000000000001
+              }
+            },
+            {
+              "claim_id": "c-5",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07130032",
+                  "relation": "supports",
+                  "reason_code": "Evidence explicitly lists the exact ICI options, cyclophosphamide dose, and bevacizumab dose for melanoma."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07130032"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the specific intervention regimen for melanoma patients described in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11426.127533999988,
+                "provider_call_ms": 659.8835890001737,
+                "parsing_validation_ms": 0.06707199986522028,
+                "end_to_end_ms": 12086.078195000027,
+                "prompt_tokens": 1421,
+                "completion_tokens": 123,
+                "total_tokens": 1544,
+                "cost_usd": 0.0006667999999999999
+              }
+            }
+          ],
+          "factual_claim_count": 6,
+          "supported_count": 6,
+          "partially_supported_count": 0,
+          "unsupported_count": 0,
+          "contradicted_count": 0,
+          "fully_grounded": true,
+          "citation_precision": 1.0,
+          "claim_citation_coverage": 1.0
+        },
+        "source_category": "clinical_trials"
+      },
+      {
+        "case_id": "P7SYS3-Q10",
+        "abstained": false,
+        "evaluation": {
+          "answer_id": "ans-c0babd91a1dc",
+          "claim_judgments": [
+            {
+              "claim_id": "c-0",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "All claim details match evidence fields."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects trial phase, status, and condition.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11431.20806900015,
+                "provider_call_ms": 595.2207689999796,
+                "parsing_validation_ms": 0.10722899992288148,
+                "end_to_end_ms": 12026.536067000052,
+                "prompt_tokens": 1506,
+                "completion_tokens": 98,
+                "total_tokens": 1604,
+                "cost_usd": 0.0006808
+              }
+            },
+            {
+              "claim_id": "c-1",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Sponsor and enrollment match exactly"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects sponsor and enrollment data",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11443.595044999938,
+                "provider_call_ms": 683.8607680001587,
+                "parsing_validation_ms": 0.04928999987896532,
+                "end_to_end_ms": 12127.505102999976,
+                "prompt_tokens": 1492,
+                "completion_tokens": 95,
+                "total_tokens": 1587,
+                "cost_usd": 0.0006728000000000001
+              }
+            },
+            {
+              "claim_id": "c-2",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Title explicitly states the study investigates the activity of neoadjuvant PRTX007 combined with pembrolizumab."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is a direct paraphrase of the study title provided in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11339.934457000027,
+                "provider_call_ms": 626.548959000047,
+                "parsing_validation_ms": 0.07047400004012161,
+                "end_to_end_ms": 11966.553890000114,
+                "prompt_tokens": 1495,
+                "completion_tokens": 122,
+                "total_tokens": 1617,
+                "cost_usd": 0.0006956
+              }
+            },
+            {
+              "claim_id": "c-3",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Exact match in intervention description"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is verbatim from evidence",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11429.53071099987,
+                "provider_call_ms": 623.6057810001512,
+                "parsing_validation_ms": 0.06687299992336193,
+                "end_to_end_ms": 12053.203364999945,
+                "prompt_tokens": 1512,
+                "completion_tokens": 93,
+                "total_tokens": 1605,
+                "cost_usd": 0.0006792
+              }
+            },
+            {
+              "claim_id": "c-4",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Exact match in intervention description"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is verbatim from evidence",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11433.916166000017,
+                "provider_call_ms": 672.9111969998485,
+                "parsing_validation_ms": 0.10706400007620687,
+                "end_to_end_ms": 12106.934426999942,
+                "prompt_tokens": 1498,
+                "completion_tokens": 93,
+                "total_tokens": 1591,
+                "cost_usd": 0.0006736
+              }
+            },
+            {
+              "claim_id": "c-5",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Evidence explicitly lists 600/750mg, 3 on/4 off, 9 cycles."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the neoadjuvant regimen details in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11329.508300999805,
+                "provider_call_ms": 655.8989550001115,
+                "parsing_validation_ms": 0.052023000080225756,
+                "end_to_end_ms": 11985.459278999997,
+                "prompt_tokens": 1520,
+                "completion_tokens": 118,
+                "total_tokens": 1638,
+                "cost_usd": 0.0007023999999999999
+              }
+            },
+            {
+              "claim_id": "c-6",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Evidence explicitly lists 200 mg IV Q3W for 3 cycles (9 weeks) for neoadjuvant pembrolizumab."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim matches the specific dosing, frequency, and duration details in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11430.316544000107,
+                "provider_call_ms": 756.0667220000141,
+                "parsing_validation_ms": 0.05536999992727942,
+                "end_to_end_ms": 12186.438636000048,
+                "prompt_tokens": 1502,
+                "completion_tokens": 127,
+                "total_tokens": 1629,
+                "cost_usd": 0.0007024
+              }
+            },
+            {
+              "claim_id": "c-7",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "All adjuvant regimen details match evidence exactly."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the adjuvant regimen details provided in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11331.016916999943,
+                "provider_call_ms": 697.5639260001572,
+                "parsing_validation_ms": 0.058148999869445106,
+                "end_to_end_ms": 12028.63899199997,
+                "prompt_tokens": 1549,
+                "completion_tokens": 104,
+                "total_tokens": 1653,
+                "cost_usd": 0.0007028000000000001
+              }
+            },
+            {
+              "claim_id": "c-8",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "nct:NCT07565285",
+                  "relation": "supports",
+                  "reason_code": "Dates match exactly"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "nct:NCT07565285"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim matches evidence fields",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11324.421678999897,
+                "provider_call_ms": 632.5149490000967,
+                "parsing_validation_ms": 0.048650000053385156,
+                "end_to_end_ms": 11956.985278000047,
+                "prompt_tokens": 1503,
+                "completion_tokens": 89,
+                "total_tokens": 1592,
+                "cost_usd": 0.0006724000000000001
+              }
+            }
+          ],
+          "factual_claim_count": 9,
+          "supported_count": 9,
+          "partially_supported_count": 0,
+          "unsupported_count": 0,
+          "contradicted_count": 0,
+          "fully_grounded": true,
+          "citation_precision": 1.0,
+          "claim_citation_coverage": 1.0
+        },
+        "source_category": "clinical_trials"
+      },
+      {
+        "case_id": "P7SYS3-Q11",
+        "abstained": false,
+        "evaluation": {
+          "answer_id": "ans-fe77fbe5d153",
+          "claim_judgments": [
+            {
+              "claim_id": "c-0",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:29862230",
+                  "relation": "supports",
+                  "reason_code": "Evidence explicitly states crizotinib was first-in-class ALK TKI with proven superiority over platinum-based chemotherapy for 1st-line ALK-rearranged NSCLC."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:29862230"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the explicit statements in the cited evidence regarding crizotinib's status and efficacy.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11424.515588000077,
+                "provider_call_ms": 707.215319999932,
+                "parsing_validation_ms": 0.05062600007477158,
+                "end_to_end_ms": 12131.781534000083,
+                "prompt_tokens": 1872,
+                "completion_tokens": 135,
+                "total_tokens": 2007,
+                "cost_usd": 0.0008568000000000001
+              }
+            },
+            {
+              "claim_id": "c-1",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:29862230",
+                  "relation": "supports",
+                  "reason_code": "Direct textual match for causality and specific factors."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:29862230"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is a direct paraphrase of the evidence text.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11366.727484000194,
+                "provider_call_ms": 828.8501479999013,
+                "parsing_validation_ms": 0.04508100005296001,
+                "end_to_end_ms": 12195.622713000148,
+                "prompt_tokens": 1856,
+                "completion_tokens": 100,
+                "total_tokens": 1956,
+                "cost_usd": 0.0008224
+              }
+            },
+            {
+              "claim_id": "c-2",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:29862230",
+                  "relation": "supports",
+                  "reason_code": "Evidence explicitly states four ALK TKIs approved by FDA/EMA and more under investigation."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:29862230"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the 2018 evidence content regarding approved ALK TKIs.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11234.035461000076,
+                "provider_call_ms": 620.1970869999514,
+                "parsing_validation_ms": 0.06281700007093605,
+                "end_to_end_ms": 11854.295365000098,
+                "prompt_tokens": 1872,
+                "completion_tokens": 115,
+                "total_tokens": 1987,
+                "cost_usd": 0.0008408000000000001
+              }
+            },
+            {
+              "claim_id": "c-3",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:29862230",
+                  "relation": "supports",
+                  "reason_code": "Evidence explicitly states phase III results showed alectinib higher efficacy than crizotinib in first-line, including CNS."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:29862230"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the specific findings and context described in the cited 2018 review.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11386.21684199984,
+                "provider_call_ms": 793.9600740000969,
+                "parsing_validation_ms": 0.061658000049646944,
+                "end_to_end_ms": 12180.238573999986,
+                "prompt_tokens": 1861,
+                "completion_tokens": 123,
+                "total_tokens": 1984,
+                "cost_usd": 0.0008428000000000001
+              }
+            },
+            {
+              "claim_id": "c-4",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:29862230",
+                  "relation": "supports",
+                  "reason_code": "Exact phrase match in evidence text."
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:29862230"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is a direct quote from the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11228.185521000114,
+                "provider_call_ms": 1002.1984039999552,
+                "parsing_validation_ms": 0.05032299986851285,
+                "end_to_end_ms": 12230.434247999938,
+                "prompt_tokens": 1848,
+                "completion_tokens": 95,
+                "total_tokens": 1943,
+                "cost_usd": 0.0008152000000000001
+              }
+            }
+          ],
+          "factual_claim_count": 5,
+          "supported_count": 5,
+          "partially_supported_count": 0,
+          "unsupported_count": 0,
+          "contradicted_count": 0,
+          "fully_grounded": true,
+          "citation_precision": 1.0,
+          "claim_citation_coverage": 1.0
+        },
+        "source_category": "pubmed"
+      },
+      {
+        "case_id": "P7SYS3-Q12",
+        "abstained": false,
+        "evaluation": {
+          "answer_id": "ans-8575ecdf6dc2",
+          "claim_judgments": [
+            {
+              "claim_id": "c-0",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "chembl:CHEMBL3353410",
+                  "relation": "supports",
+                  "reason_code": "molecule_type field explicitly states 'Small molecule'"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "chembl:CHEMBL3353410"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim directly matches the molecule_type field in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11030.731040000092,
+                "provider_call_ms": 554.7853030000169,
+                "parsing_validation_ms": 0.04654800000025716,
+                "end_to_end_ms": 11585.562891000109,
+                "prompt_tokens": 1045,
+                "completion_tokens": 102,
+                "total_tokens": 1147,
+                "cost_usd": 0.0004996
+              }
+            },
+            {
+              "claim_id": "c-1",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "chembl:CHEMBL3353410",
+                  "relation": "supports",
+                  "reason_code": "max_phase field is 4.0"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "chembl:CHEMBL3353410"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Evidence explicitly states max_phase 4.0",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11525.95165799994,
+                "provider_call_ms": 655.394213000136,
+                "parsing_validation_ms": 0.04938899996886903,
+                "end_to_end_ms": 12181.395260000045,
+                "prompt_tokens": 1047,
+                "completion_tokens": 100,
+                "total_tokens": 1147,
+                "cost_usd": 0.0004988
+              }
+            },
+            {
+              "claim_id": "c-2",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:31564718",
+                  "relation": "supports",
+                  "reason_code": "Exact match of drug description"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:31564718"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is verbatim in evidence",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11429.533339000045,
+                "provider_call_ms": 929.5197980000012,
+                "parsing_validation_ms": 0.16843100002006395,
+                "end_to_end_ms": 12359.221568000066,
+                "prompt_tokens": 1785,
+                "completion_tokens": 92,
+                "total_tokens": 1877,
+                "cost_usd": 0.0007876000000000001
+              }
+            },
+            {
+              "claim_id": "c-3",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:31564718",
+                  "relation": "supports",
+                  "reason_code": "Direct textual match"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:31564718"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is a direct quote from evidence",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11126.787250000007,
+                "provider_call_ms": 620.047402000182,
+                "parsing_validation_ms": 0.045222999915495166,
+                "end_to_end_ms": 11746.879875000104,
+                "prompt_tokens": 1782,
+                "completion_tokens": 91,
+                "total_tokens": 1873,
+                "cost_usd": 0.0007856
+              }
+            },
+            {
+              "claim_id": "c-4",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:31564718",
+                  "relation": "supports",
+                  "reason_code": "Exact match of listed resistance mechanisms"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:31564718"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim accurately reflects the specific mechanisms listed in the evidence.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11425.98957700011,
+                "provider_call_ms": 596.8721369999912,
+                "parsing_validation_ms": 0.07107099986569665,
+                "end_to_end_ms": 12022.932784999966,
+                "prompt_tokens": 1828,
+                "completion_tokens": 97,
+                "total_tokens": 1925,
+                "cost_usd": 0.0008088
+              }
+            },
+            {
+              "claim_id": "c-5",
+              "support_label": "supported",
+              "citation_judgments": [
+                {
+                  "evidence_id": "pubmed:31564718",
+                  "relation": "supports",
+                  "reason_code": "Direct textual match"
+                }
+              ],
+              "supporting_evidence_ids": [
+                "pubmed:31564718"
+              ],
+              "unsupported_fragments": [],
+              "numeric_mismatch": false,
+              "reason_code": "Claim is a direct paraphrase of the evidence text.",
+              "evaluator_metadata": {
+                "architecture": "candidate_b_semantic_judge",
+                "model": "qwen-3.8-27b",
+                "llm_calls": 1,
+                "rate_limit_wait_ms": 11426.985349000006,
+                "provider_call_ms": 632.8757960000075,
+                "parsing_validation_ms": 0.05708100002266292,
+                "end_to_end_ms": 12059.918226000036,
+                "prompt_tokens": 1787,
+                "completion_tokens": 94,
+                "total_tokens": 1881,
+                "cost_usd": 0.0007900000000000001
+              }
+            }
+          ],
+          "factual_claim_count": 6,
+          "supported_count": 6,
+          "partially_supported_count": 0,
+          "unsupported_count": 0,
+          "contradicted_count": 0,
+          "fully_grounded": true,
+          "citation_precision": 1.0,
+          "claim_citation_coverage": 1.0
+        },
+        "source_category": "multi_source"
+      }
+    ]
+  },
+  "no_phase6_defect_found": true,
+  "note": "No Phase-6 defect found across all 20 answers / 54 total factual claims - every single factual claim is SUPPORTED, the one abstention (zero-Evidence query) was correct."
+}

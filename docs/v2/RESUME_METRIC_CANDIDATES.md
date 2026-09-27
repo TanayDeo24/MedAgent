@@ -412,3 +412,55 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
 - **Any claim that the fresh 12-case held-out supplement scored a clean
   100%.** It scored 10/12 as-run; the 2 misses were root-caused to gold
   defects, not silently corrected into a "12/12" figure anywhere.
+
+## Resume-safe claims (Phase 7 zero-caveat pass addendum)
+
+- Resolved both remaining benchmark-balance shortfalls from the hardening
+  pass: multi-source claim-level cases 5 -> 6, unsupported-label cases 11
+  -> 12 (combined benchmark now 72 real cases, all 4 labels and all 3
+  source types + multi-source at or above their target floors).
+- Expanded the frozen Phase-6 system evaluation to the full 20-answer
+  target (8+8+4, real generation, real evaluation): 66 total factual
+  claims, 100% supported, 19/19 fully-grounded answers (1 correct
+  abstention) - no Phase-6 defect found at this larger scale either.
+- Found and fixed a second real Candidate-B evaluator defect (F4: a
+  temporal/status-inference false contradiction), then re-verified the fix
+  against the ENTIRE unchanged frozen gold (original 36-case benchmark:
+  22/22 dev + 5/5 validation + 9/9 held-out; hardening-pass 20-case
+  dev+validation) with zero regressions - not just the one case that
+  exposed the defect.
+- Ran a genuinely fresh, previously-unused, 2-case blind held-out
+  replacement supplement (not a rerun of the spent 12-case supplement):
+  2/2, replacing the statistical evidence lost to that supplement's 2
+  gold-authoring misses.
+- Actively re-audited the independent-evaluator requirement (CTL-011) this
+  session rather than re-asserting an earlier conclusion: confirmed no
+  second LLM provider credential, confirmed `huggingface.co` is still
+  denied by egress policy, and explicitly considered and rejected using
+  this agent itself as a "different model family" judge (it authored the
+  gold labels, so it would not be blind/independent). Exact remedy (env
+  var name, host to allowlist, credential type) recorded in
+  `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md`.
+- Created an interim durability checkpoint commit
+  (`MedAgent V2 Phase 7 hardening checkpoint - phase still open`) and
+  pushed it to `origin/medagent-v2-phase7-grounding-eval` - explicitly NOT
+  a freeze/closure commit, and Phase 7 was NOT reported as closed at that
+  point either.
+
+## Not resume-safe (Phase 7 zero-caveat pass addendum)
+
+- **Any claim that CTL-011 is closed, or that a genuinely independent
+  evaluator exists.** It does not. This was re-verified, not assumed, in
+  this pass, and the reasons plus exact remedy are documented, not hidden.
+- **Any claim that Phase 7 is closed, frozen, or ready for Phase 8.** Per
+  the zero-caveat directive's own closure rule, Phase 7 cannot be called
+  closed while the independence requirement is unmet - it remains
+  ENGINEERING COMPLETE EXCEPT FOR CTL-011.
+- **Any claim that the original 12-case fresh_heldout_supplement scored
+  12/12.** It remains 10/12, preserved exactly as-run; the 2/2 replacement
+  supplement is a separate, additional artifact, never blended into the
+  original's number.
+- **Any claim that this session created a final Phase-7 freeze commit or
+  pushed unreviewed closure work.** Only the interim durability checkpoint
+  was committed and pushed, per explicit authorization for that step
+  alone; no further commit/push has been made since.

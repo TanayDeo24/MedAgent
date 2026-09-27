@@ -418,5 +418,60 @@
       ],
       "claim_text": "Brigatinib was evaluated in the completed Phase 1/2 trial NCT01449461, and separately, a 2016-2024 Optum retrospective cohort study assessed its real-world comparative effectiveness against other first-line ALK TKIs."
     }
-  ]
+  ],
+  "zero_caveat_pass_additions": {
+    "purpose": "Step 2 of the zero-caveat pass: resolve the multi-source (5->6) and unsupported-label (11->12) shortfalls with 2 more real cases in development, plus a 2-case fresh blind held-out replacement supplement (Step 4) for the 2 invalid-gold misses in the original fresh_heldout_supplement.",
+    "new_development_cases": [
+      {
+        "case_id": "P7V3-MEL-U",
+        "gold_support_label": "unsupported",
+        "group_key": "nct:NCT07130032",
+        "multi_source": false,
+        "evidence_ids": [
+          "nct:NCT07130032",
+          "nct:NCT07130032"
+        ]
+      },
+      {
+        "case_id": "P7V3-MS6-S",
+        "gold_support_label": "supported",
+        "group_key": "multi:chembl:CHEMBL3353410+pubmed:31564718",
+        "multi_source": true,
+        "evidence_ids": [
+          "chembl:CHEMBL3353410",
+          "pubmed:31564718"
+        ]
+      }
+    ],
+    "new_fresh_heldout_supplement_2_cases": [
+      {
+        "case_id": "P7V3-HELD2-S",
+        "gold_support_label": "supported",
+        "group_key": "pubmed:29862230",
+        "evidence_ids": [
+          "pubmed:29862230"
+        ]
+      },
+      {
+        "case_id": "P7V3-HELD2-C",
+        "gold_support_label": "contradicted",
+        "group_key": "nct:NCT07565285",
+        "evidence_ids": [
+          "nct:NCT07565285",
+          "nct:NCT07565285"
+        ]
+      }
+    ],
+    "gold_audit_note": "P7V3-MEL-U's first-drafted claim was rejected by gold audit before use (would have been CONTRADICTED, not UNSUPPORTED, per the trial's own conditions/interventions metadata) - replaced with a genuinely unaddressed-fact claim before any evaluator run. See the case comment in the source script and artifacts/v2/phase7_failure_analysis.json finding F4.",
+    "updated_combined_totals": {
+      "total_cases": 72,
+      "development": 41,
+      "validation": 8,
+      "phase7_heldout_original": 9,
+      "fresh_heldout_supplement": 12,
+      "fresh_heldout_supplement_2": 2
+    },
+    "updated_multi_source_count": "5 + 1 (P7V3-MS6-S) = 6 - meets the >=6 target",
+    "updated_unsupported_count": "11 + 1 (P7V3-MEL-U) = 12 - meets the >=12 target"
+  }
 }

@@ -832,3 +832,56 @@ re-evaluation depending on it) remain genuinely blocked by this cloud
 environment. **Phase 7 is not closed by this pass** - it remains open
 specifically on the independent-evaluator requirement, per the governing
 directive's own rule against re-closing with the same-model caveat.
+
+## Phase 7 Zero-Caveat Pass Addendum (follow-up to the hardening pass)
+
+Full audit: `docs/v2/PHASE7_HARDENING_AUDIT.md` (table) plus this addendum.
+All original and hardening-pass results above are preserved unmodified.
+
+**Benchmark balance shortfalls RESOLVED:** 2 more real cases added
+(development split): multi-source 5 -> **6** (meets target), unsupported-
+label 11 -> **12** (meets target). Combined benchmark: 72 total cases (41
+dev / 8 validation / 9 original held-out / 12 fresh held-out supplement /
+2 fresh held-out supplement 2).
+
+**Real evaluator defect F4 found and fixed:** a temporal/status-inference
+false-contradiction pattern (judge inferred "a RECRUITING trial can't have
+reported results" - true in general, but not something the Evidence's own
+text states). Fixed via a targeted prompt addition. Full regression
+re-verified AFTER the fix, not assumed: original 36-case benchmark 22/22
+dev + 5/5 validation + 9/9 held-out (all re-run fresh), v2's 20/20
+dev+validation (re-run fresh) - zero regressions.
+
+**Fresh held-out supplement 2:** the original 12-case supplement (10/12,
+2 misses = gold defects) is preserved exactly as-run, never edited or
+rerun. A SEPARATE, new 2-case blind supplement from 2 more previously-
+unused real records was authored, gold-audited against full untruncated
+Evidence, frozen, and run exactly once: **2/2 = 100%**, replacing the
+statistical evidence lost to the 2 invalid-gold misses.
+
+**System evaluation:** see below (in progress as of this write).
+
+**Candidate A v1 vs v2 on the FULL benchmark (72 cases):** v1 24/72
+(33.3%), v2 27/72 (37.5%) - both computed across original+hardening+
+zero-caveat cases combined; the improvement is real but modest at this
+combined scale (the new v2 signals - entity attribution, structured
+fields - don't fire on every case type).
+
+**CTL-011 re-audit:** actively re-checked in this pass (not re-asserted).
+Confirmed still blocked: no second provider credential, huggingface.co
+still denied, and using this agent itself as judge was explicitly
+considered and rejected (gold-authorship contamination). Exact remedy
+recorded in `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md`. **CTL-011
+remains OPEN - Phase 7 still cannot close.**
+
+**System evaluation FINAL (zero-caveat pass):** 20 answers (8+8+4), 66
+factual claims, 66 supported (100%), 0 unsupported, 0 contradicted, 19/19
+fully-grounded answers (1 correct abstention). Meets the >=20-answer
+target. See `artifacts/v2/phase7_phase6_system_evaluation_v3.json` for the
+combined total (v1/v2 source artifacts preserved unmodified).
+
+**Full regression after all zero-caveat-pass changes: 418 passed, 0
+failed, 7 skipped** (unchanged count from the hardening pass - only
+`grounding_eval/judge.py`'s prompt text changed this round, verified via
+live re-runs rather than a new unit test, since prompt wording isn't
+something a unit test meaningfully pins).

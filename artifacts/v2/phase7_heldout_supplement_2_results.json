@@ -1,0 +1,58 @@
+{
+  "artifact_name": "phase7_heldout_supplement_2_results",
+  "purpose": "Step 4 of the zero-caveat pass: the original 12-case fresh_heldout_supplement (artifacts/v2/phase7_heldout_supplement_results.json, 10/12) is preserved EXACTLY as-run, never edited, never rerun. This is a SEPARATE, NEW, genuinely fresh 2-case blind supplement, from 2 more real records never used anywhere in Phase 7 before (pubmed:29862230, nct:NCT07565285), replacing the statistical evidence lost to the 2 invalid-gold misses in the original supplement.",
+  "predeclared_pass_criteria": [
+    "evaluator prediction matches gold",
+    "no schema failure",
+    "no fabricated Evidence/source IDs",
+    "all hard gates pass"
+  ],
+  "evaluator": "candidate_b_semantic_judge (prompt v3 - includes the F4 temporal/status-inference fix made during this pass, before this supplement was run)",
+  "gold_frozen_before_execution": true,
+  "run_exactly_once": true,
+  "n": 2,
+  "correct": 2,
+  "accuracy": "2/2 = 100%",
+  "hard_gates": "4/4 pass (no unknown/fabricated Evidence IDs, no schema failure, no secret leaks, no silent failure)",
+  "defects_found": "NONE",
+  "results": [
+    {
+      "case_id": "P7V3-HELD2-S",
+      "gold": "supported",
+      "pred": "supported",
+      "correct": true,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 0.013675000218427158,
+        "provider_call_ms": 687.9090989998531,
+        "parsing_validation_ms": 0.06027099993843876,
+        "end_to_end_ms": 687.98304500001,
+        "prompt_tokens": 1862,
+        "completion_tokens": 131,
+        "total_tokens": 1993,
+        "cost_usd": 0.0008496000000000002
+      }
+    },
+    {
+      "case_id": "P7V3-HELD2-C",
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "correct": true,
+      "evaluator_metadata": {
+        "architecture": "candidate_b_semantic_judge",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "rate_limit_wait_ms": 11327.875776000155,
+        "provider_call_ms": 865.7092029998239,
+        "parsing_validation_ms": 0.07172000005084556,
+        "end_to_end_ms": 12193.65669900003,
+        "prompt_tokens": 1987,
+        "completion_tokens": 182,
+        "total_tokens": 2169,
+        "cost_usd": 0.0009404000000000001
+      }
+    }
+  ]
+}

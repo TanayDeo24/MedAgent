@@ -121,15 +121,26 @@ docs/artifacts/code before writing this ledger (see each CTL item's
 - **Exact local action required:** with a second LLM provider credential
   available (or a local NLI model dependency installed), implement a
   Candidate D evaluator using that provider/model, run it on the same
-  frozen 36-case benchmark, and report its own accuracy/macro-F1 plus
-  agreement rate with Candidate B.
+  frozen benchmark, and report its own accuracy/macro-F1 plus agreement
+  rate with Candidate B.
 - **PASS criteria:** a second, architecturally-distinct evaluator is
-  validated against the same frozen gold with macro-F1 >= 0.90, and its
-  agreement rate with Candidate B on the same cases is reported.
+  validated against the same frozen gold with macro-F1 >= 0.90 on dev+
+  validation, then run exactly once on a frozen held-out split with the
+  same threshold, and its agreement rate with Candidate B on the shared
+  system-evaluation set is reported (raw agreement + Cohen's kappa).
 - **Required credentials/data/network/artifacts:** a second LLM provider
-  API key, or a local NLI model dependency.
+  API key (env var name and exact remedy in
+  `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md`), or network access to
+  `huggingface.co` for a local NLI model dependency.
 - **Evidence/artifact to update after execution:** a new
   `artifacts/v2/phase7_independent_evaluator_comparison.json`.
+- **Zero-caveat pass re-audit (this session):** re-checked from scratch
+  per `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md` Step 5 - no second
+  provider credential, no cached/downloadable local model, and using this
+  agent itself as judge was explicitly considered and rejected
+  (contaminated by having authored the gold labels itself). CTL-011
+  **remains OPEN**; exact remedy and required credential/host recorded in
+  that document for whoever provisions the fix.
 - **Result:** _(pending)_
 - **Closure date:** _(pending)_
 - **Closure commit SHA:** _(pending)_

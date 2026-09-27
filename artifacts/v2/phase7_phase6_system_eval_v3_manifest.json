@@ -1,0 +1,42 @@
+{
+  "manifest_name": "phase7_phase6_system_eval_v3_manifest",
+  "purpose": "Zero-caveat pass (Step 3): expand the frozen Phase-6 generator's system-evaluation set to >=20 total answers (16 -> 20), using 4 more real, previously-unused-in-system-eval Evidence groups.",
+  "frozen_before_generation": true,
+  "cases": [
+    {
+      "case_id": "P7SYS3-Q9",
+      "query": "What is known about the melanoma/NSCLC combination immunotherapy trial NCT07130032?",
+      "evidence_ids": [
+        "nct:NCT07130032",
+        "nct:NCT07130032"
+      ],
+      "source_category": "clinical_trials"
+    },
+    {
+      "case_id": "P7SYS3-Q10",
+      "query": "What is known about the melanoma trial NCT07565285 (PRTX007 combined with pembrolizumab)?",
+      "evidence_ids": [
+        "nct:NCT07565285",
+        "nct:NCT07565285"
+      ],
+      "source_category": "clinical_trials"
+    },
+    {
+      "case_id": "P7SYS3-Q11",
+      "query": "What is known about crizotinib and subsequent ALK inhibitor therapy for ALK-rearranged NSCLC?",
+      "evidence_ids": [
+        "pubmed:29862230"
+      ],
+      "source_category": "pubmed"
+    },
+    {
+      "case_id": "P7SYS3-Q12",
+      "query": "What is osimertinib's development phase and molecule type, and what are its acquired resistance mechanisms?",
+      "evidence_ids": [
+        "chembl:CHEMBL3353410",
+        "pubmed:31564718"
+      ],
+      "source_category": "multi_source"
+    }
+  ]
+}

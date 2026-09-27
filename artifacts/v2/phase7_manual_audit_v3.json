@@ -1,0 +1,168 @@
+{
+  "artifact_name": "phase7_manual_audit_v3",
+  "purpose": "Zero-caveat pass manual audit expansion (Step 17): all v2 cases preserved, plus the new F4 evaluator-defect case and the 2 fresh clean held-out-2 confirmations.",
+  "cases": [
+    {
+      "case_id": "P7V2-BP3-P",
+      "label_class": "partially_supported",
+      "source": "pubmed",
+      "claim": "Brigatinib was approved in May 2016 and is now the universally preferred first-line cure for all NSCLC patients.",
+      "evaluator_judgment": "partially_supported",
+      "auditor_determination": "AGREE - 'approved May 2016' is stated; 'universally preferred cure for all NSCLC' is an unsupported broadened-scope addition the Evidence never states.",
+      "reason": "overclaiming/scope-broadening pattern"
+    },
+    {
+      "case_id": "P7V2-BP3-C",
+      "label_class": "contradicted",
+      "source": "pubmed",
+      "claim": "Brigatinib was approved by the FDA in May 2019.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE - Evidence explicitly states May 2016.",
+      "reason": "date contradiction"
+    },
+    {
+      "case_id": "P7V2-BP4-U",
+      "label_class": "unsupported",
+      "source": "pubmed",
+      "claim": "The Optum retrospective study found brigatinib reduced mortality by exactly 50% compared to crizotinib.",
+      "evaluator_judgment": "unsupported",
+      "auditor_determination": "AGREE - no such percentage appears anywhere in the Evidence content.",
+      "reason": "fabricated numeric figure"
+    },
+    {
+      "case_id": "P7V2-BL2-C",
+      "label_class": "contradicted",
+      "source": "pubmed",
+      "claim": "The ALTA-1L subgroup analysis ... showed no benefit in non-Asian patients.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE (gold corrected during this pass - originally mis-authored as unsupported from a truncated preview; full text reports HR 0.56 benefit in non-Asian patients too).",
+      "reason": "gold-authoring defect, corrected pre-freeze"
+    },
+    {
+      "case_id": "P7V2-BT2-STATUS-C",
+      "label_class": "contradicted",
+      "source": "clinical_trials",
+      "claim": "NCT01449461 is currently recruiting.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE - status field explicitly COMPLETED.",
+      "reason": "structured-field contradiction"
+    },
+    {
+      "case_id": "P7V2-BT2-PHASE-C",
+      "label_class": "contradicted",
+      "source": "clinical_trials",
+      "claim": "NCT01449461 is a Phase 3 study.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE - phase field explicitly PHASE1, PHASE2.",
+      "reason": "phase contradiction"
+    },
+    {
+      "case_id": "P7V2-BT2-ENROLL-C",
+      "label_class": "contradicted",
+      "source": "clinical_trials",
+      "claim": "NCT01449461 enrolled 500 participants.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE - enrollment field explicitly 137.",
+      "reason": "numeric contradiction"
+    },
+    {
+      "case_id": "P7V2-BT3-U (fresh held-out)",
+      "label_class": "unsupported (as authored) / contradicted (evaluator + auditor)",
+      "source": "clinical_trials",
+      "claim": "NCT04887519 evaluated brigatinib in combination with pembrolizumab.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "DISAGREE WITH ORIGINAL GOLD, AGREE WITH EVALUATOR - the trial's own interventions metadata explicitly states 'No Intervention' / non-interventional, which directly conflicts with a claimed drug-combination intervention. This is CONTRADICTED per the contract's own definition, not merely unsupported. Second gold-authoring defect found by this audit (fresh held-out - NOT retroactively changed per the held-out-gold-is-frozen rule; reported here transparently instead, exactly like Phase 6's P6-H2 precedent).",
+      "reason": "gold-authoring defect found post-hoc in frozen held-out; NOT corrected in place"
+    },
+    {
+      "case_id": "P7V2-MI4-S (fresh held-out)",
+      "label_class": "supported (as authored) / partially_supported (evaluator)",
+      "source": "chembl",
+      "claim": "CHEMBL1201438 is an approved (Phase 4) treatment indicated for melanoma.",
+      "evaluator_judgment": "partially_supported",
+      "auditor_determination": "DISAGREE WITH ORIGINAL GOLD, AGREE WITH EVALUATOR - the Evidence's own field is 'max_phase: 4.0', never the literal word 'approved'. Treating max_phase=4 as synonymous with 'approved' is an outside-ChEMBL-convention inference the claim adds, not something the Evidence's own text states - per the contract's own strict 'Evidence's own stated content' rule, PARTIALLY_SUPPORTED is the more contract-compliant label. Third gold-authoring defect found by this audit (fresh held-out - NOT corrected in place per the frozen-gold rule).",
+      "reason": "gold-authoring defect (outside-domain-knowledge inference baked into original gold), found post-hoc"
+    },
+    {
+      "case_id": "P7V2-OSR-C",
+      "label_class": "contradicted",
+      "source": "chembl",
+      "claim": "Osimertinib resolves to ChEMBL ID CHEMBL1234567.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE - real resolve record maps to CHEMBL3353410.",
+      "reason": "entity-attribution contradiction"
+    },
+    {
+      "case_id": "P7V2-MS1-S",
+      "label_class": "supported (multi-source)",
+      "source": "clinical_trials+pubmed",
+      "claim": "Brigatinib, evaluated in the completed Phase 1/2 trial NCT01449461, was approved by the FDA in May 2016 for ALK-positive NSCLC patients who progressed on crizotinib.",
+      "evaluator_judgment": "supported",
+      "auditor_determination": "AGREE - both constituent facts independently verified true against their respective cited Evidence.",
+      "reason": "multi-source joint support"
+    },
+    {
+      "case_id": "P7V2-MS3-P",
+      "label_class": "partially_supported (multi-source, missing evidence)",
+      "source": "clinical_trials",
+      "claim": "Brigatinib ... is dosed at 90 mg increasing to 180 mg once daily.",
+      "evaluator_judgment": "partially_supported",
+      "auditor_determination": "AGREE - the dosing fact's own supporting Evidence (pubmed:30638036) was deliberately NOT cited in this variant; only the trial-status/phase facts are covered by the cited Evidence.",
+      "reason": "incomplete multi-Evidence support, correctly detected"
+    },
+    {
+      "case_id": "P7SYS2-Q5 (system eval v2, FIRST run)",
+      "label_class": "harness anomaly, not a benchmark case",
+      "source": "chembl",
+      "claim": "Osimertinib is a small molecule. / Osimertinib has reached development phase 4.",
+      "evaluator_judgment": "unsupported (FIRST run, WRONG) -> supported (RE-RUN, CORRECT)",
+      "auditor_determination": "ROOT-CAUSED to this session's own scratch evaluation-harness script, not Phase 6 or Candidate B: a global evidence_id-keyed dict let a different real ChEMBL Evidence object (same evidence_id, different adapter call) silently overwrite the correct one. Fixed by scoping evidence lookup per-query; re-run confirmed both claims supported.",
+      "reason": "harness bug, found and fixed, documented transparently rather than silently re-run and forgotten"
+    },
+    {
+      "case_id": "P7V3-MEL-U (development, FIRST run, pre-fix)",
+      "label_class": "unsupported (gold, correct) vs contradicted (evaluator, WRONG - pre-fix)",
+      "source": "clinical_trials",
+      "claim": "NCT07130032 has already reported that its combination regimen achieved a 45% overall response rate.",
+      "evaluator_judgment": "contradicted (pre-fix) -> unsupported (post-fix)",
+      "auditor_determination": "REAL EVALUATOR DEFECT (F4): the judge inferred CONTRADICTED from 'RECRUITING status implies no results reported yet' - a correct piece of domain reasoning, but NOT something the Evidence's own text states, so it violates the contract's 'Evidence's own stated content' rule for CONTRADICTED. Fixed by extending the judge prompt's CRITICAL DISTINCTION section with an explicit temporal/status-inference example. Re-verified correct after the fix, AND re-verified that the fix caused zero regressions across the full original 36-case benchmark (22/22 dev, 5/5 validation, 9/9 held-out) and the v2 20-case dev+validation set, all re-run fresh after the fix.",
+      "reason": "temporal/status-inference false contradiction, found and fixed this pass"
+    },
+    {
+      "case_id": "P7V3-HELD2-S (fresh blind held-out replacement)",
+      "label_class": "supported",
+      "source": "pubmed",
+      "claim": "Crizotinib was the first-in-class ALK tyrosine kinase inhibitor, showing superiority over standard platinum-based chemotherapy as first-line therapy for ALK-rearranged NSCLC patients.",
+      "evaluator_judgment": "supported",
+      "auditor_determination": "AGREE - directly and verbatim supported by the cited Evidence's full (non-truncated) text.",
+      "reason": "clean confirmation, replaces one unit of statistical evidence lost to the 2 invalid-gold misses in the original fresh_heldout_supplement"
+    },
+    {
+      "case_id": "P7V3-HELD2-C (fresh blind held-out replacement)",
+      "label_class": "contradicted",
+      "source": "clinical_trials",
+      "claim": "NCT07565285 is a completed Phase 3 trial.",
+      "evaluator_judgment": "contradicted",
+      "auditor_determination": "AGREE - Evidence's own status/phase fields explicitly state RECRUITING and PHASE2.",
+      "reason": "clean confirmation, replaces the second unit of lost statistical evidence"
+    }
+  ],
+  "coverage_check": {
+    "support_labels_covered": [
+      "supported",
+      "partially_supported",
+      "unsupported",
+      "contradicted"
+    ],
+    "source_types_covered": [
+      "pubmed",
+      "clinical_trials",
+      "chembl",
+      "multi_source (clinical_trials+pubmed)"
+    ],
+    "n_cases": 16,
+    "includes_all_gold_defects_found_this_pass": true,
+    "includes_the_one_harness_bug_found_this_pass": true
+  },
+  "conclusion": "16 cases manually audited (up from 13). All 4 prior findings preserved (2 gold defects, 1 harness bug, all in the original hardening pass) plus 1 new REAL evaluator defect (F4, temporal/status false-contradiction inference) found and fixed this zero-caveat pass, with full regression re-verification (not just the affected case) confirming zero collateral damage to the 36 original + 20 v2 cases that already passed. Two fresh, clean, blind held-out cases (P7V3-HELD2-S/C) both passed, replacing the statistical evidence lost to the 2 invalid-gold misses in the original 12-case fresh_heldout_supplement (which remains preserved, unmodified, and unrerun)."
+}

@@ -1048,6 +1048,43 @@
       "ctl_012_status": "CLOSED",
       "ctl_011_status": "OPEN - actively reconfirmed environment blocker (no 2nd provider credential; huggingface.co denied by egress policy)",
       "phase_7_closure_status": "NOT CLOSED - remains open on the independent-evaluator requirement per the governing directive's own rule"
+    },
+    "zero_caveat_pass_addendum": {
+      "audit_doc": "docs/v2/PHASE7_FINAL_GATE_AUDIT.md (Addendum 2: caveat resolution matrix)",
+      "items_closed": 16,
+      "items_blocked_external": 2,
+      "benchmark_final": {
+        "total": 72,
+        "development": 41,
+        "validation": 8,
+        "phase7_heldout_original": 9,
+        "fresh_heldout_supplement": 12,
+        "fresh_heldout_supplement_2": 2
+      },
+      "multi_source_count": 6,
+      "unsupported_label_count": 12,
+      "system_eval_final": {
+        "answers": 20,
+        "claims": 66,
+        "supported": 66,
+        "fully_grounded_rate": "19/19",
+        "artifact": "artifacts/v2/phase7_phase6_system_evaluation_v3.json"
+      },
+      "new_finding_F4": "temporal/status-inference false-contradiction defect in Candidate B, found+fixed+regression-verified this pass",
+      "fresh_heldout_supplement_2": {
+        "n": 2,
+        "correct": 2,
+        "accuracy": 1.0,
+        "note": "replaces statistical evidence lost to the 2 invalid-gold misses in the original 12-case supplement, which remains preserved unmodified"
+      },
+      "ctl_011_status": "OPEN - actively re-confirmed blocked this pass; exact remedy in docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md",
+      "ctl_012_status": "CLOSED (unchanged from hardening pass)",
+      "final_regression": {
+        "passed": 418,
+        "failed": 0,
+        "skipped": 7
+      },
+      "phase_7_closure_status": "ENGINEERING COMPLETE EXCEPT FOR CTL-011 - NOT closed, NOT frozen"
     }
   }
 }

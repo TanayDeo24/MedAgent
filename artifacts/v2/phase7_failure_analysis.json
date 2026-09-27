@@ -62,9 +62,21 @@
       "fix": "normalize extracted numeric tokens to their float value before set comparison",
       "regression_check": "all 7 grounding_eval_deterministic tests pass; does not affect Candidate B (selected) at all, since Candidate B never calls this function",
       "status": "FIXED - does not change the frozen candidate selection decision (Candidate B remains selected regardless)"
+    },
+    {
+      "id": "F4",
+      "category": "FALSE_CONTRADICTION (temporal/status inference)",
+      "root_cause": "REAL, IN-SCOPE EVALUATOR DEFECT (zero-caveat pass): Candidate B's prompt (v2) still let the judge infer CONTRADICTED from a trial's status field via outside-domain reasoning ('a RECRUITING trial cannot have reported results yet'), for a claim asserting a response-rate result the Evidence's own fields (status/phase/conditions/interventions/sponsor/enrollment/dates) never mention at all. Per the contract, CONTRADICTED requires the Evidence's own stated content to be the source of the conflict - 'RECRUITING' never states 'no results have been reported'; that is an inference from general knowledge of how trials work, the same forbidden category F1 already targeted for a different scenario (added assertions), now recurring for a temporal/status scenario the F1 fix did not cover.",
+      "cases_affected": [
+        "P7V3-MEL-U (zero-caveat pass, development split)"
+      ],
+      "detection": "development-split case added during the zero-caveat hardening pass, predicted CONTRADICTED instead of gold UNSUPPORTED",
+      "fix": "grounding_eval/judge.py's _SYSTEM_PROMPT CRITICAL DISTINCTION section was extended with an explicit temporal/status-inference example forbidding exactly this class of reasoning.",
+      "regression_check": "Full re-verification after the fix, ALL on the unchanged frozen gold: original 22/22 dev, 5/5 validation, 9/9 held-out (all re-confirmed, not assumed); new v2 20/20 dev+validation (re-confirmed); new v3 case itself now correct (unsupported). No case that previously passed regressed.",
+      "status": "FIXED, verified on fresh full re-run of every non-spent split"
     }
   ],
-  "gold_defects_found": "NONE - no gold-authoring defect was found in the Phase-7 claim-level benchmark (all 36 cases' gold labels were confirmed correct by direct re-inspection during failure triage above; both real failures traced to evaluator code, not gold).",
+  "gold_defects_found": "THREE found and handled this session (all in newly-authored zero-caveat/hardening-pass material, none in the original 36-case benchmark): P7V2-BL2 (fixed pre-freeze, development split), P7V2-BT3-U and P7V2-MI4-S (found post-hoc in the FROZEN fresh_heldout_supplement - NOT corrected in place per the frozen-gold rule; reported as misses with root cause documented instead, exactly like Phase 6's P6-H2 precedent). A candidate replacement claim for P7V3-MEL-U was also caught and rejected by gold audit BEFORE being used (see its case comment in the v3 case file) - the gold audit process is catching real defects, not rubber-stamping.",
   "overall_hard_gate_status": {
     "unknown_evidence_id_in_evaluation_output": 0,
     "fabricated_evidence_id": 0,

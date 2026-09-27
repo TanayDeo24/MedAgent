@@ -109,3 +109,57 @@ being closed by this hardening pass.** It is reported as ENGINEERING
 COMPLETE ON EVERY DIMENSION THIS ENVIRONMENT CAN RESOLVE, with the
 independent-evaluator requirement recorded as a genuine, actively-tested
 environment blocker (CTL-011, still OPEN) rather than a resolved item.
+
+## Addendum 2: Phase 7 zero-caveat closure review
+
+A second follow-up directive required every remaining avoidable shortfall
+from the hardening pass to be either fully resolved or proven a genuine
+external blocker with exact closure criteria. Full audit:
+`docs/v2/PHASE7_HARDENING_AUDIT.md` (issue table) plus this matrix.
+
+### Final caveat resolution matrix
+
+| # | Issue | Original status | Final status | Evidence | Classification |
+|---|---|---|---|---|---|
+| 1 | Benchmark size | 36 cases | 72 cases | `artifacts/v2/phase7_benchmark_expansion_manifest.json` | **CLOSED** |
+| 2 | Label balance | S10/P10/U8/C8 | S27/P14/U12/C19 (all >=12) | same artifact | **CLOSED** |
+| 3 | Multi-source count | 1, then 5 | **6** (target met) | `P7V3-MS6-S` added | **CLOSED** |
+| 4 | Candidate-A fairness | "deliberately weak" | v2 hardened (entity + structured-field checks), v1 preserved | `artifacts/v2/phase7_validation_results_v2.json` | **CLOSED** |
+| 5 | Candidate-C numeric defect | asymmetric boundary-regex bug | identifier-masking + field-aware phase normalization | 11 regression tests, all pass | **CLOSED** |
+| 6 | Independent evaluator | not built | actively re-verified: no 2nd provider credential, huggingface.co denied, self-judging rejected as contaminated | `docs/v2/PHASE7_INDEPENDENT_EVALUATOR_SETUP.md` | **BLOCKED (external)** - exact remedy documented |
+| 7 | Same-model-family caveat | present | present, unavoidable while #6 is blocked | same doc | **BLOCKED (external)**, consequence of #6 |
+| 8 | Original held-out | 9/9 | unchanged, preserved | `artifacts/v2/phase7_heldout_results.json` | **CLOSED** (already was) |
+| 9 | Fresh held-out supplement gold defects | 10/12, 2 misses = gold defects | original preserved as-run (10/12); 2-case REPLACEMENT supplement run blind, 2/2 | `artifacts/v2/phase7_heldout_supplement_2_results.json` | **CLOSED** (statistical evidence replaced, nothing retroactively altered) |
+| 10 | Expanded system evaluation | 16 answers | **20 answers**, 66 claims, 100% supported | `artifacts/v2/phase7_phase6_system_evaluation_v3.json` | **CLOSED** |
+| 11 | Evaluator token measurement | not measured | real measured tokens (prompt/completion/total) | `artifacts/v2/phase7_performance_v2.json` | **CLOSED** |
+| 12 | Evaluator cost measurement | not measured | real computed USD cost, sourced pricing | same artifact | **CLOSED** |
+| 13 | Provider vs rate-limit latency | conflated | decomposed: rate_limit_wait_ms / provider_call_ms / parsing_validation_ms / end_to_end_ms | same artifact | **CLOSED** |
+| 14 | Test-count discrepancy | "31" vs a stray "21" in chat prose | confirmed always 31 pre-hardening (7+7+17); no file was ever wrong | `docs/v2/PHASE7_HARDENING_AUDIT.md` #15 | **CLOSED** (was never a real file defect) |
+| 15 | Harness scratch-script bug | Q5 spurious 2/2 unsupported | root-caused to a scratch evidence-dict collision, NOT Phase 6 / NOT Candidate B; fixed, re-verified | `artifacts/v2/phase7_phase6_system_evaluation_v2.json` | **CLOSED** |
+| 16 | Manual audit coverage | 5, then 13 | **16 cases**, all labels/sources + every real anomaly this session found | `artifacts/v2/phase7_manual_audit_v3.json` | **CLOSED** |
+| 17 | CTL-011 | OPEN | actively re-confirmed OPEN this pass, exact remedy recorded | `docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md` | **BLOCKED (external)** |
+| 18 | CTL-012 | OPEN | CLOSED in the hardening pass, reconfirmed still closed (no regression) | same doc | **CLOSED** |
+
+**New finding this pass (not in the original 18):** F4, a temporal/status-
+inference false-contradiction defect in Candidate B's prompt, found via
+the new UNSUPPORTED case added to resolve item #2, fixed, and the fix
+re-verified against the FULL original 36-case benchmark plus the
+hardening-pass's 20 cases with zero regressions - not just the one
+affected case. See `artifacts/v2/phase7_failure_analysis.json` finding F4.
+
+### Net result
+
+**16 of 18** items are **CLOSED** with real, measured evidence. **2 of
+18** (#6/#7, and their consequence) are **BLOCKED (external)** - a
+genuinely independent evaluator cannot be built in this cloud session
+without a credential or network access this environment does not have,
+and this was actively re-verified (not re-asserted from memory) in this
+pass, including deliberately rejecting a tempting-but-invalid shortcut
+(using this agent itself as judge, which would be contaminated by having
+authored the gold labels).
+
+Per the zero-caveat directive's own closure rule: Phase 7 may only be
+called CLOSED if, in addition to every other item, "the Phase-7 contract's
+independence requirement is satisfied." It is not. Phase 7 is therefore:
+
+**ENGINEERING COMPLETE EXCEPT FOR CTL-011** - not frozen, not closed.
