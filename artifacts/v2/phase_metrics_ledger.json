@@ -1,5 +1,5 @@
 {
-  "ledger_version": "1.3.0",
+  "ledger_version": "1.4.0",
   "generated_at": "2026-09-27",
   "purpose": "Authoritative, artifact-traced before/after metric record for resume/report use. Every value recomputed directly from raw source artifacts at ledger-freeze time, not copied from prior prose.",
   "phases_recorded": [
@@ -8,7 +8,8 @@
     "phase_4_heterogeneous_retrieval",
     "phase_5_evidence_provenance",
     "phase_6_grounded_generation",
-    "phase_7_grounding_evaluation"
+    "phase_7_grounding_evaluation",
+    "phase_8_local_closure_pass"
   ],
   "phase_4_heterogeneous_retrieval": {
     "final_winner": {
@@ -1339,5 +1340,53 @@
       "final_regression_after_reopening": "506 passed, 0 failed, 7 skipped",
       "phase_8_reopened_then_closed": true
     }
+  },
+  "phase_8_local_closure_pass": {
+    "status": "CTL-013,014,015,017(narrow),018,020 CLOSED; CTL-019 re-measured/disclosed; CTL-016 PARTIALLY CLOSED",
+    "session": "medagent-v2-phase8-local-verification branch, local machine, later session",
+    "baseline_reconfirmed": "main@ac796c28f06a8e20d6c92af032088d6ab172c205, pytest tests/ -q -> 506 passed, 0 failed, 7 skipped",
+    "method": "8 real end-to-end MedAgent(research_loop=True).run() queries + 3 safely-injected real-fault-class cases, zero mocking, real network to PubMed/ClinicalTrials.gov/ChEMBL, real Cerebras+NVIDIA calls",
+    "live_metrics": {
+      "real_pubmed_followup_rounds": 3,
+      "real_ct_records_distinct_nct_ids": 13,
+      "real_chembl_records_distinct_ids": 5,
+      "chembl_expected_skip_path_exercised_live": true,
+      "fabricated_or_invalid_evidence_ids": 0,
+      "infinite_loops": 0,
+      "mean_loops_per_query_n8": 0.75,
+      "unnecessary_followup_rate": 0.0,
+      "productive_followup_rate": 1.0,
+      "fault_classes_safely_handled": 3,
+      "fault_classes_tested": [
+        "timeout",
+        "429",
+        "5xx_all_three_sources_simultaneously"
+      ]
+    },
+    "defects_found": [
+      {
+        "defect_id": "PHASE8-DEFECT-002",
+        "summary": "state['research_stop_reason'] written only inside a LangGraph conditional-edge routing function; LangGraph never threads that mutation into graph.invoke()'s returned state - every full-graph run returned research_stop_reason=None regardless of the true stop reason",
+        "fix": "agent/nodes.py: finalize_research_answer_node now recomputes the value via the same pure decide_stop_reason inputs, only when not already set",
+        "regression_tests_added": 1,
+        "regression_tests_corrected": 3,
+        "full_regression_after_fix": "507 passed, 0 failed, 7 skipped"
+      }
+    ],
+    "phase_10_protection_reconfirmed": true,
+    "phase_9_blocked": false,
+    "residual_non_blocking_debt": "CTL-016's 3-round live case not organically reproduced this pass; underlying code independently covered offline (3 pre-existing unit tests + 1 new end-to-end regression test)",
+    "artifacts": [
+      "docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md",
+      "artifacts/v2/phase8_live_pubmed_verification.json",
+      "artifacts/v2/phase8_live_clinicaltrials_verification.json",
+      "artifacts/v2/phase8_live_chembl_verification.json",
+      "artifacts/v2/phase8_live_multi_iteration_verification.json",
+      "artifacts/v2/phase8_live_fault_verification.json",
+      "artifacts/v2/phase8_live_grounding_regression.json",
+      "artifacts/v2/phase8_live_metrics.json",
+      "artifacts/v2/phase8_fresh_multisource_validation.json",
+      "artifacts/v2/phase8_local_verification_defect_002.json"
+    ]
   }
 }

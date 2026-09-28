@@ -1,0 +1,56 @@
+{
+  "artifact_name": "phase8_live_fault_verification",
+  "ctl_id": "CTL-017",
+  "purpose": "Actual network timeout/retry/429/5xx behavior under the research loop - narrowly scoped to the research loop's own bounded response to real fault classes, not general Phase-9 reliability/performance engineering.",
+  "session": "medagent-v2-phase8-local-verification (local machine, this session)",
+  "method": "MedAgent(research_loop=True).run(query), full graph.invoke(), real Cerebras/NVIDIA calls. The three biomedical tool domains (eutils.ncbi.nlm.nih.gov, clinicaltrials.gov, www.ebi.ac.uk) had their HTTP transport intercepted at utils.retry_handler.RetrySession's parent-class request() call (requests.Session.request), filtered by URL so only those three domains are affected - Cerebras/NVIDIA (also requests-based) pass through unmodified. This reproduces each specific fault class (timeout, 429, 5xx) safely, without sending abusive/excessive traffic to the real public APIs, per the governing directive's explicit allowance for 'safely simulated-at-the-network-boundary fault injection.' RetrySession's own real retry/backoff logic executes unmodified and for real against the injected fault.",
+  "pass_criterion_verbatim": "all three fault classes observed, correctly categorized, and the research loop terminates safely (never fabricates, never loops past its bounds) in each case.",
+  "important_correction_to_ledger_wording": "The ledger's CTL-017 text describes Phase 3's tool_call_history/error_category as distinguishing 'timeout vs. 429 vs. 5xx vs. malformed response.' Verified against the actual code (agent/nodes.py): error_category only distinguishes registry_invalid vs internal_error vs tool_error (a single flat bucket for every HTTP-layer failure, whatever the specific status/exception). The underlying human-readable error STRING does distinguish the fault class (e.g. 'API request timed out', 'API returned an error: 429 injected'), and the LOOP's bounded response (consecutive_failure_rounds, safe stop, no fabrication) is correct regardless of which specific fault occurred - but error_category itself is not fault-class-granular. This is a real, minor documentation correction, not a functional defect (the loop never needed fault-class granularity to behave safely) - noted here rather than silently accepted.",
+  "cases": {
+    "timeout": {
+      "query": "What does the literature say about vosoritide in achondroplasia growth outcomes?",
+      "injected_fault": "requests.exceptions.Timeout raised on every call to eutils.ncbi.nlm.nih.gov",
+      "real_retry_backoff_observed": "3 retries with real exponential-jitter backoff (0.7-0.99s, 1.2-1.5s, 2.5-2.6s) before RetrySession gives up after 4 total attempts - utils/retry_handler.py's real, unmodified logic",
+      "research_consecutive_failure_rounds": 1,
+      "final_evidence_count": 10,
+      "research_stop_reason": "safe_abstention",
+      "fabricated_evidence": 0,
+      "infinite_loop": false,
+      "pass": true
+    },
+    "429": {
+      "query": "What does the literature say about elranatamab in relapsed multiple myeloma?",
+      "injected_fault": "HTTP 429 on every call to eutils.ncbi.nlm.nih.gov",
+      "real_retry_backoff_observed": "3 retries (0.8-0.9s, 1.4-1.6s, 2.6-3.9s) before giving up after 4 attempts",
+      "research_consecutive_failure_rounds": 0,
+      "final_evidence_count": 10,
+      "research_stop_reason": "sufficient_evidence",
+      "fabricated_evidence": 0,
+      "infinite_loop": false,
+      "pass": true
+    },
+    "5xx": {
+      "query": "What does the literature say about tarlatamab in small cell lung cancer?",
+      "injected_fault": "HTTP 503 on every call to eutils.ncbi.nlm.nih.gov, clinicaltrials.gov, AND www.ebi.ac.uk simultaneously (all 3 source networks down at once)",
+      "real_retry_backoff_observed": "each of the 3 tools independently retried 3x with real exponential-jitter backoff before giving up - 9 total real retry attempts across the 3 tools, all correctly bounded, no runaway retry storm",
+      "research_consecutive_failure_rounds": 1,
+      "final_evidence_count": 10,
+      "research_stop_reason": "no_productive_action",
+      "fabricated_evidence": 0,
+      "infinite_loop": false,
+      "pass": true,
+      "note": "The hardest case (all 3 sources down simultaneously) still terminated safely and quickly, with 0 fabricated Evidence and a correctly bounded stop - the strongest single piece of evidence in this pass for the loop's fault-tolerance."
+    }
+  },
+  "pre_fix_evidence_also_on_record": "This exact 3-case fault matrix was also run once BEFORE the PHASE8-DEFECT-002 fix landed (artifacts preserved at live_results/prefix_defect_evidence/ in the session scratchpad, referenced in phase8_local_verification_defect_002.json) - that earlier run is what first co-confirmed the defect (alongside LOCAL-01) under real injected-fault conditions specifically, showing the loop's log-level decisions were always correct even when the final state readback was not.",
+  "summary": {
+    "all_three_fault_classes_observed": true,
+    "all_three_correctly_categorized_at_the_error_string_level": true,
+    "error_category_field_granularity_caveat": "flat 'tool_error' bucket, not per-fault-class - documented above, not a defect",
+    "loop_always_terminated_safely": true,
+    "zero_fabricated_evidence_across_all_3_cases": true,
+    "zero_infinite_loops": true,
+    "pass_criterion_met": true,
+    "phase_9_scope_boundary_respected": "no retry/backoff tuning, no concurrency/load testing performed here - only correctness of the existing frozen behavior under real injected faults, per CTL-017's own 'Phase 9 owns the SYSTEM-WIDE fault matrix; this item is scoped narrowly' text."
+  }
+}

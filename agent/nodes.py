@@ -1527,9 +1527,25 @@ def should_continue_research_loop(state: AgentState) -> str:
     """Conditional-edge decision function for the Phase-8 research loop -
     replaces the old confidence-threshold routing
     (agent.graph.should_continue_research) for this loop only. Computes a
-    StopReason via research.loop_control.decide_stop_reason and stores it
-    on `state["research_stop_reason"]` BEFORE routing, so the decision is
-    always inspectable regardless of which branch is taken.
+    StopReason via research.loop_control.decide_stop_reason to decide
+    routing ("continue"/"stop").
+
+    PHASE8-DEFECT-002 (docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md): this
+    function also used to write the result to `state["research_stop_reason"]`
+    directly - reproducibly confirmed, via a genuine local live run and a
+    mocked repro, that LangGraph does NOT thread a mutation made inside a
+    conditional-edge routing function (registered via
+    `add_conditional_edges`, never a node) into the state object
+    `graph.invoke()` actually returns, even though the SAME mutation is
+    correctly visible for routing within this same call and in the log
+    line immediately below. `research_stop_reason` therefore came back
+    `None` to every external caller of a full graph run, on EVERY stop
+    reason, silently, despite the routing decision itself always being
+    correct. Writing it is now `finalize_research_answer_node`'s job
+    instead (a real node on the "stop" path) - see its docstring. This
+    function no longer writes `state["research_stop_reason"]` at all, to
+    avoid the misleading appearance of two write sites for the same
+    field.
 
     Returns "continue" or "stop"."""
 
@@ -1546,7 +1562,6 @@ def should_continue_research_loop(state: AgentState) -> str:
     )
 
     if stop_reason is not None:
-        state["research_stop_reason"] = stop_reason.value
         logger.info(f"[RESEARCH LOOP] Stopping: {stop_reason.value}")
         return "stop"
 
@@ -1705,7 +1720,44 @@ def finalize_research_answer_node(state: AgentState) -> AgentState:
     functions. General and gap-type-keyed: contains no case-specific
     text/keyword, never touches Evidence, never re-invokes the generator
     or the judge, never removes a claim's citations, and is a strict no-op
-    whenever no claim-tied gap remains (the common case)."""
+    whenever no claim-tied gap remains (the common case).
+
+    PHASE8-DEFECT-002 fix (docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md):
+    this node - not `should_continue_research_loop`, a conditional-edge
+    routing function whose state mutations LangGraph does not thread into
+    `graph.invoke()`'s returned state - is now the single place
+    `state["research_stop_reason"]` is written. This node is reached ONLY
+    via the "stop" edge, using the identical pure `decide_stop_reason`
+    inputs `should_continue_research_loop` just used for routing (mirrors
+    the existing `_plan_next_actions` twice-invoked, never-stashed pattern
+    already used for the research-action plan itself), so the recomputed
+    value is guaranteed identical to the routing decision - never a second,
+    possibly-diverging decision.
+
+    Only recomputes when `state["research_stop_reason"]` is not already
+    set: a real graph run always reaches this node with it unset (per the
+    defect above), but a caller that already supplies one (e.g. a unit
+    test isolating this node's own claim-caveat logic from the unrelated
+    stop-reason decision, or any future caller with its own reason to
+    pre-set it) is never overridden or required to also supply every
+    `_plan_next_actions` input (`query`, `research_actions`, etc.)."""
+
+    if state.get("research_stop_reason") is None:
+        iteration = state.get("research_iteration", 0)
+        recomputed_gaps, planned = _plan_next_actions(state, iteration + 1)
+        recomputed_stop_reason = decide_stop_reason(
+            gaps=recomputed_gaps,
+            planned_actions=planned,
+            iteration=iteration,
+            tool_calls_used=state.get("research_tool_calls_used", 0),
+            consecutive_failure_rounds=state.get("research_consecutive_failure_rounds", 0),
+            attempted_no_evidence_before=state.get("research_attempted_no_evidence", False),
+        )
+        # This node is only reached via the "stop" edge, so decide_stop_reason
+        # (an identical, pure recomputation) always returns non-None here;
+        # the `is not None` guard is defensive, not expected to ever be False.
+        if recomputed_stop_reason is not None:
+            state["research_stop_reason"] = recomputed_stop_reason.value
 
     answer = state.get("grounded_answer")
     gaps = state.get("research_gaps") or []

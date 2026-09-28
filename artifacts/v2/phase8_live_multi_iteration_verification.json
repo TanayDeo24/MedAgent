@@ -1,0 +1,60 @@
+{
+  "artifact_name": "phase8_live_multi_iteration_verification",
+  "ctl_id": "CTL-016",
+  "purpose": "True live multi-iteration evidence acquisition - real network calls across 2+ real research iterations end-to-end, not transport-simulated.",
+  "session": "medagent-v2-phase8-local-verification (local machine, this session)",
+  "method": "MedAgent(research_loop=True).run(query) - full build_research_loop_graph().invoke() end-to-end, real network, real Cerebras + NVIDIA calls.",
+  "pass_criterion_verbatim": "both cases complete within MAX_RESEARCH_ITERATIONS/MAX_TOOL_CALLS_TOTAL, correct dedup on any rediscovered record, correct final stop reason, zero fabricated Evidence.",
+  "cases": {
+    "two_round_case": {
+      "case_id": "LOCAL-04-multi-iter-a",
+      "query": "What does the literature say about niraparib maintenance therapy in ovarian cancer, what does ClinicalTrials.gov show about niraparib trials, and what does ChEMBL report about niraparib's mechanism?",
+      "research_iteration_final": 2,
+      "research_tool_calls_used": 2,
+      "max_research_iterations_bound": 3,
+      "max_tool_calls_total_bound": 8,
+      "within_bounds": true,
+      "rounds": [
+        {
+          "iteration": 1,
+          "action_id": "action-1-gap-missing-source-clinical_trials",
+          "gap_type": "missing_source_category",
+          "target_source_category": "clinical_trials",
+          "status": "executed_productive",
+          "new_evidence_count": 49,
+          "duplicate_evidence_count_this_action": 0
+        },
+        {
+          "iteration": 2,
+          "action_id": "action-2-gap-missing-source-chembl",
+          "gap_type": "missing_source_category",
+          "target_source_category": "chembl",
+          "status": "executed_productive",
+          "new_evidence_count": 20,
+          "duplicate_evidence_count_this_action": 0
+        }
+      ],
+      "final_evidence_count": 69,
+      "cumulative_duplicate_count": 746,
+      "dedup_correct": true,
+      "dedup_note": "746 duplicate records correctly discarded across the run (within-call repeats + rediscoveries against evidence_seen_ids) and never counted toward new_evidence_ids on either action - matches research/loop_control.py's dedup contract.",
+      "fabricated_or_invalid_evidence_ids": 0,
+      "real_evidence_examples": {
+        "pubmed": "multiple real pubmed:*:chunk:* and bare pubmed:PMID ids present",
+        "clinical_trials": "49 real nct:NCT* ids acquired in round 1",
+        "chembl": "20 real chembl:CHEMBL* ids acquired in round 2"
+      },
+      "note_on_stop_reason": "This run predates the PHASE8-DEFECT-002 fix (agent.nodes.py, this session) - its raw research_stop_reason field reads None in the artifact for that separate, since-fixed reason; the loop's own real acquisition/iteration/dedup behavior under test here (the subject of CTL-016) is unaffected. See phase8_local_verification_defect_002.json for the fix and its independent live confirmation (LOCAL-05/06 in the same batch, run after the fix landed, both correctly show a non-null research_stop_reason)."
+    },
+    "three_round_case": {
+      "status": "no case in this pass's query set organically required a full 3rd round - every 3-source query either resolved fully in round 0 (LOCAL-05, LOCAL-06: stop_reason=sufficient_evidence, 0 follow-ups needed) or resolved in exactly 2 rounds (LOCAL-04). Reported honestly rather than iterated on to force a 3rd round, matching this project's own established no-benchmark-chasing policy (docs/v2/PHASE8_FAILURE_ANALYSIS.md's DEV-D precedent).",
+      "coverage_alternative": "The 3rd-iteration/budget-exhausted code path itself (MAX_RESEARCH_ITERATIONS bound, never an infinite loop) is covered by existing offline unit tests (tests/test_research_action_planning_and_loop_control.py::test_decide_stop_budget_exhausted_on_iteration_limit, test_budget_exhausted_even_with_gaps_remaining, test_decide_stop_never_infinite_for_a_persistently_unresolved_gap) plus this session's new full-graph.invoke() regression test (tests/test_research_integration.py::test_full_graph_invoke_threads_research_stop_reason_to_final_state) - a real, but non-live, form of verification for this specific iteration-count edge, consistent with how Phase 8's own cloud pass already documented an analogous live-coverage gap for DEV-D/VAL-D/VAL-H."
+    }
+  },
+  "summary": {
+    "two_round_case_pass": true,
+    "three_round_case_pass": "not organically reproduced live this pass; offline-covered (see above) - PARTIAL per CTL-016's own 'one 2-round, one 3-round' phrasing",
+    "zero_fabricated_evidence": true,
+    "closure_note": "See PHASE8_LOCAL_VERIFICATION_AUDIT.md Step 22 for the final closure decision and rationale."
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "artifact_name": "phase8_live_metrics",
+  "ctl_id": "CTL-019",
+  "purpose": "Re-measurement of Phase-8 loop-behavior metrics under live, non-transport-simulated acquisition, for direct comparison against the DEV/Validation Run 1/Validation Run 2 numbers already on record (all of which used transport-simulated follow-up acquisition).",
+  "session": "medagent-v2-phase8-local-verification (local machine, this session)",
+  "sample": {
+    "n": 8,
+    "case_ids": [
+      "LOCAL-01-pubmed-gap", "LOCAL-02-ct-gap", "LOCAL-03-chembl-gap",
+      "LOCAL-04-multi-iter-a", "LOCAL-05-multi-iter-b", "LOCAL-06-freshmultisource-a",
+      "LOCAL-07-freshmultisource-b", "LOCAL-08-unresolvable"
+    ],
+    "method": "MedAgent(research_loop=True).run(query), full graph.invoke(), 100% live network + live Cerebras/NVIDIA calls - zero transport simulation, zero mocking.",
+    "query_design_note": "Queries were designed (not cherry-picked post-hoc) to plausibly exercise each source category and follow-up shape, following this project's own established pattern (docs/v2/PHASE8_FAILURE_ANALYSIS.md's DEV-D precedent: honest reporting of what actually happened, not iteration to force an outcome). 3 of 8 cases (LOCAL-05/06/07) resolved at round 0 with sufficient_evidence - a real, unforced outcome, not evidence of a broken loop."
+  },
+  "metrics": {
+    "mean_loops_per_query": {
+      "cloud_dev": 0.5,
+      "cloud_val2": "not directly recorded in phase8_validation_run2_metrics.json as this exact metric name - see that artifact for its own metric set",
+      "local_live_n8": 0.75,
+      "comparison": "comparable order of magnitude to the cloud DEV figure (0.5, n=4); local sample skews slightly higher, consistent with the local query set deliberately including 2 explicit multi-iteration attempts (LOCAL-04, LOCAL-05) not present in DEV's 4-case set",
+      "classification": "corroborated (same order of magnitude, no material contradiction) - n too small on both sides for a statistically powered comparison"
+    },
+    "unnecessary_follow_up_rate": {
+      "local_live_n8": "0/6 actions unproductive = 0.0 (6/6 real follow-up actions taken were executed_productive)",
+      "cloud_reference": "0.0 in DEV (phase_metrics_ledger.json: unnecessary_loop_rate=0.0)",
+      "classification": "corroborated"
+    },
+    "productive_follow_up_rate": {
+      "local_live_n8": "6/6 = 1.0 (every follow-up action taken acquired new, unique real Evidence)",
+      "classification": "consistent with cloud's loop_termination_correctness=4/4 in DEV - no local contradiction, though this specific rate name was not reported identically in cloud artifacts"
+    },
+    "fabricated_or_invalid_evidence_ids": {
+      "local_live_n8": 0,
+      "cloud_dev": 0,
+      "cloud_val1": 0,
+      "cloud_val2": 0,
+      "classification": "corroborated - unanimous across every cloud and local sample to date"
+    },
+    "infinite_loops": {
+      "local_live_n8": 0,
+      "cloud_all_samples": 0,
+      "classification": "corroborated"
+    },
+    "real_world_result_quality_noise": {
+      "local_live_observation": "LOCAL-01 surfaced a real, previously-unobserved live-only interaction: grounded_generation_node's hard citation gate correctly rejected an LLM-generated citation to a bare 'pubmed:PMID' form when only a chunk-suffixed 'pubmed:PMID:chunk:N' form existed in Evidence[], under real mixed RAG-chunk + live-article PubMed Evidence. This is exactly the class of 'real-world result quality/noise' effect CTL-019 predicted transport-simulated metrics could not surface - the hard gate behaved safely (no fabricated answer), but this citation-ID-format interaction is a genuine new data point for Phase-9/11 quality work.",
+      "classification": "new local-only finding, not present in any cloud sample - materially informative, not merely a re-measurement"
+    }
+  },
+  "summary": {
+    "corroborated_metrics": ["unnecessary_follow_up_rate", "fabricated_or_invalid_evidence_ids", "infinite_loops", "mean_loops_per_query (order of magnitude)"],
+    "materially_different_metrics": "none identified",
+    "non_comparable_metrics": "productive_follow_up_rate not reported under an identical name in cloud artifacts - directionally consistent, not a like-for-like re-measurement",
+    "new_findings_not_in_cloud_sample": ["the pubmed:PMID vs pubmed:PMID:chunk:N citation-ID-format interaction (LOCAL-01)"],
+    "insufficient_local_n_for": "any claim beyond directional/order-of-magnitude comparison - n=8 local vs. n=4/8/6 cloud sub-samples are all too small for statistical significance",
+    "closure_note": "Per CTL-019's own text, this is 'not a pass/fail gate itself - a required re-measurement before any Phase-8 metric is cited as production-representative.' This re-measurement is now on record: no cloud metric is materially contradicted, and no cloud metric should yet be cited as production-representative on the strength of either sample (both are small-n). Full production-representative re-measurement at Phase-9/11 scale remains future work, as CTL-019 itself anticipates ('required closure phase: before Phase 11 cites any Phase-8 number as a product-facing claim')."
+  }
+}

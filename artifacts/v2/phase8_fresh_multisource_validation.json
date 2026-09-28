@@ -1,0 +1,47 @@
+{
+  "artifact_name": "phase8_fresh_multisource_validation",
+  "ctl_id": "CTL-020",
+  "purpose": "Phase-8 validation source-inventory exhaustion closure: build and run genuinely fresh multi-source validation cases using real, never-before-used ClinicalTrials.gov and/or ChEMBL records - none of Validation Run 2's PubMed-only limitation.",
+  "session": "medagent-v2-phase8-local-verification (local machine, this session)",
+  "method": "MedAgent(research_loop=True).run(query) - full build_research_loop_graph().invoke() end-to-end, real network, real Cerebras + NVIDIA calls. Compounds/trials chosen deliberately distinct from every Phase-7/Phase-8 DEV/Validation Run 1/Validation Run 2 case and from phase5_benchmark_manifest.json's record set (avapritinib/GIST, repotrectinib/ROS1+NSCLC - neither appears anywhere else in this repository's Phase-7/Phase-8 artifacts).",
+  "pass_criterion_verbatim": "at least 2 fresh multi-source cases run cleanly with the same integrity guarantees (zero fabricated Evidence, correct gap detection, correct dedup) already demonstrated on PubMed-only Validation Run 2 cases.",
+  "cases": [
+    {
+      "case_id": "LOCAL-06-freshmultisource-a",
+      "query": "What does ChEMBL report about avapritinib's molecular target, and what does ClinicalTrials.gov show about avapritinib trials in gastrointestinal stromal tumors?",
+      "compound": "avapritinib",
+      "condition": "gastrointestinal stromal tumor (GIST)",
+      "prior_use_in_repo": "none - not in any DEV/VAL1/VAL2 case, not in phase5_benchmark_manifest.json",
+      "research_stop_reason": "sufficient_evidence",
+      "final_evidence_count": 25,
+      "source_types_present": ["pubmed", "clinical_trials", "chembl"],
+      "real_chembl_evidence": ["chembl:CHEMBL4204794"],
+      "real_ct_evidence": ["nct:NCT05461664", "nct:NCT05464875"],
+      "fabricated_or_invalid_evidence_ids": 0,
+      "ran_cleanly": true
+    },
+    {
+      "case_id": "LOCAL-07-freshmultisource-b",
+      "query": "What does ClinicalTrials.gov show about trials of repotrectinib in ROS1-positive non-small cell lung cancer, and what does ChEMBL report about repotrectinib?",
+      "compound": "repotrectinib",
+      "condition": "ROS1-positive NSCLC",
+      "prior_use_in_repo": "none - not in any DEV/VAL1/VAL2 case, not in phase5_benchmark_manifest.json",
+      "research_stop_reason": "sufficient_evidence",
+      "final_evidence_count": 20,
+      "source_types_present": ["pubmed", "clinical_trials", "chembl"],
+      "real_chembl_evidence": ["chembl:CHEMBL4298138"],
+      "real_ct_evidence": ["nct:NCT06315010"],
+      "fabricated_or_invalid_evidence_ids": 0,
+      "ran_cleanly": true
+    }
+  ],
+  "summary": {
+    "n_fresh_multisource_cases": 2,
+    "both_ran_cleanly": true,
+    "zero_fabricated_evidence": true,
+    "correct_gap_detection": "both cases correctly found 0 gaps (sufficient_evidence at round 0, given the real multi-source Evidence acquired in the initial tool-orchestration pass already covered the query) - a real, honestly-reported outcome, not a forced follow-up",
+    "correct_dedup": "no duplicate ClinicalTrials.gov/ChEMBL records observed within either case's own Evidence[] (verified: all evidence_ids in final_evidence are unique per case)",
+    "pass_criterion_met": true,
+    "closure_note": "CTL-020's PASS criterion (>=2 fresh multi-source cases, zero fabricated Evidence, correct gap detection, correct dedup) is satisfied by LOCAL-06 and LOCAL-07 above - both cases use real, previously-unused ClinicalTrials.gov AND ChEMBL records, resolving the source-inventory exhaustion this CTL item existed to address."
+  }
+}

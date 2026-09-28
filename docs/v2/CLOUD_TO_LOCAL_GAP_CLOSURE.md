@@ -88,14 +88,29 @@ docs/artifacts/code before writing this ledger (see each CTL item's
 | CTL-010 | 6 | Legacy report_generation_node baseline latency/token measurement (needs NVIDIA_API_KEY) | OPEN | NO (see item - informational baseline only, not a Phase-6 blocker) |
 | CTL-011 | 7 | Genuinely independent (distinct-provider) grounding-evaluator validation | **CLOSED** (fresh-supplement pass) - the fresh, pre-registered 8-answer supplement (32 claims, including 3 genuine ChEMBL claims across 2 distinct compounds) plus the surviving 26-claim v3 subset give a combined 58-claim system cross-check with all four source categories represented; B-vs-E raw agreement 57/58≈98.3% pooled (32-claim supplement alone: 31/32≈96.9%), the one disagreement manually adjudicated (E_CORRECT) | N/A - closed (composition explicitly disclosed; this is not a reconstruction of the original 66) |
 | CTL-012 | 7 | Phase-7 evaluator token/cost measurement | **CLOSED** (hardening pass) | N/A - closed |
-| CTL-013 | 8 | Live PubMed iterative-research verification | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
-| CTL-014 | 8 | Live ClinicalTrials.gov iterative-research verification | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
-| CTL-015 | 8 | Live ChEMBL iterative-research verification | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
-| CTL-016 | 8 | True live multi-iteration evidence acquisition (real network, not transport-simulated) | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
-| CTL-017 | 8 | Actual network timeout/retry/429/5xx behavior under the research loop | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | Partially - Phase 3's frozen retry/error handling already covers the mechanism; only genuinely live fault injection is deferred |
-| CTL-018 | 8 | Live grounding/citation regression after real iterative acquisition | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
-| CTL-019 | 8 | Phase-8 metrics currently based on simulated transport (DEV + Validation Runs 1/2) | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES, before any of these numbers are treated as production-representative |
-| CTL-020 | 8 | Phase-8 validation source-inventory exhaustion (no fresh, non-heldout ClinicalTrials.gov or usable ChEMBL record remains in phase5_benchmark_manifest.json) | OPEN | YES (see item) |
+| CTL-013 | 8 | Live PubMed iterative-research verification | **CLOSED** (local-closure pass, `medagent-v2-phase8-local-verification`) - 3 real PubMed follow-up rounds, 24+ real PMIDs, 0 fabricated/invalid IDs; see `docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md` and `artifacts/v2/phase8_live_pubmed_verification.json` | N/A - closed |
+| CTL-014 | 8 | Live ClinicalTrials.gov iterative-research verification | **CLOSED** (local-closure pass) - 4 real CT-gap cases, 13 distinct real NCT ids, 0 fabricated; `artifacts/v2/phase8_live_clinicaltrials_verification.json` | N/A - closed |
+| CTL-015 | 8 | Live ChEMBL iterative-research verification | **CLOSED** (local-closure pass) - 5 real ChEMBL records, expected-skip (no_match) path exercised live, 0 fabricated; `artifacts/v2/phase8_live_chembl_verification.json` | N/A - closed |
+| CTL-016 | 8 | True live multi-iteration evidence acquisition (real network, not transport-simulated) | **PARTIALLY CLOSED** (local-closure pass) - 1 real 2-round case fully verified (zero fabricated Evidence, correct dedup/bounds/stop); no organic 3-round live case this pass (offline-covered instead); `artifacts/v2/phase8_live_multi_iteration_verification.json` | NO - non-blocking, see audit doc STEP 23 |
+| CTL-017 | 8 | Actual network timeout/retry/429/5xx behavior under the research loop | **CLOSED** (narrow scope only, local-closure pass) - all 3 fault classes safely injected at the network boundary, loop always terminated safely, 0 fabricated Evidence; Phase 9 still owns the system-wide fault matrix; `artifacts/v2/phase8_live_fault_verification.json` | NO - Phase 9's own broader matrix unaffected |
+| CTL-018 | 8 | Live grounding/citation regression after real iterative acquisition | **CLOSED** (local-closure pass) - a genuine live-acquired `weakly_supported_fact` gap correctly caveated its tied claim, 6 unrelated claims untouched; `artifacts/v2/phase8_live_grounding_regression.json` | N/A - closed |
+| CTL-019 | 8 | Phase-8 metrics currently based on simulated transport (DEV + Validation Runs 1/2) | **RE-MEASURED, closed for this session's purpose** (local-closure pass) - 8-case live re-measurement, all metrics corroborated, no material contradiction; still not citable as production-representative until a larger-n sample exists (Phase 9/11); `artifacts/v2/phase8_live_metrics.json` | NO - citation-time gate only, not a Phase-8/9 blocker |
+| CTL-020 | 8 | Phase-8 validation source-inventory exhaustion (no fresh, non-heldout ClinicalTrials.gov or usable ChEMBL record remains in phase5_benchmark_manifest.json) | **CLOSED** (local-closure pass) - 2 fresh, never-before-used multi-source cases (avapritinib/GIST, repotrectinib/ROS1+NSCLC) run cleanly, 0 fabricated; `artifacts/v2/phase8_fresh_multisource_validation.json` | N/A - closed |
+
+**Local-closure pass summary (this session, `medagent-v2-phase8-local-verification`
+branch, uncommitted pending human review):** all cloud-session limitations
+above (network egress blocked to all three biomedical domains) do NOT
+reproduce on this local machine - all three services independently
+confirmed reachable, both required LLM-provider credentials present. Every
+CTL-013–020 item above was re-verified against its EXACT pre-existing PASS
+criterion using real, unmocked `MedAgent(research_loop=True).run(query)`
+calls (full `graph.invoke()`, real network, real Cerebras/NVIDIA calls) -
+see `docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md` for the complete
+methodology, per-case evidence, and closure rationale. One new defect
+(PHASE8-DEFECT-002, a LangGraph conditional-edge state-threading issue
+affecting `research_stop_reason`) was discovered via this live verification,
+root-caused, generally fixed, and regression-tested (full suite: 507 passed,
+0 failed, 7 skipped) - see `artifacts/v2/phase8_local_verification_defect_002.json`.
 
 ### CTL-011 — Genuinely independent (distinct-provider) grounding-evaluator validation
 

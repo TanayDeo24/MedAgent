@@ -15,6 +15,7 @@ from unittest.mock import patch
 from agent.graph import build_agent_graph, build_research_loop_graph
 from agent.nodes import (
     evidence_merge_node,
+    finalize_research_answer_node,
     gap_analysis_node,
     research_action_planning_node,
     research_execution_node,
@@ -32,6 +33,7 @@ from evidence.models import (
     make_source_url,
 )
 from generation.models import ClaimType, GenerationMetadata, GroundedAnswer, GroundedClaim
+from generation.validation import GenerationValidationError
 from orchestration.candidate_b_native_tools import CerebrasNativeToolsResult
 from research.loop_control import MAX_RESEARCH_ITERATIONS
 from tools.base_tool import ToolResult
@@ -84,6 +86,16 @@ def test_sufficient_evidence_stops_immediately(monkeypatch):
     state = _base_state(evidence=[ev], grounded_answer=_answer([claim]))
     state = gap_analysis_node(state)
     assert should_continue_research_loop(state) == "stop"
+    # PHASE8-DEFECT-002 (docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md):
+    # should_continue_research_loop is a LangGraph conditional-edge
+    # function - any state mutation made inside it is confirmed (via a
+    # real graph.invoke() run) never to reach graph.invoke()'s returned
+    # state, so it no longer writes state["research_stop_reason"] at all.
+    # finalize_research_answer_node (a real node, reached on the "stop"
+    # edge in the actual graph) is now the single place that field is set -
+    # asserting after calling it too, exactly as the real graph does, is
+    # what actually exercises the fixed mechanism.
+    state = finalize_research_answer_node(state)
     assert state["research_stop_reason"] == "sufficient_evidence"
 
 
@@ -96,6 +108,8 @@ def test_no_evidence_gap_requests_continue_then_safe_abstains():
     state["research_attempted_no_evidence"] = True
     state = gap_analysis_node(state)  # still no evidence
     assert should_continue_research_loop(state) == "stop"
+    # See PHASE8-DEFECT-002 note above.
+    state = finalize_research_answer_node(state)
     assert state["research_stop_reason"] == "safe_abstention"
 
 
@@ -104,6 +118,8 @@ def test_budget_exhausted_even_with_gaps_remaining():
     state = gap_analysis_node(state)
     state["research_iteration"] = MAX_RESEARCH_ITERATIONS
     assert should_continue_research_loop(state) == "stop"
+    # See PHASE8-DEFECT-002 note above.
+    state = finalize_research_answer_node(state)
     assert state["research_stop_reason"] == "budget_exhausted"
 
 
@@ -226,3 +242,70 @@ def test_research_loop_graph_has_no_verification_node():
     node_names = set(graph.get_graph().nodes.keys())
     assert "gap_analysis" in node_names
     assert "verification" not in node_names
+
+
+# --- PHASE8-DEFECT-002 regression (docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md) ---
+#
+# Every test above this point calls individual node functions (and, at
+# most, should_continue_research_loop) directly - never
+# build_research_loop_graph().invoke() end-to-end. That gap in coverage is
+# exactly how PHASE8-DEFECT-002 shipped undetected: a real local live run
+# (MedAgent(research_loop=True).run(...), full graph.invoke()) showed
+# state["research_stop_reason"] always came back None, even though the
+# conditional-edge function that used to set it (should_continue_research_
+# loop) logged the correct value and used it correctly for routing WITHIN
+# that same call. LangGraph does not thread a mutation made inside a
+# conditional-edge routing function into graph.invoke()'s returned state -
+# only node return values are merged. The fix moved the write into
+# finalize_research_answer_node (a real node on the "stop" path). This
+# test is the first in the suite to actually call graph.invoke() and would
+# have caught the regression.
+def test_full_graph_invoke_threads_research_stop_reason_to_final_state(monkeypatch):
+    from nlu.schemas import NLUExtractionResult, ResearchQuery
+
+    def _fake_nlu(query):
+        rq = ResearchQuery(original_query=query, normalized_query=query)
+        return NLUExtractionResult(schema_valid=True, research_query=rq, architecture="mock")
+
+    class _FakeLLMResp:
+        content = '{"key_findings": [], "connections": [], "gaps": [], "completeness_assessment": "n/a"}'
+
+    class _FakeLLM:
+        def invoke(self, *a, **k):
+            return _FakeLLMResp()
+
+    monkeypatch.setattr("nlu.understand_query_with_result", _fake_nlu)
+    monkeypatch.setattr("agent.nodes.get_llm", lambda *a, **k: _FakeLLM())
+    monkeypatch.setattr("agent.nodes.retrieve_passages", lambda *a, **k: [])
+    monkeypatch.setattr("agent.nodes.call_cerebras_native_tools", lambda *a, **k: _mock_cerebras_one_chembl_call())
+    monkeypatch.setattr(
+        "agent.nodes.execute_validated_call",
+        lambda *a, **k: (
+            ToolResult(success=True, data={
+                "chembl_id": "CHEMBL999", "name": "TESTDRUG", "molecule_type": "Small molecule",
+                "mechanism_of_action": "n/a", "max_phase": 4,
+            }, metadata={"timestamp": None}),
+            5.0,
+        ),
+    )
+    # Every generation attempt fails the hard citation gate (deliberately,
+    # to force a real, full run all the way to safe_abstention without
+    # needing a real Evidence/claim fixture that a real LLM would produce) -
+    # this is the exact shape (non-empty Evidence, generation repeatedly
+    # fails, NO_EVIDENCE gap recurs) the live LOCAL-01 run that first
+    # surfaced this defect hit organically.
+    monkeypatch.setattr(
+        "agent.nodes.generate_grounded_answer",
+        lambda *a, **k: (_ for _ in ()).throw(GenerationValidationError("test: injected citation failure")),
+    )
+
+    graph = build_research_loop_graph()
+    state = graph.invoke(
+        create_initial_state(query="test query - full graph regression, no real network/LLM", max_iterations=10),
+        config={"recursion_limit": 50},
+    )
+
+    assert state["research_stop_reason"] == "safe_abstention"
+    assert state["research_attempted_no_evidence"] is True
+    assert state["grounded_answer"] is None
+    assert state["research_iteration"] == 1  # exactly one follow-up, never an infinite loop

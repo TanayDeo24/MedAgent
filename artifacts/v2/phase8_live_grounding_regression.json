@@ -1,0 +1,44 @@
+{
+  "artifact_name": "phase8_live_grounding_regression",
+  "ctl_id": "CTL-018",
+  "purpose": "Live grounding/citation regression after real iterative acquisition - specifically confirm PHASE8-DEFECT-001's fix (finalize_research_answer_node) holds under genuinely live, real-network-acquired Evidence, not just offline/transport-simulated verification.",
+  "session": "medagent-v2-phase8-local-verification (local machine, this session)",
+  "method": "MedAgent(research_loop=True).run(query), full graph.invoke(), real Cerebras generation + real NVIDIA Candidate B grounding-judge calls, real PubMed/ClinicalTrials.gov/ChEMBL acquisition.",
+  "pass_criterion_verbatim": "zero cases where a live-acquired residual gap fails to produce a GroundedClaim.qualifier on its tied claim.",
+  "primary_case": {
+    "case_id": "LOCAL-02-ct-gap",
+    "query": "What does the literature say about lenalidomide in multiple myeloma maintenance therapy, and what does ClinicalTrials.gov show about ongoing lenalidomide maintenance trials?",
+    "real_gap_detected": {
+      "gap_type": "weakly_supported_fact",
+      "related_claim_id": "c-0",
+      "produced_by": "the real, live NVIDIA-backed Candidate B judge (grounding_eval.judge.judge_claim_semantic), scoring claim c-0 against its real live-acquired Evidence"
+    },
+    "follow_up": "a real, live follow-up round (action-1-gap-weak-c-0, executed_productive, tool_names_used=[pubmed, clinical_trials, chembl]) ran, but the gap persisted (a real, honest outcome, not forced)",
+    "final_claim_state": [
+      {"claim_id": "c-0", "qualifier": "not fully confirmed by follow-up research", "tied_to_gap": true},
+      {"claim_id": "c-1", "qualifier": null, "tied_to_gap": false},
+      {"claim_id": "c-2", "qualifier": null, "tied_to_gap": false},
+      {"claim_id": "c-3", "qualifier": null, "tied_to_gap": false},
+      {"claim_id": "c-4", "qualifier": null, "tied_to_gap": false},
+      {"claim_id": "c-5", "qualifier": null, "tied_to_gap": false},
+      {"claim_id": "c-6", "qualifier": null, "tied_to_gap": false}
+    ],
+    "result": "PASS - the exactly-and-only claim tied to the unresolved live gap (c-0) received the correct qualifier ('not fully confirmed by follow-up research'); all 6 unrelated, supported claims were left completely untouched (qualifier=None, original text preserved) - matches finalize_research_answer_node's contract precisely.",
+    "note_on_defect_002_independence": "This case's raw research_stop_reason field predates the PHASE8-DEFECT-002 fix (reads None in the raw artifact for that separate, unrelated reason) - the claim-caveat mechanism under test here does not depend on research_stop_reason's correctness for this outcome (verified: the early-return guard 'stop_reason == \"sufficient_evidence\"' is False whether stop_reason is None or any real non-sufficient_evidence value, and gaps were non-empty here regardless), so this result stands as valid, independent live confirmation of PHASE8-DEFECT-001's fix."
+  },
+  "secondary_case": {
+    "case_id": "CTL017-fault-5xx (fault-injection matrix, CTL-017)",
+    "note": "A real weakly_supported_fact-shaped gap ('gap-weak-c-1') also appeared in the PRE-fix fault-injection run's 5xx case, with the log confirming '[FINALIZE RESEARCH ANSWER] Caveated 1 unresolved claim(s)' fired correctly under live (fault-degraded) acquisition - consistent corroborating evidence, though full claim-level detail was not captured in that script's lighter serialization (see phase8_live_fault_verification.json)."
+  },
+  "unresolved_gap_safety_confirmation": {
+    "phase8_defect_001_reproduced": false,
+    "avoids_unsupported_factual_completion": true,
+    "caveats_unresolved_portion": true,
+    "preserves_supported_portions": true,
+    "no_fabricated_evidence": true
+  },
+  "summary": {
+    "pass_criterion_met": true,
+    "closure_note": "CTL-018's PASS criterion (zero cases where a live-acquired residual gap fails to produce a qualifier) is satisfied by LOCAL-02 - a genuine, real-live-acquisition-produced weakly_supported_fact gap correctly resulted in exactly one claim being qualified, with zero collateral effect on unrelated claims. Combined with the 11 pre-existing offline regression tests plus this session's new full-graph.invoke() regression test, PHASE8-DEFECT-001's fix is now verified at 3 levels: unit (isolated node logic), full-graph (mocked, deterministic), and live (real network + real judge + real generator)."
+  }
+}

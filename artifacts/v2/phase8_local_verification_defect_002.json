@@ -1,0 +1,55 @@
+{
+  "artifact_name": "phase8_local_verification_defect_002",
+  "defect_id": "PHASE8-DEFECT-002",
+  "discovered_during": "medagent-v2-phase8-local-verification session, CTL-013 live PubMed verification (case LOCAL-01-pubmed-gap)",
+  "discovery_date": "this session",
+  "category": "D - research-loop defect (LangGraph state-threading)",
+  "summary": "state['research_stop_reason'] was written only inside should_continue_research_loop, a LangGraph conditional-edge routing function (registered via add_conditional_edges, never a graph node). LangGraph does not thread a mutation made inside a conditional-edge function into the state object graph.invoke() actually returns - only node return values are merged. As a result, MedAgent(research_loop=True).run(query)'s final returned state always carried research_stop_reason=None, on every stop reason, for every caller, even though the routing decision itself (continue vs. stop) was always computed correctly and logged correctly within the same call.",
+  "how_discovered": "A real, unmocked local live run (LOCAL-01-pubmed-gap, real PubMed+ChEMBL acquisition) showed a live-only edge case (grounded_generation_node's hard citation gate correctly rejecting a malformed LLM citation, twice) that made the anomaly visible: the log clearly showed '[RESEARCH LOOP] Stopping: safe_abstention', yet the raw JSON result captured via live_runner.py showed research_stop_reason: null. The exact same smoke-test query from the very first connectivity check (pembrolizumab vs ipilimumab, sufficient_evidence path) showed the identical null-despite-correct-logging pattern, confirming this was systematic, not case-specific.",
+  "reproduction": {
+    "method": "cheap, fully-mocked repro (no real network/LLM cost) - agent/nodes.py's get_llm/retrieve_passages/call_cerebras_native_tools/execute_validated_call/generate_grounded_answer and nlu.understand_query_with_result mocked; a real build_research_loop_graph().invoke() call made end-to-end.",
+    "script": "scratchpad/repro_stop_reason.py (session-local; logic now also captured as a permanent regression test, see below)",
+    "before_fix_result": "log shows '[RESEARCH LOOP] Stopping: safe_abstention'; final state['research_stop_reason'] read back as None",
+    "after_fix_result": "final state['research_stop_reason'] read back as 'safe_abstention' - correct"
+  },
+  "why_undetected_until_now": "Every existing test in the 513-test (pre-fix) suite that touches should_continue_research_loop or the research-loop graph calls individual node functions directly (agent.nodes.gap_analysis_node(state), should_continue_research_loop(state), etc.) or inspects graph.get_graph().nodes.keys() - not one test called build_research_loop_graph().invoke() end-to-end before this session. Calling should_continue_research_loop(state) directly as a plain Python function DOES mutate the passed-in dict (Python's normal by-reference semantics), which is exactly why the pre-existing unit tests that asserted state['research_stop_reason'] after calling it directly passed - they never went through LangGraph's actual state-channel merging, so they never observed the drop.",
+  "root_cause": "state['research_stop_reason'] had exactly one write site: agent/nodes.py's should_continue_research_loop, a conditional-edge function (workflow.add_conditional_edges('gap_analysis', should_continue_research_loop, {...}) in agent/graph.py). This is architecturally different from every other Phase-8 state field, all of which are written inside proper graph nodes.",
+  "fix": {
+    "file": "agent/nodes.py",
+    "approach": "should_continue_research_loop no longer writes state['research_stop_reason'] at all (still computes/returns the correct 'continue'/'stop' routing decision, unchanged). finalize_research_answer_node (a real node, reached only via the 'stop' edge) now recomputes the identical stop reason - using the exact same decide_stop_reason inputs should_continue_research_loop just used for routing - and writes it, but ONLY when the field is not already set (state.get('research_stop_reason') is None), so any caller that pre-sets it (e.g. an existing unit test isolating finalize_research_answer_node's claim-caveat logic from the stop-reason decision) is never overridden and never required to supply _plan_next_actions's other inputs.",
+    "pattern_reused": "mirrors the project's own established fix pattern for the analogous state-threading class of bug (PHASE8_FAILURE_ANALYSIS.md's LangGraph state-threading defect: 'called twice with identical inputs rather than stashed across a graph edge... guaranteed to return the identical plan') - a pure, deterministic recomputation from already-declared state, never a second independent decision that could diverge from routing.",
+    "scope": "minimal and general - no case-specific logic, no VAL-C/LOCAL-01-specific text or IDs anywhere in the fix."
+  },
+  "regression_tests_added": [
+    {
+      "file": "tests/test_research_integration.py",
+      "test": "test_full_graph_invoke_threads_research_stop_reason_to_final_state",
+      "description": "The first test in the suite to call build_research_loop_graph().invoke() end-to-end (fully mocked LLM/network, zero cost). Reproduces the exact LOCAL-01 shape (non-empty Evidence, generation repeatedly fails the hard citation gate, NO_EVIDENCE gap recurs) and asserts the final returned state carries research_stop_reason == 'safe_abstention', research_attempted_no_evidence is True, grounded_answer is None, and research_iteration == 1 (never an infinite loop)."
+    },
+    {
+      "file": "tests/test_research_integration.py",
+      "tests_updated": [
+        "test_sufficient_evidence_stops_immediately",
+        "test_no_evidence_gap_requests_continue_then_safe_abstains",
+        "test_budget_exhausted_even_with_gaps_remaining"
+      ],
+      "change": "each now also calls finalize_research_answer_node(state) after should_continue_research_loop(state) returns 'stop', and asserts research_stop_reason on the state finalize_research_answer_node returns - exercising the corrected mechanism (the node that now actually sets the field) instead of asserting a mutation that, as this defect proved, never reaches graph.invoke()'s real output."
+    }
+  ],
+  "regression_suite_result": {
+    "targeted_run": "50 passed (tests/test_research_finalize_answer_defect_fix.py + test_research_integration.py + test_research_action_planning_and_loop_control.py + test_research_models_and_gap_analysis.py)",
+    "full_suite_run": "507 passed, 0 failed, 7 skipped (506 baseline + 1 new regression test)"
+  },
+  "live_confirmation_after_fix": [
+    {"case_id": "LOCAL-05-multi-iter-b", "research_stop_reason": "sufficient_evidence"},
+    {"case_id": "LOCAL-06-freshmultisource-a", "research_stop_reason": "sufficient_evidence"},
+    {"case_id": "LOCAL-07-freshmultisource-b", "research_stop_reason": "sufficient_evidence"},
+    {"case_id": "LOCAL-08-unresolvable", "research_stop_reason": "safe_abstention"},
+    {"case_id": "CTL017-fault-timeout (postfix)", "research_stop_reason": "safe_abstention"},
+    {"case_id": "CTL017-fault-429 (postfix)", "research_stop_reason": "sufficient_evidence"}
+  ],
+  "affected_prior_artifacts": {
+    "impact_on_dev_val1_val2_metrics": "None of Phase-8's committed DEV/Validation Run 1/Validation Run 2 metrics (final_stop_reason columns in phase8_dev_benchmark_results.json/phase8_validation_results.json/phase8_validation_run2_results.json) are known to be affected - this session did not have access to the original (uncommitted) validation harness script that produced those artifacts, so it cannot be confirmed whether that harness read state['research_stop_reason'] from graph.invoke()'s return value (which would have been affected) or recomputed/logged it independently (which would not). This is disclosed as an open question, not asserted either way - see PHASE8_LOCAL_VERIFICATION_AUDIT.md.",
+    "functional_impact": "Zero impact on the loop's own routing correctness (continue/stop decisions were always correct) or on PHASE8-DEFECT-001's fix (finalize_research_answer_node's early-return check 'stop_reason == sufficient_evidence' degrades safely when stop_reason reads as None instead of the true value, since gaps == [] already triggers the same early return in every true sufficient_evidence case) - impact was confined to the research_stop_reason field's value as observed by any EXTERNAL caller of a full graph run (this local-closure harness, and any future Phase-9/11 consumer)."
+  }
+}

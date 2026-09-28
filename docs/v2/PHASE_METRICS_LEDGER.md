@@ -1145,3 +1145,50 @@ run, not a test suite addition).
 `docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md`, all marked ENVIRONMENT-DEFERRED/
 LOCAL-VERIFICATION-REQUIRED or OPEN - none closed merely because
 simulated-transport validation passed.
+
+## Phase 8 Local-Closure Pass (later local session, `medagent-v2-phase8-local-verification`)
+
+Full detail: `docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md`,
+`artifacts/v2/phase8_live_*.json`,
+`artifacts/v2/phase8_fresh_multisource_validation.json`,
+`artifacts/v2/phase8_local_verification_defect_002.json`.
+
+Baseline reconfirmed before any change: branch `main` at
+`ac796c28f06a8e20d6c92af032088d6ab172c205`, `pytest tests/ -q` ->
+506 passed, 0 failed, 7 skipped.
+
+Live re-verification (8 real end-to-end `MedAgent(research_loop=True).run()`
+queries, no mocking, real network to PubMed/ClinicalTrials.gov/ChEMBL, real
+Cerebras + NVIDIA calls, plus 3 safely-injected real-fault-class cases):
+
+| Metric | Local live result | n | Cloud comparison |
+|---|---|---|---|
+| Real PubMed follow-up rounds | 3 | 3 cases | corroborates DEV/Val loop-control logic |
+| Real ClinicalTrials.gov records acquired | 13 distinct NCT ids | 4 cases | first genuinely live CT acquisition this project |
+| Real ChEMBL records acquired | 5 distinct CHEMBL ids + 1 live no_match/skip case | 6 cases | first genuinely live ChEMBL acquisition this project |
+| Fabricated/invalid Evidence IDs | 0 | 8 cases + 3 fault cases | corroborated (0 in every cloud sample too) |
+| Infinite loops | 0 | 11 total live runs | corroborated |
+| Mean loops/query | 0.75 | 8 | comparable order of magnitude to DEV's 0.5 (n=4) |
+| Unnecessary-follow-up rate | 0.0 (0/6 actions unproductive) | 6 actions | corroborated |
+| Productive-follow-up rate | 1.0 (6/6) | 6 actions | consistent with DEV's 4/4 loop-termination-correctness |
+| Fault classes safely handled (timeout/429/5xx) | 3/3, all safe/bounded | 3 | first genuinely live fault-injection evidence this project |
+
+One new defect, **PHASE8-DEFECT-002**, found via this live pass:
+`state["research_stop_reason"]` was written only inside a LangGraph
+conditional-edge routing function, whose mutations LangGraph never threads
+into `graph.invoke()`'s returned state - every full-graph run returned
+`research_stop_reason=None` regardless of the true (correctly-routed-on)
+stop reason. Root-caused, fixed generally (`agent/nodes.py`:
+`finalize_research_answer_node` now recomputes the value via the same
+pure `decide_stop_reason` inputs, mirroring this project's own established
+"recompute, never stash" LangGraph-state-threading fix pattern), and
+regression-tested (1 new end-to-end `graph.invoke()` test - the first in
+the suite - plus 3 corrected existing tests). Full regression after the
+fix: **507 passed, 0 failed, 7 skipped** (506 + 1 new test).
+
+CTL-013, 014, 015, 017 (narrow scope), 018, 020 CLOSED; CTL-019
+re-measured and disclosed (not a pass/fail gate); CTL-016 PARTIALLY
+CLOSED (2-round case fully verified live; no organic 3-round case this
+pass, non-blocking, offline-covered). Phase-10 protection reconfirmed
+intact. Phase 9 determined NOT blocked by any remaining Phase-8
+functional-correctness item.

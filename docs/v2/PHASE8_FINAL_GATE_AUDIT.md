@@ -499,3 +499,46 @@ fabrication, zero infinite loops on a genuinely fresh set, within the
 disclosed PubMed-only inventory constraint (CTL-020); 8 CTL items
 document exactly what remains for local/live verification before Phase
 13's final freeze. Phase 8 is ready to freeze under this closure record.
+
+---
+
+## Local-verification addendum (`medagent-v2-phase8-local-verification`
+branch, added in a later local session - ADDITIVE ONLY, nothing above this
+line is modified)
+
+This session returned to the local machine specifically to execute the
+CTL-013–020 verification this audit's own Q/M/N answers said remained
+outstanding. Full methodology, per-case evidence, and the CTL-by-CTL
+closure table are in `docs/v2/PHASE8_LOCAL_VERIFICATION_AUDIT.md`. Summary:
+
+- All three biomedical services (PubMed, ClinicalTrials.gov, ChEMBL) and
+  both required LLM-provider credentials, blocked/absent in the original
+  cloud session, are reachable/present on this local machine - genuine
+  live verification was possible for every CTL-013–020 item.
+- **CTL-013, 014, 015, 017 (narrow scope), 018, 020: CLOSED.** **CTL-019:**
+  re-measured and disclosed (not a pass/fail gate by its own definition).
+  **CTL-016: PARTIALLY CLOSED** - the required 2-round live case fully
+  passed; no organic 3-round live case occurred this pass (non-blocking;
+  the underlying bounded-iteration code is independently covered offline).
+- **A new defect, PHASE8-DEFECT-002**, was discovered by this live
+  verification (`state["research_stop_reason"]` was lost between a
+  LangGraph conditional-edge function and `graph.invoke()`'s returned
+  state, on every stop reason, for every full-graph caller) - root-caused,
+  generally fixed (`agent/nodes.py`), and regression-tested (1 new test,
+  the first in the suite to call `build_research_loop_graph().invoke()`
+  end-to-end; 3 existing tests corrected to assert against the real fixed
+  mechanism). Zero impact on routing correctness or PHASE8-DEFECT-001's
+  fix. Full regression after the fix: **507 passed, 0 failed, 7 skipped**
+  (506 baseline + 1 new test).
+- Phase-10 protection reconfirmed: no Phase-10 file exists anywhere in the
+  repository; no Phase-10 case/gold used in any local-verification query.
+- **Phase 9 readiness (local-closure decision):** Phase 9 is NOT blocked
+  by any remaining Phase-8 functional-correctness item. The sole residual
+  gap (CTL-016's 3-round live case) is explicit, disclosed, non-blocking
+  debt with a hard decision point at Phase 13's final freeze.
+
+This addendum does not alter, retract, or supersede any answer, metric, or
+finding recorded above it - the cloud-session record stands as the
+permanent historical account of what was verified under transport
+simulation; this addendum records what the same frozen architecture does
+under real, local, live conditions.

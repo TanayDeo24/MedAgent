@@ -712,3 +712,49 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   it is permanently marked `VALIDATION RUN 1 — DEFECT DISCOVERED`
   (`artifacts/v2/phase8_validation_run1_status.json`), preserved
   unmodified as the historical record of the defect's discovery.
+
+## Phase 8 Local-Closure Pass (later local session, `medagent-v2-phase8-local-verification`)
+
+- **Resume-safe:** the research loop's PubMed, ClinicalTrials.gov, and
+  ChEMBL follow-up acquisition genuinely works against real, live network
+  APIs through the frozen Phase-3 dispatcher - not just against
+  previously-captured records. 24+ real PMIDs, 13 distinct real NCT ids,
+  and 5 distinct real CHEMBL ids acquired across 8 real end-to-end runs,
+  zero fabricated/invalid Evidence IDs.
+- **Resume-safe:** the ChEMBL adapter's expected-skip (`no_match`) path
+  was exercised live against the real ChEMBL API (not just offline unit
+  tests) and correctly produced zero fabricated/best-guess Evidence.
+- **Resume-safe:** a real, live-acquired residual `weakly_supported_fact`
+  gap was correctly caveated by PHASE8-DEFECT-001's fix
+  (`finalize_research_answer_node`) under genuine live acquisition - the
+  fix's mechanism is now verified at 3 independent levels (unit, mocked
+  full-graph, live).
+- **Resume-safe:** all 3 fault classes named by CTL-017 (timeout, 429,
+  5xx - including all 3 biomedical source networks failing
+  simultaneously) were safely reproduced and the research loop terminated
+  safely in every case - zero fabrication, zero infinite loops, bounded
+  retry.
+- **Resume-safe:** 2 fresh, never-before-used real multi-source
+  validation cases (avapritinib/GIST, repotrectinib/ROS1+NSCLC) ran
+  cleanly, closing CTL-020's source-inventory-exhaustion gap and its
+  associated Phase-10-validity concern.
+- **Resume-safe:** PHASE8-DEFECT-002 (a real LangGraph state-threading
+  defect causing `research_stop_reason` to be silently lost from every
+  full-graph run's returned state) is root-caused, generally fixed, and
+  regression-tested at the exact level (`build_research_loop_graph().invoke()`
+  end-to-end) that let it ship undetected in the first place. Full
+  regression after the fix: 507 passed, 0 failed, 7 skipped.
+- **Not resume-safe:** citing this session's 8-case live metrics (mean
+  loops/query=0.75, etc.) as production-representative - n is still small
+  on both the cloud and local samples; CTL-019 remains a citation-time
+  gate until a larger-n re-measurement exists (Phase 9/11).
+- **Not resume-safe:** claiming a live 3-round multi-iteration case has
+  been demonstrated - CTL-016's 2-round requirement is met live, but no
+  case in this pass organically required a 3rd round; the iteration-bound
+  code path itself remains covered only offline (unit tests + one new
+  full-graph regression test) for that specific count.
+- **Not resume-safe:** claiming whether the ORIGINAL cloud-session
+  DEV/Validation Run 1/Run 2 `final_stop_reason` numbers were themselves
+  affected by PHASE8-DEFECT-002 - the original (uncommitted) validation
+  harness script is not present in this repository, so this cannot be
+  confirmed either way and is disclosed as an open question, not asserted.
