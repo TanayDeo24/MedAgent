@@ -22,6 +22,7 @@ FAKE_TOKEN = "super-secret-cloudflare-test-token-12345"
 FAKE_ACCOUNT_ID = "fake-account-id-abcdef0123456789"
 FAKE_NVIDIA_KEY = "fake-nvidia-key-98765"
 FAKE_CEREBRAS_KEY = "fake-cerebras-key-13579"
+FAKE_GEMINI_KEY = "fake-gemini-key-24680"
 
 
 def _settings_with_env(monkeypatch, **env):
@@ -153,6 +154,32 @@ def test_cerebras_key_absent_by_default(monkeypatch):
     monkeypatch.delenv("CEREBRAS_API_KEY", raising=False)
     s = _settings_with_env(monkeypatch, NVIDIA_API_KEY=FAKE_NVIDIA_KEY)
     assert s.CEREBRAS_API_KEY is None
+
+
+def test_gemini_key_loads_as_secretstr(monkeypatch):
+    s = _settings_with_env(monkeypatch, GEMINI_API_KEY=FAKE_GEMINI_KEY)
+    assert isinstance(s.GEMINI_API_KEY, SecretStr)
+    assert s.GEMINI_API_KEY.get_secret_value() == FAKE_GEMINI_KEY
+
+
+def test_gemini_repr_and_str_do_not_contain_raw_fake_key(monkeypatch):
+    s = _settings_with_env(monkeypatch, GEMINI_API_KEY=FAKE_GEMINI_KEY)
+    assert FAKE_GEMINI_KEY not in repr(s)
+    assert FAKE_GEMINI_KEY not in str(s)
+
+
+def test_gemini_key_not_in_model_dump_json_by_default(monkeypatch):
+    s = _settings_with_env(monkeypatch, GEMINI_API_KEY=FAKE_GEMINI_KEY)
+    dumped = s.model_dump()
+    assert FAKE_GEMINI_KEY not in str(dumped)
+    dumped_json = s.model_dump_json()
+    assert FAKE_GEMINI_KEY not in dumped_json
+
+
+def test_gemini_key_absent_by_default(monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    s = _settings_with_env(monkeypatch, NVIDIA_API_KEY=FAKE_NVIDIA_KEY)
+    assert s.GEMINI_API_KEY is None
 
 
 def test_secret_fields_not_in_model_dump_json_by_default(monkeypatch):

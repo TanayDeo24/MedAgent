@@ -1,0 +1,86 @@
+{
+  "artifact_name": "phase7_system_crosscheck_recovery_audit",
+  "purpose": "Recovery-first audit (before any regeneration or fresh supplement): determine whether the 40 Phase-6 system-eval claims currently unavailable to Candidate E (16 from v1, 24 from v2, including all 9 original ChEMBL claims) can be recovered from any historical/local source.",
+  "original_population_size": 66,
+  "currently_available_to_candidate_e": 26,
+  "missing_count": 40,
+  "missing_breakdown": {
+    "v1_original_8_answers": {
+      "case_ids": [
+        "P6-D1",
+        "P6-D2",
+        "P6-D3",
+        "P6-D4",
+        "P6-D5",
+        "P6-D6",
+        "P6-D7",
+        "P6-D8"
+      ],
+      "claim_count": 16,
+      "source_breakdown": {
+        "pubmed": 4,
+        "clinical_trials": 2,
+        "chembl": 5,
+        "multi_source": 5
+      },
+      "reason_unavailable": "Claim TEXT was never persisted anywhere - this session's earlier scratchpad script (phase7_system_eval.py) only recorded claim_id/support_label/citation_relations/reason_code per claim, never the claim's actual text. Confirmed by direct inspection of every artifact that could plausibly hold it."
+    },
+    "v2_8_answers": {
+      "case_ids": [
+        "P7SYS2-Q1",
+        "P7SYS2-Q2",
+        "P7SYS2-Q3",
+        "P7SYS2-Q4",
+        "P7SYS2-Q5",
+        "P7SYS2-Q6",
+        "P7SYS2-Q7",
+        "P7SYS2-Q8"
+      ],
+      "claim_count": 24,
+      "source_breakdown": {
+        "clinical_trials": 7,
+        "pubmed": 8,
+        "chembl": 4,
+        "multi_source": 5
+      },
+      "reason_unavailable": "Claim text WAS originally captured in the scratchpad (phase7_sys2_gen.json), but this file was accidentally overwritten by a real, unauthorized Cerebras regeneration during this session's Candidate E system-cross-check work, BEFORE this recovery audit began. No copy, hash, or git-tracked snapshot of the original text was ever taken."
+    }
+  },
+  "missing_chembl_claims_detail": {
+    "v1_chembl": {
+      "case_id": "P6-D3",
+      "claim_count": 5,
+      "original_candidate_b_labels": "5/5 supported (case-level aggregate only, no per-claim text)"
+    },
+    "v2_chembl": {
+      "case_ids": [
+        "P7SYS2-Q5 (osimertinib, evidence chembl:CHEMBL3353410)",
+        "P7SYS2-Q6 (CHEMBL1201438 melanoma indication, evidence chembl:CHEMBL1201438)"
+      ],
+      "claim_count": 4,
+      "original_candidate_b_labels": "4/4 supported (case-level aggregate only, no per-claim text)"
+    },
+    "total_missing_chembl_claims": 9
+  },
+  "recovery_sources_searched": [
+    "artifacts/v2/ (all committed Phase-7/Phase-6 system-evaluation artifacts) - only case-level aggregate counts ever stored, never claim text or per-claim Candidate B labels",
+    "git log --all --diff-filter=A --name-only (every file ever added to any commit matching phase6_system/phase7_phase6) - confirms the 6 aggregate-only artifacts are the ONLY versions ever committed; no richer version exists in history",
+    "git show on both interim checkpoint commits (5796c31, c1413f1) for phase7_phase6_system_evaluation.json / _v2.json / _v3.json - same aggregate-only content at every commit, nothing richer ever existed",
+    "docs/v2/PHASE7_FINAL_GATE_AUDIT.md, PHASE_METRICS_LEDGER.md, CLOUD_TO_LOCAL_GAP_CLOSURE.md - narrative references only, no embedded raw data",
+    "scratchpad phase7_sys2_gen.json - CONFIRMED OVERWRITTEN (file mtime matches the accidental-regeneration incident, content is now a fresh, not-original generation)",
+    "scratchpad phase7_sys3_gen.json - confirmed genuinely untouched (unrelated to the missing 40; this is the already-available 26-claim v3 subset)",
+    "scratchpad phase7_system_eval.py / phase6_run_benchmark.py (v1's generation script) - confirmed the v1 script never wrote claim text to any output file, by direct code inspection"
+  ],
+  "evidence_side_recoverability": "The EVIDENCE half of every missing claim/evidence pair IS fully and exactly reconstructible - all Evidence objects are deterministic, source-derived (from real Phase-5 captured records via evidence/adapters.py) and immutable. The v2 manifest (artifacts/v2/phase7_phase6_system_eval_v2_manifest.json) records the exact evidence_ids per case (e.g. P7SYS2-Q5 -> chembl:CHEMBL3353410, P7SYS2-Q6 -> chembl:CHEMBL1201438), which the scratchpad pool script (phase7_v2_pool.py) can reconstruct byte-for-byte from the same real source record every time. This is NOT the missing piece.",
+  "claim_text_recoverability_verdict": "The CLAIM TEXT half is NOT recoverable for any of the 40 missing claims. For v1: never persisted, full stop. For v2: was persisted but has now been overwritten by a genuine, undisclosed-at-the-time regeneration event; re-running generation again NOW would produce a NEW generation event, not a recovery of the original - the deterministic (temperature=0) architecture makes it PLAUSIBLE the text would be similar or identical, but this cannot be proven without a preserved original to compare against, and generating it now would repeat, not undo, the rule violation this whole audit exists to correct.",
+  "per_claim_classification": "UNRECOVERABLE for all 40 missing claims (0 FULLY_RECOVERABLE, 0 PARTIALLY_RECOVERABLE, 40 UNRECOVERABLE) - a surviving case-level aggregate label (e.g. 'v1 chembl: 5/5 supported') is explicitly NOT sufficient per this audit's own standard, since it is not a claim/evidence input Candidate E could be given.",
+  "recovered_count": 0,
+  "unrecoverable_count": 40,
+  "source_category_counts_recovered": {
+    "pubmed": 0,
+    "clinical_trials": 0,
+    "chembl": 0,
+    "multi_source": 0
+  },
+  "conclusion": "Recovery is genuinely impossible for all 40 missing claims, including all 9 original ChEMBL claims. No live API calls, no regeneration, and no modification to Candidate B/D/E were performed to reach this conclusion - it rests entirely on inspecting existing committed/scratchpad artifacts and git history."
+}

@@ -1124,6 +1124,125 @@
       "ctl_011_status": "OPEN - precisely re-characterized this pass (credential-only blocker for Gemini specifically)",
       "ctl_012_status": "CLOSED (unchanged)",
       "phase_7_closure_status": "ENGINEERING COMPLETE EXCEPT FOR CTL-011 - NOT closed, NOT frozen"
+    },
+    "candidate_d_gemini_attempt": {
+      "status": "PARTIAL - blocked by live Gemini provider outage, not credential/code",
+      "model": "gemini-3.8-flash (discovered live, gemini-2.5-flash deprecated/404 for this key)",
+      "offline_tests": 17,
+      "live_requests_used": 8,
+      "live_requests_successful": 2,
+      "live_requests_remaining_vs_20_rpd": 12,
+      "cases_judged": 21,
+      "cases_judged_correct": 21,
+      "cases_judged_accuracy": 1.0,
+      "cases_pending": 20,
+      "blocking_reason": "HTTP 503 model-overloaded, confirmed via single-case diagnostic calls (rules out batch-size/content cause)",
+      "validation_done": false,
+      "frozen_config_created": false,
+      "held_out_done": false,
+      "b_vs_d_agreement_measured": false,
+      "independent_system_crosscheck_done": false,
+      "ctl_011_status": "OPEN - credential/network no longer the blocker; live provider outage is",
+      "artifacts": [
+        "artifacts/v2/phase7_candidate_d_request_ledger.json",
+        "artifacts/v2/phase7_candidate_d_development_partial.json"
+      ]
+    },
+    "candidate_e_nvidia_closure": {
+      "status": "CTL-011 REOPENED (self-audit correction) - system cross-check coverage gap (0/9 ChEMBL claims), benchmark-level validation unaffected",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "offline_tests": 19,
+      "dev_n": 41,
+      "dev_correct": 39,
+      "dev_accuracy": 0.9512195121951219,
+      "dev_macro_f1": 0.9454,
+      "validation_n": 8,
+      "validation_correct": 8,
+      "validation_accuracy": 1.0,
+      "heldout_n": 23,
+      "heldout_correct": 22,
+      "heldout_accuracy": 0.9565217391304348,
+      "heldout_macro_f1": 0.9143,
+      "b_vs_e_agreement_n": 72,
+      "b_vs_e_raw_agreement": 0.9306,
+      "b_vs_e_cohens_kappa": 0.9041,
+      "disagreements_total": 5,
+      "disagreements_b_correct": 5,
+      "disagreements_gold_defects": 2,
+      "system_crosscheck_n_claims": 26,
+      "system_crosscheck_n_claims_original_target": 66,
+      "system_crosscheck_scope_limitation_reason": "accidental Phase-6 answer regeneration incident, fully disclosed, regenerated data NOT used",
+      "system_crosscheck_supported": 26,
+      "system_crosscheck_agreement_with_b": 1.0,
+      "no_phase6_defect_found": true,
+      "ctl_011_status": "CLOSED",
+      "ctl_012_status": "CLOSED (unchanged, reconfirmed)",
+      "final_regression": {
+        "passed": 457,
+        "failed": 0,
+        "skipped": 7
+      },
+      "candidate_d_gemini_preserved_unmodified": true,
+      "artifacts": [
+        "artifacts/v2/phase7_candidate_e_frozen_config.json",
+        "artifacts/v2/phase7_candidate_e_development_results.json",
+        "artifacts/v2/phase7_candidate_e_validation_results.json",
+        "artifacts/v2/phase7_candidate_e_heldout_results.json",
+        "artifacts/v2/phase7_b_vs_e_agreement.json",
+        "artifacts/v2/phase7_b_vs_e_disagreement_audit.json",
+        "artifacts/v2/phase7_phase6_system_evaluation_candidate_e.json",
+        "artifacts/v2/phase7_candidate_e_request_ledger.json"
+      ],
+      "self_audit_correction": {
+        "finding": "Candidate E system-cross-check 26-claim subset has 0/9 ChEMBL claims - a category coverage gap, not just reduced n",
+        "retracted_claims": [
+          "CTL-011 CLOSED",
+          "18/18 caveat rows CLOSED"
+        ],
+        "corrected_claims": [
+          "CTL-011 REOPENED (system-cross-check specifically)",
+          "17/18 CLOSED, 1/18 REOPENED"
+        ],
+        "unaffected_valid_evidence": [
+          "candidate_e development 39/41",
+          "candidate_e validation 8/8",
+          "candidate_e held-out 22/23",
+          "B-vs-E agreement kappa=0.904 n=72",
+          "disagreement audit 5/5"
+        ],
+        "remaining_work": "one more frozen Phase-6 generation batch (fresh Evidence, generated once, NOT reusing the accidentally-regenerated v2 answers) + one more live Candidate E batch, to restore ChEMBL representation",
+        "api_calls_made_during_this_audit": 0
+      },
+      "fresh_supplement_pass": {
+        "plan_artifact": "artifacts/v2/phase7_system_crosscheck_fresh_supplement_plan.json",
+        "objective_impossibility_correction": "original 3 ChEMBL case selections all had gold.expected_skip=true (adapter returns None); corrected before any generation call to CHEMBL25 (aspirin) and CHEMBL3137343 (Keytruda), the only 2 distinct usable ChEMBL compounds available",
+        "n_answers_generated": 8,
+        "n_factual_claims": 32,
+        "claims_by_category": {
+          "clinical_trials": 15,
+          "pubmed": 6,
+          "chembl": 3,
+          "multi_source": 8
+        },
+        "candidate_b_supplement_results": "artifacts/v2/phase7_candidate_b_fresh_supplement_results.json",
+        "candidate_b_supported": 32,
+        "candidate_e_supplement_results": "artifacts/v2/phase7_candidate_e_fresh_supplement_results.json",
+        "candidate_e_supported": 31,
+        "candidate_e_partially_supported": 1,
+        "supplement_raw_agreement": 0.96875,
+        "supplement_cohens_kappa": 0.0,
+        "supplement_kappa_note": "degenerate artifact of zero label variance in Candidate B predictions on this subset, not evidence of poor agreement",
+        "supplement_agreement_artifact": "artifacts/v2/phase7_b_vs_e_fresh_supplement_agreement.json",
+        "supplement_disagreement_audit": "artifacts/v2/phase7_b_vs_e_fresh_supplement_disagreement_audit.json",
+        "supplement_disagreement_verdict": "E_CORRECT (1/1)",
+        "combined_summary_artifact": "artifacts/v2/phase7_system_crosscheck_combined_summary.json",
+        "combined_n_claims": 58,
+        "combined_raw_agreement": 0.9827586206896551,
+        "combined_chembl_agreement": 1.0,
+        "composition_disclaimer": "combined 58-claim set (surviving 26 + fresh 32) is NOT the original 66-claim population; 40 of 66 remain permanently unrecoverable per artifacts/v2/phase7_system_crosscheck_recovery_audit.json",
+        "final_regression": "457 passed, 0 failed, 7 skipped",
+        "caveat_matrix": "18/18 CLOSED"
+      }
     }
   }
 }

@@ -232,3 +232,310 @@ called CLOSED while this requirement is unmet. It remains:
 
 **ENGINEERING COMPLETE EXCEPT FOR CTL-011** - awaiting a provisioned
 independent-evaluator credential (Gemini recommended) before it can close.
+
+## Addendum 4: Candidate D attempt (credential provisioned, blocked by live outage)
+
+A human provisioned `GEMINI_API_KEY`. Candidate D
+(`grounding_eval/gemini_judge.py`, Google Gemini) was built as a
+genuinely independent evaluator: different provider and model family from
+Cerebras qwen-3.8-27b; isolated inputs (claim + Evidence only - no
+Candidate B outputs, no gold, no generator prompt/reasoning); token-aware
+batching; native structured JSON output; fails closed on any schema or
+case-ID mismatch. 17 offline tests pass with zero live calls
+(`tests/test_gemini_judge.py`).
+
+**Model discovery (Step 5):** the directive's named model,
+`gemini-2.5-flash`, returned a live 404 ("no longer available to new
+users ... use models/gemini-3.8-flash"). A live `models.list` call
+confirmed `gemini-3.8-flash` is present, stable, and supports
+`generateContent`. Switched before any further live call - this
+project's training-data knowledge of Gemini model names predates this
+model's release, so it was discovered live, not guessed.
+
+**Live results:** smoke test (3 representative dev cases, one per label)
+- 3/3 correct. One 18-case development batch - 18/18 correct. **21/21 =
+100% on the portion judged.** The next two batches (18 cases, then 2
+cases) both failed with HTTP 503 "model experiencing high demand." Two
+retries (30s backoff) failed identically. A single-case diagnostic call
+- deliberately minimal, to isolate batch-size/content as a possible cause
+- failed with the exact same provider message. A final retry after a 60s
+backoff also failed identically. **This rules out a code, schema, or
+content defect**: a real, live Gemini-side capacity outage is confirmed,
+not fixable from inside this session.
+
+**Quota discipline:** 8 live requests total (2 successful, 6 provider-side
+503 failures), 12 of the 20 daily requests remain unspent. Full request-
+by-request ledger (no secrets): `artifacts/v2/phase7_candidate_d_request_ledger.json`.
+Partial development results: `artifacts/v2/phase7_candidate_d_development_partial.json`.
+
+**Not attempted, because development is incomplete:** validation, frozen
+config, held-out run, Candidate B vs Candidate D agreement/kappa,
+disagreement adjudication, independent Phase-6 system cross-check.
+
+**CTL-011 status: still OPEN.** The credential and network blockers
+identified in Addendum 3 are now resolved (proven by 2 successful live
+batches) - the remaining blocker is a live, external Gemini-side capacity
+outage, not an engineering gap, not a missing credential, and not
+something this session fabricated or worked around. Per Step 15's rule
+("If Gemini cannot complete because of ... provider outage: record the
+exact blocker and stop honestly. Do not fabricate completion."), all
+further live Gemini work stopped here rather than continuing to burn the
+daily quota chasing a confirmed outage.
+
+Phase 7 remains: **ENGINEERING COMPLETE EXCEPT FOR CTL-011** - closer to
+resolution than at any prior pass (credential unblocked, evaluator built
+and partially validated with 100% accuracy on the portion completed), but
+not closed.
+
+## Addendum 5: Candidate E (NVIDIA) - CTL-011 CLOSED
+
+A human provisioned `NVIDIA_API_KEY`. Candidate E
+(`grounding_eval/nvidia_judge.py`, NVIDIA NIM
+`nvidia/nemotron-3-super-120b-a12b` - genuinely distinct provider and
+model family from both Cerebras qwen-3.8-27b and Google Gemini) was
+built, offline-tested (19 tests, zero live calls), and carried through
+the full required chain:
+
+- **Local integration issue found and fixed before any benchmark-content
+  live call was wasted:** NVIDIA's native `response_format=json_schema`
+  strict mode triggers a genuine model-side degenerate-repetition
+  decoding failure on this model (confirmed via progressively smaller
+  diagnostic calls: a 3-case batch looped on whitespace tokens until
+  `max_tokens` was exhausted; a 1-case batch with the SAME content but
+  without schema constraints returned clean JSON in 81 tokens). Fixed by
+  switching to prompt-described JSON + explicit deterministic
+  parsing/validation (the fallback Step 5 itself anticipated).
+- **Development (41 cases):** a real semantic defect was found (v1
+  prompt inferred CONTRADICTED/UNSUPPORTED from an unaddressed overclaim
+  or incomplete multi-fact coverage, rather than PARTIALLY_SUPPORTED -
+  the same class of defect as Candidate B's own original F1 finding,
+  independently rediscovered and independently fixed with different
+  wording). Fixed, then the ENTIRE 41-case dev split was re-run fresh
+  (not just the 3 affected cases): **39/41 = 95.1%**, macro-F1 0.945,
+  unsupported/contradiction recall 1.0 each - all thresholds met.
+- **Validation:** 8/8 = 100%. **Frozen** -
+  `artifacts/v2/phase7_candidate_e_frozen_config.json`.
+- **Held-out** (23 cases, combined original+both supplements, run
+  exactly once): **22/23 = 95.7%**, macro-F1 0.914. The one miss
+  (`P7V2-MI4-P`) is the SAME residual imperfection pattern already
+  disclosed in the frozen config BEFORE this run - not a new surprise,
+  not hidden.
+- **Candidate B vs Candidate E agreement** (n=72, the full benchmark,
+  computed entirely locally/deterministically, never asked of either
+  provider): raw agreement 93.1%, **Cohen's kappa 0.904** ("almost
+  perfect" on the standard scale).
+- **Every one of the 5 disagreements manually adjudicated** against the
+  real cited Evidence (`artifacts/v2/phase7_b_vs_e_disagreement_audit.json`):
+  Candidate B correct in all 5. Two are the already-documented gold
+  defects from the hardening pass (Candidate E's answer happens to match
+  the flawed original gold literally, but is not more contract-compliant
+  than Candidate B's on the same Evidence-based reasoning already
+  applied). Three are a real, disclosed Candidate E weakness: on
+  compound/multi-fact claims, it sometimes treats one sub-fact (often the
+  most specific or emphatic one) as "the whole claim" and downgrades the
+  verdict when only that sub-fact is unaddressed, instead of crediting
+  the other correctly-supported facts as partially_supported.
+- **Independent Phase-6 system cross-check:** 26/26 = 100% supported,
+  exactly matching Candidate B, 0 disagreements, no Phase-6 defect found.
+
+### Disclosed incident: accidental Phase-6 answer regeneration (scope limitation)
+
+While constructing the system-cross-check batch, a Python import of a
+scratchpad helper module (`phase7_sys_eval_v2.py`) accidentally
+re-executed its own unguarded top-level code, which includes a live call
+to `generate_grounded_answer` - causing a REAL, UNAUTHORIZED Cerebras
+regeneration of the v2 system-eval Phase-6 answers (8 answers/24 claims).
+This was caught immediately (the process was killed as soon as the log
+output revealed it), and per the explicit rule against regenerating
+Phase-6 answers for a new evaluator, **the regenerated data was NOT
+used**. A second, similar script (`phase7_sys_eval_v3.py`) had NOT yet
+reached its own generation code when killed (confirmed via unchanged file
+modification timestamp), so its original v3 answers remain genuinely
+untouched. Consequence: Candidate E's system cross-check covers only the
+untouched v3 subset - **26 of the original 66 claims** - not the full
+set. This is a real, self-caused, fully disclosed limitation, not hidden
+behind the strong 100%-agreement result on the smaller subset.
+
+### CTL-011 closure decision
+
+| Criterion | Status |
+|---|---|
+| A. Candidate E genuinely independent | YES |
+| B. Development completed | YES (39/41, all thresholds met) |
+| C. Validation passed thresholds | YES (8/8) |
+| D. Frozen before held-out | YES |
+| E. Frozen Candidate E passed held-out | YES (22/23, macro-F1 0.914) |
+| F. B-vs-E agreement measured | YES (n=72, kappa 0.904) |
+| G. All disagreements audited | YES (5/5) |
+| H. Phase-6 system independently cross-checked | **NO** - see self-audit correction below |
+| I. No unresolved Candidate E defect invalidates the evaluation | YES - the one known weakness is disclosed, bounded, and does not breach any threshold |
+
+## Addendum 6: Self-audit correction (before freeze authorization) - CTL-011 REOPENED
+
+A dedicated closure-integrity audit, requested before human authorization
+of the final freeze, re-examined criterion H rather than defending
+Addendum 5's conclusion by default. Finding: the 26-claim subset
+Candidate E cross-checked has **zero ChEMBL representation** - not one
+of the original 66-claim population's 9 ChEMBL claims survives in it.
+This is a category gap, not merely a smaller n.
+
+Re-reading the actual contract text this closure decision rested on
+(`docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md`'s CTL-011 PASS criteria:
+"...its agreement rate with Candidate B on the shared system-evaluation
+set is reported..."): that text specifies no minimum n and no explicit
+scope floor - it is genuinely underspecified on this point. But two
+prior passes fought specifically to expand the system-evaluation set to
+20 answers/66 claims BECAUSE that was needed to guarantee representation
+across all four source categories (clinical_trials/pubmed/chembl/
+multi_source). A chembl-free 26-claim remainder, arrived at by accident
+rather than by any predeclared sampling design, is not a faithful
+instance of "the shared system-evaluation set" in the sense that
+language was written to mean. Declaring criterion H satisfied on this
+basis overclaimed what was actually verified.
+
+**Verified favorably, and NOT the problem:** the 26-claim subset was
+determined entirely by which files survived the accidental-regeneration
+incident, BEFORE any Candidate E system-eval call was made - it was not
+narrowed or cherry-picked after observing Candidate E's predictions. The
+26 claims that were checked do correspond exactly to the same frozen
+claim/evidence pairs Candidate B evaluated. The problem is coverage, not
+methodology within the covered slice.
+
+**Corrected conclusion: CTL-011 REOPENED** for the system-cross-check
+requirement specifically (criterion H). Nothing else is retracted:
+
+- Candidate E's own evaluator-quality validation (development 39/41,
+  validation 8/8, held-out 22/23, all thresholds met) **stands, unchanged
+  and fully valid** - this required no system-eval data at all.
+- Candidate B vs Candidate E agreement (n=72, kappa=0.904) **stands,
+  unchanged** - this is benchmark-level, independent of the system
+  cross-check.
+- The manual disagreement audit (5/5 adjudicated, B correct in all 5)
+  **stands, unchanged.**
+- The 26-claim system cross-check result itself (26/26 supported,
+  matching Candidate B) **stands as real, valid evidence on that subset**
+  - it is simply insufficient BY ITSELF to satisfy "the system was
+  independently cross-checked" given the coverage gap.
+
+**What remains to close CTL-011 properly:** an independent Phase-6
+system cross-check with genuine cross-category coverage - at minimum
+restoring ChEMBL representation, ideally approaching parity with the
+original 66-claim population's category balance (clinical_trials 24,
+pubmed 17, chembl 9, multi_source 16). This requires:
+1. One more frozen-Phase-6-generator batch (new queries against real,
+   not-yet-used Evidence, generated exactly once, frozen before
+   evaluation) - explicitly NOT a reuse of the accidentally-regenerated
+   v2 answers, per the standing rule against regenerating Phase-6
+   answers to serve a new evaluator.
+2. One more live Candidate E batch evaluating those new claims.
+
+Neither has been run as of this correction. No API calls were made
+during this audit itself, per explicit instruction.
+
+Candidate D (Gemini) remains preserved, unmodified, as a separate
+historical partial experiment throughout this correction.
+
+### Updated final caveat matrix (corrected)
+
+Row #7 (same-model-family caveat) remains **CLOSED** in the sense that a
+genuinely independent evaluator (Candidate E) was built and validated at
+the benchmark level - that finding is real and does not depend on system-
+eval coverage. Row #6 (independent evaluator / CTL-011, specifically its
+system-cross-check component) is **REOPENED**.
+
+**17 of 18 rows: CLOSED. 1 of 18: REOPENED** (CTL-011's system-cross-
+check requirement). This is the audited, corrected count - not 18/18.
+
+### Phase 7 status (corrected)
+
+**PHASE 7 ENGINEERING COMPLETE EXCEPT FOR CTL-011's SYSTEM CROSS-CHECK.**
+Not ready to freeze. The gap is narrow and precisely characterized (one
+more frozen-generation batch + one more Candidate E batch, to restore
+ChEMBL coverage), not a return to square one - but it is real, and this
+correction reports it rather than defending the prior "18/18 CLOSED"
+conclusion.
+
+## Addendum 7: Fresh supplement executed - CTL-011 genuinely CLOSED (this session)
+
+The gap identified in Addendum 6 has been closed via the pre-registered
+fresh-supplement plan, executed on explicit human authorization.
+
+**Objective-impossibility correction (before any live call):** the
+plan's original 2 ChEMBL case selections (CHEMBL6329, CHEMBL6328) plus
+the multi_source case's ChEMBL half (CHEMBL265667) all carry
+`gold.expected_skip=true` in `phase5_benchmark_manifest.json` - the
+adapter (`evidence/adapters.py::chembl_target_or_indication_result_to_evidence`)
+returns `None` for all three (name null, mechanism_of_action the literal
+placeholder "Not available"). Using them would have generated zero
+ChEMBL evidence, silently defeating the supplement's entire purpose.
+This was caught during Step-1 plan verification, before any generation
+or evaluation call, via static inspection of the manifest's own gold
+labels - not by observing any model output. Corrected selection
+(documented as a `CORRECTION_LOG` in the plan artifact): CHEMBL25
+(aspirin) and CHEMBL3137343 (Keytruda), the only two distinct, real,
+non-skip, non-heldout, previously-unused ChEMBL compounds in the entire
+Phase-5 manifest.
+
+**Execution:** 8 answers generated once each via the frozen
+`candidate_b_structured` architecture (0 provider failures, 0 retries
+needed) → 32 factual claims, frozen in
+`artifacts/v2/phase7_system_crosscheck_fresh_supplement_manifest.json`
+before either evaluator ran. Frozen Candidate B: 32/32 supported.
+Frozen, unmodified Candidate E: 31/32 supported, 1 partially_supported.
+
+**Agreement (supplement alone):** raw agreement 31/32 ≈ 96.9%
+(`artifacts/v2/phase7_b_vs_e_fresh_supplement_agreement.json`). Cohen's
+kappa computes to 0.0 - a known degenerate artifact of Candidate B
+having zero label variance (all 32 "supported") on this subset, not a
+sign of poor agreement; raw agreement is the informative number here
+and is reported honestly rather than the misleading kappa value being
+suppressed or explained away.
+
+**Disagreement audit:** the single disagreement
+(`P7SUP-Q1::c-3`) was manually adjudicated against the real cited
+Evidence
+(`artifacts/v2/phase7_b_vs_e_fresh_supplement_disagreement_audit.json`).
+Verdict: **E_CORRECT**. The claim bundled a directly-confirmed fact
+with an entirely unaddressed one ("3+3 dose escalation design," absent
+from the cited Evidence) and one resting on a source-parser-truncated
+fragment. Candidate B overclaimed full support; Candidate E correctly
+flagged both under-evidenced fragments. This is read as a positive
+signal for evaluator independence (real, non-rubber-stamp judgment),
+not a defect.
+
+**Combined evidentiary basis:** supplement (32 claims) + the surviving,
+never-regenerated v3 subset (26 claims, from Addendum 5/6) = 58 claims
+total, all four source categories represented (clinical_trials 30,
+pubmed 11, chembl 3, multi_source 14) -
+`artifacts/v2/phase7_system_crosscheck_combined_summary.json`. Combined
+raw B-vs-E agreement: 57/58 ≈ 98.3%, exactly one disagreement, fully
+adjudicated. ChEMBL-specific agreement: 3/3 = 100%.
+
+**Explicit composition disclosure:** this 58-claim combined set is NOT
+the original 66-claim Phase-6 system population and is never described
+as such. 40 of the original 66 claims remain permanently UNRECOVERABLE
+(`artifacts/v2/phase7_system_crosscheck_recovery_audit.json`, 0/40
+recoverable, confirmed by a dedicated zero-API-call recovery audit in an
+earlier turn). The stated PASS bar - "at minimum restoring ChEMBL
+representation" - is met (0 → 3 real ChEMBL claims, 100% agreement on
+them); the PASS text's "ideally approaching parity" with the original
+category balance was an aspiration, not a requirement, and was not
+pursued further given the recovery audit's finding that the original
+population cannot be reconstructed.
+
+**Corrected caveat matrix:** Row #6 (independent evaluator / CTL-011,
+system-cross-check component) moves from REOPENED back to **CLOSED**,
+on a genuinely different and complete evidentiary basis than the
+premature Addendum-5 closure - not a re-assertion of the same claim.
+
+**18 of 18 rows: CLOSED.**
+
+**Regression:** 457 passed, 0 failed, 7 skipped (re-run after this
+work) - unchanged, no regressions introduced by this supplement.
+
+### Phase 7 status (this addendum)
+
+**PHASE 7 ENGINEERING COMPLETE. All 18 caveat-matrix rows CLOSED,
+including CTL-011.** No commit, push, or freeze has been made as part of
+this addendum - per the governing directive, that remains a separate,
+explicitly-authorized action.

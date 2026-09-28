@@ -1,0 +1,2167 @@
+{
+  "artifact_name": "phase7_system_crosscheck_fresh_supplement_MANIFEST",
+  "status": "FROZEN - generation complete, evaluation not yet performed as of this freeze",
+  "generation_architecture": "candidate_b_structured",
+  "generation_model": "Cerebras qwen-3.8-27b (frozen production Phase-2/Phase-6 config, unchanged)",
+  "source_plan": "artifacts/v2/phase7_system_crosscheck_fresh_supplement_plan.json (post-correction FINALIZED_CASE_SELECTION_BEFORE_GENERATION)",
+  "n_answers": 8,
+  "n_total_claims": 36,
+  "n_factual_claims": 32,
+  "source_category_breakdown": {
+    "clinical_trials": 2,
+    "pubmed": 2,
+    "chembl": 2,
+    "multi_source": 2
+  },
+  "factual_claims_by_source_category": {
+    "clinical_trials": 15,
+    "pubmed": 6,
+    "chembl": 3,
+    "multi_source": 8
+  },
+  "cases": [
+    {
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "phase5_case_ids": [
+        "CT-NCT07287917"
+      ],
+      "query": "What is known about the Phase 1b/2 trial NCT07287917 evaluating oral AMXT 1501 and oral DFMO in combination with standard of care for patients with advanced solid tumors who progressed after prior therapies?",
+      "answer_id": "ans-68d33a8e5c3e",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "The trial NCT07287917 is a Phase 1b/2 study currently in the recruiting status, sponsored by Aminex Therapeutics, Inc.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-1",
+          "text": "The study aims to evaluate the safety, tolerability, and preliminary effectiveness of oral AMXT 1501 and oral DFMO in combination with standard of care for patients with advanced solid tumors who have progressed after prior therapies.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-2",
+          "text": "The trial targets two specific patient populations: Cohort 1 consists of patients with ER+/HER2- breast cancer receiving fulvestrant and capivasertib, and Cohort 2 consists of patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-3",
+          "text": "The Phase 1b portion of the trial is designed to determine the recommended Phase 2 dose (RP2D) using a 3+3 dose escalation design, while the Phase 2 portion will further evaluate efficacy.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-4",
+          "text": "The investigational drug AMXT 1501 Dicaprate is administered as an enteric-coated oral tablet with a starting dose of 300 mg twice daily on an empty stomach, while DFMO is administered as a 500 mg gel capsule once or twice daily.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-5",
+          "text": "The trial plans to enroll 92 participants, with a start date of January 26, 2026, and a completion date of December 29, 2028.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q1::c-0",
+          "text": "The trial NCT07287917 is a Phase 1b/2 study currently in the recruiting status, sponsored by Aminex Therapeutics, Inc.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT07287917",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT07287917",
+              "source_url": "https://clinicaltrials.gov/study/NCT07287917",
+              "evidence_type": "trial_field",
+              "content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Melanoma (Skin Cancer)",
+                  "HER2-low Hormone Receptor Positive Breast Cancer"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "AMXT 1501 Dicaprate",
+                    "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "DFMO",
+                    "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Fulvestrant",
+                    "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Capivasertib",
+                    "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Pembrolizumab",
+                    "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+                  }
+                ],
+                "sponsor": "Aminex Therapeutics, Inc.",
+                "enrollment": "92",
+                "start_date": "2026-01-26",
+                "completion_date": "2028-12-29"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580531Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q1::c-1",
+          "text": "The study aims to evaluate the safety, tolerability, and preliminary effectiveness of oral AMXT 1501 and oral DFMO in combination with standard of care for patients with advanced solid tumors who have progressed after prior therapies.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT07287917",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT07287917",
+              "source_url": "https://clinicaltrials.gov/study/NCT07287917",
+              "evidence_type": "trial_field",
+              "content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Melanoma (Skin Cancer)",
+                  "HER2-low Hormone Receptor Positive Breast Cancer"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "AMXT 1501 Dicaprate",
+                    "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "DFMO",
+                    "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Fulvestrant",
+                    "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Capivasertib",
+                    "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Pembrolizumab",
+                    "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+                  }
+                ],
+                "sponsor": "Aminex Therapeutics, Inc.",
+                "enrollment": "92",
+                "start_date": "2026-01-26",
+                "completion_date": "2028-12-29"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580531Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-2",
+          "full_id": "P7SUP-Q1::c-2",
+          "text": "The trial targets two specific patient populations: Cohort 1 consists of patients with ER+/HER2- breast cancer receiving fulvestrant and capivasertib, and Cohort 2 consists of patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT07287917",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT07287917",
+              "source_url": "https://clinicaltrials.gov/study/NCT07287917",
+              "evidence_type": "trial_field",
+              "content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Melanoma (Skin Cancer)",
+                  "HER2-low Hormone Receptor Positive Breast Cancer"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "AMXT 1501 Dicaprate",
+                    "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "DFMO",
+                    "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Fulvestrant",
+                    "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Capivasertib",
+                    "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Pembrolizumab",
+                    "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+                  }
+                ],
+                "sponsor": "Aminex Therapeutics, Inc.",
+                "enrollment": "92",
+                "start_date": "2026-01-26",
+                "completion_date": "2028-12-29"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580531Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-3",
+          "full_id": "P7SUP-Q1::c-3",
+          "text": "The Phase 1b portion of the trial is designed to determine the recommended Phase 2 dose (RP2D) using a 3+3 dose escalation design, while the Phase 2 portion will further evaluate efficacy.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT07287917",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT07287917",
+              "source_url": "https://clinicaltrials.gov/study/NCT07287917",
+              "evidence_type": "trial_field",
+              "content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Melanoma (Skin Cancer)",
+                  "HER2-low Hormone Receptor Positive Breast Cancer"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "AMXT 1501 Dicaprate",
+                    "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "DFMO",
+                    "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Fulvestrant",
+                    "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Capivasertib",
+                    "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Pembrolizumab",
+                    "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+                  }
+                ],
+                "sponsor": "Aminex Therapeutics, Inc.",
+                "enrollment": "92",
+                "start_date": "2026-01-26",
+                "completion_date": "2028-12-29"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580531Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-4",
+          "full_id": "P7SUP-Q1::c-4",
+          "text": "The investigational drug AMXT 1501 Dicaprate is administered as an enteric-coated oral tablet with a starting dose of 300 mg twice daily on an empty stomach, while DFMO is administered as a 500 mg gel capsule once or twice daily.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT07287917",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT07287917",
+              "source_url": "https://clinicaltrials.gov/study/NCT07287917",
+              "evidence_type": "trial_field",
+              "content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Melanoma (Skin Cancer)",
+                  "HER2-low Hormone Receptor Positive Breast Cancer"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "AMXT 1501 Dicaprate",
+                    "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "DFMO",
+                    "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Fulvestrant",
+                    "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Capivasertib",
+                    "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Pembrolizumab",
+                    "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+                  }
+                ],
+                "sponsor": "Aminex Therapeutics, Inc.",
+                "enrollment": "92",
+                "start_date": "2026-01-26",
+                "completion_date": "2028-12-29"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580531Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-5",
+          "full_id": "P7SUP-Q1::c-5",
+          "text": "The trial plans to enroll 92 participants, with a start date of January 26, 2026, and a completion date of December 29, 2028.",
+          "evidence_ids": [
+            "nct:NCT07287917"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT07287917",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT07287917",
+              "source_url": "https://clinicaltrials.gov/study/NCT07287917",
+              "evidence_type": "trial_field",
+              "content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups:\n\n* Cohort 1: Patients with ER+ / HER2- breast cancer receiving fulvestrant and capivasertib\n* Cohort 2: Patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab\n\nThe Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1b/2 Trial Investigating the Safety and Efficacy of Oral AMXT 1501 and Oral DFMO in Combination With Standard of Care in Patients With Advanced Solid Tumors Who Progressed After Prior Therapies",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Melanoma (Skin Cancer)",
+                  "HER2-low Hormone Receptor Positive Breast Cancer"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "AMXT 1501 Dicaprate",
+                    "description": "Formulation: Enteric-coated oral tablet (100 mg base)\n\nDose: Body-surface-area-adjusted; starting dose = 300 mg PO BID; may escalate per 3 + 3 design\n\nAdministration: By mouth on an empty stomach (AM and PM doses)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "DFMO",
+                    "description": "Formulation: 500 mg gel capsule\n\nDose: 500 mg PO once or twice daily, per cohort dose level"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Fulvestrant",
+                    "description": "Dose: 500 mg IM injection on Day 2 and Day 15 of Cycle 1, then Day 2 of each subsequent 28-day cycle"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Capivasertib",
+                    "description": "Dose: 400 mg PO BID for 4 days on / 3 days off each week (28-day cycle)"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Pembrolizumab",
+                    "description": "200 mg IV infusion every 3 weeks (Q3W) for up to 12 months"
+                  }
+                ],
+                "sponsor": "Aminex Therapeutics, Inc.",
+                "enrollment": "92",
+                "start_date": "2026-01-26",
+                "completion_date": "2028-12-29"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580531Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 1259.1304779052734,
+        "input_tokens": 7012,
+        "output_tokens": 646
+      }
+    },
+    {
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "phase5_case_ids": [
+        "CT-NCT06897475"
+      ],
+      "query": "What is known about the Phase 2 double-blind trial NCT06897475 studying once-weekly subcutaneous LY3457263 in participants with Type 2 Diabetes Mellitus?",
+      "answer_id": "ans-515d79869e99",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "NCT06897475 is a Phase 2, double-blind, parallel-group treatment study.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-1",
+          "text": "The study is currently recruiting.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-2",
+          "text": "The study is sponsored by Eli Lilly and Company.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-3",
+          "text": "The study involves 200 participants.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-4",
+          "text": "The study started on 2025-03-28 and is expected to complete in 2027-06.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-5",
+          "text": "The study evaluates once-weekly subcutaneous LY3457263 compared to placebo.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-6",
+          "text": "Participants have Type 2 Diabetes Mellitus and are on a stable dose of semaglutide or tirzepatide who failed to achieve HbA1c goal.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-7",
+          "text": "The primary purpose is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-8",
+          "text": "Participation in the study will last about 9 months.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q2::c-0",
+          "text": "NCT06897475 is a Phase 2, double-blind, parallel-group treatment study.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q2::c-1",
+          "text": "The study is currently recruiting.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-2",
+          "full_id": "P7SUP-Q2::c-2",
+          "text": "The study is sponsored by Eli Lilly and Company.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-3",
+          "full_id": "P7SUP-Q2::c-3",
+          "text": "The study involves 200 participants.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-4",
+          "full_id": "P7SUP-Q2::c-4",
+          "text": "The study started on 2025-03-28 and is expected to complete in 2027-06.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-5",
+          "full_id": "P7SUP-Q2::c-5",
+          "text": "The study evaluates once-weekly subcutaneous LY3457263 compared to placebo.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-6",
+          "full_id": "P7SUP-Q2::c-6",
+          "text": "Participants have Type 2 Diabetes Mellitus and are on a stable dose of semaglutide or tirzepatide who failed to achieve HbA1c goal.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-7",
+          "full_id": "P7SUP-Q2::c-7",
+          "text": "The primary purpose is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-8",
+          "full_id": "P7SUP-Q2::c-8",
+          "text": "Participation in the study will last about 9 months.",
+          "evidence_ids": [
+            "nct:NCT06897475"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06897475",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06897475",
+              "source_url": "https://clinicaltrials.gov/study/NCT06897475",
+              "evidence_type": "trial_field",
+              "content": "The purpose of this study is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo in participants with type 2 diabetes who are not at HbA1c goal when treated with a stable dose of semaglutide or tirzepatide. Participation in the study will last about 9 months.",
+              "content_format": "verbatim_text",
+              "title": "A Parallel-Group Treatment, Phase 2, Double-Blind Study of Once-Weekly Subcutaneous LY3457263 Compared to Placebo in Participants With Type 2 Diabetes Mellitus on a Stable Dose of Semaglutide or Tirzepatide Who Failed to Achieve HbA1c Goal",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE2",
+                "conditions": [
+                  "Type 2 Diabetes"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "LY3457263",
+                    "description": "Administered SC"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "Administered SC"
+                  }
+                ],
+                "sponsor": "Eli Lilly and Company",
+                "enrollment": "200",
+                "start_date": "2025-03-28",
+                "completion_date": "2027-06"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.580670Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 12234.615802764893,
+        "input_tokens": 3074,
+        "output_tokens": 707
+      }
+    },
+    {
+      "case_id": "P7SUP-Q3",
+      "source_category": "pubmed",
+      "phase5_case_ids": [
+        "RAG-40306957-1"
+      ],
+      "query": "How do CD22 CAR-T cells that secrete CD19 T-cell engagers improve control of B-cell acute lymphoblastic leukemia progression?",
+      "answer_id": "ans-37ebd74a175b",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "CD22 CAR-T cells secreting CD19 T-cell engagers (CAR-STAb-T) efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-1",
+          "text": "In a heterogeneous B-ALL cell model replicating antigen loss, CAR-STAb-T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-2",
+          "text": "In patient-derived xenograft mouse models under T cell-limiting conditions, CAR-STAb-T cells controlled leukemia progression more efficiently than dual-targeting CAR-T cells.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-3",
+          "text": "The enhanced control of B-ALL progression by CD22 CAR-T cells secreting CD19 T-cell engagers is attributed to their ability to leverage bystander T cells for increased cytotoxicity and their superior performance in preventing antigen-loss escape compared to dual-targeting CAR-T cells.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "claim_type": "inference",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q3::c-0",
+          "text": "CD22 CAR-T cells secreting CD19 T-cell engagers (CAR-STAb-T) efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:40306957:chunk:1",
+              "source_type": "pubmed",
+              "source_record_id": "40306957",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/40306957/",
+              "evidence_type": "text_passage",
+              "content": "CAR-T cell therapies simultaneously targeting CD19 and CD22 have been developed and validated both preclinically and clinically. METHODS: We have generated the first dual-targeting strategy for B-cell malignancies based on CD22 CAR-T cells secreting an anti-CD19 TCE antibody (CAR-STAb-T) and conducted a comprehensive preclinical characterization comparing its therapeutic potential in B-ALL with that of previously validated dual-targeting CD19/CD22 tandem CAR cells (TanCAR-T cells) and co-administration of two single-targeting CD19 and CD22 CAR-T cells (pooled CAR-T cells). RESULTS: We demonstrate that CAR-STAb-T cells efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios. Furthermore, when antigen loss was replicated in a heterogeneous B-ALL cell model, CAR-STAb T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape. In vivo, CAR-STAb-T cells also controlled leukemia progression more efficiently than dual-targeting CAR-T cells in patient-derived xenograft mouse models under T cell-limiting conditions. CONCLUSIONS: CD22 CAR-T cells secreting CD19 T-cell engagers show an enhanced control of B-ALL progression",
+              "content_format": "verbatim_text",
+              "title": "CD22 CAR-T cells secreting CD19 T-cell engagers for improved control of B-cell acute lymphoblastic leukemia progression.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Journal for immunotherapy of cancer",
+                "year": "2025",
+                "pub_date": "2025-Apr-30",
+                "doi": "10.1136/jitc-2024-009048",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 9.372270584106445,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 1,
+                "num_chunks": 3,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580741Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q3::c-1",
+          "text": "In a heterogeneous B-ALL cell model replicating antigen loss, CAR-STAb-T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:40306957:chunk:1",
+              "source_type": "pubmed",
+              "source_record_id": "40306957",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/40306957/",
+              "evidence_type": "text_passage",
+              "content": "CAR-T cell therapies simultaneously targeting CD19 and CD22 have been developed and validated both preclinically and clinically. METHODS: We have generated the first dual-targeting strategy for B-cell malignancies based on CD22 CAR-T cells secreting an anti-CD19 TCE antibody (CAR-STAb-T) and conducted a comprehensive preclinical characterization comparing its therapeutic potential in B-ALL with that of previously validated dual-targeting CD19/CD22 tandem CAR cells (TanCAR-T cells) and co-administration of two single-targeting CD19 and CD22 CAR-T cells (pooled CAR-T cells). RESULTS: We demonstrate that CAR-STAb-T cells efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios. Furthermore, when antigen loss was replicated in a heterogeneous B-ALL cell model, CAR-STAb T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape. In vivo, CAR-STAb-T cells also controlled leukemia progression more efficiently than dual-targeting CAR-T cells in patient-derived xenograft mouse models under T cell-limiting conditions. CONCLUSIONS: CD22 CAR-T cells secreting CD19 T-cell engagers show an enhanced control of B-ALL progression",
+              "content_format": "verbatim_text",
+              "title": "CD22 CAR-T cells secreting CD19 T-cell engagers for improved control of B-cell acute lymphoblastic leukemia progression.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Journal for immunotherapy of cancer",
+                "year": "2025",
+                "pub_date": "2025-Apr-30",
+                "doi": "10.1136/jitc-2024-009048",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 9.372270584106445,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 1,
+                "num_chunks": 3,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580741Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-2",
+          "full_id": "P7SUP-Q3::c-2",
+          "text": "In patient-derived xenograft mouse models under T cell-limiting conditions, CAR-STAb-T cells controlled leukemia progression more efficiently than dual-targeting CAR-T cells.",
+          "evidence_ids": [
+            "pubmed:40306957:chunk:1"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:40306957:chunk:1",
+              "source_type": "pubmed",
+              "source_record_id": "40306957",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/40306957/",
+              "evidence_type": "text_passage",
+              "content": "CAR-T cell therapies simultaneously targeting CD19 and CD22 have been developed and validated both preclinically and clinically. METHODS: We have generated the first dual-targeting strategy for B-cell malignancies based on CD22 CAR-T cells secreting an anti-CD19 TCE antibody (CAR-STAb-T) and conducted a comprehensive preclinical characterization comparing its therapeutic potential in B-ALL with that of previously validated dual-targeting CD19/CD22 tandem CAR cells (TanCAR-T cells) and co-administration of two single-targeting CD19 and CD22 CAR-T cells (pooled CAR-T cells). RESULTS: We demonstrate that CAR-STAb-T cells efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios. Furthermore, when antigen loss was replicated in a heterogeneous B-ALL cell model, CAR-STAb T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape. In vivo, CAR-STAb-T cells also controlled leukemia progression more efficiently than dual-targeting CAR-T cells in patient-derived xenograft mouse models under T cell-limiting conditions. CONCLUSIONS: CD22 CAR-T cells secreting CD19 T-cell engagers show an enhanced control of B-ALL progression",
+              "content_format": "verbatim_text",
+              "title": "CD22 CAR-T cells secreting CD19 T-cell engagers for improved control of B-cell acute lymphoblastic leukemia progression.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Journal for immunotherapy of cancer",
+                "year": "2025",
+                "pub_date": "2025-Apr-30",
+                "doi": "10.1136/jitc-2024-009048",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 9.372270584106445,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 1,
+                "num_chunks": 3,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580741Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 13692.17038154602,
+        "input_tokens": 1084,
+        "output_tokens": 459
+      }
+    },
+    {
+      "case_id": "P7SUP-Q4",
+      "source_category": "pubmed",
+      "phase5_case_ids": [
+        "RAG-34290048-0"
+      ],
+      "query": "What is the safety and efficacy of CD19/CD22 dual-targeted CAR T-cell therapy for relapsed/refractory aggressive B-cell lymphoma?",
+      "answer_id": "ans-16e9a0d90b4d",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "In a study of 16 eligible patients with relapsed/refractory aggressive B-cell lymphoma, CD19/CD22 dual-targeted CAR T-cell therapy resulted in an objective response rate of 87.5% (14 patients) and a complete response rate of 62.5% (10 patients).",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "claim_type": "factual",
+          "qualifier": "single study"
+        },
+        {
+          "claim_id": "c-1",
+          "text": "The 2-year overall survival (OS) and progression-free survival (PFS) rates for patients treated with CD19/CD22 dual-targeted CAR T-cell therapy were 77.3% and 40.2%, respectively.",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "claim_type": "factual",
+          "qualifier": "single study"
+        },
+        {
+          "claim_id": "c-2",
+          "text": "The study assessed the safety profile of the therapy by recording CAR T-cell-associated toxicities, although specific toxicity rates or grades are not detailed in the provided text.",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-3",
+          "text": "CD19/CD22 dual-targeted CAR T-cell therapy is designed to overcome antigen escape-mediated relapse, a common limitation of therapies targeting CD19 or CD22 alone.",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "claim_type": "inference",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q4::c-0",
+          "text": "In a study of 16 eligible patients with relapsed/refractory aggressive B-cell lymphoma, CD19/CD22 dual-targeted CAR T-cell therapy resulted in an objective response rate of 87.5% (14 patients) and a complete response rate of 62.5% (10 patients).",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:34290048:chunk:0",
+              "source_type": "pubmed",
+              "source_record_id": "34290048",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/34290048/",
+              "evidence_type": "text_passage",
+              "content": "Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in patients with relapsed/refractory aggressive B-cell lymphoma. Twenty-four patients were screened, and 16 were found eligible for the study. CAR T-cell-associated toxicities were recorded. Responses, overall survival (OS), and progression-free survival (PFS) were assessed. Of the 16 eligible patients, 14 (87.5%) achieved objective response and 10 (62.5%) achieved complete response (CR). The 2-year OS and PFS rates were 77.3% and 40.2%, respectively. Achieving CR ( Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in",
+              "content_format": "verbatim_text",
+              "title": "CD19/CD22 Dual-Targeted CAR T-cell Therapy for Relapsed/Refractory Aggressive B-cell Lymphoma: A Safety and Efficacy Study.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Cancer immunology research",
+                "year": "2021",
+                "pub_date": "2021-Sep",
+                "doi": "10.1158/2326-6066.CIR-20-0675",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 3.5731072425842285,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 0,
+                "num_chunks": 2,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580814Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q4::c-1",
+          "text": "The 2-year overall survival (OS) and progression-free survival (PFS) rates for patients treated with CD19/CD22 dual-targeted CAR T-cell therapy were 77.3% and 40.2%, respectively.",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:34290048:chunk:0",
+              "source_type": "pubmed",
+              "source_record_id": "34290048",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/34290048/",
+              "evidence_type": "text_passage",
+              "content": "Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in patients with relapsed/refractory aggressive B-cell lymphoma. Twenty-four patients were screened, and 16 were found eligible for the study. CAR T-cell-associated toxicities were recorded. Responses, overall survival (OS), and progression-free survival (PFS) were assessed. Of the 16 eligible patients, 14 (87.5%) achieved objective response and 10 (62.5%) achieved complete response (CR). The 2-year OS and PFS rates were 77.3% and 40.2%, respectively. Achieving CR ( Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in",
+              "content_format": "verbatim_text",
+              "title": "CD19/CD22 Dual-Targeted CAR T-cell Therapy for Relapsed/Refractory Aggressive B-cell Lymphoma: A Safety and Efficacy Study.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Cancer immunology research",
+                "year": "2021",
+                "pub_date": "2021-Sep",
+                "doi": "10.1158/2326-6066.CIR-20-0675",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 3.5731072425842285,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 0,
+                "num_chunks": 2,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580814Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-2",
+          "full_id": "P7SUP-Q4::c-2",
+          "text": "The study assessed the safety profile of the therapy by recording CAR T-cell-associated toxicities, although specific toxicity rates or grades are not detailed in the provided text.",
+          "evidence_ids": [
+            "pubmed:34290048:chunk:0"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:34290048:chunk:0",
+              "source_type": "pubmed",
+              "source_record_id": "34290048",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/34290048/",
+              "evidence_type": "text_passage",
+              "content": "Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in patients with relapsed/refractory aggressive B-cell lymphoma. Twenty-four patients were screened, and 16 were found eligible for the study. CAR T-cell-associated toxicities were recorded. Responses, overall survival (OS), and progression-free survival (PFS) were assessed. Of the 16 eligible patients, 14 (87.5%) achieved objective response and 10 (62.5%) achieved complete response (CR). The 2-year OS and PFS rates were 77.3% and 40.2%, respectively. Achieving CR ( Chimeric antigen receptor (CAR) T-cell therapies that target either CD19 or CD22 alone have potent antilymphoma effects. However, antigen escape-mediated relapse often occurs. CAR T cells targeting both CD19 and CD22 may overcome this limitation. In this study, we developed bispecific CAR T cells simultaneously recognizing CD19- and CD22-expressing targets and assessed their safety and efficacy profiles in",
+              "content_format": "verbatim_text",
+              "title": "CD19/CD22 Dual-Targeted CAR T-cell Therapy for Relapsed/Refractory Aggressive B-cell Lymphoma: A Safety and Efficacy Study.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Cancer immunology research",
+                "year": "2021",
+                "pub_date": "2021-Sep",
+                "doi": "10.1158/2326-6066.CIR-20-0675",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 3.5731072425842285,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 0,
+                "num_chunks": 2,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580814Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 16000.863075256348,
+        "input_tokens": 1102,
+        "output_tokens": 458
+      }
+    },
+    {
+      "case_id": "P7SUP-Q5",
+      "source_category": "chembl",
+      "phase5_case_ids": [
+        "CHEMBL-resolve-aspirin"
+      ],
+      "query": "What does ChEMBL's compound-name resolution report for the drug aspirin?",
+      "answer_id": "ans-390a7654241c",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "ChEMBL's compound-name resolution for the drug aspirin reports an exact match to the preferred name 'ASPIRIN' with the compound ID CHEMBL25.",
+          "evidence_ids": [
+            "chembl:CHEMBL25"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q5::c-0",
+          "text": "ChEMBL's compound-name resolution for the drug aspirin reports an exact match to the preferred name 'ASPIRIN' with the compound ID CHEMBL25.",
+          "evidence_ids": [
+            "chembl:CHEMBL25"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "chembl:CHEMBL25",
+              "source_type": "chembl",
+              "source_record_id": "CHEMBL25",
+              "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL25/",
+              "evidence_type": "compound_identity",
+              "content": "ASPIRIN",
+              "content_format": "field_value",
+              "title": "ASPIRIN",
+              "source_metadata": {
+                "kind": "chembl",
+                "molecule_type": null,
+                "max_phase": null,
+                "mechanism_of_action": null,
+                "match_type": "exact_preferred_name"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "resolve_compound_name",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.580838Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 5711.747884750366,
+        "input_tokens": 698,
+        "output_tokens": 110
+      }
+    },
+    {
+      "case_id": "P7SUP-Q6",
+      "source_category": "chembl",
+      "phase5_case_ids": [
+        "CHEMBL-resolve-Keytruda"
+      ],
+      "query": "What does ChEMBL's compound-name resolution report for the drug Keytruda?",
+      "answer_id": "ans-e8c347bd6b33",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "ChEMBL's compound-name resolution for the drug Keytruda identifies the compound as PEMBROLIZUMAB.",
+          "evidence_ids": [
+            "chembl:CHEMBL3137343"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-1",
+          "text": "The match type reported for this resolution is 'exact_synonym'.",
+          "evidence_ids": [
+            "chembl:CHEMBL3137343"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q6::c-0",
+          "text": "ChEMBL's compound-name resolution for the drug Keytruda identifies the compound as PEMBROLIZUMAB.",
+          "evidence_ids": [
+            "chembl:CHEMBL3137343"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "chembl:CHEMBL3137343",
+              "source_type": "chembl",
+              "source_record_id": "CHEMBL3137343",
+              "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL3137343/",
+              "evidence_type": "compound_identity",
+              "content": "PEMBROLIZUMAB",
+              "content_format": "field_value",
+              "title": "PEMBROLIZUMAB",
+              "source_metadata": {
+                "kind": "chembl",
+                "molecule_type": null,
+                "max_phase": null,
+                "mechanism_of_action": null,
+                "match_type": "exact_synonym"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "resolve_compound_name",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581001Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q6::c-1",
+          "text": "The match type reported for this resolution is 'exact_synonym'.",
+          "evidence_ids": [
+            "chembl:CHEMBL3137343"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "chembl:CHEMBL3137343",
+              "source_type": "chembl",
+              "source_record_id": "CHEMBL3137343",
+              "source_url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL3137343/",
+              "evidence_type": "compound_identity",
+              "content": "PEMBROLIZUMAB",
+              "content_format": "field_value",
+              "title": "PEMBROLIZUMAB",
+              "source_metadata": {
+                "kind": "chembl",
+                "molecule_type": null,
+                "max_phase": null,
+                "mechanism_of_action": null,
+                "match_type": "exact_synonym"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "resolve_compound_name",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581001Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 12156.603336334229,
+        "input_tokens": 705,
+        "output_tokens": 173
+      }
+    },
+    {
+      "case_id": "P7SUP-Q7",
+      "source_category": "multi_source",
+      "phase5_case_ids": [
+        "CT-NCT06937203",
+        "RAG-40074511-0"
+      ],
+      "query": "What is known about the Phase 1/2a dose-escalating trial NCT06937203 and about CAR therapies for lymphoma, considered together?",
+      "answer_id": "ans-13b8b438d762",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "Clinical trial NCT06937203 is a Phase 1/2a dose-escalating study evaluating the safety, tolerability, pharmacokinetics, and pharmacodynamics of ARO-ALK7 in adult volunteers with obesity, with and without Type 2 Diabetes Mellitus.",
+          "evidence_ids": [
+            "nct:NCT06937203"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-1",
+          "text": "The trial NCT06937203 is sponsored by Arrowhead Pharmaceuticals, is currently recruiting, and has a planned enrollment of 150 participants.",
+          "evidence_ids": [
+            "nct:NCT06937203"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-2",
+          "text": "The intervention in trial NCT06937203 involves subcutaneous injection of the drug ARO-ALK7 or a matching placebo.",
+          "evidence_ids": [
+            "nct:NCT06937203"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-3",
+          "text": "Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL), with CD19-targeting CAR-T cell therapy approved for Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma.",
+          "evidence_ids": [
+            "pubmed:40074511:chunk:0"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-4",
+          "text": "CAR-T cells demonstrate robust and durable responses in heavily pretreated lymphoma patients, though clinicians must monitor for Cytokine Release Syndrome (CRS), Immune Effector Cell Neurotoxicity Syndrome (ICANS), cytopenias, infection, and secondary malignancies.",
+          "evidence_ids": [
+            "pubmed:40074511:chunk:0"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-5",
+          "text": "The provided evidence does not establish a direct connection between the specific trial NCT06937203 (which targets obesity and T2DM) and CAR therapies for lymphoma, as they address distinct therapeutic areas and mechanisms.",
+          "evidence_ids": [],
+          "claim_type": "inference",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q7::c-0",
+          "text": "Clinical trial NCT06937203 is a Phase 1/2a dose-escalating study evaluating the safety, tolerability, pharmacokinetics, and pharmacodynamics of ARO-ALK7 in adult volunteers with obesity, with and without Type 2 Diabetes Mellitus.",
+          "evidence_ids": [
+            "nct:NCT06937203"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06937203",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06937203",
+              "source_url": "https://clinicaltrials.gov/study/NCT06937203",
+              "evidence_type": "trial_field",
+              "content": "This is a Phase 1/2a double-blind dose-escalating study to evaluate the safety, tolerability, pharmacokinetics (PK), and pharmacodynamics (PD) of single and multiple doses of ARO-ALK7 in adult participants with obesity without Type 2 Diabetes Mellitus (T2DM) (Part 1), and the safety, tolerability, and PD of multiple doses of ARO-ALK7 in adult participants with obesity with and without T2DM, either as monotherapy or in combination with tirzepatide (Part 2).",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1/2A Dose-Escalating Study to Evaluate the Safety, Tolerability, Pharmacokinetics, and Pharmacodynamics of ARO-ALK7 in Adult Volunteers With Obesity With and Without Type 2 Diabetes Mellitus",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Obesity",
+                  "Diabetes Mellitus, Type 2"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "ARO-ALK7",
+                    "description": "Subcutaneous (SC) injection"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "calculated volume to match active treatment by SC injection"
+                  }
+                ],
+                "sponsor": "Arrowhead Pharmaceuticals",
+                "enrollment": "150",
+                "start_date": "2025-05-09",
+                "completion_date": "2027-02"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.581153Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q7::c-1",
+          "text": "The trial NCT06937203 is sponsored by Arrowhead Pharmaceuticals, is currently recruiting, and has a planned enrollment of 150 participants.",
+          "evidence_ids": [
+            "nct:NCT06937203"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06937203",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06937203",
+              "source_url": "https://clinicaltrials.gov/study/NCT06937203",
+              "evidence_type": "trial_field",
+              "content": "This is a Phase 1/2a double-blind dose-escalating study to evaluate the safety, tolerability, pharmacokinetics (PK), and pharmacodynamics (PD) of single and multiple doses of ARO-ALK7 in adult participants with obesity without Type 2 Diabetes Mellitus (T2DM) (Part 1), and the safety, tolerability, and PD of multiple doses of ARO-ALK7 in adult participants with obesity with and without T2DM, either as monotherapy or in combination with tirzepatide (Part 2).",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1/2A Dose-Escalating Study to Evaluate the Safety, Tolerability, Pharmacokinetics, and Pharmacodynamics of ARO-ALK7 in Adult Volunteers With Obesity With and Without Type 2 Diabetes Mellitus",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Obesity",
+                  "Diabetes Mellitus, Type 2"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "ARO-ALK7",
+                    "description": "Subcutaneous (SC) injection"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "calculated volume to match active treatment by SC injection"
+                  }
+                ],
+                "sponsor": "Arrowhead Pharmaceuticals",
+                "enrollment": "150",
+                "start_date": "2025-05-09",
+                "completion_date": "2027-02"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.581153Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-2",
+          "full_id": "P7SUP-Q7::c-2",
+          "text": "The intervention in trial NCT06937203 involves subcutaneous injection of the drug ARO-ALK7 or a matching placebo.",
+          "evidence_ids": [
+            "nct:NCT06937203"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "nct:NCT06937203",
+              "source_type": "clinical_trials",
+              "source_record_id": "NCT06937203",
+              "source_url": "https://clinicaltrials.gov/study/NCT06937203",
+              "evidence_type": "trial_field",
+              "content": "This is a Phase 1/2a double-blind dose-escalating study to evaluate the safety, tolerability, pharmacokinetics (PK), and pharmacodynamics (PD) of single and multiple doses of ARO-ALK7 in adult participants with obesity without Type 2 Diabetes Mellitus (T2DM) (Part 1), and the safety, tolerability, and PD of multiple doses of ARO-ALK7 in adult participants with obesity with and without T2DM, either as monotherapy or in combination with tirzepatide (Part 2).",
+              "content_format": "verbatim_text",
+              "title": "A Phase 1/2A Dose-Escalating Study to Evaluate the Safety, Tolerability, Pharmacokinetics, and Pharmacodynamics of ARO-ALK7 in Adult Volunteers With Obesity With and Without Type 2 Diabetes Mellitus",
+              "source_metadata": {
+                "kind": "clinical_trials",
+                "status": "RECRUITING",
+                "phase": "PHASE1, PHASE2",
+                "conditions": [
+                  "Obesity",
+                  "Diabetes Mellitus, Type 2"
+                ],
+                "interventions": [
+                  {
+                    "type": "DRUG",
+                    "name": "ARO-ALK7",
+                    "description": "Subcutaneous (SC) injection"
+                  },
+                  {
+                    "type": "DRUG",
+                    "name": "Placebo",
+                    "description": "calculated volume to match active treatment by SC injection"
+                  }
+                ],
+                "sponsor": "Arrowhead Pharmaceuticals",
+                "enrollment": "150",
+                "start_date": "2025-05-09",
+                "completion_date": "2027-02"
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "live_api",
+                "retrieval_rank": null,
+                "retrieval_score": null,
+                "corpus_index_version": null,
+                "chunk_index": null,
+                "num_chunks": null,
+                "field_path": "protocolSection.descriptionModule.briefSummary",
+                "retrieved_at": "2026-09-28T03:18:07.581153Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-3",
+          "full_id": "P7SUP-Q7::c-3",
+          "text": "Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL), with CD19-targeting CAR-T cell therapy approved for Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma.",
+          "evidence_ids": [
+            "pubmed:40074511:chunk:0"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:40074511:chunk:0",
+              "source_type": "pubmed",
+              "source_record_id": "40074511",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/40074511/",
+              "evidence_type": "text_passage",
+              "content": "Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL). CD19-targeting CAR-T cell therapy is approved for treatment in Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma. CAR-T cells demonstrate robust and durable responses even in heavily pretreated patients. Clinicians should monitor for Cytokine Release Syndrome (CRS) and Immune Effector Cell Neurotoxicity Syndrome (ICANS), as well as cytopenias, infection, and secondary malignancies. Ongoing questions remain in improving manufacturing efficacy, sequencing CAR-T cells amongst other therapies including bi-specific antibodies (BiTEs), and predicting optimal responders. In addition, novel CARs are being developed with alternative targets or that secrete activating cytokines (i.e. \"armored CARs\"). CAR-T cells represent an effective lymphoma therapy and should be considered for eligible patients. Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL). CD19-targeting CAR-T cell therapy is approved for treatment in Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma. CAR-T cells demonstrate robust and durable responses even in heavily pretreated patients.",
+              "content_format": "verbatim_text",
+              "title": "CARs for lymphoma.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Best practice & research. Clinical haematology",
+                "year": "2024",
+                "pub_date": "2024-Dec",
+                "doi": "10.1016/j.beha.2025.101601",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 2.6816091537475586,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 0,
+                "num_chunks": 2,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581171Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-4",
+          "full_id": "P7SUP-Q7::c-4",
+          "text": "CAR-T cells demonstrate robust and durable responses in heavily pretreated lymphoma patients, though clinicians must monitor for Cytokine Release Syndrome (CRS), Immune Effector Cell Neurotoxicity Syndrome (ICANS), cytopenias, infection, and secondary malignancies.",
+          "evidence_ids": [
+            "pubmed:40074511:chunk:0"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:40074511:chunk:0",
+              "source_type": "pubmed",
+              "source_record_id": "40074511",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/40074511/",
+              "evidence_type": "text_passage",
+              "content": "Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL). CD19-targeting CAR-T cell therapy is approved for treatment in Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma. CAR-T cells demonstrate robust and durable responses even in heavily pretreated patients. Clinicians should monitor for Cytokine Release Syndrome (CRS) and Immune Effector Cell Neurotoxicity Syndrome (ICANS), as well as cytopenias, infection, and secondary malignancies. Ongoing questions remain in improving manufacturing efficacy, sequencing CAR-T cells amongst other therapies including bi-specific antibodies (BiTEs), and predicting optimal responders. In addition, novel CARs are being developed with alternative targets or that secrete activating cytokines (i.e. \"armored CARs\"). CAR-T cells represent an effective lymphoma therapy and should be considered for eligible patients. Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL). CD19-targeting CAR-T cell therapy is approved for treatment in Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma. CAR-T cells demonstrate robust and durable responses even in heavily pretreated patients.",
+              "content_format": "verbatim_text",
+              "title": "CARs for lymphoma.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Best practice & research. Clinical haematology",
+                "year": "2024",
+                "pub_date": "2024-Dec",
+                "doi": "10.1016/j.beha.2025.101601",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 2.6816091537475586,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 0,
+                "num_chunks": 2,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581171Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 12403.520822525024,
+        "input_tokens": 3495,
+        "output_tokens": 664
+      }
+    },
+    {
+      "case_id": "P7SUP-Q8",
+      "source_category": "multi_source",
+      "phase5_case_ids": [
+        "RAG-36728908-4",
+        "RAG-35883645-0"
+      ],
+      "query": "What resistance mechanisms to osimertinib have been reported across the EML4-ALK/EGFR-C797S-in-cis case report and the broader review of diverse osimertinib resistance mechanisms in EGFR-mutant lung adenocarcinoma?",
+      "answer_id": "ans-6011061c71d5",
+      "abstained": false,
+      "all_claims": [
+        {
+          "claim_id": "c-0",
+          "text": "In a patient with EGFR L858R/T790M mutations, the acquisition of an EML4-ALK fusion and an EGFR C797S mutation in cis were reported as resistance mechanisms to osimertinib.",
+          "evidence_ids": [
+            "pubmed:36728908:chunk:4"
+          ],
+          "claim_type": "factual",
+          "qualifier": "case report"
+        },
+        {
+          "claim_id": "c-1",
+          "text": "The C797S mutation in cis is identified as an underlying mechanism of acquired resistance in the context of double TKI therapy.",
+          "evidence_ids": [
+            "pubmed:36728908:chunk:4"
+          ],
+          "claim_type": "factual",
+          "qualifier": null
+        },
+        {
+          "claim_id": "c-2",
+          "text": "In a study of EGFR-mutant NSCLC PC-9 cells, osimertinib resistance was developed in five cell lines (AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14), with the amplification of wild-type EGFR identified as a mechanism.",
+          "evidence_ids": [
+            "pubmed:35883645:chunk:0"
+          ],
+          "claim_type": "factual",
+          "qualifier": "in vitro study"
+        },
+        {
+          "claim_id": "c-3",
+          "text": "The reported resistance mechanisms to osimertinib are diverse, ranging from specific on-target mutations (C797S) and fusions (EML4-ALK) in clinical cases to off-target or bypass mechanisms such as wild-type EGFR amplification in preclinical models.",
+          "evidence_ids": [
+            "pubmed:36728908:chunk:4",
+            "pubmed:35883645:chunk:0"
+          ],
+          "claim_type": "inference",
+          "qualifier": null
+        }
+      ],
+      "factual_claims": [
+        {
+          "claim_id": "c-0",
+          "full_id": "P7SUP-Q8::c-0",
+          "text": "In a patient with EGFR L858R/T790M mutations, the acquisition of an EML4-ALK fusion and an EGFR C797S mutation in cis were reported as resistance mechanisms to osimertinib.",
+          "evidence_ids": [
+            "pubmed:36728908:chunk:4"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:36728908:chunk:4",
+              "source_type": "pubmed",
+              "source_record_id": "36728908",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/36728908/",
+              "evidence_type": "text_passage",
+              "content": "but critical resistance mechanism to osimertinib, and C797S mutation in cis may be an underlying mechanism of acquired resistance mutation in double TKIs therapy. Furthermore, molecular detection and rebiopsy play important roles in the selection of therapeutic strategies when the disease progresses.",
+              "content_format": "verbatim_text",
+              "title": "Acquired EML4-ALK fusion and EGFR C797S in cis mutation as resistance mechanisms to osimertinib in a non-small cell lung cancer patient with EGFR L858R/T790M.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Anti-cancer drugs",
+                "year": "2023",
+                "pub_date": "2023-Nov-01",
+                "doi": "10.1097/CAD.0000000000001489",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 8.482126235961914,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 4,
+                "num_chunks": 5,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581191Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-1",
+          "full_id": "P7SUP-Q8::c-1",
+          "text": "The C797S mutation in cis is identified as an underlying mechanism of acquired resistance in the context of double TKI therapy.",
+          "evidence_ids": [
+            "pubmed:36728908:chunk:4"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:36728908:chunk:4",
+              "source_type": "pubmed",
+              "source_record_id": "36728908",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/36728908/",
+              "evidence_type": "text_passage",
+              "content": "but critical resistance mechanism to osimertinib, and C797S mutation in cis may be an underlying mechanism of acquired resistance mutation in double TKIs therapy. Furthermore, molecular detection and rebiopsy play important roles in the selection of therapeutic strategies when the disease progresses.",
+              "content_format": "verbatim_text",
+              "title": "Acquired EML4-ALK fusion and EGFR C797S in cis mutation as resistance mechanisms to osimertinib in a non-small cell lung cancer patient with EGFR L858R/T790M.",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Anti-cancer drugs",
+                "year": "2023",
+                "pub_date": "2023-Nov-01",
+                "doi": "10.1097/CAD.0000000000001489",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 1,
+                "retrieval_score": 8.482126235961914,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 4,
+                "num_chunks": 5,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581191Z"
+              }
+            }
+          ]
+        },
+        {
+          "claim_id": "c-2",
+          "full_id": "P7SUP-Q8::c-2",
+          "text": "In a study of EGFR-mutant NSCLC PC-9 cells, osimertinib resistance was developed in five cell lines (AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14), with the amplification of wild-type EGFR identified as a mechanism.",
+          "evidence_ids": [
+            "pubmed:35883645:chunk:0"
+          ],
+          "cited_evidence": [
+            {
+              "evidence_id": "pubmed:35883645:chunk:0",
+              "source_type": "pubmed",
+              "source_record_id": "35883645",
+              "source_url": "https://pubmed.ncbi.nlm.nih.gov/35883645/",
+              "evidence_type": "text_passage",
+              "content": "Osimertinib, a third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor (TKI), is used as a first-line treatment for patients with EGFR-mutant non-small cell lung cancer (NSCLC). However, the mechanisms underlying its anticancer activity, particularly the subsequent development of acquired resistance, are unclear. Herein, we investigated the mechanisms underlying the development of osimertinib resistance by treating NSCLC PC-9 cells (harboring an EGFR-activating mutation) with osimertinib, thereby developing five resistant cell lines, i.e., AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14. The amplification of wild-type  Osimertinib, a third-generation epidermal growth factor receptor (EGFR) tyrosine kinase inhibitor (TKI), is used as a first-line treatment for patients with EGFR-mutant non-small cell lung cancer (NSCLC). However, the mechanisms underlying its anticancer activity, particularly the subsequent development of acquired resistance, are unclear. Herein, we investigated the mechanisms underlying the development of osimertinib resistance by treating NSCLC PC-9 cells (harboring an EGFR-activating mutation) with osimertinib, thereby developing five resistant cell lines, i.e., AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14. The amplification of wild-type ",
+              "content_format": "verbatim_text",
+              "title": "Diverse Mechanisms of Resistance against Osimertinib, a Third-Generation EGFR-TKI, in Lung Adenocarcinoma Cells with an ",
+              "source_metadata": {
+                "kind": "pubmed",
+                "journal": "Cells",
+                "year": "2022",
+                "pub_date": "2022-Jul-14",
+                "doi": "10.3390/cells11142201",
+                "authors": []
+              },
+              "provenance": {
+                "call_id": null,
+                "retrieval_method": "rag_hybrid_rerank",
+                "retrieval_rank": 2,
+                "retrieval_score": 8.479652404785156,
+                "corpus_index_version": "phase5_benchmark_manifest_v1",
+                "chunk_index": 0,
+                "num_chunks": 1,
+                "field_path": null,
+                "retrieved_at": "2026-09-28T03:18:07.581210Z"
+              }
+            }
+          ]
+        }
+      ],
+      "generation_metadata": {
+        "architecture": "candidate_b_structured",
+        "provider": "Cerebras",
+        "model": "qwen-3.8-27b",
+        "llm_calls": 1,
+        "latency_ms": 11792.22559928894,
+        "input_tokens": 1328,
+        "output_tokens": 487
+      }
+    }
+  ],
+  "content_sha256": "1c5e8015f8e4c8f0c4eedae71a379e0e090d30fe967ed52d3dd5f10bafbbbc78",
+  "freeze_note": "This manifest is frozen as of this write. No claim text, evidence content, or citation mapping in it may be altered after this point. Candidate B and Candidate E must both evaluate exactly these factual_claims entries."
+}

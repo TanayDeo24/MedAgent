@@ -500,3 +500,132 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   access is already usable.** It means only that no egress-policy change
   is needed IF a credential is later provided - the credential itself is
   still entirely absent this session.
+
+## Resume-safe claims (Phase 7 Candidate D attempt, this session)
+
+- `GEMINI_API_KEY` was provisioned and a genuinely independent Candidate D
+  evaluator (Google Gemini `gemini-3.8-flash`) was built, offline-tested
+  (17 tests), and its live connectivity/authentication/structured-output
+  path was verified working (2 successful live batches, 21/21 = 100%
+  correct on the portion judged).
+- Correctly discovered the live model name via the API itself
+  (`models.list` + the error message from the originally-named model)
+  rather than assuming a name from training data.
+- Confirmed, via progressively smaller diagnostic batches and repeated
+  backoff, that a subsequent run of failures was a genuine Gemini-side
+  capacity outage - not a code, schema, or content defect in Candidate D.
+- Respected the free-tier quota discipline throughout: 8 of 20 daily
+  requests used, all planned in advance, batches token-aware, no
+  single-judgment-per-request waste.
+
+## Not resume-safe (Phase 7 Candidate D attempt, this session)
+
+- **Any claim that Candidate D is validated, frozen, or has passed
+  held-out.** None of this happened - development is only 21/41 complete.
+- **Any claim that CTL-011 is closed.** It is not. The credential blocker
+  is resolved, but the evaluator is not yet validated.
+- **Any claim of B-vs-D agreement, Cohen's kappa, or an independent
+  Phase-6 system cross-check.** None of these were measured this session.
+- **Any claim that the 21/21 = 100% partial result predicts final
+  Candidate D performance.** It is real, genuine signal on a small,
+  non-random subset (whatever batches happened to succeed before the
+  outage) - not a completed validation.
+
+## Resume-safe claims (Phase 7 Candidate E / CTL-011 closure)
+
+- Built and fully validated a genuinely independent second grounding
+  evaluator, Candidate E (NVIDIA NIM, Nemotron 3 Super 120B A12B) -
+  distinct provider and model family from both Cerebras qwen-3.8-27b
+  (Candidate B / generator) and Google Gemini (Candidate D).
+- Candidate E development: 39/41 = 95.1% (macro-F1 0.945), after finding
+  and fixing one real defect analogous to Candidate B's own original F1
+  finding - independently discovered, independently fixed.
+- Candidate E validation: 8/8 = 100%. Frozen before held-out.
+- Candidate E held-out (23 cases, run exactly once): 22/23 = 95.7%
+  (macro-F1 0.914), meeting every predeclared threshold.
+- **Candidate B vs Candidate E agreement across the full 72-case
+  benchmark: 93.1% raw, Cohen's kappa 0.904 ("almost perfect")** - real,
+  measured, independent cross-model corroboration of Phase-7's grounding
+  evaluator quality.
+- Every one of the 5 disagreements was manually adjudicated against the
+  real cited Evidence, not resolved by majority vote or by treating
+  either evaluator's output as automatically correct.
+- Candidate E independently cross-checked 26 real Phase-6 system-eval
+  claims: 26/26 = 100% supported, exactly matching Candidate B, 0
+  disagreements - real, if scope-limited, independent corroboration.
+- **CTL-011 REOPENED (self-audit correction)** - see below. The
+  benchmark-level Candidate E validation and B-vs-E agreement claims
+  above remain safe; the system-cross-check claim does not.
+- Preserved Candidate D (Gemini) exactly as a separate, unmodified,
+  partial historical experiment - never merged with or overwritten by
+  Candidate E's results.
+
+## Not resume-safe (Phase 7 Candidate E / CTL-011 closure)
+
+- **Any claim that the independent Phase-6 system cross-check covered
+  all 66 original claims.** It covered only 26 (the v3 subset) - the
+  other 40 (v1's 16 + v2's 24) are excluded, the latter due to a
+  disclosed accidental-regeneration incident this session, the former
+  for a pre-existing claim-text-not-persisted reason.
+- **Any claim that the accidental Phase-6 regeneration incident didn't
+  happen, or that its output was quietly used.** It happened; the
+  regenerated data was identified and explicitly excluded, not used.
+- **Any claim that Candidate E is flawless.** It has one disclosed,
+  real, residual weakness: on compound/multi-fact claims, it sometimes
+  treats one sub-fact as "the whole claim" and downgrades the verdict
+  when only that sub-fact is unaddressed, rather than crediting other
+  correctly-supported facts as partially_supported. Candidate B was
+  correct in all 5 real disagreements found.
+- **Any claim that Candidate D (Gemini) was completed, merged with
+  Candidate E, or used as a tie-breaker.** None of this happened;
+  Gemini's 21/41 partial dev result remains a separate, preserved,
+  unfinished historical experiment.
+
+## Self-audit correction: CTL-011 REOPENED (before freeze authorization)
+
+- **Retracted:** "CTL-011 is closed" and "18/18 caveat rows closed."
+  A dedicated audit found the Candidate E system-cross-check subset (26
+  claims) has zero ChEMBL representation - a coverage gap, not a smaller
+  sample of the same population. Declaring the system cross-check
+  satisfied on that basis overclaimed what was verified.
+- **Still resume-safe, unaffected by this correction:** Candidate E's own
+  development (39/41), validation (8/8), held-out (22/23), and the
+  Candidate B vs Candidate E benchmark-level agreement (n=72, kappa
+  0.904, 5/5 disagreements adjudicated) - none of this required
+  system-eval data.
+- **Not resume-safe:** any claim that Phase 6 was independently
+  cross-checked in a way representative of the original 66-claim
+  population, or that CTL-011 or the full 18-row caveat matrix are
+  closed. Corrected status: CTL-011 REOPENED; 17/18 closed, 1/18
+  reopened.
+
+## Fresh supplement executed: CTL-011 genuinely CLOSED (this session, latest)
+
+- **Now resume-safe:** "CTL-011 is closed" and "18/18 caveat rows
+  closed," on a genuinely complete and disclosed evidentiary basis - the
+  fresh 8-answer/32-claim supplement (clinical_trials 15, pubmed 6,
+  chembl 3, multi_source 8) combined with the surviving 26-claim v3
+  subset gives 58 claims across all four source categories. Frozen
+  Candidate B: 32/32 supported on the supplement. Frozen, unmodified
+  Candidate E: 31/32 supported, 1 partially_supported. Combined raw
+  B-vs-E agreement: 57/58 (~98.3%); ChEMBL-specific agreement 3/3
+  (100%). The single disagreement was manually adjudicated: E_CORRECT
+  (Candidate B overclaimed support for a claim with an unaddressed
+  sub-fact and a source-truncated sub-fact).
+- **Resume-safe caveat:** the combined 58-claim set is explicitly NOT
+  the original 66-claim Phase-6 system population - do not resume by
+  claiming "the original system-eval set was cross-checked." 40 of the
+  original 66 claims remain permanently unrecoverable
+  (`artifacts/v2/phase7_system_crosscheck_recovery_audit.json`). Always
+  cite the combined set's disclosed composition
+  (`artifacts/v2/phase7_system_crosscheck_combined_summary.json`) rather
+  than describing it as "the 66-claim cross-check."
+- **Not resume-safe:** describing Cohen's kappa on the supplement (0.0)
+  as evidence of poor B-vs-E agreement - it is a degenerate artifact of
+  Candidate B's zero label variance on that subset; raw agreement
+  (~96.9% supplement-only, ~98.3% combined) is the informative figure.
+- **Still not resume-safe (unchanged):** any claim that Candidate D
+  (Gemini) was completed, merged with Candidate E, or used as a
+  tie-breaker; any claim that the original 40 missing Phase-6 claims
+  were recovered or reconstructed (they were not - see the recovery
+  audit).

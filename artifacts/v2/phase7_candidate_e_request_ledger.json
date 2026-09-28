@@ -1,0 +1,109 @@
+{
+  "artifact_name": "phase7_candidate_e_request_ledger",
+  "purpose": "Every live NVIDIA NIM request made this session for Candidate E. No API key, Authorization header, or secret-bearing data is recorded anywhere in this artifact.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "total_live_requests": 15,
+  "successful_requests": 13,
+  "failed_requests": 2,
+  "note_on_failures": "All 2 failures were the same diagnosed provider-side degenerate-repetition decoding issue under strict response_format=json_schema mode, root-caused and fixed before any further live spend (switched to prompt-described JSON + explicit deterministic parsing/validation) - not a quota exhaustion event.",
+  "requests": [
+    {
+      "stage": "smoke_test_v1_prompt",
+      "batch_size": 3,
+      "success": false,
+      "error_category": "schema_decoding_degenerate_loop",
+      "note": "response_format=json_schema strict mode caused finish_reason=length after infinite whitespace loop - root cause diagnosed via 2 further diagnostic calls, then fixed by switching to prompt-described JSON (no response_format)"
+    },
+    {
+      "stage": "diagnostic_full_batch",
+      "batch_size": 3,
+      "success": false,
+      "note": "diagnostic call confirming the schema-mode degenerate loop at 8192 max_tokens"
+    },
+    {
+      "stage": "diagnostic_single_case_no_schema",
+      "batch_size": 1,
+      "success": true,
+      "note": "confirmed plain-JSON-instruction mode works cleanly (81 completion tokens, finish_reason=stop)"
+    },
+    {
+      "stage": "smoke_test_v1_prompt_fixed",
+      "batch_size": 3,
+      "success": true,
+      "case_ids": [
+        "P7-F1-S",
+        "P7-F1-P",
+        "P7-F1-U"
+      ],
+      "correct": 3
+    },
+    {
+      "stage": "dev_batch_1_v1_prompt",
+      "batch_size": 18,
+      "success": true,
+      "correct": 18
+    },
+    {
+      "stage": "dev_batch_2_v1_prompt",
+      "batch_size": 18,
+      "success": true,
+      "correct": 15,
+      "note": "3 misses, all partially_supported gold cases -> motivated prompt v2 fix"
+    },
+    {
+      "stage": "dev_batch_3_v1_prompt",
+      "batch_size": 2,
+      "success": true,
+      "correct": 2
+    },
+    {
+      "stage": "dev_v2_full_rerun_batch_1",
+      "batch_size": 18,
+      "success": true,
+      "correct": 18,
+      "note": "fresh full re-run after prompt v2 fix"
+    },
+    {
+      "stage": "dev_v2_full_rerun_batch_2",
+      "batch_size": 18,
+      "success": true,
+      "correct": 16
+    },
+    {
+      "stage": "dev_v2_full_rerun_batch_3",
+      "batch_size": 5,
+      "success": true,
+      "correct": 3
+    },
+    {
+      "stage": "validation",
+      "batch_size": 8,
+      "success": true,
+      "correct": 8
+    },
+    {
+      "stage": "heldout_batch_1",
+      "batch_size": 18,
+      "success": true,
+      "correct": 18
+    },
+    {
+      "stage": "heldout_batch_2",
+      "batch_size": 5,
+      "success": true,
+      "correct": 4
+    },
+    {
+      "stage": "system_crosscheck_v3_batch_1",
+      "batch_size": 18,
+      "success": true,
+      "note": "Phase-6 system cross-check, v3 subset only (see scope-limitation disclosure)"
+    },
+    {
+      "stage": "system_crosscheck_v3_batch_2",
+      "batch_size": 8,
+      "success": true
+    }
+  ],
+  "INCIDENT_DISCLOSURE": "During construction of the Phase-6 system cross-check batch, an unrelated LOCAL (non-live) Python import accidentally re-executed unguarded top-level generation code in a scratchpad helper script (phase7_sys_eval_v2.py), causing a REAL, UNAUTHORIZED Cerebras regeneration of the v2 system-eval Phase-6 answers (8 answers). This was NOT a live NVIDIA/Candidate-E request, but is disclosed here because it directly reduced the scope of the Candidate E Phase-6 system cross-check (see artifacts/v2/phase7_phase6_system_evaluation_candidate_e.json's SCOPE_LIMITATION_DISCLOSED field for full detail). The process was killed as soon as this was noticed; a second script (phase7_sys_eval_v3.py) had NOT yet reached its own generation code and its original v3 answers remain genuinely untouched (confirmed via file modification timestamps)."
+}

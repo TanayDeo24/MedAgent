@@ -151,3 +151,55 @@ minimal new code (one HTTP client function, mirroring the existing
 Until one of these is provisioned, CTL-011 remains **OPEN**, and Phase 7
 cannot be closed with a genuinely independent evaluator - it can only be
 reported as ENGINEERING COMPLETE on every other dimension.
+
+## Update: GEMINI_API_KEY provisioned, Candidate D built, blocked mid-development by a live provider outage
+
+A human subsequently provisioned `GEMINI_API_KEY` in this session's
+environment. Candidate D (`grounding_eval/gemini_judge.py`) was built:
+Google Gemini, a genuinely different provider/model family from Cerebras
+qwen-3.8-27b; independent input isolation (claim + Evidence only, no
+Candidate B outputs, no gold, no generator prompt); token-aware batching
+(15-18 cases/batch, `x-goog-api-key` header, native JSON `responseSchema`
+structured output); fails closed on any schema/case-ID mismatch (a batch
+is rejected as a whole, never partially accepted); 17 offline tests
+(`tests/test_gemini_judge.py`), all passing without any live network call.
+
+**Model discovery, done live rather than assumed:** the directive's named
+model, `gemini-2.5-flash`, returned a live HTTP 404 - "This model ...
+is no longer available to new users ... use models/gemini-3.8-flash." A
+live `models.list` call confirmed `gemini-3.8-flash` is present and
+stable (no `-preview` suffix). Switched to it before any further live
+call.
+
+**Smoke test (Step 8): PASSED.** 3 representative development cases
+(one each of SUPPORTED/PARTIALLY_SUPPORTED/UNSUPPORTED), judged
+correctly, structured output parsed cleanly, real usage metadata
+returned (1,515 prompt / 396 completion tokens).
+
+**Development: PARTIAL, then blocked by a genuine provider outage.** One
+further 18-case batch succeeded (all 18 correct, all 4 support labels
+represented) - 21/21 = 100% judged so far. The next two batches (18
+cases, then 2 cases) both failed with HTTP 503 "This model is currently
+experiencing high demand." Two retries (30s backoff each) failed
+identically. A single-case diagnostic call (isolating batch-size/content
+as a possible cause) failed with the exact same message. A final retry
+after a 60s backoff also failed identically. **6 consecutive 503s across
+batch sizes 18/2/1/1 with increasing backoff rule out a code, schema, or
+content defect** - this is a real, currently-ongoing Gemini-side model
+overload, not something fixable from this session.
+
+**Quota discipline:** 8 live requests used (2 successful, 6 failed - all
+failures are provider 503s, not client errors), 12 of the 20 daily
+requests remain unspent. No request exceeded the batch-size/token
+ceilings planned in advance. Full ledger:
+`artifacts/v2/phase7_candidate_d_request_ledger.json`.
+
+**Conclusion:** the credential and network path are no longer the
+blocker - they both work, proven by two successful live batches. The
+current blocker is a live Gemini-side capacity outage. Candidate D
+cannot be frozen, held-out cannot be run, and no B-vs-D agreement or
+system cross-check can be produced until development+validation
+complete, which requires the outage to clear (or the daily quota to
+reset) and more live requests to be spent. CTL-011 **remains OPEN** -
+now for a transient provider-availability reason rather than a
+credential reason.

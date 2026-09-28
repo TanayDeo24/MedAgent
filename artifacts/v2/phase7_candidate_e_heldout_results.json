@@ -1,0 +1,136 @@
+{
+  "artifact_name": "phase7_candidate_e_heldout_results",
+  "purpose": "Frozen Candidate E (post-v2-fix, no further tuning) run exactly once against the FULL combined held-out (original 9 + fresh supplement 12 + fresh supplement 2 = 23 cases). Not re-run, not tuned on.",
+  "n": 23,
+  "correct": 22,
+  "accuracy": 0.9565217391304348,
+  "macro_f1": 0.9143,
+  "unsupported_recall": 1.0,
+  "contradiction_recall": 1.0,
+  "all_predeclared_thresholds_met": true,
+  "misses": [
+    {
+      "case_id": "P7V2-MI4-P",
+      "gold": "partially_supported",
+      "pred": "unsupported",
+      "root_cause": "Same pre-disclosed residual imperfection pattern documented in the frozen config BEFORE this held-out run - not a new surprise."
+    }
+  ],
+  "per_case_results": {
+    "P7-F7-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "phase7_heldout"
+    },
+    "P7-F7-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported",
+      "split": "phase7_heldout"
+    },
+    "P7-F7-U": {
+      "gold": "unsupported",
+      "pred": "unsupported",
+      "split": "phase7_heldout"
+    },
+    "P7-F7-C": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "phase7_heldout"
+    },
+    "P7-F8-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "phase7_heldout"
+    },
+    "P7-F8-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported",
+      "split": "phase7_heldout"
+    },
+    "P7-F8-U": {
+      "gold": "unsupported",
+      "pred": "unsupported",
+      "split": "phase7_heldout"
+    },
+    "P7-F8-C": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "phase7_heldout"
+    },
+    "P7-M2": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "phase7_heldout"
+    },
+    "P7V2-BT3-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-BT3-U": {
+      "gold": "unsupported",
+      "pred": "unsupported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-BT3-C": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-OS-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-OS-C1": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-OS-C2": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-OSR-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-OSR-C": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-MI4-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-MI4-P": {
+      "gold": "partially_supported",
+      "pred": "unsupported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-ASR-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V2-MS4-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement"
+    },
+    "P7V3-HELD2-S": {
+      "gold": "supported",
+      "pred": "supported",
+      "split": "fresh_heldout_supplement_2"
+    },
+    "P7V3-HELD2-C": {
+      "gold": "contradicted",
+      "pred": "contradicted",
+      "split": "fresh_heldout_supplement_2"
+    }
+  }
+}

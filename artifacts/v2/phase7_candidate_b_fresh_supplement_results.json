@@ -1,0 +1,1195 @@
+{
+  "artifact_name": "phase7_candidate_b_fresh_supplement_results",
+  "architecture": "candidate_b_semantic_judge",
+  "source_manifest": "artifacts/v2/phase7_system_crosscheck_fresh_supplement_manifest.json",
+  "n_claims": 32,
+  "label_distribution": {
+    "supported": 32
+  },
+  "results": [
+    {
+      "full_id": "P7SUP-Q1::c-0",
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "claim_text": "The trial NCT07287917 is a Phase 1b/2 study currently in the recruiting status, sponsored by Aminex Therapeutics, Inc.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "All claim details match evidence fields exactly."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects phase, status, and sponsor.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 0.012988999969820725,
+          "provider_call_ms": 601.773091000041,
+          "parsing_validation_ms": 0.052861999847664265,
+          "end_to_end_ms": 601.8389419998584,
+          "prompt_tokens": 1607,
+          "completion_tokens": 98,
+          "total_tokens": 1705,
+          "cost_usd": 0.0007212000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q1::c-1",
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "claim_text": "The study aims to evaluate the safety, tolerability, and preliminary effectiveness of oral AMXT 1501 and oral DFMO in combination with standard of care for patients with advanced solid tumors who have progressed after prior therapies.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Claim accurately reflects the study's stated objectives and population."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim is fully supported by the evidence text.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11436.207850000073,
+          "provider_call_ms": 573.5372429999188,
+          "parsing_validation_ms": 0.05049300011705782,
+          "end_to_end_ms": 12009.79558600011,
+          "prompt_tokens": 1617,
+          "completion_tokens": 100,
+          "total_tokens": 1717,
+          "cost_usd": 0.0007268000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q1::c-2",
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "claim_text": "The trial targets two specific patient populations: Cohort 1 consists of patients with ER+/HER2- breast cancer receiving fulvestrant and capivasertib, and Cohort 2 consists of patients with unresectable or metastatic cutaneous melanoma receiving pembrolizumab.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Cohort definitions match exactly"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects cited evidence",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11441.26216099994,
+          "provider_call_ms": 679.3690310000784,
+          "parsing_validation_ms": 0.06431399992834486,
+          "end_to_end_ms": 12120.695505999947,
+          "prompt_tokens": 1630,
+          "completion_tokens": 93,
+          "total_tokens": 1723,
+          "cost_usd": 0.0007264
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q1::c-3",
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "claim_text": "The Phase 1b portion of the trial is designed to determine the recommended Phase 2 dose (RP2D) using a 3+3 dose escalation design, while the Phase 2 portion will further evaluate efficacy.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-3",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Evidence explicitly states Phase 1b finds RP2D and Phase 2 evaluates efficacy."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the trial design and objectives stated in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11324.873629999956,
+          "provider_call_ms": 1091.239104000124,
+          "parsing_validation_ms": 0.06343399991237675,
+          "end_to_end_ms": 12416.176167999993,
+          "prompt_tokens": 1616,
+          "completion_tokens": 111,
+          "total_tokens": 1727,
+          "cost_usd": 0.0007352000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q1::c-4",
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "claim_text": "The investigational drug AMXT 1501 Dicaprate is administered as an enteric-coated oral tablet with a starting dose of 300 mg twice daily on an empty stomach, while DFMO is administered as a 500 mg gel capsule once or twice daily.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-4",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "All drug details match evidence exactly"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects cited trial intervention details",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 10923.581685000045,
+          "provider_call_ms": 642.8720859998975,
+          "parsing_validation_ms": 0.048342000127377105,
+          "end_to_end_ms": 11566.50211300007,
+          "prompt_tokens": 1631,
+          "completion_tokens": 95,
+          "total_tokens": 1726,
+          "cost_usd": 0.0007284000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q1::c-5",
+      "case_id": "P7SUP-Q1",
+      "source_category": "clinical_trials",
+      "claim_text": "The trial plans to enroll 92 participants, with a start date of January 26, 2026, and a completion date of December 29, 2028.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-5",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Enrollment, start, and completion dates match metadata exactly."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "All specific dates and enrollment numbers are explicitly stated in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11423.790432000033,
+          "provider_call_ms": 608.3989559999736,
+          "parsing_validation_ms": 0.1129110000874789,
+          "end_to_end_ms": 12032.302299000094,
+          "prompt_tokens": 1613,
+          "completion_tokens": 105,
+          "total_tokens": 1718,
+          "cost_usd": 0.0007292
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-0",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "NCT06897475 is a Phase 2, double-blind, parallel-group treatment study.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Title and metadata confirm Phase 2, double-blind, parallel-group design."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the study design details provided in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11424.036930000057,
+          "provider_call_ms": 1095.6908589998875,
+          "parsing_validation_ms": 0.049929999931919156,
+          "end_to_end_ms": 12519.777718999876,
+          "prompt_tokens": 1303,
+          "completion_tokens": 107,
+          "total_tokens": 1410,
+          "cost_usd": 0.0006068000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-1",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "The study is currently recruiting.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "status field is RECRUITING"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Evidence explicitly states status is RECRUITING",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 10940.334808000216,
+          "provider_call_ms": 703.81895599985,
+          "parsing_validation_ms": 0.04828000010093092,
+          "end_to_end_ms": 11644.202044000167,
+          "prompt_tokens": 1285,
+          "completion_tokens": 98,
+          "total_tokens": 1383,
+          "cost_usd": 0.0005924
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-2",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "The study is sponsored by Eli Lilly and Company.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Sponsor field matches claim"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim directly matches sponsor metadata",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11321.675869999808,
+          "provider_call_ms": 617.1700480001618,
+          "parsing_validation_ms": 0.04882999996880244,
+          "end_to_end_ms": 11938.894747999939,
+          "prompt_tokens": 1289,
+          "completion_tokens": 92,
+          "total_tokens": 1381,
+          "cost_usd": 0.0005892
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-3",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "The study involves 200 participants.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-3",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "enrollment field is 200"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim matches enrollment metadata",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11423.661558000049,
+          "provider_call_ms": 702.0301989998643,
+          "parsing_validation_ms": 0.04771199996866926,
+          "end_to_end_ms": 12125.739468999882,
+          "prompt_tokens": 1288,
+          "completion_tokens": 94,
+          "total_tokens": 1382,
+          "cost_usd": 0.0005904
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-4",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "The study started on 2025-03-28 and is expected to complete in 2027-06.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-4",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Dates match exactly"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim matches evidence metadata",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11327.105395999979,
+          "provider_call_ms": 681.5739570001824,
+          "parsing_validation_ms": 0.05867799995940004,
+          "end_to_end_ms": 12008.73803100012,
+          "prompt_tokens": 1309,
+          "completion_tokens": 89,
+          "total_tokens": 1398,
+          "cost_usd": 0.0005948
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-5",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "The study evaluates once-weekly subcutaneous LY3457263 compared to placebo.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-5",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Title and interventions confirm once-weekly SC LY3457263 vs placebo."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the study design described in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11322.871127000099,
+          "provider_call_ms": 693.0865360000098,
+          "parsing_validation_ms": 0.04698699990512978,
+          "end_to_end_ms": 12016.004650000013,
+          "prompt_tokens": 1300,
+          "completion_tokens": 110,
+          "total_tokens": 1410,
+          "cost_usd": 0.000608
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-6",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "Participants have Type 2 Diabetes Mellitus and are on a stable dose of semaglutide or tirzepatide who failed to achieve HbA1c goal.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-6",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Title and content explicitly state the participant criteria."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the study population described in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11381.11703300001,
+          "provider_call_ms": 736.5497380001216,
+          "parsing_validation_ms": 0.05968999994365731,
+          "end_to_end_ms": 12117.726461000075,
+          "prompt_tokens": 1314,
+          "completion_tokens": 100,
+          "total_tokens": 1414,
+          "cost_usd": 0.0006056
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-7",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "The primary purpose is to measure the change in hemoglobin A1c (HbA1c) with LY3457263 compared with placebo.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-7",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Claim matches evidence purpose statement"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the study's primary purpose",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11320.315073000074,
+          "provider_call_ms": 526.6027180000492,
+          "parsing_validation_ms": 0.04641299983632052,
+          "end_to_end_ms": 11846.96420399996,
+          "prompt_tokens": 1313,
+          "completion_tokens": 95,
+          "total_tokens": 1408,
+          "cost_usd": 0.0006012000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q2::c-8",
+      "case_id": "P7SUP-Q2",
+      "source_category": "clinical_trials",
+      "claim_text": "Participation in the study will last about 9 months.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-8",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Exact match in content"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim is verbatim in evidence",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11551.781464999976,
+          "provider_call_ms": 636.3119049999568,
+          "parsing_validation_ms": 0.048836999894774635,
+          "end_to_end_ms": 12188.142206999828,
+          "prompt_tokens": 1291,
+          "completion_tokens": 92,
+          "total_tokens": 1383,
+          "cost_usd": 0.00059
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q3::c-0",
+      "case_id": "P7SUP-Q3",
+      "source_category": "pubmed",
+      "claim_text": "CD22 CAR-T cells secreting CD19 T-cell engagers (CAR-STAb-T) efficiently redirect bystander T cells, resulting in higher cytotoxicity of B-ALL cells than dual-targeting CAR-T cells at limiting effector:target ratios.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40306957:chunk:1",
+            "relation": "supports",
+            "reason_code": "Claim is a direct paraphrase of the results section."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the specific findings stated in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11429.377627000122,
+          "provider_call_ms": 824.6718539999165,
+          "parsing_validation_ms": 0.04889499996352242,
+          "end_to_end_ms": 12254.098376000002,
+          "prompt_tokens": 1447,
+          "completion_tokens": 105,
+          "total_tokens": 1552,
+          "cost_usd": 0.0006628000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q3::c-1",
+      "case_id": "P7SUP-Q3",
+      "source_category": "pubmed",
+      "claim_text": "In a heterogeneous B-ALL cell model replicating antigen loss, CAR-STAb-T cells induced more potent and effective cytotoxic responses than dual-targeting CAR-T cells in both short- and long-term co-culture assays, reducing the risk of CD19-positive leukemia escape.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40306957:chunk:1",
+            "relation": "supports",
+            "reason_code": "Claim is a direct paraphrase of the evidence's results section."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the specific findings regarding heterogeneous B-ALL models and cytotoxicity.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11241.020066000146,
+          "provider_call_ms": 816.724559000022,
+          "parsing_validation_ms": 0.0663449998228316,
+          "end_to_end_ms": 12057.810969999991,
+          "prompt_tokens": 1449,
+          "completion_tokens": 113,
+          "total_tokens": 1562,
+          "cost_usd": 0.00067
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q3::c-2",
+      "case_id": "P7SUP-Q3",
+      "source_category": "pubmed",
+      "claim_text": "In patient-derived xenograft mouse models under T cell-limiting conditions, CAR-STAb-T cells controlled leukemia progression more efficiently than dual-targeting CAR-T cells.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40306957:chunk:1",
+            "relation": "supports",
+            "reason_code": "Directly states the claim's assertion in the results section."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim is a direct paraphrase of the evidence's in vivo results.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11249.671270000135,
+          "provider_call_ms": 599.7625809998226,
+          "parsing_validation_ms": 0.05958900010227808,
+          "end_to_end_ms": 11849.49344000006,
+          "prompt_tokens": 1426,
+          "completion_tokens": 109,
+          "total_tokens": 1535,
+          "cost_usd": 0.0006576
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q4::c-0",
+      "case_id": "P7SUP-Q4",
+      "source_category": "pubmed",
+      "claim_text": "In a study of 16 eligible patients with relapsed/refractory aggressive B-cell lymphoma, CD19/CD22 dual-targeted CAR T-cell therapy resulted in an objective response rate of 87.5% (14 patients) and a complete response rate of 62.5% (10 patients).",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:34290048:chunk:0",
+            "relation": "supports",
+            "reason_code": "All specific numbers and patient counts match the evidence exactly."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the study population and response rates provided in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11447.714485000006,
+          "provider_call_ms": 637.7119169999332,
+          "parsing_validation_ms": 0.04839700000047742,
+          "end_to_end_ms": 12085.47479899994,
+          "prompt_tokens": 1478,
+          "completion_tokens": 108,
+          "total_tokens": 1586,
+          "cost_usd": 0.0006776
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q4::c-1",
+      "case_id": "P7SUP-Q4",
+      "source_category": "pubmed",
+      "claim_text": "The 2-year overall survival (OS) and progression-free survival (PFS) rates for patients treated with CD19/CD22 dual-targeted CAR T-cell therapy were 77.3% and 40.2%, respectively.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:34290048:chunk:0",
+            "relation": "supports",
+            "reason_code": "Exact 2-year OS and PFS rates match."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the specific survival rates in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11423.489229000097,
+          "provider_call_ms": 1043.0121679999047,
+          "parsing_validation_ms": 0.047149000010904274,
+          "end_to_end_ms": 12466.548546000013,
+          "prompt_tokens": 1460,
+          "completion_tokens": 105,
+          "total_tokens": 1565,
+          "cost_usd": 0.000668
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q4::c-2",
+      "case_id": "P7SUP-Q4",
+      "source_category": "pubmed",
+      "claim_text": "The study assessed the safety profile of the therapy by recording CAR T-cell-associated toxicities, although specific toxicity rates or grades are not detailed in the provided text.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:34290048:chunk:0",
+            "relation": "supports",
+            "reason_code": "Evidence confirms safety assessment and toxicity recording without specific rates."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects evidence content regarding safety assessment and toxicity recording.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11020.935720000125,
+          "provider_call_ms": 739.8787929998889,
+          "parsing_validation_ms": 0.046976000021459186,
+          "end_to_end_ms": 11760.861489000035,
+          "prompt_tokens": 1440,
+          "completion_tokens": 106,
+          "total_tokens": 1546,
+          "cost_usd": 0.0006607999999999999
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q5::c-0",
+      "case_id": "P7SUP-Q5",
+      "source_category": "chembl",
+      "claim_text": "ChEMBL's compound-name resolution for the drug aspirin reports an exact match to the preferred name 'ASPIRIN' with the compound ID CHEMBL25.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "chembl:CHEMBL25",
+            "relation": "supports",
+            "reason_code": "Evidence confirms exact preferred name match for ASPIRIN with ID CHEMBL25."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "chembl:CHEMBL25"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the provided ChEMBL metadata for the compound.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11324.126270000079,
+          "provider_call_ms": 665.2989990000151,
+          "parsing_validation_ms": 0.05036199991081958,
+          "end_to_end_ms": 11989.475631000005,
+          "prompt_tokens": 1057,
+          "completion_tokens": 108,
+          "total_tokens": 1165,
+          "cost_usd": 0.0005092
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q6::c-0",
+      "case_id": "P7SUP-Q6",
+      "source_category": "chembl",
+      "claim_text": "ChEMBL's compound-name resolution for the drug Keytruda identifies the compound as PEMBROLIZUMAB.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "chembl:CHEMBL3137343",
+            "relation": "supports",
+            "reason_code": "Evidence confirms exact synonym match for Keytruda to Pembrolizumab."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "chembl:CHEMBL3137343"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim is directly supported by the provided ChEMBL evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11336.849224999924,
+          "provider_call_ms": 733.523170999888,
+          "parsing_validation_ms": 0.04751799997393391,
+          "end_to_end_ms": 12070.419913999785,
+          "prompt_tokens": 1050,
+          "completion_tokens": 109,
+          "total_tokens": 1159,
+          "cost_usd": 0.0005072
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q6::c-1",
+      "case_id": "P7SUP-Q6",
+      "source_category": "chembl",
+      "claim_text": "The match type reported for this resolution is 'exact_synonym'.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "chembl:CHEMBL3137343",
+            "relation": "supports",
+            "reason_code": "Metadata explicitly states match_type is exact_synonym"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "chembl:CHEMBL3137343"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim directly matches the provided metadata field",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11325.253972999917,
+          "provider_call_ms": 578.9291500000218,
+          "parsing_validation_ms": 0.055367999948430224,
+          "end_to_end_ms": 11904.238490999887,
+          "prompt_tokens": 1040,
+          "completion_tokens": 99,
+          "total_tokens": 1139,
+          "cost_usd": 0.0004952
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q7::c-0",
+      "case_id": "P7SUP-Q7",
+      "source_category": "multi_source",
+      "claim_text": "Clinical trial NCT06937203 is a Phase 1/2a dose-escalating study evaluating the safety, tolerability, pharmacokinetics, and pharmacodynamics of ARO-ALK7 in adult volunteers with obesity, with and without Type 2 Diabetes Mellitus.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06937203",
+            "relation": "supports",
+            "reason_code": "Claim accurately summarizes the trial title and content."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06937203"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "All factual assertions in the claim are directly supported by the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11467.444582000098,
+          "provider_call_ms": 632.1140219999961,
+          "parsing_validation_ms": 0.04626700001608697,
+          "end_to_end_ms": 12099.60487100011,
+          "prompt_tokens": 1372,
+          "completion_tokens": 102,
+          "total_tokens": 1474,
+          "cost_usd": 0.0006304000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q7::c-1",
+      "case_id": "P7SUP-Q7",
+      "source_category": "multi_source",
+      "claim_text": "The trial NCT06937203 is sponsored by Arrowhead Pharmaceuticals, is currently recruiting, and has a planned enrollment of 150 participants.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06937203",
+            "relation": "supports",
+            "reason_code": "All claim details match evidence fields exactly."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06937203"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Sponsor, status, and enrollment match evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11422.291833999907,
+          "provider_call_ms": 819.350428000007,
+          "parsing_validation_ms": 0.052733000075022574,
+          "end_to_end_ms": 12241.694994999989,
+          "prompt_tokens": 1346,
+          "completion_tokens": 98,
+          "total_tokens": 1444,
+          "cost_usd": 0.0006167999999999999
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q7::c-2",
+      "case_id": "P7SUP-Q7",
+      "source_category": "multi_source",
+      "claim_text": "The intervention in trial NCT06937203 involves subcutaneous injection of the drug ARO-ALK7 or a matching placebo.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06937203",
+            "relation": "supports",
+            "reason_code": "Interventions list confirms SC injection of ARO-ALK7 and matching placebo."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06937203"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the intervention details provided in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11222.745842999984,
+          "provider_call_ms": 748.2103620000089,
+          "parsing_validation_ms": 0.04635499999494641,
+          "end_to_end_ms": 11971.002559999988,
+          "prompt_tokens": 1343,
+          "completion_tokens": 108,
+          "total_tokens": 1451,
+          "cost_usd": 0.0006236
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q7::c-3",
+      "case_id": "P7SUP-Q7",
+      "source_category": "multi_source",
+      "claim_text": "Chimeric Antigen Receptor (CAR)-T cell therapy has revolutionized treatment options for B-cell Non-Hodgkin Lymphoma (NHL), with CD19-targeting CAR-T cell therapy approved for Diffuse Large B Cell Lymphoma, Follicular Lymphoma, Mantle Cell Lymphoma, and Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-3",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40074511:chunk:0",
+            "relation": "supports",
+            "reason_code": "Exact match of all assertions"
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40074511:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim is a verbatim subset of the evidence",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11325.653930000044,
+          "provider_call_ms": 663.1558919998497,
+          "parsing_validation_ms": 0.0714249999873573,
+          "end_to_end_ms": 11988.881246999881,
+          "prompt_tokens": 1489,
+          "completion_tokens": 99,
+          "total_tokens": 1588,
+          "cost_usd": 0.0006748
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q7::c-4",
+      "case_id": "P7SUP-Q7",
+      "source_category": "multi_source",
+      "claim_text": "CAR-T cells demonstrate robust and durable responses in heavily pretreated lymphoma patients, though clinicians must monitor for Cytokine Release Syndrome (CRS), Immune Effector Cell Neurotoxicity Syndrome (ICANS), cytopenias, infection, and secondary malignancies.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-4",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40074511:chunk:0",
+            "relation": "supports",
+            "reason_code": "Claim is a direct paraphrase of the evidence text."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40074511:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "All assertions are explicitly stated in the provided evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11430.291850999993,
+          "provider_call_ms": 651.2354960000266,
+          "parsing_validation_ms": 0.06564000000253145,
+          "end_to_end_ms": 12081.592987000022,
+          "prompt_tokens": 1458,
+          "completion_tokens": 104,
+          "total_tokens": 1562,
+          "cost_usd": 0.0006664
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q8::c-0",
+      "case_id": "P7SUP-Q8",
+      "source_category": "multi_source",
+      "claim_text": "In a patient with EGFR L858R/T790M mutations, the acquisition of an EML4-ALK fusion and an EGFR C797S mutation in cis were reported as resistance mechanisms to osimertinib.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:36728908:chunk:4",
+            "relation": "supports",
+            "reason_code": "Title and content confirm all specific mutations and resistance mechanisms."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:36728908:chunk:4"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the specific case details provided in the evidence title and text.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11427.323915999978,
+          "provider_call_ms": 666.4266069999485,
+          "parsing_validation_ms": 0.047627999947508215,
+          "end_to_end_ms": 12093.798150999874,
+          "prompt_tokens": 1229,
+          "completion_tokens": 109,
+          "total_tokens": 1338,
+          "cost_usd": 0.0005788000000000001
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q8::c-1",
+      "case_id": "P7SUP-Q8",
+      "source_category": "multi_source",
+      "claim_text": "The C797S mutation in cis is identified as an underlying mechanism of acquired resistance in the context of double TKI therapy.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:36728908:chunk:4",
+            "relation": "supports",
+            "reason_code": "Direct textual match for mechanism and context."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:36728908:chunk:4"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim is a direct paraphrase of the evidence text.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11424.922134000099,
+          "provider_call_ms": 666.0585849999734,
+          "parsing_validation_ms": 0.04553099984150322,
+          "end_to_end_ms": 12091.026249999913,
+          "prompt_tokens": 1204,
+          "completion_tokens": 102,
+          "total_tokens": 1306,
+          "cost_usd": 0.0005632
+        }
+      }
+    },
+    {
+      "full_id": "P7SUP-Q8::c-2",
+      "case_id": "P7SUP-Q8",
+      "source_category": "multi_source",
+      "claim_text": "In a study of EGFR-mutant NSCLC PC-9 cells, osimertinib resistance was developed in five cell lines (AZDR3, AZDR6, AZDR9, AZDR11, and AZDR14), with the amplification of wild-type EGFR identified as a mechanism.",
+      "support_label": "supported",
+      "judgment": {
+        "claim_id": "c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:35883645:chunk:0",
+            "relation": "supports",
+            "reason_code": "All specific cell lines and mechanisms are explicitly stated in the text."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:35883645:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "Claim accurately reflects the study details and findings provided in the evidence.",
+        "evaluator_metadata": {
+          "architecture": "candidate_b_semantic_judge",
+          "model": "qwen-3.8-27b",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11337.51298900006,
+          "provider_call_ms": 631.9246529999418,
+          "parsing_validation_ms": 0.04630600005839369,
+          "end_to_end_ms": 11969.483948000061,
+          "prompt_tokens": 1472,
+          "completion_tokens": 109,
+          "total_tokens": 1581,
+          "cost_usd": 0.0006760000000000001
+        }
+      }
+    }
+  ]
+}

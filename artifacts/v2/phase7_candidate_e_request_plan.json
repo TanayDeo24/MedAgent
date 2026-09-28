@@ -1,0 +1,68 @@
+{
+  "artifact_name": "phase7_candidate_e_request_plan",
+  "purpose": "Pre-registered NVIDIA NIM request plan (Candidate E) constructed BEFORE any benchmark-content live call, per Step 7.",
+  "verified_repository_counts": {
+    "development": 41,
+    "validation": 8,
+    "phase7_heldout_original": 9,
+    "fresh_heldout_supplement": 12,
+    "fresh_heldout_supplement_2": 2,
+    "heldout_combined": 23,
+    "system_eval_v2_v3_claims": 50
+  },
+  "planned_stages": [
+    {
+      "stage": "smoke_test",
+      "n_cases": 3,
+      "requests": 1
+    },
+    {
+      "stage": "dev_remaining_batch_1",
+      "n_cases": 18,
+      "requests": 1
+    },
+    {
+      "stage": "dev_remaining_batch_2",
+      "n_cases": 18,
+      "requests": 1
+    },
+    {
+      "stage": "dev_remaining_batch_3",
+      "n_cases": 2,
+      "requests": 1
+    },
+    {
+      "stage": "validation",
+      "n_cases": 8,
+      "requests": 1
+    },
+    {
+      "stage": "heldout_combined_batch_1",
+      "n_cases": 18,
+      "requests": 1
+    },
+    {
+      "stage": "heldout_combined_batch_2",
+      "n_cases": 5,
+      "requests": 1
+    },
+    {
+      "stage": "system_eval_batch_1",
+      "n_claims": 18,
+      "requests": 1
+    },
+    {
+      "stage": "system_eval_batch_2",
+      "n_claims": 18,
+      "requests": 1
+    },
+    {
+      "stage": "system_eval_batch_3",
+      "n_claims": 14,
+      "requests": 1
+    }
+  ],
+  "planned_total_live_requests": 10,
+  "max_retries_per_batch": 2,
+  "note": "NVIDIA NIM has no comparably tight free-tier daily cap to Gemini, but the same disciplined batching/planning is used regardless. system_eval uses v2(8 answers/24 claims)+v3(4 answers/26 claims)=12 answers/50 claims - v1's original 8 answers/16 claims are excluded because this session's earlier scratchpad script never persisted claim TEXT for them, and regenerating Phase-6 answers merely for a new evaluator is forbidden - identical disclosed limitation as for Candidate D."
+}

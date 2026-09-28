@@ -1,0 +1,46 @@
+{
+  "artifact_name": "phase7_candidate_e_frozen_config",
+  "candidate_id": "candidate_e_nvidia_judge",
+  "provider": "NVIDIA NIM",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "base_url": "https://integrate.api.nvidia.com/v1",
+  "prompt_version": "v2 (v1 had a real defect: inferred CONTRADICTED/UNSUPPORTED from an unaddressed overclaim or incomplete multi-fact coverage rather than PARTIALLY_SUPPORTED - same class of defect as Candidate B's original F1 finding, independently discovered and independently fixed here with different wording)",
+  "schema_version": "prompt-described JSON shape (NOT provider response_format/json_schema - see independence_rationale)",
+  "generation_settings": {
+    "temperature": 0,
+    "top_p": 1,
+    "max_tokens": 6144,
+    "chat_template_kwargs": {
+      "thinking": false
+    },
+    "reasoning_disabled_rationale": "Nemotron-3-Super is reasoning-capable by default; verified live that leaving thinking enabled burns the entire max_tokens budget on chain-of-thought before any final answer, causing finish_reason=length with no usable output."
+  },
+  "batching_configuration": {
+    "max_cases_per_batch": 18,
+    "max_estimated_tokens_per_batch": 40000,
+    "max_retries_per_batch": 2
+  },
+  "independence_rationale": "Genuinely distinct provider (NVIDIA NIM) and model family (Nemotron 3 Super, a dense/MoE Llama-lineage model) from Cerebras qwen-3.8-27b (Candidate B / Phase-6 generator) and from Google Gemini (Candidate D). Isolated inputs: claim text + cited Evidence content/metadata only - no Candidate B or Candidate D outputs, no gold labels, no generator prompt/reasoning ever included in any Candidate E request.",
+  "code_gemini_dependency": "NONE - grounding_eval/nvidia_judge.py has zero imports from grounding_eval/gemini_judge.py or grounding_eval/judge.py; batching/schema-validation logic independently reimplemented",
+  "response_format_note": "NVIDIA's native `response_format: json_schema` strict mode was tried first and triggers a genuine model-side degenerate-repetition decoding failure (confirmed live: valid JSON prefix, then infinite whitespace-token loop until max_tokens exhausted, finish_reason=length). Switched to prompt-described JSON shape + explicit deterministic parsing/validation instead - documented, not hidden.",
+  "development_metrics": {
+    "n": 41,
+    "correct": 39,
+    "accuracy": 0.9512195121951219,
+    "macro_f1": 0.9454,
+    "unsupported_recall": 1.0,
+    "contradiction_recall": 1.0,
+    "residual_known_imperfections": [
+      "P7V2-MS1-S: gold supported, predicted partially_supported - both cited facts are actually fully supported by the real Evidence (verified by direct inspection); the model appears to hedge toward partially_supported when a compound claim combines a trial-identity fact with a separate approval fact, even when both are correct.",
+      "P7V2-MS3-P: gold partially_supported, predicted unsupported - the model treats the claim's most specific sub-fact (a dosing detail entirely absent from the cited evidence) as the 'core assertion', rather than recognizing the also-present, also-cited, correct trial-identity facts as sufficient for partially_supported."
+    ],
+    "decision": "NOT further prompt-tuned - these are genuine but minor boundary-interpretation edge cases (both involve WHICH sub-fact of a multi-fact claim counts as 'the core assertion', an inherently softer judgment than the F1-class defect already fixed), and further iteration risks an unproductive prompt-tuning loop. Development already exceeds all predeclared thresholds (macro-F1 0.945 >= 0.90, unsupported/contradiction recall 1.0 >= 0.95)."
+  },
+  "validation_metrics": {
+    "n": 8,
+    "correct": 8,
+    "accuracy": 1.0,
+    "all_predeclared_thresholds_met": true
+  },
+  "freeze_timestamp": "2026-09-28 (this session)"
+}

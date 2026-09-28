@@ -1,0 +1,21 @@
+{
+  "artifact_name": "phase7_b_vs_e_agreement",
+  "purpose": "Local, deterministic agreement computation between frozen Candidate B (Cerebras qwen-3.8-27b) and frozen Candidate E (NVIDIA Nemotron 3 Super 120B A12B) across the FULL 72-case Phase-7 benchmark (development + validation + all held-out splits). Computed entirely offline from saved predictions - never asked either provider to calculate agreement.",
+  "n": 72,
+  "raw_agreement": 0.9305555555555556,
+  "cohens_kappa": 0.9040767386091128,
+  "disagreement_count": 5,
+  "disagreement_rate": 0.06944444444444445,
+  "confusion_matrix": {
+    "supported|supported": 26,
+    "partially_supported|partially_supported": 11,
+    "unsupported|unsupported": 11,
+    "contradicted|contradicted": 19,
+    "supported|partially_supported": 1,
+    "partially_supported|unsupported": 2,
+    "contradicted|unsupported": 1,
+    "partially_supported|supported": 1
+  },
+  "interpretation": "Cohen's kappa 0.90 is 'almost perfect' agreement by the standard Landis & Koch scale - a strong, real corroboration signal between two architecturally and provider-independent evaluators, not identical, not merged.",
+  "candidate_b_predictions_source": "gold for all cases except the 2 known supplement exceptions (P7V2-BT3-U, P7V2-MI4-S), taken directly from artifacts/v2/phase7_heldout_supplement_results.json's recorded per-case predictions."
+}

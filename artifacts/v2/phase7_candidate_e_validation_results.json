@@ -1,0 +1,41 @@
+{
+  "artifact_name": "phase7_candidate_e_validation_results",
+  "n": 8,
+  "correct": 8,
+  "accuracy": 1.0,
+  "all_predeclared_thresholds_met": true,
+  "per_case_results": {
+    "P7-F6-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F6-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7-F6-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7-F6-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7-M4": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7V2-BL1-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BL1-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7V2-MS2-S": {
+      "gold": "supported",
+      "pred": "supported"
+    }
+  }
+}

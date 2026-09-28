@@ -1,0 +1,55 @@
+{
+  "artifact_name": "phase7_b_vs_e_disagreement_audit",
+  "purpose": "Manual, Evidence-based adjudication of every Candidate B vs Candidate E disagreement across the full 72-case benchmark (5 disagreements out of 72 cases).",
+  "disagreements": [
+    {
+      "case_id": "P7V2-MS1-S",
+      "gold": "supported",
+      "B_pred": "supported",
+      "E_pred": "partially_supported",
+      "adjudication": "B_CORRECT / E_ERROR",
+      "reasoning": "Claim combines a trial-identity fact (NCT01449461 completed Phase 1/2) and an FDA-approval fact. Direct inspection of the full cited pubmed:31109722 Evidence confirms it explicitly states 'Brigatinib, approved in May 2016...for ALK-positive metastatic NSCLC in patients who have progressed on or resistant to crizotinib' - BOTH facts are fully supported by the cited Evidence. Candidate E's partially_supported verdict is an instance of its documented residual imperfection: hedging on compound claims even when every sub-fact is genuinely correct."
+    },
+    {
+      "case_id": "P7V2-MS3-P",
+      "gold": "partially_supported",
+      "B_pred": "partially_supported",
+      "E_pred": "unsupported",
+      "adjudication": "B_CORRECT / E_ERROR",
+      "reasoning": "This case deliberately cites ONLY the trial-status/phase Evidence (dosing Evidence intentionally omitted, per the original multi-Evidence-insufficiency test design). The trial-identity facts ARE correctly cited and correct; the dosing fact is the only unaddressed part. Candidate E's documented residual pattern: it weighs the claim's most specific/informative sub-fact (dosing) as 'the core assertion' and downgrades to unsupported when that part alone is unaddressed, rather than crediting the other, also-present, correctly-supported facts."
+    },
+    {
+      "case_id": "P7V2-BT3-U",
+      "gold": "unsupported (KNOWN GOLD DEFECT from the hardening pass)",
+      "B_pred": "contradicted",
+      "E_pred": "unsupported",
+      "adjudication": "GOLD_DEFECT (previously documented) / B_CORRECT / E matches the flawed gold but is not more contract-compliant",
+      "reasoning": "Previously audited in artifacts/v2/phase7_manual_audit_v2.json: the trial's own interventions metadata explicitly states 'No Intervention', directly conflicting with the claimed drug combination - CONTRADICTED is the contract-compliant label. Candidate E's 'unsupported' answer coincidentally matches the original (flawed) gold literally, but on the same Evidence-based reasoning already applied to Candidate B, Candidate E is NOT more correct here - it simply did not identify the explicit conflict either."
+    },
+    {
+      "case_id": "P7V2-MI4-S",
+      "gold": "supported (KNOWN GOLD DEFECT from the hardening pass)",
+      "B_pred": "partially_supported",
+      "E_pred": "supported",
+      "adjudication": "GOLD_DEFECT (previously documented) / B_CORRECT / E matches the flawed gold but is not more contract-compliant",
+      "reasoning": "Previously audited: the Evidence's own field is 'max_phase: 4.0', never the literal word 'approved' - treating max_phase=4 as synonymous with 'approved' is an outside-ChEMBL-convention inference the claim adds, which the Evidence's own text never states. PARTIALLY_SUPPORTED (Candidate B's answer) is more contract-compliant. Candidate E's 'supported' answer matches the original (flawed) gold but repeats the same outside-convention inference the audit already flagged as incorrect."
+    },
+    {
+      "case_id": "P7V2-MI4-P",
+      "gold": "partially_supported",
+      "B_pred": "partially_supported",
+      "E_pred": "unsupported",
+      "adjudication": "B_CORRECT / E_ERROR",
+      "reasoning": "Claim: 'CHEMBL1201438 is indicated for melanoma and is the single most effective melanoma treatment available worldwide.' The core fact (Melanoma indication, Phase 4) IS supported by the cited Evidence; the superlative addition is unaddressed. Same documented Candidate E residual pattern: the model treats the most emphatic/superlative sub-clause as the entire claim and downgrades to unsupported rather than partially_supported when that specific sub-clause is unaddressed."
+    }
+  ],
+  "summary": {
+    "total_disagreements": 5,
+    "B_correct": 5,
+    "E_correct": 0,
+    "both_defensible": 0,
+    "gold_defects": 2,
+    "ambiguous": 0,
+    "conclusion": "In all 5 disagreements, Candidate B's judgment is correct or more contract-compliant than Candidate E's. Candidate E has one consistent, documented weakness: on compound/multi-fact claims, it sometimes treats a single (often the most specific or emphatic) sub-fact as 'the core assertion' and downgrades the whole judgment when that sub-fact alone is unaddressed, rather than crediting the other correctly-supported facts as partially_supported. This is a real, disclosed limitation, not hidden by high aggregate agreement (93.1% raw, kappa 0.904)."
+  }
+}

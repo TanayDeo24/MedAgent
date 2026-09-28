@@ -1,0 +1,43 @@
+{
+  "artifact_name": "phase7_b_vs_e_fresh_supplement_agreement",
+  "n": 32,
+  "raw_agreement": 0.96875,
+  "cohens_kappa": 0.0,
+  "confusion_matrix": {
+    "supported__supported": 31,
+    "supported__partially_supported": 1
+  },
+  "agreement_by_source_category": {
+    "clinical_trials": {
+      "n": 15,
+      "agree": 14,
+      "raw_agreement": 0.9333333333333333
+    },
+    "pubmed": {
+      "n": 6,
+      "agree": 6,
+      "raw_agreement": 1.0
+    },
+    "chembl": {
+      "n": 3,
+      "agree": 3,
+      "raw_agreement": 1.0
+    },
+    "multi_source": {
+      "n": 8,
+      "agree": 8,
+      "raw_agreement": 1.0
+    }
+  },
+  "candidate_b_label_distribution": {
+    "supported": 32
+  },
+  "candidate_e_label_distribution": {
+    "supported": 31,
+    "partially_supported": 1
+  },
+  "disagreements": [
+    "P7SUP-Q1::c-3"
+  ],
+  "n_disagreements": 1
+}

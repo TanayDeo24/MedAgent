@@ -1,0 +1,120 @@
+{
+  "artifact_name": "phase7_phase6_system_evaluation_candidate_e",
+  "purpose": "Independent Phase-6 system cross-check using frozen Candidate E (NVIDIA Nemotron 3 Super 120B A12B), evaluating the SAME frozen Phase-6 answer claims Candidate B already evaluated. Phase-6 answers were NOT regenerated for this cross-check.",
+  "SCOPE_LIMITATION_DISCLOSED": "This cross-check covers ONLY the v3 system-eval subset (4 answers, 26 factual claims), NOT the full 20-answer/66-claim set Candidate B evaluated. Reason: an accidental process error during this session (importing grounding_eval-adjacent scratchpad helper scripts phase7_sys_eval_v2.py/v3.py as Python modules re-executed their unguarded top-level code, which includes a live call to generate_grounded_answer) caused the v2 system-eval Phase-6 answers (8 answers/24 claims) to be ACCIDENTALLY REGENERATED via a real Cerebras call before this was noticed and the process was killed. The v3 script's generation loop was NOT reached before the kill (confirmed via unchanged file mtime), so v3's original answers remain genuinely untouched and safe to use. Per the explicit rule 'Do NOT regenerate Phase 6 answers merely for Candidate D/E,' the accidentally-regenerated v2 answers are NOT used here, even though the frozen candidate_b_structured architecture at temperature 0 makes the regenerated content very likely near-identical to the original - using it regardless would still be a genuine, avoidable rule violation, not a defensible substitution. v1's original 8 answers/16 claims were already excluded from any Candidate D/E cross-check for a separate, pre-existing reason (claim text was never persisted for them). This incident is disclosed in full, not hidden.",
+  "n_claims": 26,
+  "candidate_e_supported": 26,
+  "candidate_e_partial": 0,
+  "candidate_e_unsupported": 0,
+  "candidate_e_contradicted": 0,
+  "candidate_e_claim_support_rate": 1.0,
+  "candidate_b_original_result_on_same_subset": "26/26 claims supported (from artifacts/v2/phase7_phase6_system_evaluation_v3.json's v3-only 4-answer/26-claim subset)",
+  "b_vs_e_agreement_on_this_subset": "26/26 = 100% raw agreement (both evaluators: 100% supported, 0 partial/unsupported/contradicted) - Cohen's kappa is undefined/degenerate here since there is no label variance in either evaluator's output on this subset (a real result, not a computation error).",
+  "no_phase6_defect_found_by_candidate_e": true,
+  "per_claim_detail": {
+    "P7SYS3-Q9::c-0": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q9::c-1": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q9::c-2": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q9::c-3": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q9::c-4": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q9::c-5": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-0": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-1": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-2": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-3": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-4": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-5": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-6": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-7": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q10::c-8": {
+      "pred": "supported",
+      "source_category": "clinical_trials"
+    },
+    "P7SYS3-Q11::c-0": {
+      "pred": "supported",
+      "source_category": "pubmed"
+    },
+    "P7SYS3-Q11::c-1": {
+      "pred": "supported",
+      "source_category": "pubmed"
+    },
+    "P7SYS3-Q11::c-2": {
+      "pred": "supported",
+      "source_category": "pubmed"
+    },
+    "P7SYS3-Q11::c-3": {
+      "pred": "supported",
+      "source_category": "pubmed"
+    },
+    "P7SYS3-Q11::c-4": {
+      "pred": "supported",
+      "source_category": "pubmed"
+    },
+    "P7SYS3-Q12::c-0": {
+      "pred": "supported",
+      "source_category": "multi_source"
+    },
+    "P7SYS3-Q12::c-1": {
+      "pred": "supported",
+      "source_category": "multi_source"
+    },
+    "P7SYS3-Q12::c-2": {
+      "pred": "supported",
+      "source_category": "multi_source"
+    },
+    "P7SYS3-Q12::c-3": {
+      "pred": "supported",
+      "source_category": "multi_source"
+    },
+    "P7SYS3-Q12::c-4": {
+      "pred": "supported",
+      "source_category": "multi_source"
+    },
+    "P7SYS3-Q12::c-5": {
+      "pred": "supported",
+      "source_category": "multi_source"
+    }
+  }
+}

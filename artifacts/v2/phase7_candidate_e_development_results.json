@@ -1,0 +1,189 @@
+{
+  "artifact_name": "phase7_candidate_e_development_results",
+  "candidate": "candidate_e_nvidia_judge (Nemotron 3 Super 120B A12B)",
+  "prompt_version": "v1->v2 (v1 had a real defect analogous to Candidate B's original F1 finding; fixed, full dev re-run after fix)",
+  "n": 41,
+  "correct": 39,
+  "accuracy": 0.9512195121951219,
+  "macro_f1": 0.9454,
+  "unsupported_recall": 1.0,
+  "contradiction_recall": 1.0,
+  "v1_defect_examples": [
+    "P7-M3 (partially_supported misjudged as unsupported)",
+    "P7V2-BP3-P (partially_supported misjudged as contradicted)",
+    "P7V2-MS3-P (partially_supported misjudged as unsupported)"
+  ],
+  "v1_result": "35/38 checked before the fix (3 misses, all partially_supported cases)",
+  "v2_fix": "Added an explicit rule distinguishing partially_supported (some facts addressed, none contradicted) from unsupported/contradicted, with a worked example - independently authored, not copied from Candidate B's or Candidate D's prompt text.",
+  "v2_result": "39/41 = 0.951 on a full fresh re-run of ALL 41 dev cases (not just the 3 that failed under v1)",
+  "residual_known_imperfections": [
+    "P7V2-MS1-S: gold supported, predicted partially_supported.",
+    "P7V2-MS3-P: gold partially_supported, predicted unsupported (still present after v2 fix)."
+  ],
+  "per_case_results": {
+    "P7-F1-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F1-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7-F1-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7-F1-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7-F2-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F2-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7-F2-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7-F2-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7-F3-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F3-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7-F3-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7-F3-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7-M1": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F4-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F4-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7-F4-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7-F4-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7-F5-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7-F5-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7-F5-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7-F5-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7-M3": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7V2-BP3-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BP3-P": {
+      "gold": "partially_supported",
+      "pred": "partially_supported"
+    },
+    "P7V2-BP3-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7V2-BP3-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7V2-BP4-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BP4-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7V2-BL2-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BL2-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7V2-BT2-STATUS-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BT2-STATUS-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7V2-BT2-PHASE-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BT2-PHASE-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7V2-BT2-ENROLL-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V2-BT2-ENROLL-C": {
+      "gold": "contradicted",
+      "pred": "contradicted"
+    },
+    "P7V2-MS1-S": {
+      "gold": "supported",
+      "pred": "partially_supported"
+    },
+    "P7V2-MS3-P": {
+      "gold": "partially_supported",
+      "pred": "unsupported"
+    },
+    "P7V2-MS5-S": {
+      "gold": "supported",
+      "pred": "supported"
+    },
+    "P7V3-MEL-U": {
+      "gold": "unsupported",
+      "pred": "unsupported"
+    },
+    "P7V3-MS6-S": {
+      "gold": "supported",
+      "pred": "supported"
+    }
+  }
+}

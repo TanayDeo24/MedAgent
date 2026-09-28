@@ -1,0 +1,135 @@
+{
+  "artifact_name": "phase7_candidate_d_request_ledger",
+  "purpose": "Every live Gemini API request made this session for Candidate D (Phase 7 CTL-011 work). No API key, Authorization header, or secret-bearing URL is recorded anywhere in this artifact.",
+  "known_quota": {
+    "rpm": 5,
+    "input_tpm_approx": 250000,
+    "rpd": 20
+  },
+  "total_live_requests": 8,
+  "successful_requests": 2,
+  "failed_requests": 6,
+  "retries": 3,
+  "remaining_headroom_vs_20_rpd": 12,
+  "model_used": "gemini-3.8-flash (discovered live via models.list after gemini-2.5-flash returned a 404 'no longer available to new users' - not a preview/experimental model)",
+  "failure_root_cause": "Confirmed genuine Gemini-side outage/overload (HTTP 503 'UNAVAILABLE - This model is currently experiencing high demand'), NOT a code, schema, batch-size, or content defect - isolated by testing progressively smaller batches (18 -> 2 -> 1 case) and a 60s backoff retry, all of which failed identically with the same provider message.",
+  "cases_successfully_judged": 21,
+  "cases_pending_due_to_outage": 20,
+  "requests": [
+    {
+      "request_num": 1,
+      "stage": "smoke_test",
+      "batch_id": "smoke",
+      "case_ids": [
+        "P7-F1-S",
+        "P7-F1-P",
+        "P7-F1-U"
+      ],
+      "case_count": 3,
+      "success": true,
+      "http_status": 200,
+      "schema_valid": true,
+      "latency_ms": 4243.16,
+      "usage": {
+        "prompt_token_count": 1515,
+        "candidates_token_count": 396,
+        "total_token_count": 2584
+      },
+      "retry_of": null,
+      "error_category": null
+    },
+    {
+      "request_num": 2,
+      "stage": "dev_batch_1",
+      "batch_id": "dev-1",
+      "case_count": 18,
+      "success": true,
+      "http_status": 200,
+      "schema_valid": true,
+      "latency_ms": 6365.67,
+      "usage": {
+        "prompt_token_count": 4914,
+        "candidates_token_count": 2157,
+        "total_token_count": 7071
+      },
+      "retry_of": null,
+      "error_category": null
+    },
+    {
+      "request_num": 3,
+      "stage": "dev_batch_2",
+      "batch_id": "dev-2",
+      "case_count": 18,
+      "success": false,
+      "http_status": 503,
+      "schema_valid": null,
+      "error_category": "provider_overload",
+      "error": "model overloaded / high demand",
+      "retry_of": null
+    },
+    {
+      "request_num": 4,
+      "stage": "dev_batch_3",
+      "batch_id": "dev-3",
+      "case_count": 2,
+      "success": false,
+      "http_status": 503,
+      "schema_valid": null,
+      "error_category": "provider_overload",
+      "error": "model overloaded / high demand",
+      "retry_of": null
+    },
+    {
+      "request_num": 5,
+      "stage": "dev_batch_2_retry",
+      "batch_id": "dev-2",
+      "case_count": 18,
+      "success": false,
+      "http_status": 503,
+      "schema_valid": null,
+      "error_category": "provider_overload",
+      "error": "model overloaded / high demand",
+      "retry_of": 3,
+      "backoff_before_s": 30
+    },
+    {
+      "request_num": 6,
+      "stage": "dev_batch_3_retry",
+      "batch_id": "dev-3",
+      "case_count": 2,
+      "success": false,
+      "http_status": 503,
+      "schema_valid": null,
+      "error_category": "provider_overload",
+      "error": "model overloaded / high demand",
+      "retry_of": 4,
+      "backoff_before_s": 30
+    },
+    {
+      "request_num": 7,
+      "stage": "diagnostic_single_case",
+      "batch_id": "diag-1",
+      "case_count": 1,
+      "success": false,
+      "http_status": 503,
+      "schema_valid": null,
+      "error_category": "provider_overload",
+      "error": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+      "retry_of": null,
+      "purpose": "isolate whether 503 is batch-size/content-related or a genuine global outage - a single tiny case failing identically confirms global outage, not a code/content defect"
+    },
+    {
+      "request_num": 8,
+      "stage": "final_retry_single_case",
+      "batch_id": "diag-1",
+      "case_count": 1,
+      "success": false,
+      "http_status": 503,
+      "schema_valid": null,
+      "error_category": "provider_overload",
+      "error": "same message as request 7",
+      "retry_of": 7,
+      "backoff_before_s": 60
+    }
+  ]
+}

@@ -1,0 +1,1035 @@
+{
+  "artifact_name": "phase7_candidate_e_fresh_supplement_results",
+  "architecture": "candidate_e_nvidia_nim (frozen config, unchanged)",
+  "source_manifest": "artifacts/v2/phase7_system_crosscheck_fresh_supplement_manifest.json",
+  "n_claims": 32,
+  "results": {
+    "P7SUP-Q1::c-0": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q1::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "All claim elements match evidence: phase, status, sponsor."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q1::c-1": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q1::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Claim matches evidence content verbatim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q1::c-2": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q1::c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Cohort details explicitly stated in evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q1::c-3": {
+      "support_label": "partially_supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q1::c-3",
+        "support_label": "partially_supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "partial_support",
+            "reason_code": "Evidence confirms RP2D and Phase 2 evaluation but does not mention 3+3 design or efficacy evaluation."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [
+          "using a 3+3 dose escalation design",
+          "will further evaluate efficacy"
+        ],
+        "numeric_mismatch": false,
+        "reason_code": "PARTIAL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q1::c-4": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q1::c-4",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Drug formulation, dose, and administration details match evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q1::c-5": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q1::c-5",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT07287917",
+            "relation": "supports",
+            "reason_code": "Enrollment, start, and completion dates match evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT07287917"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-0": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Phase 2, double-blind, parallel-group treatment study confirmed."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-1": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Status RECRUITING matches claim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-2": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Sponsor explicitly stated as Eli Lilly and Company."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-3": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-3",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Enrollment of 200 participants matches evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-4": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-4",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Start and completion dates match evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-5": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-5",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Interventions match once-weekly subcutaneous LY3457263 vs placebo."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-6": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-6",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Participant criteria match evidence content."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-7": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-7",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Primary purpose matches evidence content."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q2::c-8": {
+      "support_label": "supported",
+      "source_category": "clinical_trials",
+      "judgment": {
+        "claim_id": "P7SUP-Q2::c-8",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06897475",
+            "relation": "supports",
+            "reason_code": "Participation duration matches evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06897475"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q3::c-0": {
+      "support_label": "supported",
+      "source_category": "pubmed",
+      "judgment": {
+        "claim_id": "P7SUP-Q3::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40306957:chunk:1",
+            "relation": "supports",
+            "reason_code": "Claim matches evidence results verbatim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q3::c-1": {
+      "support_label": "supported",
+      "source_category": "pubmed",
+      "judgment": {
+        "claim_id": "P7SUP-Q3::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40306957:chunk:1",
+            "relation": "supports",
+            "reason_code": "Claim matches evidence results verbatim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q3::c-2": {
+      "support_label": "supported",
+      "source_category": "pubmed",
+      "judgment": {
+        "claim_id": "P7SUP-Q3::c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40306957:chunk:1",
+            "relation": "supports",
+            "reason_code": "Claim matches evidence results verbatim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40306957:chunk:1"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 18,
+          "prompt_tokens": 9361,
+          "completion_tokens": 1645,
+          "total_tokens": 11006
+        }
+      }
+    },
+    "P7SUP-Q4::c-0": {
+      "support_label": "supported",
+      "source_category": "pubmed",
+      "judgment": {
+        "claim_id": "P7SUP-Q4::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:34290048:chunk:0",
+            "relation": "supports",
+            "reason_code": "All claim details (16 eligible patients, 87.5% ORR, 62.5% CR) are explicitly stated in the evidence."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q4::c-1": {
+      "support_label": "supported",
+      "source_category": "pubmed",
+      "judgment": {
+        "claim_id": "P7SUP-Q4::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:34290048:chunk:0",
+            "relation": "supports",
+            "reason_code": "The evidence explicitly states the 2-year OS and PFS rates as 77.3% and 40.2%."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q4::c-2": {
+      "support_label": "supported",
+      "source_category": "pubmed",
+      "judgment": {
+        "claim_id": "P7SUP-Q4::c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:34290048:chunk:0",
+            "relation": "supports",
+            "reason_code": "The evidence states that CAR T-cell-associated toxicities were recorded, supporting the claim that safety was assessed via toxicity recording; the claim's qualifier about lack of detail is consistent with the evidence not providing specific rates or grades."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:34290048:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q5::c-0": {
+      "support_label": "supported",
+      "source_category": "chembl",
+      "judgment": {
+        "claim_id": "P7SUP-Q5::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "chembl:CHEMBL25",
+            "relation": "supports",
+            "reason_code": "The evidence shows exact match to preferred name 'ASPIRIN' with compound ID CHEMBL25, matching the claim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "chembl:CHEMBL25"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q6::c-0": {
+      "support_label": "supported",
+      "source_category": "chembl",
+      "judgment": {
+        "claim_id": "P7SUP-Q6::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "chembl:CHEMBL3137343",
+            "relation": "supports",
+            "reason_code": "The evidence title and content are 'PEMBROLIZUMAB', confirming the compound name resolution for Keytruda."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "chembl:CHEMBL3137343"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q6::c-1": {
+      "support_label": "supported",
+      "source_category": "chembl",
+      "judgment": {
+        "claim_id": "P7SUP-Q6::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "chembl:CHEMBL3137343",
+            "relation": "supports",
+            "reason_code": "The additional field 'match_type: exact_synonym' directly supports the claim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "chembl:CHEMBL3137343"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q7::c-0": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q7::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06937203",
+            "relation": "supports",
+            "reason_code": "The evidence title and content confirm it is a Phase 1/2a dose-escalating study evaluating safety, tolerability, PK, and PD of ARO-ALK7 in adult volunteers with obesity, with and without T2DM."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06937203"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q7::c-1": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q7::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06937203",
+            "relation": "supports",
+            "reason_code": "The evidence additional fields show sponsor: Arrowhead Pharmaceuticals, status: RECRUITING, enrollment: 150, all matching the claim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06937203"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q7::c-2": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q7::c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "nct:NCT06937203",
+            "relation": "supports",
+            "reason_code": "The interventions field specifies subcutaneous injection of ARO-ALK7 or placebo, directly supporting the claim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "nct:NCT06937203"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q7::c-3": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q7::c-3",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40074511:chunk:0",
+            "relation": "supports",
+            "reason_code": "The evidence content explicitly states that CAR-T therapy has revolutionized treatment for B-cell NHL and that CD19-targeting CAR-T is approved for the listed indications."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40074511:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q7::c-4": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q7::c-4",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:40074511:chunk:0",
+            "relation": "supports",
+            "reason_code": "The evidence explicitly states that CAR-T cells demonstrate robust and durable responses in heavily pretreated patients and that clinicians should monitor for CRS, ICANS, cytopenias, infection, and secondary malignancies."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:40074511:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q8::c-0": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q8::c-0",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:36728908:chunk:4",
+            "relation": "supports",
+            "reason_code": "The evidence title and content confirm the acquisition of EML4-ALK fusion and EGFR C797S in cis as resistance mechanisms to osimertinib in a patient with EGFR L858R/T790M."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:36728908:chunk:4"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q8::c-1": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q8::c-1",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:36728908:chunk:4",
+            "relation": "supports",
+            "reason_code": "The evidence states that C797S mutation in cis may be an underlying mechanism of acquired resistance in double TKI therapy, supporting the claim."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:36728908:chunk:4"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    },
+    "P7SUP-Q8::c-2": {
+      "support_label": "supported",
+      "source_category": "multi_source",
+      "judgment": {
+        "claim_id": "P7SUP-Q8::c-2",
+        "support_label": "supported",
+        "citation_judgments": [
+          {
+            "evidence_id": "pubmed:35883645:chunk:0",
+            "relation": "supports",
+            "reason_code": "The evidence describes the development of five osimertinib-resistant PC-9 cell lines (AZDR3, AZDR6, AZDR9, AZDR11, AZDR14) and identifies wild-type EGFR amplification as a resistance mechanism."
+          }
+        ],
+        "supporting_evidence_ids": [
+          "pubmed:35883645:chunk:0"
+        ],
+        "unsupported_fragments": [],
+        "numeric_mismatch": false,
+        "reason_code": "FULL_SUPPORT",
+        "evaluator_metadata": {
+          "architecture": "candidate_e_nvidia_judge",
+          "model": "nvidia/nemotron-3-super-120b-a12b",
+          "provider": "nvidia_nim",
+          "batch_case_count": 14,
+          "prompt_tokens": 5768,
+          "completion_tokens": 1614,
+          "total_tokens": 7382
+        }
+      }
+    }
+  },
+  "ledgers": [
+    {
+      "success": true,
+      "error_category": null,
+      "error": null,
+      "latency_ms": 9572.169972999973,
+      "case_ids": [
+        "P7SUP-Q1::c-0",
+        "P7SUP-Q1::c-1",
+        "P7SUP-Q1::c-2",
+        "P7SUP-Q1::c-3",
+        "P7SUP-Q1::c-4",
+        "P7SUP-Q1::c-5",
+        "P7SUP-Q2::c-0",
+        "P7SUP-Q2::c-1",
+        "P7SUP-Q2::c-2",
+        "P7SUP-Q2::c-3",
+        "P7SUP-Q2::c-4",
+        "P7SUP-Q2::c-5",
+        "P7SUP-Q2::c-6",
+        "P7SUP-Q2::c-7",
+        "P7SUP-Q2::c-8",
+        "P7SUP-Q3::c-0",
+        "P7SUP-Q3::c-1",
+        "P7SUP-Q3::c-2"
+      ],
+      "case_count": 18,
+      "usage": {
+        "prompt_tokens": 9361,
+        "completion_tokens": 1645,
+        "total_tokens": 11006
+      },
+      "attempts": 2
+    },
+    {
+      "success": true,
+      "error_category": null,
+      "error": null,
+      "latency_ms": 10711.415978000105,
+      "case_ids": [
+        "P7SUP-Q4::c-0",
+        "P7SUP-Q4::c-1",
+        "P7SUP-Q4::c-2",
+        "P7SUP-Q5::c-0",
+        "P7SUP-Q6::c-0",
+        "P7SUP-Q6::c-1",
+        "P7SUP-Q7::c-0",
+        "P7SUP-Q7::c-1",
+        "P7SUP-Q7::c-2",
+        "P7SUP-Q7::c-3",
+        "P7SUP-Q7::c-4",
+        "P7SUP-Q8::c-0",
+        "P7SUP-Q8::c-1",
+        "P7SUP-Q8::c-2"
+      ],
+      "case_count": 14,
+      "usage": {
+        "prompt_tokens": 5768,
+        "completion_tokens": 1614,
+        "total_tokens": 7382
+      },
+      "attempts": 1
+    }
+  ]
+}

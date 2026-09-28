@@ -910,3 +910,137 @@ system cross-check.
 not frozen. Full regression: 418 passed, 0 failed, 7 skipped (unchanged -
 no new test-relevant code this pass beyond the F4 prompt fix, already
 verified in the prior addendum).
+
+## Phase 7 Candidate D (Independent Evaluator) Attempt - This Session
+
+`GEMINI_API_KEY` was provisioned. Candidate D was built
+(`grounding_eval/gemini_judge.py`, Google Gemini `gemini-3.8-flash` -
+discovered live, not assumed, after the originally-named model returned
+a 404). 17 offline tests pass with zero live calls.
+
+**Live results (real, partial):** smoke test 3/3 correct; one 18-case
+development batch 18/18 correct. **21/21 = 100% on the portion judged so
+far.** Then 6 consecutive HTTP 503 "model experiencing high demand"
+failures (batch sizes 18/2/1/1, backoffs 0s/30s/30s/60s) - a genuine,
+isolated Gemini-side outage, not a code/schema/content defect. 8/20 daily
+requests used, 12 remaining.
+
+**Not yet measured (blocked by the live outage, not by missing
+engineering):** full development (20/41 cases pending), validation,
+frozen config, held-out, Candidate B vs Candidate D agreement/kappa,
+disagreement adjudication, independent Phase-6 system cross-check.
+
+**CTL-011 status: still OPEN.** Credential and network are no longer the
+blocker (proven working); the blocker is now a transient provider
+capacity outage. Full regression: 438 passed (+20 new Candidate D/
+Gemini-settings tests), 0 failed, 7 skipped.
+
+## Phase 7 Candidate E (NVIDIA, Independent Evaluator #2) - CTL-011 CLOSED
+
+Preserving Candidate D (Gemini, PARTIAL, provider-outage-blocked) exactly
+as a separate historical experiment - not merged, not deleted, not
+continued with NVIDIA.
+
+**Candidate E**: `grounding_eval/nvidia_judge.py`, NVIDIA NIM
+`nvidia/nemotron-3-super-120b-a12b`. 19 offline tests, zero live calls.
+
+**Real defect found and fixed (dev split)**: v1 prompt inferred
+CONTRADICTED/UNSUPPORTED from an unaddressed overclaim or incomplete
+multi-fact coverage rather than PARTIALLY_SUPPORTED - the same class of
+defect Candidate B's original F1 finding had, independently rediscovered
+and independently fixed (different wording, no cross-copying). Full dev
+re-run after the fix, not just the 3 affected cases: **39/41 = 95.1%**,
+macro-F1 0.945, unsupported/contradiction recall 1.0 each.
+
+**Validation**: 8/8 = 100%. **Frozen.** **Held-out** (23 cases, run once):
+**22/23 = 95.7%**, macro-F1 0.914 - the one miss is the SAME residual
+imperfection pattern already disclosed in the frozen config before this
+run, not a new surprise.
+
+**Candidate B vs Candidate E agreement** (n=72, full benchmark): raw
+agreement 93.1%, **Cohen's kappa 0.904** ("almost perfect"). 5
+disagreements, all manually adjudicated against real Evidence: Candidate
+B correct in all 5 (2 are the already-known gold defects from the
+hardening pass; 3 are Candidate E's disclosed compound-claim weakness).
+
+**Independent Phase-6 system cross-check**: 26/26 = 100% supported,
+matching Candidate B exactly, 0 disagreements, no Phase-6 defect found -
+**scope-limited to the v3 subset (26 of the original 66 claims)** due to
+a disclosed process incident (see below).
+
+**INCIDENT (fully disclosed)**: while building the system-cross-check
+batch, an accidental Python import re-executed unguarded top-level
+generation code in a scratchpad helper script, causing an unauthorized
+real Cerebras regeneration of the v2 system-eval Phase-6 answers (8
+answers/24 claims). Per the explicit rule against regenerating Phase-6
+answers for a new evaluator, the regenerated data was NOT used - the
+process was killed and the affected 24 claims (plus v1's already-excluded
+16) were excluded from Candidate E's cross-check, leaving only the
+genuinely untouched v3 subset (26 claims). This reduces the cross-check's
+statistical power but does not compromise its validity on the claims it
+does cover.
+
+**CTL-011: CLOSED.** Full regression: 457 passed, 0 failed, 7 skipped
+(+19 Candidate E tests since the last count).
+
+## Self-Audit Correction (before freeze authorization): CTL-011 REOPENED
+
+A dedicated closure-integrity audit (requested before human authorization
+of the final freeze) found that the prior "CTL-011 CLOSED" conclusion
+overclaimed the Phase-6 system cross-check: Candidate E's 26-claim
+subset has **zero ChEMBL representation** (0 of the original 66-claim
+set's 9 ChEMBL claims) - a coverage gap, not just a smaller sample.
+
+**Not retracted** (all still valid, real evidence): Candidate E's own
+development (39/41), validation (8/8), held-out (22/23), and the
+Candidate B vs Candidate E benchmark-level agreement (n=72, kappa 0.904,
+5/5 disagreements adjudicated, B correct in all 5). None of this
+required system-eval data and none of it is affected by the correction.
+
+**Retracted:** "CTL-011 CLOSED" and "18/18 caveat rows CLOSED." Corrected
+to: **CTL-011 REOPENED** (system-cross-check requirement specifically);
+**17/18 CLOSED, 1/18 REOPENED**.
+
+**What remains:** one more frozen Phase-6 generation batch (fresh
+Evidence, generated once, NOT the accidentally-regenerated v2 answers)
+plus one more live Candidate E batch, sized/sourced to restore ChEMBL
+representation. Neither has been run. No API calls were made during this
+audit.
+
+## Fresh Supplement Executed: CTL-011 Genuinely CLOSED
+
+The gap identified above has been closed. Pre-registered fresh-supplement
+plan executed on explicit authorization: 8 answers generated once each
+(frozen `candidate_b_structured`, 0 failures) -> 32 factual claims
+(clinical_trials 15, pubmed 6, chembl 3, multi_source 8), frozen before
+either evaluator ran.
+
+Before generation, Step-1 verification found the plan's original 3
+ChEMBL case selections all carry `gold.expected_skip=true` (adapter
+returns no Evidence for any of them) - an objective impossibility,
+corrected (documented in-place, before any generation call) to the only
+2 distinct, real, non-skip, unused ChEMBL compounds in the whole Phase-5
+manifest: aspirin (CHEMBL25) and Keytruda (CHEMBL3137343).
+
+Frozen Candidate B: 32/32 supported. Frozen Candidate E: 31/32 supported,
+1 partially_supported. Raw agreement 31/32 (~96.9%); Cohen's kappa = 0.0,
+a degenerate artifact of Candidate B's zero label variance on this
+subset, not evidence of poor agreement - reported honestly rather than
+hidden. The one disagreement, manually adjudicated against the real
+cited Evidence: **E_CORRECT** (Candidate B overclaimed full support for
+a claim with an unaddressed fragment and a source-truncated fragment;
+Candidate E correctly flagged both) - read as a positive independence
+signal, not a defect.
+
+Combined with the surviving, never-regenerated 26-claim v3 subset: 58
+claims total, all four source categories represented, combined raw
+agreement 57/58 (~98.3%). ChEMBL-specific agreement: 3/3 = 100%. This
+58-claim set is explicitly disclosed as NOT the original 66-claim
+population (40 of those claims remain permanently unrecoverable); the
+PASS bar actually stated ("at minimum restoring ChEMBL representation")
+is met.
+
+**CTL-011: CLOSED** (genuinely, on complete evidence - not a
+re-assertion of the earlier premature closure). **18/18 caveat rows
+CLOSED.** Full regression re-run: 457 passed, 0 failed, 7 skipped -
+unchanged, no regressions.

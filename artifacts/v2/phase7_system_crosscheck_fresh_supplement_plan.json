@@ -1,0 +1,126 @@
+{
+  "artifact_name": "phase7_system_crosscheck_fresh_supplement_PLAN",
+  "status": "PRE-REGISTERED ONLY - NOT EXECUTED. No generation call, no evaluator call has been made for this plan.",
+  "purpose": "Since recovery of the original 40 missing Phase-6 system-eval claims (including all 9 ChEMBL claims) is genuinely impossible (see artifacts/v2/phase7_system_crosscheck_recovery_audit.json), this is the pre-registered design for a FRESH supplemental system cross-check, to be executed only on explicit future authorization.",
+  "target_answer_count": 8,
+  "target_source_category_quotas": {
+    "clinical_trials": 2,
+    "pubmed": 2,
+    "chembl": 2,
+    "multi_source": 2
+  },
+  "candidate_real_evidence_records_identified": {
+    "chembl": [
+      {
+        "case_id": "CHEMBL-search_by_target-CHEMBL6329",
+        "phase5_split": "development",
+        "usable_fields": "molecule_type=Small molecule, molecular_weight=341.75, alogp=2.11 (name is null in the real record - claims must be structured-field-based, not entity-name-based)"
+      },
+      {
+        "case_id": "CHEMBL-search_by_target-CHEMBL6328",
+        "phase5_split": "development",
+        "usable_fields": "molecule_type=Small molecule, molecular_weight=332.32, alogp=1.33"
+      }
+    ],
+    "clinical_trials": [
+      {
+        "case_id": "candidate: any of the 9 remaining unused clinical_trials records in phase5_benchmark_manifest.json's development split - exact IDs to be finalized at execution time, none previously used anywhere in Phase 7"
+      }
+    ],
+    "pubmed": [
+      {
+        "case_id": "candidate: any of the 16 remaining unused pubmed_rag or 12 remaining unused pubmed_live records in the development split - exact IDs to be finalized at execution time"
+      }
+    ],
+    "multi_source": [
+      {
+        "case_id": "combine one of the above clinical_trials or pubmed records with one chembl record, or two records of different source_type, per the existing multi-source case-construction pattern used throughout Phase 7"
+      }
+    ]
+  },
+  "exclusions": [
+    "No phase5_heldout-split records (CHEMBL-search_by_target-CHEMBL267864, CHEMBL-search_by_indication-CHEMBL467, etc.) - never reuse Phase-5's own held-out.",
+    "No Phase-6 held-out or Phase-10 held-out records.",
+    "No record already used anywhere in Phase 7 (original 36-case benchmark, hardening-pass 32, zero-caveat-pass 4, or the original 66-claim system-eval set).",
+    "No record from the accidentally-regenerated v2 batch."
+  ],
+  "generation_config": "Frozen candidate_b_structured architecture, Cerebras qwen-3.8-27b, UNCHANGED from every prior Phase-6/Phase-7 use - no new generation config, no tuning.",
+  "candidate_b_evaluation_plan": "Evaluate the new answers with the SAME frozen Candidate B (candidate_b_semantic_judge) evaluator config used throughout Phase 7 - no changes.",
+  "candidate_e_evaluation_plan": "Evaluate the identical new claim/evidence pairs with the FROZEN Candidate E config exactly as recorded in artifacts/v2/phase7_candidate_e_frozen_config.json - no prompt/generation-setting changes, no retuning, no re-inspection of dev/validation.",
+  "critical_requirement": "BOTH Candidate B and Candidate E MUST evaluate the exact same new claim/evidence pairs - this plan explicitly rejects evaluating with only one of them.",
+  "agreement_metrics_to_compute": [
+    "raw agreement",
+    "Cohen's kappa",
+    "per-label confusion matrix",
+    "source-category-level agreement",
+    "disagreement count and full manual adjudication against real Evidence"
+  ],
+  "disagreement_adjudication_procedure": "Identical to the procedure already used in artifacts/v2/phase7_b_vs_e_disagreement_audit.json: for each disagreement, inspect the claim, the full cited Evidence, gold if applicable, and both evaluators' outputs; classify as B_CORRECT / E_CORRECT / BOTH_DEFENSIBLE / GOLD_DEFECT / AMBIGUOUS; never resolve by majority vote or by treating one evaluator's output as automatically authoritative.",
+  "no_selection_after_seeing_outputs": "Case selection (which real records to use) will be finalized BEFORE any generation or evaluation call, based only on source-category quota and prior-usage exclusion - never based on any evaluator's predicted labels.",
+  "estimated_expected_claim_count": "roughly 24-32 claims across 8 answers, based on the observed claims-per-answer ratio in prior system-eval batches (v1: 2.0/answer, v2: 3.0/answer, v3: 6.5/answer)",
+  "NOT_EXECUTED": true,
+  "FINALIZED_CASE_SELECTION_BEFORE_GENERATION": {
+    "Q-CT1": {
+      "source_category": "clinical_trials",
+      "phase5_case_id": "CT-NCT07287917",
+      "phase5_split": "development"
+    },
+    "Q-CT2": {
+      "source_category": "clinical_trials",
+      "phase5_case_id": "CT-NCT06897475",
+      "phase5_split": "development"
+    },
+    "Q-PM1": {
+      "source_category": "pubmed",
+      "phase5_case_id": "RAG-40306957-1",
+      "phase5_split": "development"
+    },
+    "Q-PM2": {
+      "source_category": "pubmed",
+      "phase5_case_id": "RAG-34290048-0",
+      "phase5_split": "development"
+    },
+    "Q-CH1": {
+      "source_category": "chembl",
+      "phase5_case_id": "CHEMBL-resolve-aspirin",
+      "phase5_split": "validation",
+      "corrected_from": "CHEMBL-search_by_target-CHEMBL6329 (see CORRECTION_LOG below)"
+    },
+    "Q-CH2": {
+      "source_category": "chembl",
+      "phase5_case_id": "CHEMBL-resolve-Keytruda",
+      "phase5_split": "validation",
+      "corrected_from": "CHEMBL-search_by_target-CHEMBL6328 (see CORRECTION_LOG below)"
+    },
+    "Q-MS1": {
+      "source_category": "multi_source",
+      "phase5_case_ids": [
+        "CT-NCT06937203",
+        "RAG-40074511-0"
+      ],
+      "phase5_splits": [
+        "development",
+        "development"
+      ]
+    },
+    "Q-MS2": {
+      "source_category": "multi_source",
+      "phase5_case_ids": [
+        "RAG-36728908-4",
+        "RAG-35883645-0"
+      ],
+      "phase5_splits": [
+        "development",
+        "development"
+      ],
+      "corrected_from": "CHEMBL-search_by_target-CHEMBL265667 + RAG-35943592-0 (see CORRECTION_LOG below); RAG-35943592-0 itself remains unused and was simply not needed once the chembl half was replaced with a second pubmed record"
+    }
+  },
+  "selection_timestamp_note": "Finalized and written to this artifact BEFORE any generation or evaluation call was made this turn.",
+  "CORRECTION_LOG": {
+    "trigger": "Objective impossibility discovered during Step 1 verification (before any generation/evaluation call): all three originally-selected ChEMBL case_ids (CHEMBL-search_by_target-CHEMBL6329, CHEMBL6328, CHEMBL265667) carry gold.expected_skip=true in artifacts/v2/phase5_benchmark_manifest.json (expected_skip_reason: 'no_real_content_moa_and_name_both_placeholder_or_absent') - the raw record's name field is null AND mechanism_of_action is the literal placeholder 'Not available'. Per evidence/adapters.py's own chembl_target_or_indication_result_to_evidence, this means the adapter returns None (no Evidence record at all) for every one of these three records. Generating a claim citing these records is impossible, not just weak - there is no Evidence to cite. Using them would silently produce zero ChEMBL evidence, defeating the entire purpose of this supplement (restoring ChEMBL representation, the exact gap that reopened CTL-011).",
+    "remediation": "Enumerated the full universe of ChEMBL records in phase5_benchmark_manifest.json (20 total). Applying the plan's own pre-existing exclusion rules (no phase5_heldout split, no record already used anywhere in Phase 6/Phase 7) plus the newly-discovered non-skip requirement, exactly two distinct usable ChEMBL compounds remain in the entire manifest: CHEMBL25 (aspirin, validation split, chembl_operation=resolve_compound_name, evidence_type=compound_identity) and CHEMBL3137343 (Keytruda/pembrolizumab, validation split, same operation/type). ('CHEMBL-resolve-asprin' is the same underlying CHEMBL25 compound as 'CHEMBL-resolve-aspirin' - a real-world source duplicate - so only one of the pair was used.) No third distinct, non-skip, non-excluded ChEMBL compound exists, so Q-MS2's chembl half could not be filled without either reusing CHEMBL25/CHEMBL3137343 again (source duplication) or violating an exclusion. Q-MS2 was therefore rebuilt as a two-pubmed-source multi_source case (both real, distinct pmids, unused anywhere in Phase 6/Phase 7) instead of forcing a third, invalid or duplicated ChEMBL selection.",
+    "scope_of_correction": "This changes WHICH real records are used for Q-CH1, Q-CH2, and Q-MS2's second half. It does not change the target_source_category_quotas (chembl remains 2, multi_source remains 2), the generation architecture, the evaluation plan, or any exclusion rule. No case was substituted after seeing any generated answer or evaluator output - this correction was made purely from static gold-label/adapter-behavior inspection, before any generation or evaluation call for this supplement.",
+    "api_calls_made_to_reach_this_correction": 0
+  }
+}

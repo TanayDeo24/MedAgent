@@ -115,6 +115,15 @@ class Settings(BaseSettings):
                      "header boundary via get_secret_value()."
     )
 
+    # Google Gemini (Phase 7 Candidate D - genuinely independent evaluator)
+    # Genuine auth secret -> SecretStr, never printed/logged/repr'd. Unwrap
+    # only at the HTTP x-goog-api-key header boundary via get_secret_value().
+    GEMINI_API_KEY: Optional[SecretStr] = Field(
+        default=None,
+        description="Google Gemini API key. Unwrap only at the HTTP "
+                     "x-goog-api-key header boundary via get_secret_value()."
+    )
+
     # PubMed Specific
     PUBMED_DEFAULT_MAX_RESULTS: int = Field(
         default=10,

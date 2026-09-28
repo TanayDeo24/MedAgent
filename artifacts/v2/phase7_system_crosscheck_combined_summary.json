@@ -1,0 +1,44 @@
+{
+  "artifact_name": "phase7_system_crosscheck_COMBINED_summary",
+  "purpose": "Combines the surviving v3-only original-66 subset (untouched by the accidental-regeneration incident) with the fresh, pre-registered 8-answer supplement, to give CTL-011 a complete evidentiary basis. This combined set is NOT the original 66-claim population and must never be described as such - it is composition-disclosed below.",
+  "composition": {
+    "surviving_original_v3_subset": {
+      "n_claims": 26,
+      "source": "artifacts/v2/phase7_phase6_system_evaluation_candidate_e.json",
+      "source_category_breakdown": {
+        "clinical_trials": 15,
+        "pubmed": 5,
+        "multi_source": 6,
+        "chembl": 0
+      },
+      "provenance": "Genuine, untouched original Phase-6 v3 system-eval answers (4 answers), never regenerated."
+    },
+    "fresh_supplement": {
+      "n_claims": 32,
+      "source": "artifacts/v2/phase7_system_crosscheck_fresh_supplement_manifest.json",
+      "source_category_breakdown": {
+        "clinical_trials": 15,
+        "pubmed": 6,
+        "chembl": 3,
+        "multi_source": 8
+      },
+      "provenance": "Freshly generated (once each, this session) via the frozen candidate_b_structured architecture on 8 pre-registered, never-before-used real Phase-5 evidence records. NOT part of the original 66-claim population; this is a supplement, generated after the original population was lost to the accidental-regeneration incident."
+    },
+    "total_n_claims": 58,
+    "total_chembl_claims": 3,
+    "explicit_disclaimer": "This 58-claim combined set is NOT the original 66-claim Phase-6 system population. 40 of the original 66 claims remain genuinely UNRECOVERABLE (see artifacts/v2/phase7_system_crosscheck_recovery_audit.json). This combined set is offered as the best available complete evidentiary basis for CTL-011, not as a reconstruction of the original."
+  },
+  "combined_candidate_b_support_rate": 1.0,
+  "combined_candidate_e_support_rate": 0.9827586206896551,
+  "combined_candidate_e_partial_count": 1,
+  "combined_b_vs_e_raw_agreement": 0.9827586206896551,
+  "combined_b_vs_e_disagreement_count": 1,
+  "combined_chembl_agreement": {
+    "n": 3,
+    "agree": 3,
+    "raw_agreement": 1.0
+  },
+  "fresh_supplement_agreement_detail": "see artifacts/v2/phase7_b_vs_e_fresh_supplement_agreement.json",
+  "fresh_supplement_disagreement_audit": "see artifacts/v2/phase7_b_vs_e_fresh_supplement_disagreement_audit.json (1 disagreement, verdict E_CORRECT)",
+  "no_phase6_defect_found_beyond_the_one_e_correct_disagreement": true
+}

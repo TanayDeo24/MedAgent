@@ -1,0 +1,24 @@
+{
+  "artifact_name": "phase7_b_vs_e_fresh_supplement_disagreement_audit",
+  "procedure": "Identical to artifacts/v2/phase7_b_vs_e_disagreement_audit.json: inspect claim + full cited Evidence + both evaluators outputs; classify root cause; never resolve by majority vote or treat one evaluator as automatically authoritative.",
+  "n_disagreements": 1,
+  "adjudications": [
+    {
+      "full_id": "P7SUP-Q1::c-3",
+      "claim_text": "The Phase 1b portion of the trial is designed to determine the recommended Phase 2 dose (RP2D) using a 3+3 dose escalation design, while the Phase 2 portion will further evaluate efficacy.",
+      "cited_evidence_content": "This study will evaluate the safety, tolerability, and preliminary effectiveness of AMXT 1501 and DFMO when combined with standard treatments for advanced solid tumors. The trial includes two groups: * Cohort 1: ... * Cohort 2: ... The Phase 1b portion will find the recommended Phase 2 dose (RP2D). The Phase 2 portion will further evaluate c [TRUNCATED BY SOURCE PARSER]",
+      "candidate_b_label": "supported",
+      "candidate_e_label": "partially_supported",
+      "root_cause_analysis": "The claim bundles three sub-facts: (1) Phase 1b determines RP2D - directly stated in the evidence, verbatim match. (2) the dose escalation follows a '3+3 design' - this specific design term does NOT appear anywhere in the cited Evidence text; it is not addressed at all, let alone confirmed. (3) Phase 2 'will further evaluate efficacy' - the Evidence text is cut off by the source parser's own truncation exactly at 'The Phase 2 portion will further evaluate c[TRUNCATED]', so the word that would confirm or refute 'efficacy' never actually appears in what was cited; it is genuinely ambiguous whether the underlying (untruncated) source says 'clinical efficacy' or something else entirely (e.g. 'combination safety', 'clinical outcomes'). Per the grounding contract's partial-support rule (a multi-fact claim where some facts are addressed and confirmed, others are simply unaddressed, with nothing contradicted, is partially_supported, not supported), the correct label is partially_supported: fact (1) is confirmed, fact (2) is wholly unaddressed, and fact (3) rests on a source-parser-truncated fragment that cannot be verified as stated. Candidate B's 'supported' judgment overlooked both the unaddressed 3+3-design detail and the truncation boundary on 'efficacy', which matches this project's previously-documented Candidate-B/Candidate-E-class failure mode: inferring full support for a multi-fact claim from evidence that plainly addresses only part of it. Candidate E's citation_judgments and unsupported_fragments correctly and specifically identify both under-evidenced fragments ('using a 3+3 dose escalation design', 'will further evaluate efficacy').",
+      "verdict": "E_CORRECT",
+      "note": "This is a genuine evaluator disagreement resolved by direct inspection of the real cited Evidence text, not by majority vote or by treating either evaluator as default-authoritative."
+    }
+  ],
+  "summary": {
+    "B_correct": 0,
+    "E_correct": 1,
+    "both_defensible": 0,
+    "gold_defect": 0,
+    "ambiguous": 0
+  }
+}
