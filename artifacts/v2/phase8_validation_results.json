@@ -1,0 +1,538 @@
+[
+  {
+    "case_id": "VAL-A-sufficient",
+    "category": "A - initial evidence already sufficient",
+    "expected_behavior": "no unnecessary follow-up; stop_reason=sufficient_evidence at round 0",
+    "query": "What is known about the Phase 4 trial NCT06657209 comparing adipocyte-directed pioglitazone vs. tirzepatide therapy in normal-weight Type 2 diabetes?",
+    "control": {
+      "n_evidence": 16,
+      "n_factual_claims": 8,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 8
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 16,
+          "n_factual_claims": 8,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [],
+          "stop_reason": "sufficient_evidence"
+        }
+      ],
+      "final_stop_reason": "sufficient_evidence",
+      "n_rounds_run": 1,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "clinicaltrials"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 16
+    },
+    "pre_source_coverage": 1.0,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL-B-missing-source-recovered",
+    "category": "B - initial evidence incomplete, one productive follow-up",
+    "expected_behavior": "MISSING_SOURCE_CATEGORY(pubmed) gap detected at round 0; follow-up recovers it; stop_reason=sufficient_evidence at round 1",
+    "query": "What is known about the trial NCT07677865 studying GLP-1 receptor agonists for Alzheimer's disease prevention, and what does the broader literature say about GLP-1 receptor agonist weight-loss compositions?",
+    "control": {
+      "n_evidence": 9,
+      "n_factual_claims": 6,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 6
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 9,
+          "n_factual_claims": 6,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-pubmed",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'pubmed' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "pubmed",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "productive",
+          "new_evidence_ids": [
+            "pubmed:39344838:chunk:2"
+          ],
+          "duplicate_evidence_ids": []
+        },
+        {
+          "round": 1,
+          "n_evidence": 2,
+          "n_factual_claims": 6,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [],
+          "stop_reason": "sufficient_evidence"
+        }
+      ],
+      "final_stop_reason": "sufficient_evidence",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "clinicaltrials",
+        "pubmed"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 2
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.5
+  },
+  {
+    "case_id": "VAL-C-multi-source-completeness",
+    "category": "C - multi-source gap, additional source improves completeness",
+    "expected_behavior": "MISSING_SOURCE_CATEGORY(chembl) gap detected at round 0; follow-up recovers it; completeness/source-coverage improves",
+    "query": "What does the literature say about combination immunotherapy development in melanoma, and what does ChEMBL report about the compound identified as CHEMBL3137343 (Keytruda)?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 2,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 2
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 2,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "productive",
+          "new_evidence_ids": [
+            "chembl:CHEMBL3137343"
+          ],
+          "duplicate_evidence_ids": []
+        },
+        {
+          "round": 1,
+          "n_evidence": 2,
+          "n_factual_claims": 3,
+          "claim_support_precision": 0.6666666666666666,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-weak-c-1",
+              "gap_type": "weakly_supported_fact",
+              "description": "Claim 'c-1' is only partially_supported per the frozen Candidate B judge - additional evidence may resolve it.",
+              "target_source_category": null,
+              "related_claim_id": "c-1",
+              "severity": 0.6
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "no_new_evidence"
+        },
+        {
+          "round": 2,
+          "n_evidence": 2,
+          "n_factual_claims": 3,
+          "claim_support_precision": 0.6666666666666666,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-weak-c-1",
+              "gap_type": "weakly_supported_fact",
+              "description": "Claim 'c-1' is only partially_supported per the frozen Candidate B judge - additional evidence may resolve it.",
+              "target_source_category": null,
+              "related_claim_id": "c-1",
+              "severity": 0.6
+            }
+          ],
+          "stop_reason": "no_productive_action"
+        }
+      ],
+      "final_stop_reason": "no_productive_action",
+      "n_rounds_run": 3,
+      "pre_csp": 1.0,
+      "post_csp": 0.6666666666666666,
+      "csp_delta": -0.33333333333333337,
+      "requested_evidence_types": [
+        "pubmed",
+        "chembl"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 2
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.5
+  },
+  {
+    "case_id": "VAL-D-duplicate-only-followup",
+    "category": "D - duplicate-only follow-up must not count as progress",
+    "expected_behavior": "round 0: MISSING_SOURCE_CATEGORY(pubmed) gap, follow-up recovers RAG-30604292-0 (productive); round 1: a SECOND, forced follow-up round re-delivers the SAME RAG-30604292-0 record (simulating a provider rediscovery) - must be counted as duplicate (evidence_duplicate_count increments), not new progress, and the loop must still terminate safely (not misreport a duplicate round as productive)",
+    "query": "What is known about the trial NCT06657209, and what does the literature say about immune checkpoint inhibitors in gastroesophageal cancer?",
+    "control": {
+      "n_evidence": 16,
+      "n_factual_claims": 4,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 4
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 16,
+          "n_factual_claims": 4,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-pubmed",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'pubmed' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "pubmed",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "productive",
+          "new_evidence_ids": [
+            "pubmed:30604292:chunk:0"
+          ],
+          "duplicate_evidence_ids": []
+        },
+        {
+          "round": 1,
+          "n_evidence": 2,
+          "n_factual_claims": 7,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [],
+          "stop_reason": "sufficient_evidence"
+        }
+      ],
+      "final_stop_reason": "sufficient_evidence",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 2
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.5
+  },
+  {
+    "case_id": "VAL-E-unrecoverable-abstention",
+    "category": "E - unrecoverable gap, correct behavior is abstention",
+    "expected_behavior": "NO_EVIDENCE gap at round 0; follow-up genuinely finds nothing (no real record exists to inject); stop_reason=safe_abstention at round 1",
+    "query": "What is known about the fictitious compound QRX-00000-NONEXISTENT for treating a condition with no captured evidence in this benchmark?",
+    "control": {
+      "n_evidence": 0,
+      "n_factual_claims": 0,
+      "abstained": true,
+      "claim_support_precision": null,
+      "label_counts": {},
+      "invalid_evidence_ids": [],
+      "citations": 0
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 0,
+          "n_factual_claims": 0,
+          "claim_support_precision": null,
+          "abstained": true,
+          "gaps": [
+            {
+              "gap_id": "gap-no-evidence",
+              "gap_type": "no_evidence",
+              "description": "No usable Evidence yet, or the current answer abstained for lack of evidence.",
+              "target_source_category": null,
+              "related_claim_id": null,
+              "severity": 1.0
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "no_new_evidence"
+        },
+        {
+          "round": 1,
+          "n_evidence": 0,
+          "n_factual_claims": 0,
+          "claim_support_precision": null,
+          "abstained": true,
+          "gaps": [
+            {
+              "gap_id": "gap-no-evidence",
+              "gap_type": "no_evidence",
+              "description": "No usable Evidence yet, or the current answer abstained for lack of evidence.",
+              "target_source_category": null,
+              "related_claim_id": null,
+              "severity": 1.0
+            }
+          ],
+          "stop_reason": "safe_abstention"
+        }
+      ],
+      "final_stop_reason": "safe_abstention",
+      "n_rounds_run": 2,
+      "pre_csp": null,
+      "post_csp": null,
+      "csp_delta": null,
+      "requested_evidence_types": [
+        "pubmed"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 0
+    },
+    "pre_source_coverage": 0.0,
+    "post_source_coverage": 0.0,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL-F-tool-failure-safe-termination",
+    "category": "F - source/tool failure, safe termination never fabrication",
+    "expected_behavior": "round 0: MISSING_SOURCE_CATEGORY gap detected; the follow-up tool call is made to FAIL (mocked provider failure, mirroring this session's genuine live-tool-network block) rather than succeed; research_consecutive_failure_rounds increments; after MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS failed rounds, stop_reason=tool_failure_limit; zero fabricated Evidence at any point",
+    "query": "What is known about the trial NCT07677865, and what does ChEMBL report about a related compound?",
+    "control": {
+      "n_evidence": 9,
+      "n_factual_claims": 8,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 8
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 9,
+          "n_factual_claims": 8,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "tool_failure"
+        },
+        {
+          "round": 1,
+          "n_evidence": 9,
+          "n_factual_claims": 8,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": "no_productive_action"
+        }
+      ],
+      "final_stop_reason": "no_productive_action",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "clinicaltrials",
+        "chembl"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 9
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 0.5,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL-G-stagnation-no-repeat",
+    "category": "G - repeated/equivalent action temptation must not cause wasteful looping",
+    "expected_behavior": "round 0: a gap is detected for which no real record is available to recover (follow-up finds nothing); the loop must NOT re-attempt the identical gap signature a second time - stop_reason=no_productive_action (not a second identical, wasteful action)",
+    "query": "What does ChEMBL report about a compound relevant to the trial NCT06657209's mechanism, where no such real ChEMBL record exists in this benchmark?",
+    "control": {
+      "n_evidence": 16,
+      "n_factual_claims": 1,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 1
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 16,
+          "n_factual_claims": 1,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "no_new_evidence"
+        },
+        {
+          "round": 1,
+          "n_evidence": 16,
+          "n_factual_claims": 1,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": "no_productive_action"
+        }
+      ],
+      "final_stop_reason": "no_productive_action",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "chembl",
+        "clinicaltrials"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 16
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 0.5,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL-H-budget-exhausted-persistent-gap",
+    "category": "H - additional meaningful case not represented in DEV: budget exhaustion under a persistently-recurring gap",
+    "expected_behavior": "a gap that keeps being detected every round (no real record ever fully resolves it) must still cause the loop to stop within MAX_RESEARCH_ITERATIONS - stop_reason=budget_exhausted, never an infinite loop, even though the gap itself never resolves",
+    "query": "What does the literature say about immune checkpoint inhibitors in gastroesophageal cancer, considering the recurring evidentiary gaps in this specific benchmark slice?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 5,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "label_counts": {
+        "supported": 5
+      },
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 5,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [],
+          "stop_reason": "sufficient_evidence"
+        }
+      ],
+      "final_stop_reason": "sufficient_evidence",
+      "n_rounds_run": 1,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed"
+      ],
+      "invalid_evidence_ids": [],
+      "fabricated_evidence_count": 0,
+      "final_n_evidence": 1
+    },
+    "pre_source_coverage": 1.0,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.0
+  }
+]

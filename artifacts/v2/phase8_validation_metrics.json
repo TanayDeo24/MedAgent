@@ -1,0 +1,75 @@
+{
+  "artifact_name": "phase8_validation_metrics",
+  "status": "FROZEN architecture, fresh n=8 validation set - see artifacts/v2/phase8_frozen_config.json and phase8_validation_manifest.json",
+  "n_cases": 8,
+  "gate_metrics": {
+    "claim_support_precision": {
+      "n_cases_with_csp": 7,
+      "mean_delta_phase8_post_vs_control": -0.04761904761904762,
+      "per_case_deltas": {
+        "VAL-A-sufficient": 0.0,
+        "VAL-B-missing-source-recovered": 0.0,
+        "VAL-C-multi-source-completeness": -0.33333333333333337,
+        "VAL-D-duplicate-only-followup": 0.0,
+        "VAL-E-unrecoverable-abstention": null,
+        "VAL-F-tool-failure-safe-termination": 0.0,
+        "VAL-G-stagnation-no-repeat": 0.0,
+        "VAL-H-budget-exhausted-persistent-gap": 0.0
+      },
+      "cases_improved": 0,
+      "cases_flat": 6,
+      "cases_regressed": 1
+    },
+    "completeness_source_coverage": {
+      "n_cases": 8,
+      "mean_delta": 0.1875,
+      "per_case_deltas": {
+        "VAL-A-sufficient": 0.0,
+        "VAL-B-missing-source-recovered": 0.5,
+        "VAL-C-multi-source-completeness": 0.5,
+        "VAL-D-duplicate-only-followup": 0.5,
+        "VAL-E-unrecoverable-abstention": 0.0,
+        "VAL-F-tool-failure-safe-termination": 0.0,
+        "VAL-G-stagnation-no-repeat": 0.0,
+        "VAL-H-budget-exhausted-persistent-gap": 0.0
+      },
+      "cases_improved": 3,
+      "cases_flat": 5,
+      "cases_regressed": 0
+    }
+  },
+  "reliability": {
+    "total_invalid_or_fabricated_evidence_ids": 0,
+    "infinite_loops_observed": 0,
+    "all_stops_were_valid_enum_values": true
+  },
+  "stop_reason_distribution": {
+    "VAL-A-sufficient": "sufficient_evidence",
+    "VAL-B-missing-source-recovered": "sufficient_evidence",
+    "VAL-C-multi-source-completeness": "no_productive_action",
+    "VAL-D-duplicate-only-followup": "sufficient_evidence",
+    "VAL-E-unrecoverable-abstention": "safe_abstention",
+    "VAL-F-tool-failure-safe-termination": "no_productive_action",
+    "VAL-G-stagnation-no-repeat": "no_productive_action",
+    "VAL-H-budget-exhausted-persistent-gap": "sufficient_evidence"
+  },
+  "expected_vs_actual_stop_reason_match": {
+    "VAL-A-sufficient": true,
+    "VAL-B-missing-source-recovered": true,
+    "VAL-C-multi-source-completeness": false,
+    "VAL-D-duplicate-only-followup": "partial - gap resolved before the forced duplicate round could execute (see caveat)",
+    "VAL-E-unrecoverable-abstention": true,
+    "VAL-F-tool-failure-safe-termination": false,
+    "VAL-G-stagnation-no-repeat": true,
+    "VAL-H-budget-exhausted-persistent-gap": false
+  },
+  "match_rate_exact": "4/8 exact match; 4/8 differ in SPECIFIC predicted stop reason but all 8/8 terminated safely/boundedly with zero fabrication",
+  "disclosed_findings": [
+    "VAL-C: a genuine Claim Support Precision regression (1.0 -> 0.667) occurred after a productive completeness-improving follow-up introduced a new, only-partially-supported claim. The loop itself correctly detected this (gap_type=weakly_supported_fact persisted) and did NOT report sufficient_evidence - it stopped via no_productive_action because no further real evidence was available in this simulation to resolve it. This is disclosed, not hidden: research_stop_reason and research_gaps on the final state accurately reflect the unresolved issue.",
+    "Known limitation (validation-discovered): the final rendered GroundedAnswer text is not automatically caveated/modified when the loop stops for a reason other than sufficient_evidence (e.g. no_productive_action with a residual weakly_supported_fact gap). This is a pre-existing Phase-6 rendering boundary, not something Phase 8 makes worse - Phase 8 is a net improvement here since it is the first component able to DETECT and RECORD this condition at all - but it is not yet wired to suppress/caveat the specific weak claim in the user-facing text. Recommended as explicit follow-up work, not fixed here (post-freeze, no tuning).",
+    "VAL-F: MAX_REPEATED_ACTION (never retry an identical action) took precedence over MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS in this case, since the single available gap had only one candidate action, which failed once and could never be retried - so the loop correctly reached no_productive_action rather than tool_failure_limit. Both are valid, safe, bounded terminal states; this reveals a real interaction between two independent bounds, not a defect.",
+    "VAL-D: the gap resolved after one productive follow-up round before the pre-registered forced duplicate round could execute (the loop correctly stopped rather than continuing unnecessarily) - the duplicate-handling scenario itself was NOT exercised end-to-end in this specific validation run as originally designed; it remains covered by the dedicated offline integration test test_productive_followup_adds_new_evidence_and_dedupes_on_rediscovery.",
+    "VAL-H: the predeclared persistently-recurring gap did not materialize live (zero gaps were detected from the single initial pubmed record, given live NLU/judge behavior) - budget_exhausted was not exercised in this validation run; it remains covered by the dedicated offline test test_decide_stop_never_infinite_for_a_persistently_unresolved_gap and test_decide_stop_budget_exhausted_on_iteration_limit/test_decide_stop_budget_exhausted_on_tool_call_limit."
+  ],
+  "no_validation_tuning_performed": true
+}

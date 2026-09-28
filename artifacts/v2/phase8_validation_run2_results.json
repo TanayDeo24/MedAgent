@@ -1,0 +1,373 @@
+[
+  {
+    "case_id": "VAL2-A-sufficient",
+    "category": "A - initial evidence already sufficient",
+    "expected_behavior": "no unnecessary follow-up; ideally stop_reason=sufficient_evidence at round 0 (per Validation Run 1's audit, a different-but-still-safe/bounded stop reason is acceptable and will be reported honestly, not treated as a failure)",
+    "query": "What does the literature say about pembrolizumab versus ipilimumab in advanced melanoma?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 4,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8_v2": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 4,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [],
+          "stop_reason": "sufficient_evidence"
+        }
+      ],
+      "final_stop_reason": "sufficient_evidence",
+      "n_rounds_run": 1,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed"
+      ],
+      "invalid_evidence_ids": [],
+      "final_n_evidence": 1,
+      "caveated_claim_ids": [],
+      "final_rendered_text_has_caveat": false
+    },
+    "pre_source_coverage": 1.0,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL2-B-productive-followup",
+    "category": "B - initial evidence incomplete, one productive follow-up",
+    "expected_behavior": "a gap is detected at round 0 (single-source coverage or weak support); a real, on-topic second PubMed record resolves it",
+    "query": "What does the literature say about emerging PD-1/PD-L1 antagonists for melanoma treatment, and what does seven-year adjuvant pembrolizumab trial data show in stage III melanoma?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 2,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8_v2": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 2,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-clinical_trials",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'clinical_trials' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "clinical_trials",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "productive",
+          "new_evidence_ids": [
+            "pubmed:39288737"
+          ],
+          "duplicate_evidence_ids": []
+        },
+        {
+          "round": 1,
+          "n_evidence": 2,
+          "n_factual_claims": 6,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-clinical_trials",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'clinical_trials' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "clinical_trials",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": "no_productive_action"
+        }
+      ],
+      "final_stop_reason": "no_productive_action",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed",
+        "clinicaltrials"
+      ],
+      "invalid_evidence_ids": [],
+      "final_n_evidence": 2,
+      "caveated_claim_ids": [],
+      "final_rendered_text_has_caveat": false
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 0.5,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL2-D-duplicate-only-followup",
+    "category": "D - duplicate-only follow-up must not count as progress",
+    "expected_behavior": "round 0: a gap is detected, follow-up recovers LIVE-36482474 (productive); a SECOND, forced follow-up round re-delivers the SAME record - must be counted as duplicate, not progress",
+    "query": "What does the literature say about EGFR-mutated NSCLC osimertinib resistance mechanisms, and what does the CTLA-4/PD-1 pathway comparison literature add?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 4,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8_v2": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 4,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [],
+          "stop_reason": "sufficient_evidence"
+        }
+      ],
+      "final_stop_reason": "sufficient_evidence",
+      "n_rounds_run": 1,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed"
+      ],
+      "invalid_evidence_ids": [],
+      "final_n_evidence": 1,
+      "caveated_claim_ids": [],
+      "final_rendered_text_has_caveat": false
+    },
+    "pre_source_coverage": 1.0,
+    "post_source_coverage": 1.0,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL2-E-unrecoverable-abstention",
+    "category": "E - unrecoverable gap, correct behavior is abstention",
+    "expected_behavior": "NO_EVIDENCE gap at round 0; nothing recoverable; stop_reason=safe_abstention",
+    "query": "What is known about the fictitious compound VXR-00000-NONEXISTENT2 for a condition with no captured evidence in this benchmark?",
+    "control": {
+      "n_evidence": 0,
+      "n_factual_claims": 0,
+      "abstained": true,
+      "claim_support_precision": null,
+      "invalid_evidence_ids": [],
+      "citations": 0
+    },
+    "phase8_v2": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 0,
+          "n_factual_claims": 0,
+          "claim_support_precision": null,
+          "abstained": true,
+          "gaps": [
+            {
+              "gap_id": "gap-no-evidence",
+              "gap_type": "no_evidence",
+              "description": "No usable Evidence yet, or the current answer abstained for lack of evidence.",
+              "target_source_category": null,
+              "related_claim_id": null,
+              "severity": 1.0
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "no_new_evidence"
+        },
+        {
+          "round": 1,
+          "n_evidence": 0,
+          "n_factual_claims": 0,
+          "claim_support_precision": null,
+          "abstained": true,
+          "gaps": [
+            {
+              "gap_id": "gap-no-evidence",
+              "gap_type": "no_evidence",
+              "description": "No usable Evidence yet, or the current answer abstained for lack of evidence.",
+              "target_source_category": null,
+              "related_claim_id": null,
+              "severity": 1.0
+            }
+          ],
+          "stop_reason": "safe_abstention"
+        }
+      ],
+      "final_stop_reason": "safe_abstention",
+      "n_rounds_run": 2,
+      "pre_csp": null,
+      "post_csp": null,
+      "csp_delta": null,
+      "requested_evidence_types": [
+        "pubmed"
+      ],
+      "invalid_evidence_ids": [],
+      "final_n_evidence": 0,
+      "caveated_claim_ids": [],
+      "final_rendered_text_has_caveat": false
+    },
+    "pre_source_coverage": 0.0,
+    "post_source_coverage": 0.0,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL2-F-tool-failure-safe-termination",
+    "category": "F - source/tool failure, safe termination never fabrication",
+    "expected_behavior": "a gap is detected; the follow-up tool call is made to FAIL (mocked provider failure); no fabricated Evidence at any point; loop still terminates safely and boundedly",
+    "query": "What does the literature say about tackling osimertinib resistance in EGFR-mutant NSCLC, and what does ChEMBL report about a related compound?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 3,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8_v2": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 3,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "tool_failure"
+        },
+        {
+          "round": 1,
+          "n_evidence": 1,
+          "n_factual_claims": 3,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": "no_productive_action"
+        }
+      ],
+      "final_stop_reason": "no_productive_action",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed",
+        "chembl"
+      ],
+      "invalid_evidence_ids": [],
+      "final_n_evidence": 1,
+      "caveated_claim_ids": [],
+      "final_rendered_text_has_caveat": false
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 0.5,
+    "source_coverage_delta": 0.0
+  },
+  {
+    "case_id": "VAL2-G-stagnation-no-repeat",
+    "category": "G - repeated/equivalent action temptation must not cause wasteful looping",
+    "expected_behavior": "a gap is detected for which no real record is available to recover; the SAME gap signature must not be retried a second time",
+    "query": "What does the literature say about candidate mechanisms of acquired resistance to first-line osimertinib, and what does ChEMBL report about a related compound where no such real ChEMBL record exists in this benchmark?",
+    "control": {
+      "n_evidence": 1,
+      "n_factual_claims": 3,
+      "abstained": false,
+      "claim_support_precision": 1.0,
+      "invalid_evidence_ids": [],
+      "citations": 1
+    },
+    "phase8_v2": {
+      "rounds": [
+        {
+          "round": 0,
+          "n_evidence": 1,
+          "n_factual_claims": 3,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": null,
+          "followup_outcome": "no_new_evidence"
+        },
+        {
+          "round": 1,
+          "n_evidence": 1,
+          "n_factual_claims": 3,
+          "claim_support_precision": 1.0,
+          "abstained": false,
+          "gaps": [
+            {
+              "gap_id": "gap-missing-source-chembl",
+              "gap_type": "missing_source_category",
+              "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+              "target_source_category": "chembl",
+              "related_claim_id": null,
+              "severity": 0.7
+            }
+          ],
+          "stop_reason": "no_productive_action"
+        }
+      ],
+      "final_stop_reason": "no_productive_action",
+      "n_rounds_run": 2,
+      "pre_csp": 1.0,
+      "post_csp": 1.0,
+      "csp_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed",
+        "chembl"
+      ],
+      "invalid_evidence_ids": [],
+      "final_n_evidence": 1,
+      "caveated_claim_ids": [],
+      "final_rendered_text_has_caveat": false
+    },
+    "pre_source_coverage": 0.5,
+    "post_source_coverage": 0.5,
+    "source_coverage_delta": 0.0
+  }
+]

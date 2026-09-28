@@ -88,6 +88,14 @@ docs/artifacts/code before writing this ledger (see each CTL item's
 | CTL-010 | 6 | Legacy report_generation_node baseline latency/token measurement (needs NVIDIA_API_KEY) | OPEN | NO (see item - informational baseline only, not a Phase-6 blocker) |
 | CTL-011 | 7 | Genuinely independent (distinct-provider) grounding-evaluator validation | **CLOSED** (fresh-supplement pass) - the fresh, pre-registered 8-answer supplement (32 claims, including 3 genuine ChEMBL claims across 2 distinct compounds) plus the surviving 26-claim v3 subset give a combined 58-claim system cross-check with all four source categories represented; B-vs-E raw agreement 57/58≈98.3% pooled (32-claim supplement alone: 31/32≈96.9%), the one disagreement manually adjudicated (E_CORRECT) | N/A - closed (composition explicitly disclosed; this is not a reconstruction of the original 66) |
 | CTL-012 | 7 | Phase-7 evaluator token/cost measurement | **CLOSED** (hardening pass) | N/A - closed |
+| CTL-013 | 8 | Live PubMed iterative-research verification | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
+| CTL-014 | 8 | Live ClinicalTrials.gov iterative-research verification | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
+| CTL-015 | 8 | Live ChEMBL iterative-research verification | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
+| CTL-016 | 8 | True live multi-iteration evidence acquisition (real network, not transport-simulated) | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
+| CTL-017 | 8 | Actual network timeout/retry/429/5xx behavior under the research loop | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | Partially - Phase 3's frozen retry/error handling already covers the mechanism; only genuinely live fault injection is deferred |
+| CTL-018 | 8 | Live grounding/citation regression after real iterative acquisition | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES (see item) |
+| CTL-019 | 8 | Phase-8 metrics currently based on simulated transport (DEV + Validation Runs 1/2) | ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED | YES, before any of these numbers are treated as production-representative |
+| CTL-020 | 8 | Phase-8 validation source-inventory exhaustion (no fresh, non-heldout ClinicalTrials.gov or usable ChEMBL record remains in phase5_benchmark_manifest.json) | OPEN | YES (see item) |
 
 ### CTL-011 — Genuinely independent (distinct-provider) grounding-evaluator validation
 
@@ -988,3 +996,251 @@ file).
   the identical new claims. **No live calls were made to reach this
   conclusion. CTL-011 remains REOPENED** (not closed by this audit,
   correctly, since no new evaluation was performed).
+
+### CTL-013 — Live PubMed iterative-research verification
+
+- **ID:** CTL-013
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** this cloud session's egress
+  proxy denies `eutils.ncbi.nlm.nih.gov` (`connect_rejected`/HTTP 403,
+  confirmed via direct `curl`) - `research_execution_node`'s real
+  follow-up tool call cannot reach the live PubMed API.
+- **Cloud evidence available:** the research loop's own gap-detection,
+  action-planning, stop-reason, and evidence-merge/dedup logic run for
+  real (unmocked) against real, previously-captured PubMed records
+  (`artifacts/v2/phase8_dev_benchmark_results.json`,
+  `phase8_validation_results.json`, `phase8_validation_run2_results.json`)
+  - only the live-network transport hop is substituted.
+- **Why that is insufficient:** it cannot demonstrate that a live PubMed
+  API call, made mid-loop with a gap-targeted follow-up query, actually
+  returns a schema-valid, on-topic result through the real Phase-3
+  dispatcher under real network conditions (latency, rate limits,
+  malformed/partial responses).
+- **Exact local verification procedure:** with network access to
+  `eutils.ncbi.nlm.nih.gov` restored, re-run the Phase-8 validation
+  harness (`tests/test_research_integration.py`'s pattern, or a fresh
+  script matching `phase8_validation.py`'s shape) with
+  `call_cerebras_native_tools`/`execute_validated_call` UNMOCKED for at
+  least 3 real PubMed-gap cases.
+- **PASS condition:** at least 3 live PubMed follow-up rounds complete
+  end-to-end (real HTTP call -> real parsed result -> real Evidence via
+  `evidence/adapters.py`, unmodified) with zero fabricated/invalid
+  Evidence IDs and a correctly-updated `research_gaps`/`evidence_merge`
+  state.
+- **Required credentials/data/network/artifacts:** network egress to
+  `eutils.ncbi.nlm.nih.gov:443`; artifact:
+  `artifacts/v2/phase8_live_pubmed_verification.json`.
+- **Required closure phase:** before Phase 13's final freeze; recommended
+  before Phase 10 consumes results that assume live-source reliability.
+- **Result:** _(pending)_
+
+### CTL-014 — Live ClinicalTrials.gov iterative-research verification
+
+- **ID:** CTL-014
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** `clinicaltrials.gov` is
+  network-blocked identically to CTL-013's finding.
+- **Cloud evidence available / why insufficient / exact local
+  verification procedure / PASS condition:** identical in kind to
+  CTL-013, substituting ClinicalTrials.gov and at least 3 real
+  CT-gap cases (DEV-A/B and Validation Run 1's CT-based cases already
+  demonstrate the transport-simulated path).
+- **Required credentials/data/network/artifacts:** network egress to
+  `clinicaltrials.gov:443`; artifact:
+  `artifacts/v2/phase8_live_clinicaltrials_verification.json`.
+- **Required closure phase:** before Phase 13's final freeze.
+- **Result:** _(pending)_
+
+### CTL-015 — Live ChEMBL iterative-research verification
+
+- **ID:** CTL-015
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** `www.ebi.ac.uk` is
+  network-blocked identically to CTL-013's finding.
+- **Cloud evidence available / why insufficient / exact local
+  verification procedure / PASS condition:** identical in kind to
+  CTL-013, substituting ChEMBL. Additionally requires verifying live
+  behavior against a `gold.expected_skip=true`-shaped real record (the
+  adapter's `None`-return path, exercised offline via unit tests but not
+  live end-to-end through the research loop).
+- **Required credentials/data/network/artifacts:** network egress to
+  `www.ebi.ac.uk:443`; artifact:
+  `artifacts/v2/phase8_live_chembl_verification.json`.
+- **Required closure phase:** before Phase 13's final freeze.
+- **Result:** _(pending)_
+
+### CTL-016 — True live multi-iteration evidence acquisition
+
+- **ID:** CTL-016
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** every DEV/Validation Run
+  1/Validation Run 2 follow-up round that acquired new Evidence did so via
+  a real, captured record injected directly (transport-simulated,
+  disclosed in each manifest's `network_simulation_disclosure`) - no run
+  in this cloud session made 2+ live network tool calls across 2+ real
+  research iterations end-to-end.
+- **Cloud evidence available:** the full research-loop STATE MACHINE
+  (iteration counting, budget enforcement, dedup, stop-reason decisions)
+  is exercised for real across multiple iterations in every DEV/Val1/Val2
+  case that looped - only the acquisition network hop is simulated.
+- **Why that is insufficient:** cannot rule out a live-network-specific
+  interaction (e.g. a second live call behaving differently from the
+  first due to rate limiting, connection reuse, or provider-side session
+  state) that a transport-simulated run cannot surface.
+- **Exact local verification procedure:** run at least 2 real, multi-
+  iteration cases (one 2-round, one 3-round) fully live, all 3 tool
+  networks reachable, recording full request/response provenance.
+- **PASS condition:** both cases complete within
+  `MAX_RESEARCH_ITERATIONS`/`MAX_TOOL_CALLS_TOTAL`, correct dedup on any
+  rediscovered record, correct final stop reason, zero fabricated
+  Evidence.
+- **Required credentials/data/network/artifacts:** all three tool
+  networks reachable; artifact:
+  `artifacts/v2/phase8_live_multi_iteration_verification.json`.
+- **Required closure phase:** before Phase 13's final freeze.
+- **Result:** _(pending)_
+
+### CTL-017 — Actual network timeout/retry/429/5xx behavior under the research loop
+
+- **ID:** CTL-017
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** the genuine, currently-occurring
+  live network block in this session (`connect_rejected`) exercised the
+  "tool call fails" path for real in Validation Run 1's VAL-F and
+  Validation Run 2's VAL2-F cases, but the SPECIFIC error shapes (timeout
+  vs. 429 vs. 5xx vs. malformed response) could not be distinguished,
+  since the proxy denial is a single uniform failure mode, not a
+  reproduction of each real HTTP fault class.
+- **Cloud evidence available:** Phase 3's frozen retry/error-handling
+  code (unmodified by Phase 8) already distinguishes these categories at
+  the `tool_call_history`/`error_category` level in its own design and
+  tests; `research_consecutive_failure_rounds`/`TOOL_FAILURE_LIMIT`
+  correctly bound the research loop's response regardless of which
+  specific fault occurred.
+- **Why that is insufficient:** no live 429/5xx/timeout was actually
+  observed and recorded end-to-end through the research loop specifically
+  (as opposed to through Phase 3's tool orchestration in isolation, which
+  IS covered by existing Phase 3 tests).
+- **Exact local verification procedure:** with network access, inject (or
+  wait for) at least one real 429, one real 5xx, and one real timeout
+  during a live research-loop follow-up call; confirm each is recorded
+  with the correct `error_category` and produces the correct, bounded
+  research-loop stop behavior.
+- **PASS condition:** all three fault classes observed, correctly
+  categorized, and the research loop terminates safely (never fabricates,
+  never loops past its bounds) in each case.
+- **Required credentials/data/network/artifacts:** live network access;
+  artifact: `artifacts/v2/phase8_live_fault_verification.json`.
+- **Required closure phase:** before Phase 13's final freeze; may overlap
+  with Phase 9's fault-injection matrix (`EVALUATION_CONTRACT.md` §10) -
+  Phase 9 owns the SYSTEM-WIDE fault matrix; this item is scoped narrowly
+  to the research loop's own bounded response, not general reliability
+  engineering.
+- **Result:** _(pending)_
+
+### CTL-018 — Live grounding/citation regression after real iterative acquisition
+
+- **ID:** CTL-018
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** PHASE8-DEFECT-001's fix
+  (`finalize_research_answer_node`) was verified via offline regression
+  tests (`tests/test_research_finalize_answer_defect_fix.py`, including a
+  defect-reproduction case replaying Validation Run 1's exact recorded
+  VAL-C trace) and via Validation Run 2's transport-simulated cases - not
+  yet via a live, multi-iteration, real-network acquisition producing a
+  genuinely new residual-gap scenario end-to-end.
+- **Cloud evidence available:** the fix's mechanism (reading
+  `research_gaps`/`research_stop_reason`, setting `GroundedClaim.
+  qualifier`, recompiling via the unmodified Phase-6 citation compiler)
+  is architecture-level and does not depend on how Evidence was acquired
+  - so the offline/transport-simulated verification is a real, valid
+  test of the mechanism itself.
+- **Why that is insufficient:** cannot rule out a live-acquisition-
+  specific claim/gap interaction (e.g. real network latency causing a
+  different claim structure) not present in any case run so far.
+- **Exact local verification procedure:** run CTL-016's live multi-
+  iteration cases through the frozen Candidate B judge and confirm any
+  residual `weakly_supported_fact`/`conflicting_evidence` gap is
+  correctly caveated in the final rendered answer.
+- **PASS condition:** zero cases where a live-acquired residual gap fails
+  to produce a `GroundedClaim.qualifier` on its tied claim.
+- **Required credentials/data/network/artifacts:** depends on CTL-016;
+  artifact: `artifacts/v2/phase8_live_grounding_regression.json`.
+- **Required closure phase:** before Phase 13's final freeze.
+- **Result:** _(pending)_
+
+### CTL-019 — Phase-8 metrics based on simulated transport
+
+- **ID:** CTL-019
+- **Phase:** 8
+- **Status:** ENVIRONMENT-DEFERRED / LOCAL-VERIFICATION-REQUIRED
+- **Why it could not be fully verified:** every quantitative Phase-8
+  result in this session (DEV n=4, Validation Run 1 n=8, Validation Run 2
+  n=6) used transport-simulated follow-up acquisition, disclosed
+  explicitly in each manifest. None of these numbers should be treated as
+  representative of live-network production behavior (latency, real
+  failure rates, real result relevance/noise) until re-measured live.
+- **Cloud evidence available:** real Evidence content, real frozen
+  generation/judge calls, real loop-control logic in every case - only
+  the acquisition transport itself is simulated.
+- **Why that is insufficient:** production-representative metrics
+  (mean loops/query, unnecessary-follow-up rate, productive-follow-up
+  rate under real-world result quality/noise) require live acquisition.
+- **Exact local verification procedure:** re-run the DEV/Validation
+  benchmark methodology with live network access, on a comparably-sized
+  or larger case set, and report the same metric set for direct
+  comparison against the simulated-transport numbers already on record.
+- **PASS condition:** not a pass/fail gate itself - a required
+  re-measurement before any Phase-8 metric is cited as production-
+  representative (e.g. in Phase 11's product-facing documentation or
+  Phase 13's final report).
+- **Required credentials/data/network/artifacts:** live network access to
+  all three tool APIs; artifact: `artifacts/v2/phase8_live_metrics.json`.
+- **Required closure phase:** before Phase 13's final freeze; before
+  Phase 11 cites any Phase-8 number as a product-facing claim.
+- **Result:** _(pending)_
+
+### CTL-020 — Phase-8 validation source-inventory exhaustion
+
+- **ID:** CTL-020
+- **Phase:** 8
+- **Status:** OPEN
+- **Why it could not be fully verified:** by the time Validation Run 2
+  was built, every non-`phase5_heldout` ClinicalTrials.gov record (all
+  15) and every non-`phase5_heldout`, non-skip ChEMBL record in
+  `artifacts/v2/phase5_benchmark_manifest.json` had already been consumed
+  across Phase 7 and Phase 8 (DEV + Validation Run 1). Validation Run 2
+  (`artifacts/v2/phase8_validation_run2_manifest.json`) was therefore
+  built entirely from real, unused PubMed records - no fresh, genuinely
+  multi-source (cross-category) validation case was possible this
+  session.
+- **Cloud evidence available:** multi-source behavior (a gap spanning 2+
+  source categories, recovered by a targeted follow-up) IS demonstrated
+  in DEV-B/DEV-C and Validation Run 1's VAL-B/VAL-C/VAL-D, all using real
+  ClinicalTrials.gov/ChEMBL records that were available at the time - the
+  capability is proven, just not re-provable on FRESH records in
+  Validation Run 2 specifically.
+- **Why that is insufficient:** a defect specific to a not-yet-exercised
+  real-world ClinicalTrials.gov/ChEMBL record shape cannot be ruled out
+  by PubMed-only validation.
+- **Exact local verification procedure:** with live network access (or a
+  freshly captured, larger Phase-5-style manifest), build and run a
+  genuinely fresh multi-source validation case using real,
+  never-before-used ClinicalTrials.gov and/or ChEMBL records.
+- **PASS condition:** at least 2 fresh multi-source cases run cleanly
+  with the same integrity guarantees (zero fabricated Evidence, correct
+  gap detection, correct dedup) already demonstrated on PubMed-only
+  Validation Run 2 cases.
+- **Required credentials/data/network/artifacts:** either live network
+  access to `clinicaltrials.gov`/`www.ebi.ac.uk`, or a freshly captured
+  benchmark manifest with new real records; artifact:
+  `artifacts/v2/phase8_fresh_multisource_validation.json`.
+- **Required closure phase:** before Phase 10 consumes any Phase-8-
+  dependent result, and before Phase 13's final freeze.
+- **Result:** _(pending)_

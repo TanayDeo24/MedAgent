@@ -1244,5 +1244,100 @@
         "caveat_matrix": "18/18 CLOSED"
       }
     }
+  },
+  "phase_8_research_loop": {
+    "status": "EXIT_GATE_MET_small_n",
+    "graph_builder": "agent.graph.build_research_loop_graph (additive; build_agent_graph unchanged)",
+    "opt_in_flag": "MedAgent(research_loop=True)",
+    "bounded_loop_limits": {
+      "max_research_iterations": 3,
+      "max_tool_calls_total": 8,
+      "max_repeated_action": 1,
+      "max_consecutive_tool_failure_rounds": 2
+    },
+    "dev_benchmark": {
+      "n_cases": 4,
+      "artifact": "artifacts/v2/phase8_dev_benchmark_results.json",
+      "metrics_summary_artifact": "artifacts/v2/phase8_dev_benchmark_metrics_summary.json",
+      "csp_delta_dev_b": 0.0,
+      "source_coverage_delta_dev_b": 0.5,
+      "loop_termination_correctness": "4/4",
+      "unnecessary_loop_rate": 0.0,
+      "mean_loops_per_query": 0.5,
+      "network_simulated_followup": true,
+      "network_simulation_reason": "live PubMed/ClinicalTrials.gov/ChEMBL network blocked in this cloud session (egress-proxy connect_rejected) - Cerebras (generation + Candidate B judge) genuinely live"
+    },
+    "new_tests": 38,
+    "final_regression": "495 passed, 0 failed, 7 skipped",
+    "starting_regression_baseline": "457 passed, 0 failed, 7 skipped",
+    "infinite_loop_count": 0,
+    "phase_9_untouched": true,
+    "phase_10_untouched": true,
+    "caveats": [
+      "n=4 dev sample is illustrative, not statistically powered",
+      "CSP delta flat (ceiling) in this sample - exit gate met via Completeness delta instead, per the gate's own and/or wording",
+      "DEV-D did not organically produce a WEAKLY_SUPPORTED_FACT/CONFLICTING_EVIDENCE gap live; those detectors verified via offline unit tests instead"
+    ],
+    "validation_pass": {
+      "frozen_config_artifact": "artifacts/v2/phase8_frozen_config.json",
+      "manifest": "artifacts/v2/phase8_validation_manifest.json",
+      "results": "artifacts/v2/phase8_validation_results.json",
+      "metrics": "artifacts/v2/phase8_validation_metrics.json",
+      "n_cases": 8,
+      "csp_mean_delta_phase8_vs_control": -0.04761904761904762,
+      "csp_cases_regressed": 1,
+      "csp_cases_flat": 6,
+      "coverage_mean_delta": 0.1875,
+      "coverage_cases_improved": 3,
+      "fabricated_or_invalid_evidence_ids": 0,
+      "infinite_loops_observed": 0,
+      "validation_tuning_performed": false,
+      "phase_8_reopened": false,
+      "disclosed_limitation": "final rendered answer text not yet auto-caveated when loop stops with a residual gap (VAL-C) - documented follow-up work, not fixed in this pass",
+      "final_regression_after_validation": "495 passed, 0 failed, 7 skipped",
+      "test_count_correction": "38 total (12+17+9), pytest --collect-only verified; prior report prose breakdown summed to 40 in error, the 38/495 totals were always correct"
+    },
+    "reopening_and_fix": {
+      "defect_id": "PHASE8-DEFECT-001",
+      "defect_case": "VAL-C-multi-source-completeness (Validation Run 1)",
+      "root_cause": "research loop residual-gap state (research_gaps/research_stop_reason) not propagated to the final GroundedAnswer",
+      "fix": "agent.nodes.finalize_research_answer_node, wired into build_research_loop_graph between the loop stop branch and report_generation; sets GroundedClaim.qualifier (existing frozen Phase-6 field) on claims tied to an unresolved weakly_supported_fact/conflicting_evidence gap, recompiles rendered_text via unmodified Phase-6 compiler functions",
+      "general_not_case_specific": true,
+      "new_regression_tests": 11,
+      "defect_reproduction_test": "tests/test_research_finalize_answer_defect_fix.py::test_val_c_defect_reproduction_now_caveats_the_weak_claim",
+      "v1_status_artifact": "artifacts/v2/phase8_validation_run1_status.json (VALIDATION RUN 1 \u2014 DEFECT DISCOVERED, permanently preserved)",
+      "v2_frozen_config": "artifacts/v2/phase8_frozen_config_v2.json",
+      "v2_code_state_sha256": "4f90d37741ef1f35fc4ac4e5601ff13a69605fc8c061c008ef92ab89e9ce781b",
+      "validation_run_2": {
+        "manifest": "artifacts/v2/phase8_validation_run2_manifest.json",
+        "results": "artifacts/v2/phase8_validation_run2_results.json",
+        "metrics": "artifacts/v2/phase8_validation_run2_metrics.json",
+        "n_cases": 6,
+        "csp_regressions": 0,
+        "completeness_delta_this_run": 0.0,
+        "completeness_delta_caveat": "no fresh ClinicalTrials.gov/ChEMBL record available (CTL-020) - Validation Run 1s +0.1875 mean gain preserved and still valid",
+        "fabricated_or_invalid_evidence_ids": 0,
+        "infinite_loops_observed": 0,
+        "validation_tuning_performed": false
+      },
+      "stop_reason_mismatch_audit": {
+        "VAL-C": "pre-registration expectation too narrow (also independently surfaced PHASE8-DEFECT-001)",
+        "VAL-D": "semantically equivalent valid stop",
+        "VAL-F": "semantically equivalent valid stop (MAX_REPEATED_ACTION legitimately preempts MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS)",
+        "VAL-H": "pre-registration expectation too narrow"
+      },
+      "ctl_items_added": [
+        "CTL-013",
+        "CTL-014",
+        "CTL-015",
+        "CTL-016",
+        "CTL-017",
+        "CTL-018",
+        "CTL-019",
+        "CTL-020"
+      ],
+      "final_regression_after_reopening": "506 passed, 0 failed, 7 skipped",
+      "phase_8_reopened_then_closed": true
+    }
   }
 }

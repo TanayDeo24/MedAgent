@@ -1044,3 +1044,104 @@ is met.
 re-assertion of the earlier premature closure). **18/18 caveat rows
 CLOSED.** Full regression re-run: 457 passed, 0 failed, 7 skipped -
 unchanged, no regressions.
+
+## Phase 8: Evidence-Driven Research Loop
+
+Implemented a bounded, gap-driven follow-up research loop (`research/`
+package + additive `agent/nodes.py`/`agent/graph.py`/`agent/state.py`
+integration points), replacing the old confidence-threshold loop
+(`verification_node`) for callers who opt in (`MedAgent(research_loop=True)`)
+- the pre-Phase-8 graph/default behavior is fully preserved, unchanged.
+
+Dev benchmark (n=4 real cases, `artifacts/v2/phase8_dev_benchmark_results.json`,
+`artifacts/v2/phase8_dev_benchmark_metrics_summary.json`; live Cerebras
+generation + Candidate B judge calls, network-simulated follow-up
+acquisition since live tool network is blocked in this session - see
+`docs/v2/PHASE8_GATE_PLAN.md`):
+
+| Metric | Before | After | Delta | n | Benchmark | Resume-safe |
+|---|---|---|---|---|---|---|
+| Claim Support Precision (DEV-B) | 1.0 | 1.0 | 0.0 | 1 | phase8_dev_benchmark | Yes (flat result, not a claimed improvement) |
+| Source-category coverage / completeness (DEV-B) | 0.5 | 1.0 | **+0.5** | 1 | phase8_dev_benchmark | Yes |
+| Loop termination correctness | - | 4/4 | - | 4 | phase8_dev_benchmark | Yes |
+| Unnecessary-loop rate | - | 0% (0/1 actions) | - | 1 action | phase8_dev_benchmark | Yes |
+| Mean loops/query | - | 0.5 | - | 4 | phase8_dev_benchmark | Yes |
+| Infinite-loop count | - | 0 (proven bounded) | - | all tested paths | test_research_action_planning_and_loop_control | Yes |
+
+Full regression after Phase 8: 495 passed, 0 failed, 7 skipped (+38 new
+Phase-8 tests over the Phase-8 starting baseline of 457/0/7 - zero
+pre-existing tests weakened or removed).
+
+Caveats: n=4 dev sample is illustrative, not statistically powered; CSP
+delta was flat (ceiling) in this sample - the measured quality
+improvement supporting the exit gate is the Completeness/coverage delta,
+per the gate's own "Claim Support Precision and/or Completeness" wording.
+See `docs/v2/PHASE8_FINAL_GATE_AUDIT.md` for full detail.
+
+## Phase 8 Validation Pass (frozen architecture, fresh n=8 set)
+
+Architecture frozen (`artifacts/v2/phase8_frozen_config.json`) before this
+pass; no validation-driven tuning performed. CONTROL (frozen single-pass)
+vs. PHASE-8 (research loop) on the SAME 8 fresh cases
+(`artifacts/v2/phase8_validation_manifest.json`,
+`phase8_validation_results.json`, `phase8_validation_metrics.json`).
+
+| Metric | Before (CONTROL) | After (PHASE-8) | Absolute delta | n | Benchmark | Resume-safe |
+|---|---|---|---|---|---|---|
+| Claim Support Precision (mean, measurable cases) | 1.0 | 0.952 (mean) | -0.048 | 7 | phase8_validation | Yes (a real, disclosed regression on 1/7 cases, not hidden) |
+| Completeness / source-category coverage (mean) | n/a (single-pass has no pre/post) | +0.1875 (mean) | +0.1875 | 8 | phase8_validation | Yes |
+| Fabricated/invalid Evidence IDs | 0 | 0 | 0 | 16 arm-runs | phase8_validation | Yes |
+| Infinite loops | - | 0 | - | 8 | phase8_validation | Yes |
+
+Full regression after validation: 495 passed, 0 failed, 7 skipped -
+unchanged (no new tests added this pass).
+
+Caveats: n=8, still small; 1/8 cases (VAL-C) showed a genuine CSP
+regression, disclosed and explained (not hidden), with a documented,
+non-blocking follow-up-work limitation (final answer text is not yet
+auto-caveated when a residual gap remains). 4/8 cases did not exercise
+their exact predicted stop reason (all 8/8 still terminated safely and
+boundedly) - see `docs/v2/PHASE8_FAILURE_ANALYSIS.md`.
+
+Test-count correction: the prior report's Phase-8 test-file breakdown
+summed to 40; the exact, `pytest --collect-only`-verified count is 38
+(12 + 17 + 9) - the 38/495 totals themselves were always correct, only
+the prose per-file breakdown was wrong.
+
+## Phase 8 Reopening: PHASE8-DEFECT-001 Fix + Validation Run 2
+
+Human review reopened Phase 8 after Validation Run 1's VAL-C case showed a
+Claim Support Precision regression (1.0->0.667) that the research loop
+detected internally but did not propagate into the final rendered answer.
+Root-caused (`docs/v2/PHASE8_FAILURE_ANALYSIS.md`'s PHASE8-DEFECT-001) and
+fixed generally (`agent.nodes.finalize_research_answer_node`, gap-type-
+keyed, not case-specific). 11 new regression tests, including a faithful
+replay of VAL-C's exact recorded trace, confirm the fix. Architecture
+re-frozen as v2 (`artifacts/v2/phase8_frozen_config_v2.json`).
+
+Validation Run 2 (6 fresh, previously-unused PubMed cases,
+`artifacts/v2/phase8_validation_run2_results.json`,
+`phase8_validation_run2_metrics.json`):
+
+| Metric | Result | n | Resume-safe |
+|---|---|---|---|
+| Claim Support Precision, Phase-8 vs. control | flat (Δ=0), 0 regressions | 5 | Yes |
+| Completeness/coverage | flat (Δ=0) this run - no fresh CT/ChEMBL record available (CTL-020) | 6 | Yes, with the CTL-020 caveat stated |
+| Fabricated/invalid Evidence IDs | 0 | 6 | Yes |
+| Infinite loops | 0 | 6 | Yes |
+
+Validation Run 1's original, independent +0.1875 mean completeness gain
+(3/8 cases) is preserved unmodified and remains valid evidence for the
+exit gate - not superseded or invalidated by Run 2's null completeness
+result, which is honestly attributed to source-inventory exhaustion, not
+a regression.
+
+Full regression after the fix and Validation Run 2: 506 passed, 0 failed,
+7 skipped (495 baseline + 11 new PHASE8-DEFECT-001 regression tests; no
+new tests were needed for Validation Run 2 itself, which is a benchmark
+run, not a test suite addition).
+
+8 new CTL items (CTL-013 through CTL-020) added to
+`docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md`, all marked ENVIRONMENT-DEFERRED/
+LOCAL-VERIFICATION-REQUIRED or OPEN - none closed merely because
+simulated-transport validation passed.

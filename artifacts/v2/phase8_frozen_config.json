@@ -1,0 +1,98 @@
+{
+  "artifact_name": "phase8_frozen_config",
+  "status": "FROZEN - no Phase-8 behavior/config change permitted after this point based on validation outcomes",
+  "freeze_timestamp": "2026-09-28T06:55:48.152398Z",
+  "base_commit": "1247f514c782a3b30ad738b0e2cb9df9e4833d5e",
+  "branch": "medagent-v2-phase8-research-loop",
+  "code_state_sha256": "b81e3725fd469e31f570dbcffe36fe9a788bdb35b14d29fd540bfdb8ccd92794",
+  "code_state_sha256_files": [
+    "agent/graph.py",
+    "agent/nodes.py",
+    "agent/state.py",
+    "research/__init__.py",
+    "research/action_planning.py",
+    "research/gap_analysis.py",
+    "research/loop_control.py",
+    "research/models.py"
+  ],
+  "graph_architecture": {
+    "builder": "agent.graph.build_research_loop_graph",
+    "version_note": "additive graph, separate from agent.graph.build_agent_graph (unchanged)",
+    "opt_in_flag": "MedAgent(research_loop=True)",
+    "nodes": [
+      "query_analysis",
+      "tool_orchestration",
+      "synthesis",
+      "evidence_normalization",
+      "grounded_generation",
+      "gap_analysis",
+      "research_action_planning",
+      "research_execution",
+      "evidence_merge",
+      "report_generation"
+    ],
+    "loop_edge": "grounded_generation -> gap_analysis -> [continue: research_action_planning -> research_execution -> evidence_merge -> grounded_generation | stop: report_generation]"
+  },
+  "research_loop_config": {
+    "max_research_iterations": 3,
+    "max_tool_calls_total": 8,
+    "max_repeated_action": 1,
+    "max_consecutive_tool_failure_rounds": 2,
+    "max_actions_per_iteration": 1
+  },
+  "gap_taxonomy": [
+    "no_evidence",
+    "missing_source_category",
+    "weakly_supported_fact",
+    "conflicting_evidence"
+  ],
+  "action_taxonomy": [
+    "planned",
+    "executed_productive",
+    "executed_unproductive",
+    "executed_duplicate_only",
+    "failed"
+  ],
+  "stop_reason_taxonomy": [
+    "sufficient_evidence",
+    "no_productive_action",
+    "budget_exhausted",
+    "tool_failure_limit",
+    "unresolvable_gap",
+    "safe_abstention"
+  ],
+  "evidence_merge_dedup_behavior": "evidence_id-keyed, first-occurrence-wins, diffed against cumulative evidence_seen_ids across the run; rediscovered ids increment evidence_duplicate_count and are excluded from ResearchAction.new_evidence_ids",
+  "gap_analysis_configuration": {
+    "no_evidence_detector": "state.evidence empty or grounded_answer None/abstained (deterministic)",
+    "missing_source_category_detector": "Phase-2 ResearchQuery.requested_evidence_types vs. present Evidence source_types (deterministic set diff)",
+    "weakly_supported_fact_detector": "frozen Candidate B judge (grounding_eval.judge.judge_claim_semantic), label in {unsupported, partially_supported}",
+    "conflicting_evidence_detector": "frozen Candidate B judge, label == contradicted",
+    "judge_model_version": "unchanged from Phase 7 freeze - Cerebras qwen-3.8-27b, candidate_b_semantic_judge architecture, no prompt/config change"
+  },
+  "action_planning_configuration": {
+    "selection_rule": "highest-severity gap not already attempted (by action_signature), max 1 action/iteration",
+    "followup_query_construction": "templated from gap_type + target_source_category/description - never free LLM brainstorming"
+  },
+  "generation_configuration": {
+    "architecture": "candidate_b_structured",
+    "model": "Cerebras qwen-3.8-27b",
+    "unchanged_from_phase6_freeze": true
+  },
+  "prompt_config_versions": {
+    "nlu": "artifacts/v2/nlu_frozen_config.json (Phase 2, unchanged)",
+    "generation": "Phase 6 frozen candidate_b_structured (unchanged)",
+    "grounding_judge": "artifacts/v2/phase7_frozen_evaluator_config.json (Phase 7 Candidate B, unchanged)"
+  },
+  "development_metrics_at_freeze_time": {
+    "source": "artifacts/v2/phase8_dev_benchmark_metrics_summary.json",
+    "n_dev_cases": 4,
+    "dev_b_source_coverage_delta": 0.5,
+    "dev_csp_delta_all_cases": 0.0,
+    "loop_termination_correctness": "4/4",
+    "unnecessary_loop_rate": 0.0,
+    "mean_loops_per_query_dev": 0.5,
+    "new_tests_at_freeze_time": 38,
+    "full_regression_at_freeze_time": "495 passed, 0 failed, 7 skipped"
+  },
+  "freeze_scope_statement": "Every field above is frozen as of freeze_timestamp. No gap rule, action-planning rule, loop bound, dedup rule, stopping logic, prompt, or config may be changed based on any subsequent validation-run outcome. A validation-revealed blocking defect must be reported and development explicitly reopened, never silently tuned."
+}

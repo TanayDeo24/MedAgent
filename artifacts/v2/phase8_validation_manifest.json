@@ -1,0 +1,89 @@
+{
+  "artifact_name": "phase8_validation_manifest",
+  "status": "PRE-REGISTERED - written BEFORE any generation/evaluation call for this validation pass",
+  "frozen_config_reference": "artifacts/v2/phase8_frozen_config.json",
+  "purpose": "Fresh, previously-unused-in-Phase-8-development validation set to test whether the frozen Phase-8 architecture generalizes beyond its 4 dev cases.",
+  "exclusions": [
+    "Not one of the 4 Phase-8 DEV cases (DEV-A/B/C/D) or their underlying records (CT-NCT07565285, CT-NCT05549297, CHEMBL-resolve-CHEMBL941, RAG-39368244-0, RAG-31109722-1)",
+    "No phase5_heldout-split record (Phase 5's own held-out; never used downstream of Phase 5 itself)",
+    "No Phase-10 final held-out benchmark (does not exist in this repository)",
+    "No synthetic/fabricated Evidence - every record below is a real, captured record from artifacts/v2/phase5_benchmark_manifest.json, verified via evidence/adapters.py"
+  ],
+  "disclosed_reuse": "CHEMBL-resolve-Keytruda (CHEMBL3137343) was previously used in the Phase-7 fresh supplement (artifacts/v2/phase7_candidate_b_fresh_supplement_results.json) - a different phase, different purpose, never used in Phase-8 development. No unused, non-skip ChEMBL record remains anywhere in phase5_benchmark_manifest.json (the only 4 fully-unused ChEMBL case_ids all carry gold.expected_skip=true, i.e. produce zero real Evidence via the frozen adapter - the same defect class discovered and documented in Phase 7's fresh-supplement correction). This reuse is disclosed here rather than hidden.",
+  "cases": [
+    {
+      "case_id": "VAL-A-sufficient",
+      "category": "A - initial evidence already sufficient",
+      "expected_behavior": "no unnecessary follow-up; stop_reason=sufficient_evidence at round 0",
+      "query": "What is known about the Phase 4 trial NCT06657209 comparing adipocyte-directed pioglitazone vs. tirzepatide therapy in normal-weight Type 2 diabetes?",
+      "phase5_case_ids": ["CT-NCT06657209"],
+      "initial_evidence_source": "CT-NCT06657209 (full field-level evidence)",
+      "followup_plan": "none"
+    },
+    {
+      "case_id": "VAL-B-missing-source-recovered",
+      "category": "B - initial evidence incomplete, one productive follow-up",
+      "expected_behavior": "MISSING_SOURCE_CATEGORY(pubmed) gap detected at round 0; follow-up recovers it; stop_reason=sufficient_evidence at round 1",
+      "query": "What is known about the trial NCT07677865 studying GLP-1 receptor agonists for Alzheimer's disease prevention, and what does the broader literature say about GLP-1 receptor agonist weight-loss compositions?",
+      "phase5_case_ids": ["CT-NCT07677865", "RAG-39344838-2"],
+      "initial_evidence_source": "CT-NCT07677865 only",
+      "followup_plan": "inject RAG-39344838-2 (pubmed) on round 0's follow-up"
+    },
+    {
+      "case_id": "VAL-C-multi-source-completeness",
+      "category": "C - multi-source gap, additional source improves completeness",
+      "expected_behavior": "MISSING_SOURCE_CATEGORY(chembl) gap detected at round 0; follow-up recovers it; completeness/source-coverage improves",
+      "query": "What does the literature say about combination immunotherapy development in melanoma, and what does ChEMBL report about the compound identified as CHEMBL3137343 (Keytruda)?",
+      "phase5_case_ids": ["RAG-30231333-2", "CHEMBL-resolve-Keytruda"],
+      "initial_evidence_source": "RAG-30231333-2 (pubmed) only",
+      "followup_plan": "inject CHEMBL-resolve-Keytruda (chembl) on round 0's follow-up"
+    },
+    {
+      "case_id": "VAL-D-duplicate-only-followup",
+      "category": "D - duplicate-only follow-up must not count as progress",
+      "expected_behavior": "round 0: MISSING_SOURCE_CATEGORY(pubmed) gap, follow-up recovers RAG-30604292-0 (productive); round 1: a SECOND, forced follow-up round re-delivers the SAME RAG-30604292-0 record (simulating a provider rediscovery) - must be counted as duplicate (evidence_duplicate_count increments), not new progress, and the loop must still terminate safely (not misreport a duplicate round as productive)",
+      "query": "What is known about the trial NCT06657209, and what does the literature say about immune checkpoint inhibitors in gastroesophageal cancer?",
+      "phase5_case_ids": ["CT-NCT06657209", "RAG-30604292-0"],
+      "initial_evidence_source": "CT-NCT06657209 only",
+      "followup_plan": "round 0: inject RAG-30604292-0 (pubmed, new); round 1 (forced, after resolution): re-deliver RAG-30604292-0 again (duplicate) to directly test dedup accounting on a rediscovery, not just a first-touch gap"
+    },
+    {
+      "case_id": "VAL-E-unrecoverable-abstention",
+      "category": "E - unrecoverable gap, correct behavior is abstention",
+      "expected_behavior": "NO_EVIDENCE gap at round 0; follow-up genuinely finds nothing (no real record exists to inject); stop_reason=safe_abstention at round 1",
+      "query": "What is known about the fictitious compound QRX-00000-NONEXISTENT for treating a condition with no captured evidence in this benchmark?",
+      "phase5_case_ids": [],
+      "initial_evidence_source": "none",
+      "followup_plan": "none available (genuinely no real record for this fictitious query)"
+    },
+    {
+      "case_id": "VAL-F-tool-failure-safe-termination",
+      "category": "F - source/tool failure, safe termination never fabrication",
+      "expected_behavior": "round 0: MISSING_SOURCE_CATEGORY gap detected; the follow-up tool call is made to FAIL (mocked provider failure, mirroring this session's genuine live-tool-network block) rather than succeed; research_consecutive_failure_rounds increments; after MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS failed rounds, stop_reason=tool_failure_limit; zero fabricated Evidence at any point",
+      "query": "What is known about the trial NCT07677865, and what does ChEMBL report about a related compound?",
+      "phase5_case_ids": ["CT-NCT07677865"],
+      "initial_evidence_source": "CT-NCT07677865 only",
+      "followup_plan": "every follow-up attempt is made to fail (mocked tool failure) - by design, to test the failure path, not to recover evidence"
+    },
+    {
+      "case_id": "VAL-G-stagnation-no-repeat",
+      "category": "G - repeated/equivalent action temptation must not cause wasteful looping",
+      "expected_behavior": "round 0: a gap is detected for which no real record is available to recover (follow-up finds nothing); the loop must NOT re-attempt the identical gap signature a second time - stop_reason=no_productive_action (not a second identical, wasteful action)",
+      "query": "What does ChEMBL report about a compound relevant to the trial NCT06657209's mechanism, where no such real ChEMBL record exists in this benchmark?",
+      "phase5_case_ids": ["CT-NCT06657209"],
+      "initial_evidence_source": "CT-NCT06657209 only",
+      "followup_plan": "the one available gap's follow-up genuinely returns nothing (no matching real record); the SAME gap signature must not be retried"
+    },
+    {
+      "case_id": "VAL-H-budget-exhausted-persistent-gap",
+      "category": "H - additional meaningful case not represented in DEV: budget exhaustion under a persistently-recurring gap",
+      "expected_behavior": "a gap that keeps being detected every round (no real record ever fully resolves it) must still cause the loop to stop within MAX_RESEARCH_ITERATIONS - stop_reason=budget_exhausted, never an infinite loop, even though the gap itself never resolves",
+      "query": "What does the literature say about immune checkpoint inhibitors in gastroesophageal cancer, considering the recurring evidentiary gaps in this specific benchmark slice?",
+      "phase5_case_ids": ["RAG-30604292-0"],
+      "initial_evidence_source": "RAG-30604292-0 only",
+      "followup_plan": "follow-up rounds are made to never resolve the detected gap (no new evidence injected on any round), forcing MAX_RESEARCH_ITERATIONS to be reached"
+    }
+  ],
+  "no_selection_after_seeing_outputs": "All 8 cases and their expected behavior were finalized and written to this file before any generate_grounded_answer, judge_claim_semantic, or research-loop call was made for this validation pass.",
+  "network_simulation_disclosure": "Live PubMed/ClinicalTrials.gov/ChEMBL tool network is blocked in this cloud session (docs/v2/PHASE8_INITIAL_AUDIT.md Section 7). Every follow-up 'acquisition' below uses a REAL, previously-captured Phase-5 manifest record, converted to Evidence via the unmodified evidence/adapters.py functions - never a fabricated or case-authored record. Only the live-network transport hop of research_execution_node's underlying tool_orchestration_node call is substituted (mocked at the call_cerebras_native_tools/execute_validated_call boundary, exactly as in tests/test_research_integration.py) - the research loop's own gap-analysis/action-planning/stop-reason logic executes for real, unmocked, and does not know in advance which record (if any) a follow-up will yield."
+}

@@ -629,3 +629,86 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   tie-breaker; any claim that the original 40 missing Phase-6 claims
   were recovered or reconstructed (they were not - see the recovery
   audit).
+
+## Phase 8: Evidence-Driven Research Loop (this session)
+
+- **Resume-safe:** the Phase-8 research loop is implemented, additive, and
+  opt-in (`MedAgent(research_loop=True)`); the pre-Phase-8 graph/default
+  behavior is unchanged and still passes its full original test suite
+  (457 tests, all still passing after Phase 8's additions).
+- **Resume-safe:** bounded-loop safety (4 independent hard limits, proven
+  to terminate even for a persistently unresolved gap) - zero infinite
+  loops possible via any tested path.
+- **Resume-safe:** a real, measured, attributable quality delta exists
+  (Completeness/source-coverage +0.5 on DEV-B, a genuine gap-driven
+  recovery) - the exit gate's "measured quality improvement... not just
+  the loop ran" requirement is met, not asserted from vibes.
+- **Resume-safe, with the caveat stated:** Claim Support Precision showed
+  no delta in this n=4 sample (ceiling in every case) - do not resume by
+  claiming a CSP improvement; the honest result is "flat, exit gate met
+  via Completeness instead."
+- **Not resume-safe:** claiming the dev benchmark is statistically
+  powered, or claiming the WEAKLY_SUPPORTED_FACT/CONFLICTING_EVIDENCE gap
+  detectors were demonstrated live end-to-end (they were not, in this
+  small sample - see `docs/v2/PHASE8_FAILURE_ANALYSIS.md`; they are
+  verified via offline unit tests only).
+- **Not resume-safe:** claiming a live, successful multi-source follow-up
+  round against the real internet - live tool network is blocked in this
+  session; DEV-B's follow-up evidence acquisition is disclosed as
+  network-simulated (real adapters, real Phase-5 manifest records, real
+  frozen generation/judge calls - only the live tool-execution network
+  hop itself was substituted).
+
+## Phase 8 Validation Pass (this session, frozen architecture, n=8)
+
+- **Resume-safe:** the Phase-8 architecture was frozen
+  (`artifacts/v2/phase8_frozen_config.json`) before an independent, fresh
+  8-case validation set was built and run; zero validation-driven tuning
+  occurred.
+- **Resume-safe:** Completeness/source-coverage improved on a fresh
+  validation set too (3/8 cases, mean +0.1875), independently confirming
+  the DEV-pass finding rather than resting on it alone.
+- **Resume-safe, with the caveat stated:** Claim Support Precision showed
+  a genuine regression on 1/8 validation cases (VAL-C) - do not resume by
+  claiming Phase 8 only improves grounding; the honest result is "usually
+  flat/neutral on CSP, occasionally a real trade-off, always disclosed by
+  the loop's own state rather than hidden."
+- **Resume-safe:** zero fabricated/invalid Evidence IDs and zero infinite
+  loops across all 8 validation cases (16 arm-runs, CONTROL+PHASE-8).
+- **Not resume-safe:** claiming all 8 validation cases exercised their
+  exact predicted stop reason - only 4/8 did; the other 4/8 still
+  terminated safely, but for a different (still valid, still bounded)
+  reason than predicted at design time. See
+  `docs/v2/PHASE8_FAILURE_ANALYSIS.md`'s "Validation-pass findings."
+- **Not resume-safe:** claiming the final rendered answer text is
+  automatically caveated when the research loop ends with a residual,
+  unresolved gap - it is not, as of this session; this is documented
+  follow-up work, not yet implemented.
+
+## Phase 8 Reopening + Fix + Validation Run 2 (this session)
+
+- **Resume-safe:** PHASE8-DEFECT-001 (Validation Run 1's VAL-C CSP
+  regression not propagated to the final answer) is root-caused, fixed
+  generally (not VAL-C-specific), and regression-tested (11 new tests,
+  including an exact defect-reproduction of VAL-C's recorded trace).
+- **Resume-safe:** Validation Run 2 (6 fresh cases, post-fix) shows zero
+  CSP regressions, zero fabricated/invalid Evidence, zero infinite loops.
+- **Resume-safe, with the CTL-020 caveat stated:** do not claim
+  Validation Run 2 independently demonstrated a completeness gain - it
+  measured a flat 0.0 delta this run, honestly attributed to a genuine,
+  disclosed ClinicalTrials.gov/ChEMBL record inventory exhaustion, not a
+  regression. Validation Run 1's original +0.1875 mean completeness gain
+  (3/8 cases, different records, still real and unmodified) remains the
+  valid evidence for the exit gate's Completeness side.
+- **Resume-safe:** 8 new CTL items (CTL-013–CTL-020) in
+  `CLOUD_TO_LOCAL_GAP_CLOSURE.md` name exactly what live/local
+  verification remains before Phase 13's final freeze - do not treat any
+  Phase-8 metric as production-representative until those close.
+- **Not resume-safe:** claiming Phase 8's numbers reflect live network
+  acquisition - every DEV/Validation Run 1/Validation Run 2 follow-up used
+  transport-simulated acquisition (real records, simulated network hop
+  only), disclosed in every manifest and now tracked as CTL-016/CTL-019.
+- **Not resume-safe:** claiming Validation Run 1 was ever a clean pass -
+  it is permanently marked `VALIDATION RUN 1 — DEFECT DISCOVERED`
+  (`artifacts/v2/phase8_validation_run1_status.json`), preserved
+  unmodified as the historical record of the defect's discovery.

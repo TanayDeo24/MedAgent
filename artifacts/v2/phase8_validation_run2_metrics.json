@@ -1,0 +1,76 @@
+{
+  "artifact_name": "phase8_validation_run2_metrics",
+  "status": "Validation Run 2 - post-fix (v2 frozen config), fresh n=6 pubmed-only set (see CTL-020 for the disclosed source-inventory limitation)",
+  "n_cases": 6,
+  "gate_metrics": {
+    "claim_support_precision": {
+      "n_cases_with_csp": 5,
+      "mean_delta_phase8_post_vs_control": 0.0,
+      "cases_regressed": 0,
+      "cases_flat": 5,
+      "cases_improved": 0,
+      "per_case_deltas": {
+        "VAL2-A-sufficient": 0.0,
+        "VAL2-B-productive-followup": 0.0,
+        "VAL2-D-duplicate-only-followup": 0.0,
+        "VAL2-E-unrecoverable-abstention": null,
+        "VAL2-F-tool-failure-safe-termination": 0.0,
+        "VAL2-G-stagnation-no-repeat": 0.0
+      }
+    },
+    "completeness_source_coverage": {
+      "n_cases": 6,
+      "mean_delta": 0.0,
+      "cases_improved": 0,
+      "cases_flat": 6,
+      "cases_regressed": 0,
+      "per_case_deltas": {
+        "VAL2-A-sufficient": 0.0,
+        "VAL2-B-productive-followup": 0.0,
+        "VAL2-D-duplicate-only-followup": 0.0,
+        "VAL2-E-unrecoverable-abstention": 0.0,
+        "VAL2-F-tool-failure-safe-termination": 0.0,
+        "VAL2-G-stagnation-no-repeat": 0.0
+      },
+      "caveat": "No completeness improvement was measured THIS RUN because no fresh ClinicalTrials.gov/ChEMBL record was available to inject (CTL-020, disclosed inventory exhaustion) - Validation Run 1's real, independent +0.1875 mean completeness gain (3/8 cases) is preserved unmodified and still valid; it is not invalidated or superseded by this null result."
+    }
+  },
+  "reliability": {
+    "total_invalid_or_fabricated_evidence_ids": 0,
+    "infinite_loops_observed": 0,
+    "caveated_claims_this_run": 0,
+    "caveat_note": "PHASE8-DEFECT-001 did not recur in this run (no weakly_supported_fact/conflicting_evidence gap arose live) - the fix's effectiveness against the ORIGINAL defect is verified via tests/test_research_finalize_answer_defect_fix.py's VAL-C defect-reproduction case, not by a fresh live recurrence in Validation Run 2."
+  },
+  "stop_reason_distribution": {
+    "VAL2-A-sufficient": "sufficient_evidence",
+    "VAL2-B-productive-followup": "no_productive_action",
+    "VAL2-D-duplicate-only-followup": "sufficient_evidence",
+    "VAL2-E-unrecoverable-abstention": "safe_abstention",
+    "VAL2-F-tool-failure-safe-termination": "no_productive_action",
+    "VAL2-G-stagnation-no-repeat": "no_productive_action"
+  },
+  "no_validation_tuning_performed": true,
+  "provider_note": "one transient Cerebras HTTP 429 (queue_exceeded) occurred on the first run attempt at case VAL2-G; the run was retried in full after a short wait, per this project's established transient-failure-retry discipline - no case selection, expected behavior, or architecture was changed between attempts.",
+  "run_attempt_history": {
+    "attempt_1": {
+      "outcome": "FAILED",
+      "failure_class": "provider (Cerebras HTTP 429 queue_exceeded - transient provider-side rate/queue limit, not an infrastructure, harness, or code defect)",
+      "failed_at_case": "VAL2-G-stagnation-no-repeat",
+      "cases_completed_before_failure": 5,
+      "exact_error": "generation.generator.GenerationProviderError: Cerebras claim generation failed: HTTP 429: {'message': \"We're experiencing high traffic right now! Please try again soon.\", 'type': 'too_many_requests_error', 'param': 'queue', 'code': 'queue_exceeded'}"
+    },
+    "attempt_2": {
+      "outcome": "SUCCESS",
+      "action_taken": "retried the full script after a 20-second wait, per this project's established transient-provider-failure-retry discipline (unbounded case selection unchanged)",
+      "all_6_cases_completed": true
+    },
+    "invariants_preserved_across_attempts": {
+      "validation_run2_manifest_changed": false,
+      "phase8_v2_frozen_config_changed": false,
+      "case_selection_changed": false,
+      "expected_behavior_changed": false,
+      "architecture_or_prompts_changed": false
+    },
+    "note": "This is a routine transient-provider-failure retry, not a validation-tuning event - no decision, gap rule, action-planning rule, loop bound, or config was touched between attempt 1 and attempt 2."
+  }
+}

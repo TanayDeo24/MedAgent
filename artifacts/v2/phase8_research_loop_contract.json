@@ -1,0 +1,24 @@
+{
+  "artifact_name": "phase8_research_loop_contract",
+  "authoritative_doc": "docs/v2/PHASE8_RESEARCH_LOOP_CONTRACT.md",
+  "gap_types": ["no_evidence", "missing_source_category", "weakly_supported_fact", "conflicting_evidence"],
+  "stop_reasons": ["sufficient_evidence", "no_productive_action", "budget_exhausted", "tool_failure_limit", "unresolvable_gap", "safe_abstention"],
+  "research_action_statuses": ["planned", "executed_productive", "executed_unproductive", "executed_duplicate_only", "failed"],
+  "bounded_loop_limits": {
+    "max_research_iterations": 3,
+    "max_tool_calls_total": 8,
+    "max_repeated_action": 1,
+    "max_consecutive_tool_failure_rounds": 2
+  },
+  "gap_detectors": {
+    "no_evidence": "state.evidence empty or grounded_answer None/abstained",
+    "missing_source_category": "Phase-2 requested_evidence_types not present among current Evidence source_types (deterministic set diff)",
+    "weakly_supported_fact": "factual claim judged unsupported/partially_supported by frozen Candidate B judge",
+    "conflicting_evidence": "factual claim judged contradicted by frozen Candidate B judge"
+  },
+  "action_execution_path": "orchestration.candidate_b_native_tools + orchestration.registry.DEFAULT_REGISTRY, via agent.nodes.tool_orchestration_node (unmodified) - no other execution path exists",
+  "dedup_key": "Evidence.evidence_id, first occurrence wins",
+  "final_generation": "generation.pipeline.generate_grounded_answer via agent.nodes.grounded_generation_node (unmodified), from the merged/deduplicated Evidence[] only",
+  "graph_builder": "agent.graph.build_research_loop_graph (additive; agent.graph.build_agent_graph unchanged)",
+  "opt_in": "MedAgent(research_loop=True) - default False preserves pre-Phase-8 behavior exactly"
+}

@@ -1,0 +1,72 @@
+{
+  "artifact_name": "phase8_validation_run2_manifest",
+  "status": "PRE-REGISTERED - written BEFORE any generation/evaluation call for this run",
+  "frozen_config_reference": "artifacts/v2/phase8_frozen_config_v2.json",
+  "purpose": "Fresh, independent validation of the PHASE8-DEFECT-001 fix and the frozen v2 architecture, on cases never used in DEV, Validation Run 1, or as regression fixtures.",
+  "inventory_limitation_disclosed": "Every non-phase5_heldout ClinicalTrials.gov record (all 15) in phase5_benchmark_manifest.json has now been consumed across Phase 7 and Phase 8 (DEV + Validation Run 1). Every non-phase5_heldout, non-skip ChEMBL record has also been consumed (the only 4 fully-unused ChEMBL case_ids remaining all carry gold.expected_skip=true and produce zero real Evidence via the frozen adapter). This is a genuine, documented benchmark-source inventory exhaustion, not a design choice - see docs/v2/CLOUD_TO_LOCAL_GAP_CLOSURE.md's new CTL items for the required future remedy (fresh, real biomedical records via live network access, once available). Validation Run 2 is therefore built ENTIRELY from real, unused PubMed records (both the RAG chunk-level adapter and, for the first time in this project's Phase 7/8 work, the LIVE article-level adapter, pubmed_live_result_to_evidence) - no fresh multi-source (cross-category) case was possible this run. This is disclosed explicitly, not hidden.",
+  "exclusions": [
+    "Not one of the 4 Phase-8 DEV cases or their underlying records",
+    "Not one of the 8 Validation Run 1 cases or their underlying records (VAL-C's specific inputs are reused ONLY in tests/test_research_finalize_answer_defect_fix.py as a defect-reproduction regression fixture, never here as fresh validation)",
+    "No phase5_heldout-split record",
+    "No Phase-10 final held-out benchmark (does not exist in this repository)",
+    "No synthetic/fabricated Evidence - every record is real, from artifacts/v2/phase5_benchmark_manifest.json, via the unmodified evidence/adapters.py functions"
+  ],
+  "cases": [
+    {
+      "case_id": "VAL2-A-sufficient",
+      "category": "A - initial evidence already sufficient",
+      "expected_behavior": "no unnecessary follow-up; ideally stop_reason=sufficient_evidence at round 0 (per Validation Run 1's audit, a different-but-still-safe/bounded stop reason is acceptable and will be reported honestly, not treated as a failure)",
+      "query": "What does the literature say about pembrolizumab versus ipilimumab in advanced melanoma?",
+      "phase5_case_ids": ["LIVE-25891173"],
+      "initial_evidence_source": "LIVE-25891173 (pubmed_live_result_to_evidence)",
+      "followup_plan": "none"
+    },
+    {
+      "case_id": "VAL2-B-productive-followup",
+      "category": "B - initial evidence incomplete, one productive follow-up",
+      "expected_behavior": "a gap is detected at round 0 (single-source coverage or weak support); a real, on-topic second PubMed record resolves it",
+      "query": "What does the literature say about emerging PD-1/PD-L1 antagonists for melanoma treatment, and what does seven-year adjuvant pembrolizumab trial data show in stage III melanoma?",
+      "phase5_case_ids": ["RAG-33686894-0", "LIVE-39288737"],
+      "initial_evidence_source": "RAG-33686894-0 only",
+      "followup_plan": "inject LIVE-39288737 on round 0's follow-up"
+    },
+    {
+      "case_id": "VAL2-D-duplicate-only-followup",
+      "category": "D - duplicate-only follow-up must not count as progress",
+      "expected_behavior": "round 0: a gap is detected, follow-up recovers LIVE-36482474 (productive); a SECOND, forced follow-up round re-delivers the SAME record - must be counted as duplicate, not progress",
+      "query": "What does the literature say about EGFR-mutated NSCLC osimertinib resistance mechanisms, and what does the CTLA-4/PD-1 pathway comparison literature add?",
+      "phase5_case_ids": ["LIVE-26558876", "LIVE-36482474"],
+      "initial_evidence_source": "LIVE-26558876 only",
+      "followup_plan": "round 0: inject LIVE-36482474 (new); round 1 (forced, after resolution): re-deliver LIVE-36482474 again (duplicate)"
+    },
+    {
+      "case_id": "VAL2-E-unrecoverable-abstention",
+      "category": "E - unrecoverable gap, correct behavior is abstention",
+      "expected_behavior": "NO_EVIDENCE gap at round 0; nothing recoverable; stop_reason=safe_abstention",
+      "query": "What is known about the fictitious compound VXR-00000-NONEXISTENT2 for a condition with no captured evidence in this benchmark?",
+      "phase5_case_ids": [],
+      "initial_evidence_source": "none",
+      "followup_plan": "none available (genuinely no real record)"
+    },
+    {
+      "case_id": "VAL2-F-tool-failure-safe-termination",
+      "category": "F - source/tool failure, safe termination never fabrication",
+      "expected_behavior": "a gap is detected; the follow-up tool call is made to FAIL (mocked provider failure); no fabricated Evidence at any point; loop still terminates safely and boundedly",
+      "query": "What does the literature say about tackling osimertinib resistance in EGFR-mutant NSCLC, and what does ChEMBL report about a related compound?",
+      "phase5_case_ids": ["LIVE-37093192"],
+      "initial_evidence_source": "LIVE-37093192 only",
+      "followup_plan": "every follow-up attempt is made to fail (mocked tool failure)"
+    },
+    {
+      "case_id": "VAL2-G-stagnation-no-repeat",
+      "category": "G - repeated/equivalent action temptation must not cause wasteful looping",
+      "expected_behavior": "a gap is detected for which no real record is available to recover; the SAME gap signature must not be retried a second time",
+      "query": "What does the literature say about candidate mechanisms of acquired resistance to first-line osimertinib, and what does ChEMBL report about a related compound where no such real ChEMBL record exists in this benchmark?",
+      "phase5_case_ids": ["LIVE-36849494"],
+      "initial_evidence_source": "LIVE-36849494 only",
+      "followup_plan": "the available gap's follow-up genuinely returns nothing; the SAME gap signature must not be retried"
+    }
+  ],
+  "no_selection_after_seeing_outputs": "All 6 cases and their expected behavior were finalized and written to this file before any generate_grounded_answer, judge_claim_semantic, or research-loop call was made for Validation Run 2.",
+  "network_simulation_disclosure": "Identical disclosure as Validation Run 1 (see artifacts/v2/phase8_validation_manifest.json's network_simulation_disclosure) - live tool network remains blocked in this cloud session; only the live-network transport hop of research_execution_node's underlying dispatcher is substituted, using only real, previously-captured Phase-5 manifest records."
+}

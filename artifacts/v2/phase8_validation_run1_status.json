@@ -1,0 +1,13 @@
+{
+  "artifact_name": "phase8_validation_run1_status",
+  "status": "VALIDATION RUN 1 — DEFECT DISCOVERED",
+  "permanent_record_note": "This status is additive metadata only. artifacts/v2/phase8_validation_manifest.json, phase8_validation_results.json, and phase8_validation_metrics.json are all preserved byte-for-byte unmodified from Validation Run 1 - never overwritten, relabeled, or hidden.",
+  "defect_id": "PHASE8-DEFECT-001",
+  "defect_case": "VAL-C-multi-source-completeness",
+  "defect_summary": "Claim Support Precision regression (1.0 -> 0.667) after a productive, completeness-improving follow-up; the research loop correctly detected and recorded the residual weakly_supported_fact gap (final stop_reason=no_productive_action), but the final rendered GroundedAnswer did not propagate that unresolved-gap state - the internal research state was safer than the user-facing answer.",
+  "exact_stop_reason_match_rate": "4/8",
+  "was_declared_passing_at_the_time": true,
+  "corrected_status": "NOT closed - reopened by human review after this run. See docs/v2/PHASE8_FAILURE_ANALYSIS.md's PHASE8-DEFECT-001 section for the full traced root cause and docs/v2/PHASE8_FINAL_GATE_AUDIT.md for the fix/re-validation record.",
+  "fix_reference": "agent.nodes.finalize_research_answer_node, wired into agent.graph.build_research_loop_graph between the loop's 'stop' branch and report_generation",
+  "superseding_frozen_config": "artifacts/v2/phase8_frozen_config_v2.json"
+}

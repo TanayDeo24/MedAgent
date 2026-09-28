@@ -40,6 +40,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 from evidence.models import Evidence, SourceType
 from evidence.registry import DEFAULT_ADAPTER_REGISTRY, EvidenceAdapterError
+from generation.citation_compiler import compile_citations, render_answer_text
 from generation.generator import GenerationProviderError
 from generation.pipeline import generate_grounded_answer
 from generation.validation import GenerationValidationError
@@ -505,6 +506,13 @@ def query_analysis_node(state: AgentState) -> AgentState:
         # Store analysis in research_plan (will be used by planning node) -
         # same field, same shape, same downstream consumer as before Phase 2.
         state["research_plan"] = json.dumps(analysis, indent=2)
+
+        # Phase 8 (additive, backward-compatible): also store the full
+        # ResearchQuery (not just the lossy legacy projection above), since
+        # Phase 8's gap analysis needs `requested_evidence_types`, which
+        # to_legacy_research_plan() drops. No pre-Phase-8 code reads this
+        # key - see agent/state.py's research_query_raw docstring.
+        state["research_query_raw"] = research_query.model_dump(mode="json")
 
         # Log to reasoning trace
         state["intermediate_thoughts"].append(
@@ -1463,4 +1471,279 @@ Tool results were collected but could not be synthesized into a full report.
 Please check the logs for details.
 """
 
+    return state
+
+
+# =============================================================================
+# PHASE 8: EVIDENCE-DRIVEN RESEARCH LOOP (additive - see
+# docs/v2/PHASE8_RESEARCH_LOOP_CONTRACT.md; none of these nodes run in the
+# pre-Phase-8 graph built by agent.graph.build_agent_graph())
+# =============================================================================
+
+from research.gap_analysis import analyze_gaps
+from research.action_planning import plan_actions
+from research.loop_control import attempted_signatures, decide_stop_reason
+from research.models import ResearchActionStatus
+
+
+def gap_analysis_node(state: AgentState) -> AgentState:
+    """Deterministically (plus one frozen, already-validated Candidate B
+    judge call per factual claim) computes this iteration's EvidenceGap[]
+    from the CURRENT `state["evidence"]`/`state["grounded_answer"]`. Never
+    asks an LLM "what's missing" in free form - see research/gap_analysis.py."""
+
+    gaps = analyze_gaps(state)
+    state["research_gaps"] = [g.model_dump(mode="json") for g in gaps]
+    state["intermediate_thoughts"].append(
+        f"[Phase 8] Gap analysis (research iteration {state.get('research_iteration', 0)}): "
+        f"{len(gaps)} gap(s) found: {[g.gap_type.value for g in gaps]}"
+    )
+    logger.info(f"[GAP ANALYSIS] {len(gaps)} gap(s): {[g.gap_id for g in gaps]}")
+    return state
+
+
+def _plan_next_actions(state: AgentState, iteration: int):
+    """Shared, deterministic planning step used by BOTH
+    should_continue_research_loop (the conditional edge) and
+    research_action_planning_node (the node that acts on the decision).
+    Called twice with identical inputs rather than stashed across a graph
+    edge, because LangGraph's StateGraph only threads schema-declared
+    AgentState keys between nodes - an ad hoc "_pending_..." key written by
+    one node is silently dropped before the next node runs. Being a pure
+    function of already-declared state (`research_gaps`, `research_actions`,
+    `query`), calling it twice is guaranteed to return the identical plan,
+    so this never risks the routing decision and the executed action
+    diverging."""
+
+    from research.models import EvidenceGap
+
+    gaps = [EvidenceGap.model_validate(g) for g in state.get("research_gaps", [])]
+    already = attempted_signatures(state.get("research_actions", []))
+    planned = plan_actions(gaps, state["query"], iteration, already)
+    return gaps, planned
+
+
+def should_continue_research_loop(state: AgentState) -> str:
+    """Conditional-edge decision function for the Phase-8 research loop -
+    replaces the old confidence-threshold routing
+    (agent.graph.should_continue_research) for this loop only. Computes a
+    StopReason via research.loop_control.decide_stop_reason and stores it
+    on `state["research_stop_reason"]` BEFORE routing, so the decision is
+    always inspectable regardless of which branch is taken.
+
+    Returns "continue" or "stop"."""
+
+    iteration = state.get("research_iteration", 0)
+    gaps, planned = _plan_next_actions(state, iteration + 1)
+
+    stop_reason = decide_stop_reason(
+        gaps=gaps,
+        planned_actions=planned,
+        iteration=iteration,
+        tool_calls_used=state.get("research_tool_calls_used", 0),
+        consecutive_failure_rounds=state.get("research_consecutive_failure_rounds", 0),
+        attempted_no_evidence_before=state.get("research_attempted_no_evidence", False),
+    )
+
+    if stop_reason is not None:
+        state["research_stop_reason"] = stop_reason.value
+        logger.info(f"[RESEARCH LOOP] Stopping: {stop_reason.value}")
+        return "stop"
+
+    logger.info(f"[RESEARCH LOOP] Continuing (iteration {iteration + 1})")
+    return "continue"
+
+
+def research_action_planning_node(state: AgentState) -> AgentState:
+    """Re-derives the SAME plan should_continue_research_loop just computed
+    (see _plan_next_actions's docstring for why this is a safe recompute,
+    not a re-decision) and records it as this iteration's `research_plan`
+    for research_execution_node to act on."""
+
+    state["research_iteration"] = state.get("research_iteration", 0) + 1
+    _, planned = _plan_next_actions(state, state["research_iteration"])
+
+    if planned:
+        action = planned[0]
+        state["intermediate_thoughts"].append(
+            f"[Phase 8] Research action planned (iteration {state['research_iteration']}): "
+            f"targeting gap {action.gap_id!r} - {action.reason}"
+        )
+    return state
+
+
+def research_execution_node(state: AgentState) -> AgentState:
+    """Executes the single planned ResearchAction's `followup_query`
+    through the FROZEN Phase-3 schema-constrained dispatcher (the same
+    `tool_orchestration_node` used by the initial pass - never a
+    hand-rolled tool call). Records whether the round was productive
+    (new results) for stagnation/failure-limit tracking. Re-derives the
+    same plan research_action_planning_node just recorded (see
+    _plan_next_actions's docstring)."""
+
+    _, planned = _plan_next_actions(state, state.get("research_iteration", 1))
+    if not planned:
+        return state
+    action = planned[0]
+
+    tool_results_before = sum(
+        len(v) for v in (state.get("tool_results") or {}).values() if isinstance(v, list)
+    )
+
+    # Run the follow-up query through the exact same frozen dispatcher the
+    # initial pass uses, temporarily substituting `state["query"]` with the
+    # gap-targeted follow-up text, then restoring the original query -
+    # tool_orchestration_node has no other input channel for "what to look
+    # for", and this keeps every Phase-3 validation/registry guarantee
+    # (schema-constrained args, fail-closed on unknown tool/malformed args)
+    # fully intact for the follow-up call too.
+    original_query = state["query"]
+    state["query"] = action.followup_query
+    try:
+        state = tool_orchestration_node(state)
+    finally:
+        state["query"] = original_query
+
+    tool_results_after = sum(
+        len(v) for v in (state.get("tool_results") or {}).values() if isinstance(v, list)
+    )
+    state["research_tool_calls_used"] = state.get("research_tool_calls_used", 0) + 1
+
+    latest_calls = [
+        c for c in state.get("tool_call_history", [])
+        if c.get("call_id", "").startswith(f"step{state['current_step'] - 1}-")
+    ]
+    tool_names_used = sorted({c["tool"] for c in latest_calls if c.get("tool")})
+    any_success = any(c.get("success") for c in latest_calls)
+
+    if action.gap_id == "gap-no-evidence":
+        state["research_attempted_no_evidence"] = True
+
+    if not any_success or tool_results_after == tool_results_before:
+        action.status = ResearchActionStatus.EXECUTED_UNPRODUCTIVE
+        state["research_consecutive_failure_rounds"] = state.get("research_consecutive_failure_rounds", 0) + 1
+    else:
+        action.status = ResearchActionStatus.EXECUTED_PRODUCTIVE
+        state["research_consecutive_failure_rounds"] = 0
+
+    action.tool_names_used = tool_names_used
+    gap_lookup = {g["gap_id"]: g for g in state.get("research_gaps", [])}
+    gap = gap_lookup.get(action.gap_id, {})
+    action_record = action.model_dump(mode="json")
+    action_record["gap_signature"] = (
+        f"{gap.get('gap_type', '')}:{gap.get('target_source_category') or ''}:"
+        f"{gap.get('related_claim_id') or ''}"
+    )
+    state["research_actions"] = state.get("research_actions", []) + [action_record]
+
+    return state
+
+
+def evidence_merge_node(state: AgentState) -> AgentState:
+    """Runs the frozen Phase-5 `evidence_normalization_node` (unmodified) to
+    recompute Evidence[] from the now-larger accumulated tool_results, then
+    deterministically deduplicates by `evidence_id` against everything
+    already seen in a prior iteration - Phase 5 itself performs no dedup
+    (recomputes from scratch every visit), so this is Phase 8's own,
+    additive integration point, not a modification of evidence_normalization_node."""
+
+    state = evidence_normalization_node(state)
+
+    # Phase 5 recomputes state["evidence"] from scratch every visit (from
+    # the full, ever-growing tool_results/tool_call_history/rag_documents),
+    # so the raw recomputed list here is a mix of records seen in a prior
+    # research iteration and records new this iteration. Deduplicate by
+    # evidence_id, first occurrence wins, and diff against the running
+    # `evidence_seen_ids` set (populated from all PRIOR calls to this node)
+    # purely to measure how many of this iteration's raw records were
+    # rediscoveries vs. genuinely new - never counted as research progress.
+    previously_seen = set(state.get("evidence_seen_ids", []))
+    raw = state.get("evidence", [])
+
+    by_id: Dict[str, Evidence] = {}
+    for ev in raw:
+        by_id.setdefault(ev.evidence_id, ev)
+
+    new_ids = [eid for eid in by_id if eid not in previously_seen]
+    duplicate_this_call = len(raw) - len(by_id)  # within-call repeats (e.g. same PMID cited twice)
+    rediscovered_this_call = len([eid for eid in by_id if eid in previously_seen])
+
+    state["evidence"] = list(by_id.values())
+    state["evidence_seen_ids"] = sorted(previously_seen | set(by_id.keys()))
+    state["evidence_duplicate_count"] = (
+        state.get("evidence_duplicate_count", 0) + duplicate_this_call + rediscovered_this_call
+    )
+
+    if state.get("research_actions"):
+        state["research_actions"][-1]["new_evidence_ids"] = new_ids
+
+    state["intermediate_thoughts"].append(
+        f"[Phase 8] Evidence merge: {len(state['evidence'])} unique Evidence record(s) total "
+        f"({len(new_ids)} new this iteration), "
+        f"{state['evidence_duplicate_count']} duplicate(s) discarded so far this run."
+    )
+    return state
+
+
+# PHASE8-DEFECT-001 fix (see docs/v2/PHASE8_FAILURE_ANALYSIS.md): the loop's
+# own residual-gap state must reach the FINAL answer, not just its own
+# internal state. Runs once, after should_continue_research_loop returns
+# "stop", before report_generation.
+_UNRESOLVED_CLAIM_GAP_TYPES = {"weakly_supported_fact", "conflicting_evidence"}
+
+
+def finalize_research_answer_node(state: AgentState) -> AgentState:
+    """If the research loop stopped with one or more claim-tied,
+    unresolved `weakly_supported_fact`/`conflicting_evidence` gaps still
+    open (i.e. anything other than a clean `sufficient_evidence` stop),
+    sets `GroundedClaim.qualifier` (an existing, frozen Phase-6 schema
+    field - see generation/models.py - already rendered into
+    `rendered_text` by the unmodified
+    `generation.citation_compiler.render_answer_text`) on exactly the
+    claim(s) each gap names via `related_claim_id`, then deterministically
+    re-renders `rendered_text` via the frozen, unmodified Phase-6 compiler
+    functions. General and gap-type-keyed: contains no case-specific
+    text/keyword, never touches Evidence, never re-invokes the generator
+    or the judge, never removes a claim's citations, and is a strict no-op
+    whenever no claim-tied gap remains (the common case)."""
+
+    answer = state.get("grounded_answer")
+    gaps = state.get("research_gaps") or []
+    stop_reason = state.get("research_stop_reason")
+
+    if answer is None or not gaps or stop_reason == "sufficient_evidence":
+        return state
+
+    unresolved_claim_gaps = {
+        g["related_claim_id"]: g
+        for g in gaps
+        if g.get("related_claim_id") and g.get("gap_type") in _UNRESOLVED_CLAIM_GAP_TYPES
+    }
+    if not unresolved_claim_gaps:
+        return state
+
+    evidence_by_id = {e.evidence_id: e for e in state.get("evidence", [])}
+    changed_claim_ids = []
+    for claim in answer.claims:
+        gap = unresolved_claim_gaps.get(claim.claim_id)
+        if gap is None:
+            continue
+        if gap["gap_type"] == "conflicting_evidence":
+            claim.qualifier = "evidence conflict not resolved by follow-up research - treat with caution"
+        else:
+            claim.qualifier = "not fully confirmed by follow-up research"
+        changed_claim_ids.append(claim.claim_id)
+
+    if not changed_claim_ids:
+        return state
+
+    _, _, evidence_id_to_number = compile_citations(answer.claims, evidence_by_id)
+    answer.rendered_text = render_answer_text(answer.claims, evidence_id_to_number)
+    state["grounded_answer"] = answer
+    state["intermediate_thoughts"].append(
+        f"[Phase 8] finalize_research_answer_node: caveated claim(s) "
+        f"{changed_claim_ids} due to unresolved evidence gap(s) at stop "
+        f"(reason={stop_reason!r}) - see PHASE8-DEFECT-001."
+    )
+    logger.info(f"[FINALIZE RESEARCH ANSWER] Caveated {len(changed_claim_ids)} unresolved claim(s)")
     return state

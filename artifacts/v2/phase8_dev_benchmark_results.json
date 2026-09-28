@@ -1,0 +1,127 @@
+[
+  {
+    "case_id": "DEV-A-sufficient",
+    "query": "What is known about the Phase 2 trial NCT07565285 evaluating neoadjuvant PRTX007 combined with pembrolizumab in Stage III melanoma?",
+    "rounds": [
+      {
+        "round": 0,
+        "n_evidence": 10,
+        "n_factual_claims": 8,
+        "claim_support_precision": 1.0,
+        "abstained": false,
+        "gaps": [],
+        "stop_reason": "sufficient_evidence"
+      }
+    ],
+    "final_stop_reason": "sufficient_evidence",
+    "pre_csp": 1.0,
+    "post_csp": 1.0,
+    "csp_delta": 0.0,
+    "n_rounds_run": 1
+  },
+  {
+    "case_id": "DEV-B-missing-source-recovered",
+    "query": "What is known about the melanoma trial NCT05549297 evaluating tebentafusp, and what does ChEMBL say about the compound identified as CHEMBL941?",
+    "rounds": [
+      {
+        "round": 0,
+        "n_evidence": 11,
+        "n_factual_claims": 4,
+        "claim_support_precision": 1.0,
+        "abstained": false,
+        "gaps": [
+          {
+            "gap_id": "gap-missing-source-chembl",
+            "gap_type": "missing_source_category",
+            "description": "Phase-2 predicted 'chembl' evidence is relevant to this query, but no Evidence of that source type has been retrieved yet.",
+            "target_source_category": "chembl",
+            "related_claim_id": null,
+            "severity": 0.7
+          }
+        ],
+        "stop_reason": null
+      },
+      {
+        "round": 1,
+        "n_evidence": 12,
+        "n_factual_claims": 5,
+        "claim_support_precision": 1.0,
+        "abstained": false,
+        "gaps": [],
+        "stop_reason": "sufficient_evidence"
+      }
+    ],
+    "final_stop_reason": "sufficient_evidence",
+    "pre_csp": 1.0,
+    "post_csp": 1.0,
+    "csp_delta": 0.0,
+    "n_rounds_run": 2
+  },
+  {
+    "case_id": "DEV-C-safe-abstention",
+    "query": "What is known about the compound ZZZ-99999-NOTAREALCOMPOUND for treating a disease with no known evidence?",
+    "rounds": [
+      {
+        "round": 0,
+        "n_evidence": 0,
+        "n_factual_claims": 0,
+        "claim_support_precision": null,
+        "abstained": true,
+        "gaps": [
+          {
+            "gap_id": "gap-no-evidence",
+            "gap_type": "no_evidence",
+            "description": "No usable Evidence yet, or the current answer abstained for lack of evidence.",
+            "target_source_category": null,
+            "related_claim_id": null,
+            "severity": 1.0
+          }
+        ],
+        "stop_reason": null
+      },
+      {
+        "round": 1,
+        "n_evidence": 0,
+        "n_factual_claims": 0,
+        "claim_support_precision": null,
+        "abstained": true,
+        "gaps": [
+          {
+            "gap_id": "gap-no-evidence",
+            "gap_type": "no_evidence",
+            "description": "No usable Evidence yet, or the current answer abstained for lack of evidence.",
+            "target_source_category": null,
+            "related_claim_id": null,
+            "severity": 1.0
+          }
+        ],
+        "stop_reason": "safe_abstention"
+      }
+    ],
+    "final_stop_reason": "safe_abstention",
+    "pre_csp": null,
+    "post_csp": null,
+    "csp_delta": null,
+    "n_rounds_run": 2
+  },
+  {
+    "case_id": "DEV-D-weak-evidence-strengthened",
+    "query": "What clinical evidence supports brigatinib for ALK-positive advanced non-small cell lung cancer?",
+    "rounds": [
+      {
+        "round": 0,
+        "n_evidence": 1,
+        "n_factual_claims": 2,
+        "claim_support_precision": 1.0,
+        "abstained": false,
+        "gaps": [],
+        "stop_reason": "sufficient_evidence"
+      }
+    ],
+    "final_stop_reason": "sufficient_evidence",
+    "pre_csp": 1.0,
+    "post_csp": 1.0,
+    "csp_delta": 0.0,
+    "n_rounds_run": 1
+  }
+]

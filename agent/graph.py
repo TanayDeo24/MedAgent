@@ -17,7 +17,13 @@ from agent.nodes import (
     evidence_normalization_node,
     grounded_generation_node,
     verification_node,
-    report_generation_node
+    report_generation_node,
+    gap_analysis_node,
+    should_continue_research_loop,
+    research_action_planning_node,
+    research_execution_node,
+    evidence_merge_node,
+    finalize_research_answer_node,
 )
 from utils.logger import get_logger
 
@@ -174,6 +180,81 @@ def build_agent_graph() -> StateGraph:
     return compiled_graph
 
 
+def build_research_loop_graph() -> StateGraph:
+    """Phase 8 (docs/v2/PHASE8_RESEARCH_LOOP_CONTRACT.md): a SEPARATE,
+    additive graph builder - does not modify or replace build_agent_graph()
+    above, which remains the exact pre-Phase-8 graph, unchanged, for any
+    caller that does not opt into `MedAgent(research_loop=True)`.
+
+    START
+      -> query_analysis -> tool_orchestration -> synthesis
+      -> evidence_normalization -> grounded_generation
+      -> gap_analysis (Phase 8: structured EvidenceGap[] from the CURRENT
+                       Evidence[]/GroundedAnswer - never free-form "what's
+                       missing")
+      -> [CONDITIONAL: should_continue_research_loop]
+           "continue" -> research_action_planning -> research_execution
+                         (frozen Phase-3 dispatcher, gap-targeted query)
+                      -> evidence_merge (frozen Phase-5 renormalization +
+                         Phase-8 deterministic dedup)
+                      -> grounded_generation (re-run on the merged Evidence[])
+                      -> gap_analysis (loop)
+           "stop"     -> finalize_research_answer (PHASE8-DEFECT-001 fix:
+                         caveats any claim still tied to an unresolved
+                         weakly_supported_fact/conflicting_evidence gap)
+                      -> report_generation -> END
+
+    Notably absent from this graph: verification_node (the old LLM
+    self-confidence-threshold loop this phase replaces - see
+    docs/v2/V2_PHASE_GATES.md Phase 8's purpose statement). It is neither
+    deleted nor modified; build_agent_graph() above still uses it
+    unchanged."""
+
+    workflow = StateGraph(AgentState)
+
+    workflow.add_node("query_analysis", query_analysis_node)
+    workflow.add_node("tool_orchestration", tool_orchestration_node)
+    workflow.add_node("synthesis", synthesis_node)
+    workflow.add_node("evidence_normalization", evidence_normalization_node)
+    workflow.add_node("grounded_generation", grounded_generation_node)
+    workflow.add_node("gap_analysis", gap_analysis_node)
+    workflow.add_node("research_action_planning", research_action_planning_node)
+    workflow.add_node("research_execution", research_execution_node)
+    workflow.add_node("evidence_merge", evidence_merge_node)
+    workflow.add_node("finalize_research_answer", finalize_research_answer_node)
+    workflow.add_node("report_generation", report_generation_node)
+
+    workflow.set_entry_point("query_analysis")
+    workflow.add_edge("query_analysis", "tool_orchestration")
+    workflow.add_edge("tool_orchestration", "synthesis")
+    workflow.add_edge("synthesis", "evidence_normalization")
+    workflow.add_edge("evidence_normalization", "grounded_generation")
+    workflow.add_edge("grounded_generation", "gap_analysis")
+
+    workflow.add_conditional_edges(
+        "gap_analysis",
+        should_continue_research_loop,
+        {
+            "continue": "research_action_planning",
+            "stop": "finalize_research_answer",
+        },
+    )
+
+    workflow.add_edge("research_action_planning", "research_execution")
+    workflow.add_edge("research_execution", "evidence_merge")
+    workflow.add_edge("evidence_merge", "grounded_generation")
+    # PHASE8-DEFECT-001 fix (docs/v2/PHASE8_FAILURE_ANALYSIS.md): before
+    # report_generation ever sees the final GroundedAnswer, propagate any
+    # still-unresolved, claim-tied gap into it (qualifier caveat) - the
+    # loop's own state must never be safer than the answer it hands back.
+    workflow.add_edge("finalize_research_answer", "report_generation")
+    workflow.add_edge("report_generation", END)
+
+    compiled_graph = workflow.compile()
+    logger.info("Phase 8 research-loop graph compiled successfully (10 nodes, gap-driven conditional routing)")
+    return compiled_graph
+
+
 class MedAgent:
     """MedAgent - Autonomous Drug Discovery Research Assistant.
 
@@ -199,12 +280,16 @@ class MedAgent:
         self,
         max_iterations: int = 10,
         temperature: float = 0.3,
-        use_rag: bool = True
+        use_rag: bool = True,
+        research_loop: bool = False,
     ):
         """Initialize the MedAgent.
 
         Args:
-            max_iterations: Maximum reasoning loops before stopping
+            max_iterations: Maximum reasoning loops before stopping (only
+                meaningful for the pre-Phase-8 confidence-threshold loop;
+                the Phase-8 research loop has its own independent bounds -
+                see research/loop_control.py - not controlled by this param).
             temperature: LLM creativity (0.0 = deterministic, 1.0 = creative)
             use_rag: Whether synthesis_node retrieves local RAG passages
                 (retrieval.retriever.retrieve()) to ground synthesis/report
@@ -215,14 +300,21 @@ class MedAgent:
                 empty retrieved_context, no "PubMed RAG" citations),
                 everything else (tools, prompts minus the RAG section,
                 non-RAG citations) unchanged.
+            research_loop: Phase 8 (docs/v2/PHASE8_RESEARCH_LOOP_CONTRACT.md).
+                False (default) preserves the exact pre-Phase-8 graph and
+                behavior (build_agent_graph(), verification_node's
+                confidence-threshold loop) - nothing changes for any
+                existing caller. True opts into build_research_loop_graph()
+                instead - the evidence-gap-driven bounded loop.
         """
         self.max_iterations = max_iterations
         self.temperature = temperature
         self.use_rag = use_rag
+        self.research_loop = research_loop
 
         # Build the graph
-        logger.info(f"Initializing MedAgent (max_iterations={max_iterations})")
-        self.graph = build_agent_graph()
+        logger.info(f"Initializing MedAgent (max_iterations={max_iterations}, research_loop={research_loop})")
+        self.graph = build_research_loop_graph() if research_loop else build_agent_graph()
 
         logger.info("MedAgent initialized successfully")
 
@@ -276,7 +368,15 @@ class MedAgent:
         # is exhausted by ~7-8 iterations, well under max_iterations'
         # intended ceiling, so size it explicitly from max_iterations
         # (with headroom) instead of relying on the default.
-        recursion_limit = (self.max_iterations * 3) + 10
+        # Phase 8's research-loop graph has its own independent, much
+        # smaller bound (research.loop_control.MAX_RESEARCH_ITERATIONS=3,
+        # 5 node visits/iteration) - use a fixed, generous headroom instead
+        # of self.max_iterations (which that graph does not consume at all).
+        if self.research_loop:
+            from research.loop_control import MAX_RESEARCH_ITERATIONS
+            recursion_limit = (MAX_RESEARCH_ITERATIONS * 5) + 15
+        else:
+            recursion_limit = (self.max_iterations * 3) + 10
         try:
             final_state = self.graph.invoke(
                 initial_state,

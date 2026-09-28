@@ -1,0 +1,63 @@
+{
+  "artifact_name": "phase8_dev_benchmark_metrics_summary",
+  "methodology_note": "network_simulated_followup: true for all cases with a follow-up round - live tool network (PubMed/ClinicalTrials.gov/ChEMBL) is blocked in this cloud session (see docs/v2/PHASE8_INITIAL_AUDIT.md Section 7); generate_grounded_answer and judge_claim_semantic (Candidate B judge) both ran live via Cerebras. Case selection and design were predeclared in docs/v2/PHASE8_GATE_PLAN.md before this run; no case was added/changed after seeing outputs.",
+  "cases": [
+    {
+      "case_id": "DEV-A-sufficient",
+      "n_rounds_run": 1,
+      "final_stop_reason": "sufficient_evidence",
+      "pre_claim_support_precision": 1.0,
+      "post_claim_support_precision": 1.0,
+      "csp_delta": 0.0,
+      "pre_source_coverage": 1.0,
+      "post_source_coverage": 1.0,
+      "source_coverage_delta": 0.0,
+      "requested_evidence_types": [
+        "clinicaltrials"
+      ]
+    },
+    {
+      "case_id": "DEV-B-missing-source-recovered",
+      "n_rounds_run": 2,
+      "final_stop_reason": "sufficient_evidence",
+      "pre_claim_support_precision": 1.0,
+      "post_claim_support_precision": 1.0,
+      "csp_delta": 0.0,
+      "pre_source_coverage": 0.5,
+      "post_source_coverage": 1.0,
+      "source_coverage_delta": 0.5,
+      "requested_evidence_types": [
+        "clinicaltrials",
+        "chembl"
+      ]
+    },
+    {
+      "case_id": "DEV-C-safe-abstention",
+      "n_rounds_run": 2,
+      "final_stop_reason": "safe_abstention",
+      "pre_claim_support_precision": null,
+      "post_claim_support_precision": null,
+      "csp_delta": null,
+      "pre_source_coverage": 0.0,
+      "post_source_coverage": 0.0,
+      "source_coverage_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    },
+    {
+      "case_id": "DEV-D-weak-evidence-strengthened",
+      "n_rounds_run": 1,
+      "final_stop_reason": "sufficient_evidence",
+      "pre_claim_support_precision": 1.0,
+      "post_claim_support_precision": 1.0,
+      "csp_delta": 0.0,
+      "pre_source_coverage": 1.0,
+      "post_source_coverage": 1.0,
+      "source_coverage_delta": 0.0,
+      "requested_evidence_types": [
+        "pubmed"
+      ]
+    }
+  ]
+}

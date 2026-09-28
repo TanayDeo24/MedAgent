@@ -222,6 +222,63 @@ class AgentState(TypedDict):
     `evidence`'s own recompute-from-scratch convention."""
 
     # ═══════════════════════════════════════════════════════════
+    # PHASE 8 RESEARCH-LOOP FIELDS (additive, backward-compatible - see
+    # docs/v2/PHASE8_RESEARCH_LOOP_CONTRACT.md; unused/left at defaults by
+    # the pre-Phase-8 graph, which never touches these keys)
+    # ═══════════════════════════════════════════════════════════
+
+    research_query_raw: Optional[Dict[str, Any]]
+    """Full `nlu.schemas.ResearchQuery.model_dump(mode='json')` from
+    query_analysis_node, stored ADDITIVELY alongside the existing lossy
+    `research_plan` legacy dict (never replacing it - see
+    to_legacy_research_plan()'s own docstring on why that projection stays
+    unchanged). Phase 8's gap analysis needs the `requested_evidence_types`
+    field this legacy projection drops; nothing pre-Phase-8 reads this key."""
+
+    research_gaps: List[Dict[str, Any]]
+    """Serialized `research.models.EvidenceGap` list from the CURRENT
+    research iteration's gap analysis (research/gap_analysis.py). Overwritten
+    each iteration, not accumulated - `research_actions` below is the
+    cumulative, traceable history."""
+
+    research_actions: List[Dict[str, Any]]
+    """Cumulative history of every `research.models.ResearchAction` attempted
+    this run (serialized, each carrying its own `gap_signature` - see
+    research/loop_control.py::attempted_signatures). Append-only."""
+
+    research_iteration: int
+    """Research-loop iteration counter (distinct from `current_step`, which
+    counts every node visit including the pre-Phase-8 confidence loop)."""
+
+    research_tool_calls_used: int
+    """Cumulative count of follow-up tool-orchestration calls issued by the
+    research loop, checked against research.loop_control.MAX_TOOL_CALLS_TOTAL."""
+
+    research_consecutive_failure_rounds: int
+    """Consecutive research iterations in which the planned action's
+    follow-up tool call produced zero new results - feeds
+    research.loop_control's TOOL_FAILURE_LIMIT stop reason."""
+
+    research_attempted_no_evidence: bool
+    """Whether a NO_EVIDENCE-gap follow-up has already been attempted once
+    this run - a second all-gaps-are-NO_EVIDENCE round means SAFE_ABSTENTION,
+    not another blind retry."""
+
+    research_stop_reason: Optional[str]
+    """The `research.models.StopReason` value the loop actually stopped on -
+    never left implicit."""
+
+    evidence_seen_ids: List[str]
+    """Evidence IDs already produced by any prior research iteration - used
+    by evidence_merge_node (Phase 8) to deterministically deduplicate newly
+    normalized Evidence against evidence already in the final set."""
+
+    evidence_duplicate_count: int
+    """Count of Evidence records discarded as duplicates (already-seen
+    evidence_id) across the whole run - a rediscovered record is never
+    counted as research progress (contract Section 11)."""
+
+    # ═══════════════════════════════════════════════════════════
     # METADATA FIELDS
     # ═══════════════════════════════════════════════════════════
 
@@ -306,6 +363,18 @@ def create_initial_state(
         rag_documents=[],
         evidence=[],
         grounded_answer=None,
+
+        # Phase 8 research-loop (additive defaults - see field docstrings above)
+        research_query_raw=None,
+        research_gaps=[],
+        research_actions=[],
+        research_iteration=0,
+        research_tool_calls_used=0,
+        research_consecutive_failure_rounds=0,
+        research_attempted_no_evidence=False,
+        research_stop_reason=None,
+        evidence_seen_ids=[],
+        evidence_duplicate_count=0,
 
         # Metadata
         start_time=datetime.now(),
