@@ -1,0 +1,67 @@
+{
+  "artifact_name": "phase9_concurrency_audit",
+  "purpose": "Phase 9 Step 9 - concurrency safety audit: inventory every shared-mutable-state object, classify it, then empirically test at concurrency=2 and concurrency=4 using the evaluator's own fresh-MedAgent()-per-task pattern with stubbed LLM/tool boundaries (no real network calls).",
+  "generated_from": "tests/test_phase9_concurrency_audit.py (5 tests, all PASS at generation time)",
+  "environment": {"hardware": "single developer laptop (darwin)", "power_state": "AC", "concurrency_levels_tested": [2, 4], "network": "fully stubbed, no real calls"},
+  "shared_mutable_state_inventory": [
+    {"object": "orchestration.registry.DEFAULT_REGISTRY (module-level singleton)", "scope": "process-wide, shared across every MedAgent() instance/thread", "classification": "shared-thread-safe", "notes": "Holds references to the 3 BaseTool subclass instances; the registry's own validate_call/get_execution_fn methods are pure/read-only over static maps built once at import time - no mutation after construction."},
+    {"object": "BaseTool.cache (per-tool-instance plain dict)", "scope": "shared across every concurrent request via the singleton tool instances (registry + agent.nodes._chembl_backfill_tool)", "classification": "shared-with-benign-duplicate-work-race", "notes": "Empirically confirmed this pass (see cache_race_empirical_result below) - a forced-simultaneous cache miss causes BOTH racing threads to execute the real upstream call once each (2 upstream calls for 1 logical request pattern), but the final cached value and both callers' returned data are correct and identical; CPython dict assignment is atomic under the GIL so there is no partial/corrupted cache entry ever observable. This is wasted work (thundering herd), not a correctness defect."},
+    {"object": "BaseTool.session (RetrySession, per-tool-instance)", "scope": "shared, module-level via singleton tool instances", "classification": "shared-thread-safe", "notes": "requests.Session + urllib3 connection pooling are designed for concurrent use; no additional protection needed. No test in this pass found a race-attributable failure."},
+    {"object": "utils.rate_limiter._rate_limiter (global RateLimiter singleton)", "scope": "shared, module-level", "classification": "shared-thread-safe", "notes": "Each TokenBucket has its own threading.Lock; RateLimiter.get_bucket also locks around bucket-dict creation. Confirmed via TestSimultaneousCallers and TestFairnessAndBurstBound in tests/test_phase9_rate_limiter_audit.py: exactly 1 of N racing consume() calls against a 1-token bucket ever succeeds, never 0 or >1."},
+    {"object": "config.llm_config._llm_call_count / _llm_call_lock", "scope": "shared, module-level", "classification": "shared-thread-safe", "notes": "Explicit threading.Lock guards every increment."},
+    {"object": "config.llm_config._thread_local", "scope": "thread-local by design", "classification": "request-local", "notes": "threading.local() - correct, intentional per-thread isolation for per-task LLM call counting under evaluator-style concurrency."},
+    {"object": "retrieval.retriever._retriever (lazy module-level singleton)", "scope": "shared, module-level", "classification": "shared-thread-safe", "notes": "Theoretically racy init pattern (if _retriever is None: ...) but practically eager - agent/nodes.py calls _get_retriever() at its own module-import time (single-threaded, before any concurrent request can run), so the race window never occurs in this codebase's actual call pattern. Not independently re-tested this pass (Phase-9 scope: audit, not re-derive Phase-4's own closure)."},
+    {"object": "agent.nodes._rag_retrieval_lock (threading.Lock)", "scope": "shared, module-level", "classification": "shared-thread-safe", "notes": "The deliberate fix for the real, previously-crashing Metal/MPS concurrency bug (commit 01760fe) - confirmed still present via grep this pass; NOT touched or weakened per the governing directive's explicit instruction."},
+    {"object": "agent.nodes._chembl_backfill_tool (module-level ChEMBLTool())", "scope": "shared, module-level", "classification": "shared-with-benign-duplicate-work-race", "notes": "Same classification as the registry's ChEMBL instance - owns its own independent cache/session with the identical BaseTool.cache race property."},
+    {"object": "AgentState (LangGraph state dict)", "scope": "constructed fresh per MedAgent().run() call", "classification": "request-local", "notes": "create_initial_state() builds a new dict every call; confirmed no leakage across concurrency=2/4 in this pass's own test (each task's returned query/stop-reason/iteration count matched only its own input, with no cross-task string ever appearing)."},
+    {"object": "Evidence / GroundedAnswer / citation objects", "scope": "constructed fresh per request from AgentState", "classification": "request-local", "notes": "No shared container found - each request builds its own list from its own state."},
+    {"object": "logging (utils/logger.py, Python stdlib logging)", "scope": "shared, process-wide handlers/formatters", "classification": "shared-thread-safe", "notes": "Python's stdlib logging module is documented thread-safe (internal locks around handler.emit); no custom buffering found in utils/logger.py beyond standard Handler/Formatter usage."},
+    {"object": "research/loop_control.py module-level constants (MAX_RESEARCH_ITERATIONS etc.)", "scope": "shared, module-level", "classification": "immutable", "notes": "Plain int constants, never mutated after import - safe by construction."}
+  ],
+  "concurrency_tests": {
+    "concurrency_2": {
+      "test": "test_concurrent_runs_no_cross_task_state_leakage[2]",
+      "tasks_launched": 2,
+      "tasks_completed_without_uncaught_exception": 2,
+      "state_isolation_verified": true,
+      "cross_task_leakage_found": false,
+      "result_stop_reasons": ["safe_abstention", "safe_abstention"],
+      "verdict": "PASS"
+    },
+    "concurrency_4": {
+      "test": "test_concurrent_runs_no_cross_task_state_leakage[4]",
+      "tasks_launched": 4,
+      "tasks_completed_without_uncaught_exception": 4,
+      "state_isolation_verified": true,
+      "cross_task_leakage_found": false,
+      "result_stop_reasons": ["safe_abstention", "safe_abstention", "safe_abstention", "safe_abstention"],
+      "verdict": "PASS"
+    },
+    "rate_limiter_under_concurrency_4": {
+      "test": "test_concurrency_4_rate_limiter_still_thread_safe_no_exception",
+      "threads": 4,
+      "calls_per_thread": 20,
+      "total_calls": 80,
+      "exceptions_observed": 0,
+      "verdict": "PASS"
+    }
+  },
+  "base_tool_cache_barrier_test": {
+    "test": "test_two_concurrent_identical_requests_barrier_forced_simultaneous_miss",
+    "method": "threading.Barrier(2) placed inside the stubbed upstream call, AFTER the cache-miss check (_get_from_cache returns None for both threads) and BEFORE either thread's result is written to cache (_save_to_cache) - forces the exact simultaneous-miss window the unlocked check-then-act pattern is vulnerable to, rather than hoping real timing reproduces it.",
+    "duplicate_upstream_executions_counted": 2,
+    "logical_requests": 2,
+    "data_correctness_preserved": true,
+    "cache_write_structurally_safe": true,
+    "final_cache_entry_valid": true,
+    "classification": "inefficiency_only_not_correctness_defect",
+    "explanation": "Both racing threads independently executed the real upstream call and both obtained the identical correct data; the plain-dict cache write (self.cache[cache_key] = (timestamp, data)) is a single atomic dict-item assignment under the GIL, so there is no possibility of a torn/partial write - whichever thread writes last simply overwrites the identical-shape tuple the other thread would have written. This is wasted redundant work under concurrent identical-key requests (a 'thundering herd' effect), not a data-integrity defect. Per the governing directive's explicit instruction, this race is audited, NOT fixed, in this pass."
+  },
+  "duplicate_execution_summary": {
+    "count_attributable_solely_to_a_race": 2,
+    "count_attributable_to_legitimate_research_loop_re_querying": 0,
+    "note": "The '2' above is the BaseTool.cache barrier test's own deliberately-forced scenario, not an emergent count from the concurrency=2/4 MedAgent runs (those runs used distinct queries per task, so no shared cache key was ever raced in that test)."
+  },
+  "shared_client_safety_verdict": true,
+  "race_conditions_observed_beyond_documented_cache_race": 0
+}

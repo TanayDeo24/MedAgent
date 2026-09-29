@@ -57,7 +57,28 @@ def plan_actions(
     research/loop_control.py, is responsible for turning that into a stop
     reason, not this function)."""
 
-    candidates = sorted(gaps, key=lambda g: g.severity, reverse=True)
+    # PHASE9-DEFECT-001 fix: an EVALUATION_BUDGET_EXHAUSTED gap can NEVER be
+    # resolved by another tool call (it means "this claim's own citations
+    # were never judged", not "evidence is missing") - re-searching would be
+    # a NO_PRODUCTIVE_ACTION-guaranteed round-trip that only wastes a
+    # research-loop iteration and a MAX_REPEATED_ACTION slot. Excluded here,
+    # at the source, rather than given a no-op `_followup_query_for` branch,
+    # so it can never be selected as `candidates[0]` even when it happens to
+    # have the highest severity among the current gaps. This is exactly how
+    # research/loop_control.py::decide_stop_reason is required to treat it
+    # (an open, unresolved gap that nonetheless drives zero further tool
+    # calls) - see docs/v2/PHASE9_FAILURE_ANALYSIS.md's PHASE9-DEFECT-001
+    # fix requirement 8.
+    # Phase-9 PAIR BATCHING fix: a CLAIM_EVALUATION_FAILED gap is excluded
+    # for the identical reason - re-searching cannot fix "the judge attempt
+    # itself never produced a usable result", it can only waste a
+    # research-loop iteration exactly like EVALUATION_BUDGET_EXHAUSTED above.
+    _UNRETARGETABLE_GAP_TYPES = {GapType.EVALUATION_BUDGET_EXHAUSTED, GapType.CLAIM_EVALUATION_FAILED}
+    candidates = sorted(
+        (g for g in gaps if g.gap_type not in _UNRETARGETABLE_GAP_TYPES),
+        key=lambda g: g.severity,
+        reverse=True,
+    )
     actions: List[ResearchAction] = []
 
     for gap in candidates:

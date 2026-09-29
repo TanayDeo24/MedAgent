@@ -1,0 +1,80 @@
+{
+  "experiment_name": "gap_analysis_judge_call_pair_batching",
+  "purpose": "Pre-registers the live A/B comparison of gap-analysis judge-call PAIR BATCHING (research/gap_analysis.py grouping claims into GAP_ANALYSIS_BATCH_SIZE=2 requests via grounding_eval.judge.judge_claims_batch) against the unbatched CONTROL (GAP_ANALYSIS_BATCH_SIZE=1), BEFORE any live pair-batching timing data exists - this is the LAST Phase-9 optimization experiment (see artifacts/v2/phase9_next_optimization_decision.json for why this candidate was selected over batch_size=4/full-answer/synthesis-consolidation/report-generation-redesign/cache/retry-policy, all explicitly out of scope for this phase).",
+  "created_during_pass": "phase9-final-freeze-pass",
+  "prior_experiment_this_builds_on": "artifacts/v2/phase9_gap_analysis_concurrency_experiment.json (GAP_ANALYSIS_MAX_CONCURRENCY=1 confirmed as final; batching is evaluated independently, NOT combined with concurrency>1 in this phase)",
+  "control": {
+    "gap_analysis_batch_size": 1,
+    "description": "Unbatched baseline - every scheduled claim judged with its own, unmodified single-claim grounding_eval.judge.judge_claim_semantic call. This is the current production default."
+  },
+  "candidate": {
+    "gap_analysis_batch_size": 2,
+    "description": "Bounded pair-batched judge dispatch via grounding_eval.judge.judge_claims_batch - 2 claims per logical Cerebras request, each strictly isolated to its own cited Evidence, explicitly claim_id-tagged (never positional association). An odd trailing claim uses the ordinary single-claim path."
+  },
+  "held_constant": {
+    "gap_analysis_max_concurrency": 1,
+    "claim_evaluation_budget": 32,
+    "max_tool_calls_per_round": 12,
+    "max_tool_calls_per_request": 24,
+    "note": "Batching is NOT combined with concurrency>1 in this phase - GAP_ANALYSIS_MAX_CONCURRENCY stays 1 throughout this experiment, isolating batch_size as the only independent variable."
+  },
+  "production_default_before_experiment": 1,
+  "production_default_change_policy": "Do NOT change the production default until live results justify it, per this experiment's own pre-registered candidate_selection rollback criteria (mirroring the concurrency experiment's identical policy).",
+  "deterministic_validation_status": {
+    "pair_batching_unit_tests": "tests/test_phase9_pair_batching.py - 29/29 passed (grouping, odd-count handling, ID validation, retry-bounding, whole-batch-failure semantics, budget accounting under batching, ordering/contamination isolation)",
+    "semantic_equivalence_on_frozen_fixtures": "PASSED - batch_size=1 vs batch_size=2 produce identical gaps/claim_judge_calls_used/ordering on SMALL/MEDIUM/LARGE frozen fixtures with judge responses held fixed; logical call counts matched ceil(n/2) exactly (SMALL 4->2, MEDIUM 5->3, LARGE 6->3)",
+    "full_offline_regression": "See docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's final-freeze-pass section for the exact pass count recorded after this file was written."
+  },
+  "durable_fixtures_used": "artifacts/v2/phase9_gap_analysis_frozen_fixtures.json (SMALL=4/MEDIUM=5/LARGE=6 judge-eligible claims - identical fixtures used by the prior concurrency experiment, for direct comparability)",
+  "expected_logical_judge_calls_per_fixture": {
+    "SMALL": {"batch_1": 4, "batch_2": 2},
+    "MEDIUM": {"batch_1": 5, "batch_2": 3},
+    "LARGE": {"batch_1": 6, "batch_2": 3}
+  },
+  "planned_live_call_accounting": {
+    "control_batch_1": {"SMALL": 4, "MEDIUM": 5, "LARGE": 6, "total": 15},
+    "candidate_batch_2": {"SMALL": 2, "MEDIUM": 3, "LARGE": 3, "total": 8},
+    "grand_total_planned": 23,
+    "note": "CONTROL is re-run CONTEMPORANEOUSLY in this pass (not reused from the historical concurrency-experiment batch1 timings) so the batch1-vs-batch2 latency comparison is not confounded by day-to-day provider latency drift - per this pass's explicit 'do not reuse only historical batch1 timings as causal baseline' requirement. The historical concurrency-experiment batch1 numbers remain available as a HISTORICAL cross-check only."
+  },
+  "execution_order_pre_registered": [
+    {"sequence": 1, "fixture": "SMALL", "batch_size": 1},
+    {"sequence": 2, "fixture": "SMALL", "batch_size": 2},
+    {"sequence": 3, "fixture": "MEDIUM", "batch_size": 2},
+    {"sequence": 4, "fixture": "MEDIUM", "batch_size": 1},
+    {"sequence": 5, "fixture": "LARGE", "batch_size": 1},
+    {"sequence": 6, "fixture": "LARGE", "batch_size": 2}
+  ],
+  "execution_order_rationale": "Balanced/interleaved order alternating which condition runs first per fixture (SMALL: 1-then-2; MEDIUM: 2-then-1; LARGE: 1-then-2) to avoid systematically confounding batch_size with run position / time-of-day provider drift, mirroring the concurrency experiment's rotation design. Fixed and stored BEFORE any run - not modified afterward.",
+  "rerun_policy": "No rerun of any completed measurement is permitted, even if inconvenient, unless a run is infrastructure-invalid (e.g. a crash before any judge call completes) - such a case must be preserved with its failure recorded, never silently deleted.",
+  "metrics_to_collect": {
+    "wall_clock_seconds": null,
+    "logical_judge_calls_made": null,
+    "provider_attempts": null,
+    "retries": null,
+    "rate_limit_wait_ms_per_call": null,
+    "http_429_count": null,
+    "http_5xx_count": null,
+    "malformed_batch_responses": null,
+    "failed_batches": null,
+    "returned_claim_ids_and_classifications": null,
+    "evidence_references": null,
+    "ordering": null
+  },
+  "candidate_selection_rollback_criteria": {
+    "reject_batch_size_2_if_any_of": [
+      "missing claim",
+      "duplicate claim",
+      "wrong claim association",
+      "Evidence contamination (a claim's support attributable to another co-batched claim's Evidence)",
+      "false support attributable to batching (an unsupported/contradicted claim becomes supported due to cross-claim context leakage)",
+      "materially worse judgment agreement vs the contemporaneous batch_size=1 control on the SAME claims",
+      "unsafe malformed-response behavior (a fabricated judgment, a silently-dropped claim, or a silent fallback to individual calls)",
+      "retry amplification that eliminates the practical call-count reduction",
+      "no meaningful latency improvement"
+    ],
+    "select_batch_size_2_only_if": "a meaningful latency reduction is observed with zero semantic/safety regression from the list above",
+    "do_not_force_a_win": true
+  },
+  "explicit_non_fabrication_notice": "No field under metrics_to_collect has ever been populated with a real or placeholder number as of this file's creation. All are null by design at pre-registration time. This file must not be edited to add fabricated timing/result values before the live benchmark actually runs."
+}

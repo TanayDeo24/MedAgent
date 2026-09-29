@@ -1,0 +1,114 @@
+{
+  "audit_name": "phase9_post_concurrency_optimization_decision_audit",
+  "purpose": "Decide, from existing evidence only (no new benchmarking, no live calls, no production changes), which single optimization experiment is worth authorizing next.",
+  "governing_prior_result": {
+    "experiment": "gap_analysis_judge_call_concurrency",
+    "artifact": "artifacts/v2/phase9_gap_analysis_concurrency_experiment.json",
+    "conclusion": "Bounded concurrency (2 or 4) demonstrates no meaningful, defensible latency improvement over sequential (1) under the current Cerebras 5 RPM / capacity=1 rate-limit configuration. Waits stack additively regardless of thread count. Production default unchanged: GAP_ANALYSIS_MAX_CONCURRENCY=1.",
+    "verified_in_step_1": true
+  },
+  "evidence_used": [
+    "artifacts/v2/phase9_gap_analysis_concurrency_experiment.json (rate_limiter_mechanism_finding, candidate_selection)",
+    "artifacts/v2/phase9_baseline_profile.json (bottleneck_ranking_by_total_time: gap_analysis 56.3%, report_generation 19.5%, synthesis 17.2%, grounded_generation 4.6%)",
+    "grounding_eval/judge.py (provider=Cerebras qwen-3.8-27b, 1 call/claim, max_completion_tokens=1024, rate-limit key cerebras_free_trial, capacity=1, 5/60 RPS, retry=2 attempts no backoff)",
+    "research/gap_analysis.py (Step A/B/C scheduling design; CLAIM_EVALUATION_BUDGET=32)",
+    "agent/nodes.py:1388-1543 (report_generation_node: separate NVIDIA call, 1x/request, re-derives citations independently of grounded_generation)",
+    "agent/nodes.py:946-1053 (synthesis_node: separate NVIDIA call, 1x/request, feeds report_generation's prompt and verification_node, not consumed by grounded_generation)",
+    "orchestration/candidate_b_native_tools.py:197-249 (tool-selection call: deliberately un-retried, safe-abstention failure path, separate rate-limit bucket cerebras_candidate_b_native_tools)",
+    "tools/base_tool.py + docs/v2/PHASE9_FAILURE_ANALYSIS.md:637-641 (BaseTool.cache: confirmed inefficiency-only race, 2 duplicate executions ONLY under an artificially forced barrier test; zero naturally-occurring duplication observed in baseline artifacts)"
+  ],
+  "theoretical_rate_limit_floor": {
+    "assumption": "Cerebras judge bucket: capacity=1, 5 RPM => strict ~12s minimum spacing between dispatches (matches observed rate_limit_wait_ms increments of ~11.6-11.8s in the live benchmark). Floor = (ceil(claim_count/batch_size) - 1) * 12s. Provider inference time (~0.3-0.7s/call observed) and parsing (~0.05-0.1ms) are additive but small relative to the 12s floor and are excluded from this floor calculation. This is a LOWER BOUND, not a measured or predicted wall-clock time - observed values can exceed it (e.g. when the shared bucket isn't freshly full at run start, as seen for MEDIUM concurrency=1 in the live benchmark: 60.05s observed vs 48s floor).",
+    "label": "THEORETICAL RATE-LIMIT FLOOR - not measured latency",
+    "logical_calls_by_batch_size": {
+      "3":  {"batch_1": 3,  "batch_2": 2,  "batch_4": 1},
+      "4":  {"batch_1": 4,  "batch_2": 2,  "batch_4": 1},
+      "5":  {"batch_1": 5,  "batch_2": 3,  "batch_4": 2},
+      "6":  {"batch_1": 6,  "batch_2": 3,  "batch_4": 2},
+      "8":  {"batch_1": 8,  "batch_2": 4,  "batch_4": 2},
+      "16": {"batch_1": 16, "batch_2": 8,  "batch_4": 4},
+      "32": {"batch_1": 32, "batch_2": 16, "batch_4": 8}
+    },
+    "dispatch_floor_seconds_by_batch_size": {
+      "3":  {"batch_1": 24,  "batch_2": 12,  "batch_4": 0},
+      "4":  {"batch_1": 36,  "batch_2": 12,  "batch_4": 0},
+      "5":  {"batch_1": 48,  "batch_2": 24,  "batch_4": 12},
+      "6":  {"batch_1": 60,  "batch_2": 24,  "batch_4": 12},
+      "8":  {"batch_1": 84,  "batch_2": 36,  "batch_4": 12},
+      "16": {"batch_1": 180, "batch_2": 84,  "batch_4": 36},
+      "32": {"batch_1": 372, "batch_2": 180, "batch_4": 84}
+    },
+    "median_case_note": "At the observed median (3 claims/round) and observed max cumulative request total (16), batch_size=4 reduces the dispatch floor from 24s->0s and 180s->36s respectively - this is the only lever identified in this audit that can reduce the rate-limit floor itself, since scheduling concurrency (already tested) cannot."
+  },
+  "rejected_options": [
+    {
+      "option": "raise GAP_ANALYSIS_MAX_CONCURRENCY above 1",
+      "reason_rejected": "Already tested live (this experiment). No meaningful improvement possible under capacity=1 rate limiter - mechanically incapable of reducing wall-clock time regardless of thread count."
+    },
+    {
+      "option": "full-answer gap batching (all budget-eligible claims in ONE judge request)",
+      "reason_rejected": "Maximizes logical-call reduction (ceil(n/n)=1) but carries the highest semantic risk: single largest prompt/output size, single point of failure requiring full-batch retry on any parse error (retry amplification = re-judge every claim in the batch even if only one was malformed), highest cross-claim-interference risk (evidence context bleed could let an unsupported claim inherit false support from a co-batched, well-supported claim), and requires the most invasive prompt/schema change. Rejected as the FIRST experiment; may be reconsidered later if pair/small batching validates the batching approach's quality safety."
+    },
+    {
+      "option": "report_generation elimination/local rendering",
+      "reason_rejected": "report_generation_node re-derives its own citations independently from tool_results/retrieved_context and is not a pure formatter of grounded_generation's GroundedAnswer - the two paths are structurally disconnected by explicit design (agent/nodes.py:1246-1248). Eliminating or replacing it with a deterministic renderer would require either (a) making report_generation consume GroundedAnswer/claims directly, a structural contract change out of scope for a bounded optimization pass, or (b) blindly dropping content that may not otherwise exist (its own citation derivation, exec-summary prose, tables). Not rejected as unfixable, but requires a design decision beyond a narrow optimization experiment - flagged for future architectural review, not selected as the next STEP experiment."
+    },
+    {
+      "option": "synthesis/grounded_generation consolidation",
+      "reason_rejected": "synthesis_node's output feeds report_generation_node's prompt and verification_node - it is not merely redundant with grounded_generation (which only consumes state['evidence'], never synthesis's output). Consolidating the two would change two independent frozen-provider call sites (NVIDIA synthesis vs Cerebras grounded_generation) into one, a cross-provider architectural change with unclear semantic-equivalence guarantees. Higher risk than gap-analysis batching for uncertain benefit (synthesis is 17.2% but this pass has no evidence yet that its provider call count can be reduced without a contract change). Not selected as the next experiment."
+    },
+    {
+      "option": "BaseTool.cache single-flight",
+      "reason_rejected": "Classified LOW PRIORITY - duplicate upstream execution has only been demonstrated under an artificially forced simultaneous-miss barrier test (tests/test_phase9_concurrency_audit.py), never observed in any real measured Phase-9 baseline case. No baseline artifact shows measurable E2E latency attributable to this race. Fixing it would touch shared mutable cache state under concurrency and is not justified by any current measured impact."
+    },
+    {
+      "option": "Cerebras tool-selection retry",
+      "reason_rejected": "This is a reliability lever, not a latency lever (see Step 7 analysis) - the fault matrix already shows tool-selection failures degrade safely (empty tools_to_call, no uncaught exception). Adding retry would only ADD latency (extra round trip against the SAME 5 RPM shared-pattern rate limiter used by other Cerebras calls) with no demonstrated success-rate problem to fix. Explicitly excluded per the governing directive's own instruction not to select it as a latency optimization merely because it is an open design choice."
+    }
+  ],
+  "selected_next_candidate": {
+    "candidate": "gap-analysis claim-judging PAIR BATCHING (batch_size=2)",
+    "reason": "It is the only lever identified across this audit that can reduce the THEORETICAL RATE-LIMIT FLOOR itself (concurrency cannot, per the completed live experiment). It targets gap_analysis, the single largest measured bottleneck (56.3% of baseline stage time). Pair batching is the smallest, least invasive batching step (2 claims/request) - it minimizes prompt/output growth, minimizes retry-amplification blast radius (at most 2 claims re-judged on a malformed response, vs up to 32 for full-answer batching), and provides an early, low-risk read on whether the LLM can reliably maintain per-claim grounding-judgment quality and correct claim_id association when judging more than one claim per request, before ever considering size-4 or full-answer batching.",
+    "explicitly_not_selected": ["batch_size=4 (small batching)", "full-answer batching", "adaptive batching"],
+    "why_not_the_larger_batch_sizes_yet": "Per Step 3's own analysis, none of the batching candidates can be called 'safe' until evaluated - pair batching is proposed as the smallest first probe of the batching approach's quality/reliability properties. If pair batching validates cleanly (no cross-claim interference, no ordering defects, no retry-amplification issues, quality non-regression on a held-out claim set), a SEPARATE future pass may evaluate batch_size=4."
+  },
+  "hypothesis": "Judging 2 factual claims per Cerebras request (instead of 1) can reduce the number of logical judge calls (and therefore the theoretical rate-limit dispatch floor) by up to ~50% for typical claim counts (median=3, so ceil(3/2)=2 calls vs 3), WITHOUT any measurable degradation in per-claim grounding-judgment quality (support_label correctness, evidence-association correctness) compared to the current one-claim-per-call baseline.",
+  "exact_production_change_that_would_be_tested": [
+    "grounding_eval/judge.py: new schema/prompt variant accepting a LIST of (claim_id, claim_text, evidence_ids) tuples and returning a LIST of ClaimGroundingJudgment objects, each explicitly tagged with its own claim_id in the response (never relying on positional/array-index association)",
+    "research/gap_analysis.py: Step A groups scheduled claims into pairs (last odd claim, if any, judged alone - no partial/uneven-batch fabrication) before dispatch; Step C unpacks each batch response by claim_id exactly as today's single-claim path does",
+    "CLAIM_EVALUATION_BUDGET accounting: each individual claim inside a batch still consumes exactly 1 budget unit (a 2-claim batch consumes 2 units, one provider call) - budget semantics must remain per-CLAIM, not per-REQUEST, to avoid silently doubling effective capacity",
+    "Malformed/partial-batch-response handling: if the batch response is malformed, invalid, or missing a claim_id's judgment, treat as an evaluator failure for the WHOLE batch consistent with today's single-claim retry semantics (retry the whole batch, do not silently fabricate a missing claim's result) - MUST NOT be implemented in this audit, only specified here for the next pass"
+  ],
+  "deterministic_tests_needed_first": [
+    "Batch-of-2 request/response schema round-trip (stubbed provider) proves correct claim_id tagging and unpacking, including when the LLM returns the two judgments in reversed order",
+    "Odd claim count (e.g. 3) produces exactly one batch-of-2 plus one batch-of-1, never a fabricated pair",
+    "Malformed/partial batch response triggers a whole-batch retry (not silent partial fabrication), bounded to the existing 2-attempt retry policy",
+    "CLAIM_EVALUATION_BUDGET is consumed per-claim, not per-request, under batching (2-claim batch consumes 2 units)",
+    "Cross-claim contamination check: two claims with DIFFERING support levels in the same batch must not bleed evidence/support conclusions into each other (stubbed provider returning deliberately claim-specific answers, verified via response inspection)",
+    "Failure isolation: a batch-level provider failure must not silently mark claims as unsupported/omitted - must surface as a real gap or genuine retry, consistent with today's failure semantics",
+    "Quality non-regression: run the full existing test_phase9_claim_budget.py, test_phase9_gap_analysis_concurrency.py, test_phase9_tool_call_budget.py, test_phase9_quality_non_regression.py suites unmodified (aside from any newly needed batching tests) to confirm zero behavioral change when batch_size=1 (the production default, unchanged until a live benchmark separately authorizes otherwise)"
+  ],
+  "frozen_fixtures": "Reuse the SAME three already-frozen scratchpad fixtures from the concurrency experiment (LOCAL-06/SMALL=4 claims, LOCAL-04/MEDIUM=5 claims, LOCAL-02/LARGE=6 claims) for direct comparability of any future live benchmark against this pass's baseline numbers - no new fixture acquisition needed.",
+  "quality_metrics": [
+    "Per-claim support_label agreement rate between batch_size=1 (already-recorded baseline labels from this pass's raw_results) and batch_size=2 on the SAME frozen fixtures/claims - must be 100% agreement on the small fixed fixture set, or any disagreement must be manually reviewed as provider nondeterminism vs batching-induced quality change",
+    "Zero cross-claim contamination (no claim's support_label attributable to another co-batched claim's evidence)",
+    "Zero claim loss or ordering corruption (same correctness checks already used in the concurrency experiment's semantic_check)"
+  ],
+  "rollback_criterion": "If ANY of: (a) a single disagreement in support_label vs the batch_size=1 baseline that cannot be attributed to ordinary provider nondeterminism, (b) any cross-claim contamination observed, (c) any claim_id misassociation, (d) any budget-accounting mismatch - the batching change is not adopted and GAP_ANALYSIS_JUDGE_BATCH_SIZE (or equivalent) defaults to 1 (current unbatched behavior), mirroring exactly how GAP_ANALYSIS_MAX_CONCURRENCY defaulted to 1 pending this experiment's own evidence.",
+  "future_live_benchmark_design": "Mirror this pass's exact design: same 3 frozen fixtures (SMALL=4/MEDIUM=5/LARGE=6 judge-eligible claims), same rotated execution order pattern to avoid time-drift confounding, compare batch_size in {1, 2} (NOT 4 or full-answer in the same pass) at each fixture size, record the same per-call rate_limit_wait_ms/provider_call_ms telemetry, and add a NEW per-claim quality-agreement check against this pass's already-recorded batch_size=1 support_labels (LOCAL-06: c-0/c-2/c-3/c-4 all 'supported'; LOCAL-04: c-0/c-1/c-2/c-3/c-4 all 'supported'; LOCAL-02: c-0 'partially_supported', c-1/c-2/c-3/c-4/c-5 'supported') as the quality baseline to compare against.",
+  "expected_future_live_call_budget": {
+    "calculation": "3 fixtures x (batch_1 baseline already exists from THIS pass, re-usable without a rerun, so only batch_2 needs new live calls) - batch_2 logical calls: SMALL ceil(4/2)=2, MEDIUM ceil(5/2)=3, LARGE ceil(6/2)=3 => 8 new live judge calls total for the core comparison, PLUS one full pipeline sanity pass at batch_2 if a single-fixture E2E confirmation is separately authorized in that future pass.",
+    "total_new_live_calls_estimate": 8,
+    "note": "Deliberately reuses this pass's already-recorded batch_size=1 results as the baseline rather than re-running concurrency=1 again, minimizing new live traffic per the same 'keep total live traffic bounded' principle applied throughout this Phase-9 effort."
+  },
+  "risks": {
+    "schema_change_risk": "Requires a new, more complex JSON schema (list-of-claims request, list-of-judgments response with explicit claim_id tags) - a genuine prompt/schema change, larger in scope than the concurrency experiment (which touched zero prompts/schemas).",
+    "quality_risk": "Primary risk is cross-claim interference degrading grounding-judgment accuracy - must be validated against a real quality baseline (already available: this pass's own recorded batch_size=1 support_labels) before any production adoption.",
+    "retry_amplification_risk": "A malformed batch-of-2 response requires re-judging BOTH claims (vs 1 claim today) - bounded and small at batch_size=2, would grow linearly with larger batch sizes (this is why full-answer batching was rejected as the first step).",
+    "token_growth_risk": "Prompt and expected output size grow with batch size; max_completion_tokens=1024 (today's single-claim setting) would need re-evaluation for 2+ claims' worth of reasoning/output - to be sized empirically in deterministic testing before any live call.",
+    "out_of_scope_explicitly": "This audit selects and specifies the next experiment only. No prompt, schema, model, rate-limiter, retry, or budget code is modified in this pass."
+  },
+  "production_code_modified_this_pass": false,
+  "live_provider_calls_made_this_pass": 0,
+  "committed_or_pushed_this_pass": false
+}

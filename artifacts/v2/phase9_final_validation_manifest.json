@@ -1,0 +1,68 @@
+{
+  "artifact_name": "phase9_final_validation_manifest",
+  "status": "PRE-REGISTERED - written BEFORE any Phase-9 final validation run",
+  "purpose": "Freezes the exact fresh, Phase-9-safe validation cases for the FINAL Phase-9 confirmation pass (Step 18/19 of the Phase-9 final freeze directive) - run ONCE on the frozen candidate configuration, no tuning afterward.",
+  "exclusions": [
+    "No Phase-10 case (does not exist in this repository, untouched)",
+    "No case from the gap-analysis concurrency/pair-batching benchmark fixtures (SMALL=LOCAL-06/avapritinib, MEDIUM=LOCAL-04/niraparib, LARGE=LOCAL-02/lenalidomide) - those were used to TUNE/SELECT the pair-batching candidate and must not double as its validation",
+    "Reuses (does not re-tune-against) cases already pre-registered in artifacts/v2/phase9_workload_manifest.json's functional-performance set A - those cases were used for BASELINE PROFILING (Step 6/7, before any optimization existed), never for tuning concurrency or batching, so reusing them here as fresh validation is methodologically clean"
+  ],
+  "cases": [
+    {
+      "case_id": "VAL9-1-simple-successful",
+      "source": "artifacts/v2/phase9_workload_manifest.json:A_functional_performance.F1-simple-pubmed",
+      "category": "simple successful query",
+      "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+      "expected_shape": "single-source (pubmed) real answer, likely sufficient_evidence at round 0"
+    },
+    {
+      "case_id": "VAL9-2-multi-source",
+      "source": "artifacts/v2/phase9_workload_manifest.json:A_functional_performance.F4-multi-source",
+      "category": "multi-source query",
+      "query": "What does the literature say about lorlatinib in ALK-positive NSCLC, what does ClinicalTrials.gov show about ongoing trials, and what does ChEMBL report about its mechanism?",
+      "expected_shape": "pubmed + clinical_trials + chembl in a single round, likely sufficient_evidence at round 0"
+    },
+    {
+      "case_id": "VAL9-3-research-loop",
+      "source": "artifacts/v2/phase9_workload_manifest.json:A_functional_performance.F5-research-loop-one-followup",
+      "category": "research-loop query (evidence-gap-driven follow-up)",
+      "query": "What does ChEMBL report about mirikizumab's mechanism of action, and what does the literature say about mirikizumab in ulcerative colitis?",
+      "expected_shape": "designed to bias the initial native-tool-call toward one source, leaving a real gap for exactly one live follow-up round"
+    },
+    {
+      "case_id": "VAL9-4-multi-iteration",
+      "source": "artifacts/v2/phase9_workload_manifest.json:A_functional_performance.F6-multi-iteration",
+      "category": "representative normal case / multi-iteration budget bookkeeping",
+      "query": "What does the literature say about aficamten in hypertrophic cardiomyopathy, what does ClinicalTrials.gov show about aficamten trials, and what does ChEMBL report about aficamten's mechanism?",
+      "expected_shape": "3-source request, plausibly requiring follow-up round(s) - exercises real (non-exhausted) tool-call/claim-budget bookkeeping across multiple rounds"
+    },
+    {
+      "case_id": "VAL9-5-safe-abstention",
+      "source": "artifacts/v2/phase9_workload_manifest.json:A_functional_performance.F7-no-result-abstention",
+      "category": "no-result / safe abstention path",
+      "query": "What is known about the fictitious compound QRVX-40417-NOTREAL for a condition with no real biomedical evidence anywhere?",
+      "expected_shape": "zero real Evidence found, SAFE_ABSTENTION"
+    }
+  ],
+  "boundedness_path_disclosure": "Literal budget EXHAUSTION (CLAIM_EVALUATION_BUDGET=32 reached, or MAX_TOOL_CALLS_PER_ROUND/PER_REQUEST reached) is not organically reachable by any known real, non-adversarial query - no representative case in this project's history has produced >=32 factual claims or >=12 tool calls in one round. This validation set therefore verifies boundedness MECHANISMS are active by construction (every request passes through the same unconditional budget-check code path, already proven correct by the deterministic test suites in tests/test_phase9_claim_budget.py, tests/test_phase9_tool_call_budget.py, and tests/test_phase9_pair_batching.py) rather than forcing an artificial, non-representative exhaustion scenario live - consistent with this pass's 'do not overdo live traffic' / 'final confirmation, not another broad benchmark' constraint.",
+  "repetition_plan": {"each_case_run_count": 1, "total_planned_live_runs": 5},
+  "configuration_under_test": {
+    "GAP_ANALYSIS_BATCH_SIZE": 2,
+    "GAP_ANALYSIS_MAX_CONCURRENCY": 1,
+    "CLAIM_EVALUATION_BUDGET": 32,
+    "MAX_TOOL_CALLS_PER_ROUND": 12,
+    "MAX_TOOL_CALLS_PER_REQUEST": 24,
+    "source": "artifacts/v2/phase9_frozen_config.json, locked immediately before these validation runs execute - this validation run uses the LOCKED candidate, was not used to select it."
+  },
+  "metrics_to_verify": [
+    "bounded retries", "timeout handling safe", "partial failures safe", "no infinite loop", "explicit terminal states",
+    "no cross-request leakage", "configured concurrency respected",
+    "claim budget respected", "tool budgets respected", "theoretical bounds still valid",
+    "fabricated Evidence IDs = 0", "invalid Evidence IDs = 0", "grounding non-regression",
+    "citation/provenance integrity", "safe abstention correctness", "no false sufficient_evidence",
+    "unresolved claims caveated",
+    "PHASE8-DEFECT-001 remains fixed", "PHASE8-DEFECT-002 remains fixed",
+    "PHASE9-DEFECT-001 remains fixed", "PHASE9-DEFECT-002 remains fixed"
+  ],
+  "tuning_policy": "Run frozen candidate ONCE on this set. Do not tune afterward. If a genuine PRODUCT defect is exposed: preserve the failed run, assign a defect ID, root-cause, apply the smallest general fix only if necessary, add a regression test, and explicitly mark this validation candidate reopened - never silently rerun until passing."
+}

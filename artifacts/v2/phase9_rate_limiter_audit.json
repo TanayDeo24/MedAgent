@@ -1,0 +1,67 @@
+{
+  "artifact_name": "phase9_rate_limiter_audit",
+  "purpose": "Phase 9 Step 10 - rate limiter correctness audit using an injectable fake clock (monkeypatched time.time/time.sleep inside utils.rate_limiter), per the governing directive's requirement to avoid real sleeps.",
+  "generated_from": "tests/test_phase9_rate_limiter_audit.py (15 tests, all PASS at generation time)",
+  "module_under_test": "utils/rate_limiter.py (TokenBucket, RateLimiter, wait_for_rate_limit) - read in full this pass, unmodified",
+  "configured_provider_rates": {
+    "nvidia_nim_llm": {"rpm": 35, "rps": 0.5833333333333334, "capacity": 1.0, "source": "config/llm_config.py NVIDIA_RATE_LIMIT_RPM=35"},
+    "cerebras_candidate_b_native_tools": {"rpm": 5, "rps": 0.08333333333333333, "capacity": 1.0, "source": "orchestration/candidate_b_native_tools.py CEREBRAS_RATE_LIMIT_RPS=5.0/60.0"},
+    "cerebras_free_trial": {"rpm": 5, "rps": 0.08333333333333333, "capacity": 1.0, "source": "grounding_eval/judge.py + generation/generator.py CEREBRAS_RATE_LIMIT_RPS=5.0/60.0"},
+    "pubmed_rps": {"rps": 3, "capacity": 3, "source": "config/settings.py PUBMED_RATE_LIMIT=3"},
+    "clinical_trials_rps": {"rps": 10, "capacity": 10, "source": "config/settings.py CLINICAL_TRIALS_RATE_LIMIT=10"},
+    "chembl_rps": {"rps": 10, "capacity": 10, "source": "config/settings.py CHEMBL_RATE_LIMIT=10"}
+  },
+  "findings": {
+    "first_request_behavior": {
+      "verdict": "PASS",
+      "description": "First call against a fresh bucket at any tested provider rate never waits (bucket starts at full capacity, capacity>=1 required and confirmed present for the sub-1/s NVIDIA/Cerebras rates).",
+      "tests": ["test_first_call_never_waits[nvidia_nim_llm...]", "test_first_call_never_waits[cerebras_candidate_b_native_tools...]", "test_first_call_never_waits[pubmed...]", "test_first_call_never_waits[clinical_trials...]", "test_first_call_never_waits[chembl...]"]
+    },
+    "subsequent_request_spacing": {
+      "verdict": "PASS",
+      "nvidia_35rpm_observed_minimum_spacing_seconds": "~1.714 (60/35), confirmed >= (1/rate - 0.1) via fake clock",
+      "cerebras_5rpm_observed_minimum_spacing_seconds": "~12.0 (60/5), confirmed >= (1/rate - 0.1) via fake clock",
+      "pubmed_3rps_burst_then_wait": "first 3 calls free (capacity=3), 4th call waits - confirmed",
+      "tests": ["test_nvidia_35rpm_exact_minimum_spacing_after_burst", "test_cerebras_5rpm_exact_minimum_spacing", "test_pubmed_3rps_allows_3_bursts_then_waits"]
+    },
+    "independent_buckets_per_key": {
+      "verdict": "PASS",
+      "description": "Exhausting one provider's bucket (e.g. pubmed) has zero effect on another's (e.g. chembl) - confirmed via a shared RateLimiter instance with 2 distinct keys.",
+      "test": "test_each_provider_key_has_independent_bucket"
+    },
+    "simultaneous_callers": {
+      "verdict": "PASS",
+      "description": "5 real threads racing threading.Barrier-synchronized calls against a capacity=1 bucket: at most 1 consumed the pre-existing token without waiting; the rest genuinely waited (observed via sleep_calls growth). Directly at the TokenBucket.consume() level, 10 racing threads against a 1-token bucket produced EXACTLY 1 successful consume(), never 0, never >1 - the internal threading.Lock in TokenBucket.consume() prevents double-spending the same token.",
+      "burst_above_intended_rate_observed": false,
+      "tests": ["test_concurrent_callers_never_exceed_capacity_within_one_window", "test_bucket_lock_prevents_double_consumption_of_same_token"]
+    },
+    "queue_wait_behavior": {
+      "verdict": "documented, not a defect",
+      "description": "wait_for_token() is a plain spin-wait loop (while not consume(): time.sleep(0.1)), confirmed via source reading and via test_wait_for_token_blocks_until_available_deterministically in the pre-existing tests/test_rate_limiter.py. No FIFO queue exists - RateLimiter/TokenBucket expose no queue primitive (confirmed via hasattr checks)."
+    },
+    "fairness": {
+      "verdict": "not guaranteed by design - documented, not asserted as a bug",
+      "description": "Because wait_for_token() is an unordered spin-wait with no queue, under contention the thread whose consume() call happens to run first after a refill wins, not necessarily the thread that arrived first. This is an inherent property of the polling design, not a defect this audit found freshly - not measured further (would require statistical fairness measurement across many contended refills, out of this pass's scope, and not something the exit gate asks for)."
+    },
+    "retry_interaction": {
+      "verdict": "confirmed: every retry attempt consumes its own token",
+      "description": "wait_for_rate_limit() is called BEFORE the HTTP/LLM attempt at every real call site (candidate_b_native_tools.py, config/llm_config.py, grounding_eval/judge.py, generation/generator.py) and has no visibility into whether that attempt succeeds or fails - it unconditionally gates and consumes a token per call, including every retry attempt. Confirmed empirically: 3 consecutive wait() calls (simulating LLM_CALL_MAX_ATTEMPTS=3) against a capacity=1, 1/s bucket produced >=2 waits (1 free + 2 forced waits) - i.e. failed attempts DO consume a rate-limit token/slot, they are not free/exempted.",
+      "implication": "This means a burst of retries (e.g. 3 NVIDIA-client retry attempts after a 503) counts as 3 separate rate-limited calls against the 35 RPM bucket, not 1 - already accounted for in config/llm_config.py's own documented rationale for capping at 35 rather than the true 40 RPM limit (\"a burst of retries after a transient 503 could otherwise tip a run over the hard limit\").",
+      "test": "test_failed_downstream_attempt_still_consumed_a_token"
+    },
+    "burst_bound": {
+      "verdict": "PASS - no burst above configured capacity observed",
+      "description": "A TokenBucket never allows more than `capacity` tokens' worth of consumption without an intervening wait, regardless of call pattern (rapid-fire consume() calls tested directly).",
+      "test": "test_no_burst_above_capacity_regardless_of_call_pattern"
+    },
+    "provider_instance_correctness": {
+      "verdict": "PASS",
+      "description": "Each of the 5 real provider/source keys (nvidia_nim_llm, cerebras_candidate_b_native_tools/cerebras_free_trial, pubmed, clinical_trials, chembl) is a distinct RateLimiter bucket key, confirmed via RateLimiter.get_bucket's key-to-bucket dict and the independent-buckets test above - no cross-provider bucket sharing found in the codebase."
+    }
+  },
+  "correctness_defects_found": [],
+  "inefficiencies_noted_not_defects": [
+    "wait_for_token()'s 0.1s spin-wait polling is CPU-cheap but adds up to 0.1s of avoidable wait latency per refill-wait event versus an event-driven wake mechanism - a performance, not correctness, observation, and explicitly out of scope to fix (no optimization permitted this pass).",
+    "No fairness/ordering guarantee under contention - acceptable for this codebase's actual usage pattern (single-process, a handful of concurrent tasks) but would need revisiting only if a fairness-sensitive multi-tenant scenario were introduced (Phase 10+ territory, not measured here)."
+  ]
+}

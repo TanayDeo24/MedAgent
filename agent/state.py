@@ -268,6 +268,29 @@ class AgentState(TypedDict):
     """The `research.models.StopReason` value the loop actually stopped on -
     never left implicit."""
 
+    claim_judge_calls_used: int
+    """PHASE9-DEFECT-001 fix (Phase-9 BOUNDEDNESS HARDENING pass): cumulative,
+    REQUEST-GLOBAL count of judge_claim_semantic() calls issued so far across
+    every gap_analysis_node visit this run, checked against
+    research.loop_control.CLAIM_EVALUATION_BUDGET by
+    research/gap_analysis.py::analyze_gaps. Must be a declared AgentState
+    field (not an ad hoc key) precisely because LangGraph only threads
+    schema-declared keys between node invocations - an undeclared key
+    written by one node visit would be silently dropped before the next
+    gap_analysis_node visit, defeating the whole point of a REQUEST-GLOBAL
+    (not per-cycle) budget."""
+
+    tool_calls_used_this_request: int
+    """PHASE9-DEFECT-002 fix (Phase-9 BOUNDEDNESS HARDENING pass): cumulative,
+    REQUEST-GLOBAL count of LOGICAL model-emitted tool_calls[] entries
+    (raw_tool_calls, valid or invalid - see the design-decision note in
+    docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md) processed so far by
+    agent/nodes.py::tool_orchestration_node across every round this run,
+    checked against research.loop_control.MAX_TOOL_CALLS_PER_REQUEST.
+    Distinct from `research_tool_calls_used` above, which counts ROUND
+    invocations, not individual tool_calls entries. Declared here for the
+    same LangGraph cross-node-threading reason as `claim_judge_calls_used`."""
+
     evidence_seen_ids: List[str]
     """Evidence IDs already produced by any prior research iteration - used
     by evidence_merge_node (Phase 8) to deterministically deduplicate newly
@@ -373,6 +396,8 @@ def create_initial_state(
         research_consecutive_failure_rounds=0,
         research_attempted_no_evidence=False,
         research_stop_reason=None,
+        claim_judge_calls_used=0,
+        tool_calls_used_this_request=0,
         evidence_seen_ids=[],
         evidence_duplicate_count=0,
 

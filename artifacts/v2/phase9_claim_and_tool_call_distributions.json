@@ -1,0 +1,82 @@
+{
+  "artifact_name": "phase9_claim_and_tool_call_distributions",
+  "purpose": "Phase 9 BOUNDEDNESS HARDENING pass, Steps 4 and 6 - raw, repo-committed development-evidence distributions used to derive CLAIM_EVALUATION_BUDGET, MAX_TOOL_CALLS_PER_ROUND, and MAX_TOOL_CALLS_PER_REQUEST in research/loop_control.py. Extracted by direct read of the exact JSON artifacts named below (no live calls, no fabrication, no Phase-10 data). n<30-report-raw-values convention (PHASE9_RELIABILITY_PERFORMANCE_CONTRACT.md) followed for every distribution here.",
+  "claim_count_distribution": {
+    "primary_corpus": {
+      "description": "n_factual_claims, strictly - every value found by grepping the 3 files the governing directive explicitly named, at the (case, round) granularity Phase-8's own artifacts recorded. Each value is one generation cycle's factual-claim count (= one gap_analysis_node visit's worth of candidate judge calls).",
+      "source_files": [
+        "artifacts/v2/phase8_dev_benchmark_results.json",
+        "artifacts/v2/phase8_validation_results.json",
+        "artifacts/v2/phase8_validation_run2_results.json"
+      ],
+      "n": 45,
+      "min": 0,
+      "median": 3,
+      "max": 8,
+      "raw_values_sorted": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 7, 8, 8, 8, 8, 8, 8],
+      "note": "n=45 exceeds this project's own n<30 raw-value-reporting threshold, but the raw sorted list is still disclosed in full here for auditability; the summary stats (n/min/median/max) are what downstream docs cite."
+    },
+    "cumulative_per_multi_round_case": {
+      "description": "For every (case) with >1 recorded round in the primary corpus, the SUM of n_factual_claims across all its real rounds - this is the actual request-global cumulative total a real multi-round request produced, which is what CLAIM_EVALUATION_BUDGET (a request-global budget) is most directly comparable to.",
+      "cases": [
+        {"case": "DEV-B-missing-source-recovered", "source": "phase8_dev_benchmark_results.json", "per_round": [4, 5], "sum": 9},
+        {"case": "DEV-C-safe-abstention", "source": "phase8_dev_benchmark_results.json", "per_round": [0, 0], "sum": 0},
+        {"case": "VAL-B-missing-source-recovered", "source": "phase8_validation_results.json", "per_round": [6, 6], "sum": 12},
+        {"case": "VAL-C-multi-source-completeness", "source": "phase8_validation_results.json", "per_round": [2, 3, 3], "sum": 8},
+        {"case": "VAL-D-duplicate-only-followup", "source": "phase8_validation_results.json", "per_round": [4, 7], "sum": 11},
+        {"case": "VAL-E-unrecoverable-abstention", "source": "phase8_validation_results.json", "per_round": [0, 0], "sum": 0},
+        {"case": "VAL-F-tool-failure-safe-termination", "source": "phase8_validation_results.json", "per_round": [8, 8], "sum": 16},
+        {"case": "VAL-G-stagnation-no-repeat", "source": "phase8_validation_results.json", "per_round": [1, 1], "sum": 2},
+        {"case": "VAL2-B-productive-followup", "source": "phase8_validation_run2_results.json", "per_round": [2, 6], "sum": 8},
+        {"case": "VAL2-E-unrecoverable-abstention", "source": "phase8_validation_run2_results.json", "per_round": [0, 0], "sum": 0},
+        {"case": "VAL2-F-tool-failure-safe-termination", "source": "phase8_validation_run2_results.json", "per_round": [3, 3], "sum": 6},
+        {"case": "VAL2-G-stagnation-no-repeat", "source": "phase8_validation_run2_results.json", "per_round": [3, 3], "sum": 6}
+      ],
+      "max_observed_cumulative_total": 16,
+      "max_observed_case": "VAL-F-tool-failure-safe-termination (8+8 across its 2 real rounds)",
+      "max_real_rounds_observed_in_any_case": 2,
+      "note": "The hard MAX_RESEARCH_ITERATIONS bound allows up to 4 real rounds (G=4) - none of these dev/validation cases actually exercised more than 2, so 16 is a REAL observed floor on 'what request-global cumulative claim totals look like in practice', not a ceiling accounting for the full hard-bounded round count."
+    },
+    "broader_corpus_including_phase6_single_shot_generation": {
+      "description": "n_factual_claims values ALSO found in Phase-6 (pre-research-loop, single-shot generation, no gap-analysis loop) artifacts - included for context only, NOT used as the primary basis for CLAIM_EVALUATION_BUDGET, since these answers never went through research/gap_analysis.py's judge-call loop at all (Phase 6 predates Phase 8's research loop).",
+      "source_files": [
+        "artifacts/v2/phase6_candidate_comparison.json",
+        "artifacts/v2/phase6_heldout_supplement_results.json"
+      ],
+      "n": 9,
+      "raw_values": [4, 4, 1, 2, 1, 1, 1, 1, 4],
+      "combined_with_primary_corpus_max": 8,
+      "note": "Confirms the primary corpus's max=8 is not an artifact of only checking 3 files - the broader corpus (54 values total) has the identical max (8)."
+    },
+    "excluded_as_not_comparable": {
+      "description": "artifacts/v2/phase7_*.json files also contain a field literally named 'n_claims' (not 'n_factual_claims') with values up to 32 - inspected directly (phase7_candidate_b_fresh_supplement_results.json) and confirmed this is an AGGREGATE summary field counting claims across MANY test cases in one evaluation batch, not a per-answer/per-cycle count comparable to Phase-8's per-round n_factual_claims. Excluded from the distribution above to avoid conflating aggregate-batch counts with per-request counts - documented here rather than silently dropped."
+    }
+  },
+  "tool_call_count_distribution": {
+    "aggregate_per_request": {
+      "description": "n_tool_calls field from artifacts/v2/phase9_baseline_results.json's 12 real (live, Category-A) baseline cases - the TOTAL count of tool_call_history entries across the WHOLE request (all rounds combined), not a per-round breakdown.",
+      "source_file": "artifacts/v2/phase9_baseline_results.json",
+      "n": 12,
+      "min": 1,
+      "median": 3.5,
+      "max": 12,
+      "raw_values_by_case": {
+        "F1-simple-pubmed-run1": 5, "F2-simple-clinicaltrials": 1, "F3-simple-chembl": 1,
+        "F4-multi-source": 6, "F5-research-loop-one-followup": 12, "F6-multi-iteration": 3,
+        "F7-no-result-abstention": 4, "F8-duplicate-heavy": 2, "F1-simple-pubmed-run2": 2,
+        "F1-simple-pubmed-run3": 4, "F1-simple-pubmed-run4": 2, "F1-simple-pubmed-run5": 4
+      },
+      "max_case": "F5-research-loop-one-followup (12 total tool calls across its multiple rounds)"
+    },
+    "per_round_breakdown": {
+      "exists_in_any_repo_artifact": false,
+      "statement": "NO repo-committed artifact (phase8_*.json or phase9_*.json) records the PER-ROUND length of the model-emitted raw_tool_calls[] array specifically - grep confirmed (`tool_calls_per_round`, `n_tool_calls`, `tools_called` patterns) against every artifacts/v2/phase8_*.json file returns no per-round breakdown; phase9_baseline_results.json's n_tool_calls is an aggregate-per-request figure only. This is stated explicitly per the governing directive's instruction to say so rather than guess."
+    },
+    "code_level_soft_ceiling_used_as_secondary_basis": {
+      "source": "artifacts/v2/phase9_boundedness_analysis.json's pre_optimization_consistency_audit_corrections.tool_vs_source_call_reconciliation key",
+      "declared_tools_count": 6,
+      "corrected_per_round_soft_ceiling_order_of_magnitude": "~20-30 valid tool_calls/round, derived from orchestration/candidate_b_native_tools.py's call_cerebras_native_tools max_completion_tokens=1024 default (no override), using the same order-of-magnitude token-cost-per-entry reasoning as the claim-count analysis.",
+      "note": "This is a SOFT, provider-token-budget-derived estimate, not observed real data - used only as an upper sanity bound to confirm the chosen MAX_TOOL_CALLS_PER_ROUND=12 is well below it (a genuine application-level tightening, not a restatement)."
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "artifact_name": "phase9_workload_manifest",
+  "status": "PRE-REGISTERED - written BEFORE any Phase-9 baseline measurement or optimization",
+  "purpose": "Freezes the exact workload definitions Phase 9 measures against, per the governing directive's Step 5.",
+  "exclusions": [
+    "No Phase-10 final held-out benchmark case (does not exist in this repository)",
+    "No case reused verbatim from Phase 7/8 DEV/Validation Run 1/Validation Run 2 or phase5_benchmark_manifest.json - fresh real-world compounds/conditions chosen throughout, matching this project's established hygiene even though Phase 9 measures system performance, not gold-label quality"
+  ],
+
+  "A_functional_performance": {
+    "purpose": "Representative successful end-to-end cases, one per required category, for the unoptimized baseline (Step 6) and stage-level profiling (Step 7).",
+    "cases": [
+      {
+        "case_id": "F1-simple-pubmed",
+        "category": "simple PubMed",
+        "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+        "expected_shape": "single-source (pubmed) real answer, likely sufficient_evidence at round 0"
+      },
+      {
+        "case_id": "F2-simple-clinicaltrials",
+        "category": "ClinicalTrials",
+        "query": "What does ClinicalTrials.gov show about trials of zanidatamab in HER2-positive biliary tract cancer?",
+        "expected_shape": "clinical_trials-dominant real answer"
+      },
+      {
+        "case_id": "F3-simple-chembl",
+        "category": "ChEMBL",
+        "query": "What does ChEMBL report about the molecular target of zanubrutinib?",
+        "expected_shape": "chembl-dominant real answer"
+      },
+      {
+        "case_id": "F4-multi-source",
+        "category": "multi-source",
+        "query": "What does the literature say about lorlatinib in ALK-positive NSCLC, what does ClinicalTrials.gov show about ongoing trials, and what does ChEMBL report about its mechanism?",
+        "expected_shape": "pubmed + clinical_trials + chembl in a single round, likely sufficient_evidence at round 0"
+      },
+      {
+        "case_id": "F5-research-loop-one-followup",
+        "category": "research-loop (one follow-up round)",
+        "query": "What does ChEMBL report about mirikizumab's mechanism of action, and what does the literature say about mirikizumab in ulcerative colitis?",
+        "expected_shape": "designed to bias the initial native-tool-call toward one source, leaving a real gap for exactly one live follow-up round (same query-design pattern validated live in Phase-8 local-closure LOCAL-01/03)"
+      },
+      {
+        "case_id": "F6-multi-iteration",
+        "category": "multi-iteration (2+ rounds)",
+        "query": "What does the literature say about aficamten in hypertrophic cardiomyopathy, what does ClinicalTrials.gov show about aficamten trials, and what does ChEMBL report about aficamten's mechanism?",
+        "expected_shape": "3-source request, plausibly requiring 2 follow-up rounds (same pattern validated live for niraparib in Phase-8's LOCAL-04, 2 real rounds)"
+      },
+      {
+        "case_id": "F7-no-result-abstention",
+        "category": "no-result / abstention",
+        "query": "What is known about the fictitious compound QRVX-40417-NOTREAL for a condition with no real biomedical evidence anywhere?",
+        "expected_shape": "zero real Evidence found, SAFE_ABSTENTION (same pattern validated live in Phase-8's LOCAL-08)"
+      },
+      {
+        "case_id": "F8-duplicate-heavy",
+        "category": "duplicate-heavy",
+        "query": "What does the literature say about tirzepatide in obesity management, and what does ClinicalTrials.gov show about tirzepatide obesity trials?",
+        "expected_shape": "a well-studied, heavily-published compound/condition pair likely to produce many overlapping/duplicate records across an initial call and any follow-up round (same pattern observed live and unprompted in Phase-8's LOCAL-02, 364 real duplicates)"
+      }
+    ],
+    "repetition_plan": {
+      "each_case_run_count": 1,
+      "additional_repeated_case": {
+        "case_id": "F1-simple-pubmed",
+        "additional_runs": 4,
+        "total_runs_this_case": 5,
+        "rationale": "one representative case repeated 5x total to obtain a genuine same-workload latency distribution (mean/median/min/max/std dev) - still far below n=30, explicitly NOT eligible for a P95/P99 claim, reported as raw per-run values per the measurement contract's own rule"
+      }
+    },
+    "total_planned_live_runs": 12
+  },
+
+  "B_concurrency": {
+    "purpose": "Independent queries that can safely run simultaneously - pre-registered here, EXECUTED in Step 19 (concurrency scaling experiment), not in Steps 6-7.",
+    "cases": [
+      {"case_id": "C1", "query": "What does the literature say about resmetirom in metabolic dysfunction-associated steatohepatitis?"},
+      {"case_id": "C2", "query": "What does ClinicalTrials.gov show about trials of sotatercept in pulmonary arterial hypertension?"},
+      {"case_id": "C3", "query": "What does ChEMBL report about the molecular target of danicopan?"},
+      {"case_id": "C4", "query": "What does the literature say about donanemab in early Alzheimer's disease, and what does ClinicalTrials.gov show about ongoing trials?"},
+      {"case_id": "C5", "query": "What does the literature say about bimekizumab in psoriatic arthritis?"},
+      {"case_id": "C6", "query": "What does ClinicalTrials.gov show about trials of elranatamab in relapsed multiple myeloma?"},
+      {"case_id": "C7", "query": "What does ChEMBL report about the mechanism of action of daridorexant?"},
+      {"case_id": "C8", "query": "What does the literature say about lecanemab safety outcomes in early Alzheimer's disease?"}
+    ],
+    "independence_rationale": "each targets a distinct real compound/condition pair, no shared state dependency between cases (per-case fresh MedAgent() instance per docs/v2/PHASE9_INITIAL_AUDIT.md's confirmed evaluation-harness pattern), safe to run concurrently by construction"
+  },
+
+  "C_fault_matrix": {
+    "purpose": "Controlled timeout/429/5xx/malformed-response/source-failure/provider-failure cases - pre-registered here, EXECUTED in Step 8 (systematic reliability matrix), not in Steps 6-7.",
+    "note": "Full case list, injection method, and exact fault classes are specified in artifacts/v2/phase9_fault_matrix.json (written in Step 8), reusing the same safe network-boundary injection method validated in Phase 8's CTL-017 pass (never abusive real-world traffic against the real public APIs)."
+  },
+
+  "D_stress_boundedness": {
+    "purpose": "Cases exercising repeated action, duplicate-only retrieval, retry amplification, research-budget exhaustion, and maximum loop depth - pre-registered here, EXECUTED in Step 11 (worst-case call bounds) and Step 8 (reliability matrix), not in Steps 6-7.",
+    "planned_cases": [
+      {"case_id": "D1-repeated-action", "purpose": "force MAX_REPEATED_ACTION=1 to fire (an identical action signature attempted twice)"},
+      {"case_id": "D2-duplicate-only-retrieval", "purpose": "a follow-up round that rediscovers only already-seen records (evidence_duplicate_count increments, new_evidence_ids stays empty)"},
+      {"case_id": "D3-budget-exhaustion", "purpose": "force research_iteration to reach MAX_RESEARCH_ITERATIONS=3 with a gap still unresolved (BUDGET_EXHAUSTED)"},
+      {"case_id": "D4-max-loop-depth", "purpose": "confirm the LangGraph recursion_limit (30 for the research-loop graph) is never approached under the loop's own 3-iteration/8-tool-call bounds"}
+    ]
+  },
+
+  "environment_at_freeze_time": {
+    "cpu": "Apple M3",
+    "logical_cores": 8,
+    "ram_gb": 16,
+    "os": "macOS 15.7.4 (Darwin 24.6.0)",
+    "python_version": "3.12.7",
+    "power_state": "AC Power (confirmed via `pmset -g batt` immediately before this manifest was frozen)",
+    "live_network_status": "PubMed/ClinicalTrials.gov/ChEMBL all independently confirmed reachable this session (Phase-8 local-closure pass, re-confirmed implicitly by every successful live run since)"
+  }
+}

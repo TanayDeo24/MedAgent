@@ -758,3 +758,68 @@ before/after pair, unlike some of the other Phase-3 candidate data (see
   affected by PHASE8-DEFECT-002 - the original (uncommitted) validation
   harness script is not present in this repository, so this cannot be
   confirmed either way and is disclosed as an open question, not asserted.
+
+## Phase 9: Reliability/Concurrency/Performance (this session)
+
+- **Resume-safe:** `GAP_ANALYSIS_BATCH_SIZE=2` is production-locked, backed
+  by a contemporaneous, pre-registered, AC-powered live A/B benchmark (23
+  live judge calls, exact planned-vs-actual match, 0 failures/retries) -
+  SMALL/MEDIUM/LARGE fixtures each showed a genuine 34-50% wall-clock
+  reduction with zero semantic/safety regression (0 missing/duplicate/
+  wrong-association claims, 0 evidence contamination, 0 false support,
+  identical support labels to the batch_size=1 control on every claim).
+- **Resume-safe:** `GAP_ANALYSIS_MAX_CONCURRENCY=1` (unchanged default) is
+  backed by an equally rigorous live experiment (45 live judge calls) that
+  found NO meaningful benefit from concurrency=2/4 - a genuine negative
+  result, not an untested assumption. Do not re-benchmark concurrency
+  without new evidence the underlying Cerebras rate-limit configuration
+  has changed.
+- **Resume-safe:** `CLAIM_EVALUATION_BUDGET=32` and
+  `MAX_TOOL_CALLS_PER_ROUND=12`/`MAX_TOOL_CALLS_PER_REQUEST=24` are
+  intentional, documented, request-global application-level budgets
+  (PHASE9-DEFECT-001/002 fixes), derived from real Phase-8/9 corpus
+  distributions, extensively deterministically tested, and confirmed
+  respected under real live traffic in the final validation pass (usage
+  never approached the ceiling in any of 5 fresh live cases).
+- **Resume-safe:** the pair-batching implementation's correctness (strict
+  claim_id-tagged ID validation, whole-batch failure semantics via the new
+  `CLAIM_EVALUATION_FAILED` gap type, per-claim not per-batch budget
+  accounting, zero cross-claim contamination) is backed by 29 dedicated
+  deterministic tests (`tests/test_phase9_pair_batching.py`) plus the live
+  benchmark's own zero-contamination finding on real provider responses.
+- **Resume-safe:** PHASE8-DEFECT-001's claim-caveat mechanism
+  (`finalize_research_answer_node`) was reconfirmed firing correctly under
+  live, real, end-to-end traffic with the NEW Phase-9 configuration
+  (final validation case VAL9-4) - the fix remains robust across a
+  configuration change, not just at the moment it was originally applied.
+- **Resume-safe:** `grounded_generation`'s hard Evidence-ID gate (a
+  pre-existing Phase-6/7 mechanism, not modified by Phase 9) was observed
+  live, twice, correctly rejecting a malformed/fabricated Evidence-ID
+  citation and triggering safe abstention rather than accepting it - fresh
+  live confirmation the safety net holds, though the underlying generation
+  behavior that occasionally produces such a mismatched ID is itself a
+  Phase-6/7 concern, out of Phase-9's scope, and not something this phase
+  fixed or was asked to fix.
+- **Not resume-safe:** citing the live benchmark deltas (concurrency or
+  pair-batching) as statistically robust percentile claims - both
+  experiments used n=1 per (fixture, condition) cell, explicitly below the
+  project's own n>=30 contract requirement for any P95/P99 claim. The raw,
+  disclosed per-fixture values are the only defensible citation.
+- **Not resume-safe:** claiming CTL-016 (a live 3-round multi-iteration
+  case) or CTL-019 (a larger-n live re-measurement of Phase-8's own
+  DEV/Validation metrics) were closed by this phase - both remain exactly
+  as they stood after the Phase-8 local-closure pass; Phase 9's live
+  traffic served different, narrower purposes (judge-call benchmarking,
+  final configuration validation) that do not satisfy either item's
+  specific criterion.
+- **Not resume-safe:** claiming PHASE9-PROCESS-DEV-003 is a confirmed
+  incident - it is explicitly SUSPECTED, not confirmed (no provider-side
+  usage/billing confirmation was sought, and no new live call was made to
+  verify it, per instruction). Treat it as a documented risk that was
+  remediated (network guards added), not as proof traffic actually
+  escaped.
+- **Not resume-safe:** claiming the final validation run's two hard-gate
+  rejections (VAL9-1, VAL9-3) indicate a Phase-9 defect - they demonstrate
+  a pre-existing Phase-6/7 safety mechanism working correctly under live
+  conditions, not a new failure Phase 9 introduced or is responsible for
+  fixing.

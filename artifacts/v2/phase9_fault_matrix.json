@@ -1,0 +1,587 @@
+{
+  "artifact_name": "phase9_fault_matrix",
+  "purpose": "Phase 9 Step 8 systematic fault-injection matrix - the broader, system-wide fault matrix CTL-017's ledger text assigns to Phase 9 (Phase 8's own CTL-017 pass was narrow: 3 individually-injected fault classes on the research loop only).",
+  "method": "Every scenario is exercised via unittest.mock.patch/monkeypatch at the transport boundary (requests.post, ChatNVIDIA.invoke, RetrySession.request, orchestration execution functions) or via direct unit-level construction of the deciding function (research.loop_control.decide_stop_reason, research.action_planning.plan_actions). No real network call against Cerebras/NVIDIA/PubMed/ClinicalTrials/ChEMBL was made anywhere in this artifact.",
+  "generated_from": "tests/test_phase9_fault_matrix.py (37 tests, all PASS at generation time)",
+  "environment": {
+    "hardware": "single developer laptop (darwin)",
+    "power_state": "AC",
+    "network": "no live network calls - all fault injection is stub/mock-based"
+  },
+  "scenario_count": 38,
+  "pass_count": 38,
+  "fail_count": 0,
+  "defects_found": [],
+  "sections": {
+    "A_cerebras_tool_selection": {
+      "component": "orchestration/candidate_b_native_tools.py::call_cerebras_native_tools",
+      "design": "deliberately zero-retry, single 60s requests timeout, all failures returned in .error (never raised)",
+      "scenarios": [
+        {
+          "id": "A1",
+          "injected_condition": "requests.Timeout",
+          "expected_behavior": "no raise, .error populated, 1 HTTP attempt",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a (mocked, no real wait)",
+          "final_stop_state": "CerebrasNativeToolsResult.error set, raw_tool_calls=[]",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_timeout_returns_error_not_raise"
+        },
+        {
+          "id": "A2",
+          "injected_condition": "requests.ConnectionError",
+          "expected_behavior": "no raise, .error populated, 1 HTTP attempt",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "CerebrasNativeToolsResult.error set",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_connection_error_returns_error_not_raise"
+        },
+        {
+          "id": "A3",
+          "injected_condition": "HTTP 429",
+          "expected_behavior": "1 attempt, no retry, error returned",
+          "actual_behavior": "matched (exactly 1 requests.post call)",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "error='HTTP 429: ...'",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_http_error_status_single_attempt_no_retry[429]"
+        },
+        {
+          "id": "A4",
+          "injected_condition": "HTTP 500",
+          "expected_behavior": "1 attempt, no retry, error returned",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "error='HTTP 500: ...'",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_http_error_status_single_attempt_no_retry[500]"
+        },
+        {
+          "id": "A5",
+          "injected_condition": "HTTP 502",
+          "expected_behavior": "1 attempt, no retry, error returned",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "error='HTTP 502: ...'",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_http_error_status_single_attempt_no_retry[502]"
+        },
+        {
+          "id": "A6",
+          "injected_condition": "HTTP 503",
+          "expected_behavior": "1 attempt, no retry, error returned",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "error='HTTP 503: ...'",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_http_error_status_single_attempt_no_retry[503]"
+        },
+        {
+          "id": "A7",
+          "injected_condition": "malformed JSON response body",
+          "expected_behavior": "caught, error returned, no crash",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "error='Malformed Cerebras response envelope: ...'",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_malformed_json_envelope_returns_error"
+        },
+        {
+          "id": "A8",
+          "injected_condition": "well-formed JSON, missing 'choices' key",
+          "expected_behavior": "caught, error returned, no crash",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "elapsed_time": "n/a",
+          "final_stop_state": "error set",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_missing_choices_key_returns_error"
+        },
+        {
+          "id": "A9",
+          "injected_condition": "unrecognized tool_call function name",
+          "expected_behavior": "registry_valid=False, failure_category=unregistered_tool, never executed",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 0,
+          "elapsed_time": "n/a",
+          "final_stop_state": "ParsedToolCallOutcome.registry_valid=False",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_schema_invalid_tool_call_args_never_reaches_execution (part 1)"
+        },
+        {
+          "id": "A10",
+          "injected_condition": "tool_call arguments not valid JSON",
+          "expected_behavior": "registry_valid=False, failure_category=arguments_json_invalid",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 0,
+          "elapsed_time": "n/a",
+          "final_stop_state": "registry_valid=False",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_schema_invalid_tool_call_args_never_reaches_execution (part 2)"
+        },
+        {
+          "id": "A11",
+          "injected_condition": "tool_call arguments valid JSON but schema-invalid (wrong field)",
+          "expected_behavior": "registry_valid=False, failure_category=schema_invalid",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 0,
+          "elapsed_time": "n/a",
+          "final_stop_state": "registry_valid=False",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_schema_invalid_tool_call_args_never_reaches_execution (part 3)"
+        }
+      ]
+    },
+    "B_three_llm_clients_separately": {
+      "B1_nvidia_chatnvidia": {
+        "component": "config/llm_config.py::_RateLimitedChatNVIDIA",
+        "policy": "LLM_CALL_MAX_ATTEMPTS=3, fresh ChatNVIDIA client per retry, 429/503-substring-classified retryable, LLM_CALL_TIMEOUT_SECONDS=90 hard daemon-thread timeout enforced independently of ChatNVIDIA's own constructor timeout",
+        "scenarios": [
+          {
+            "id": "B1-1",
+            "injected_condition": "retryable 503-shaped exception on attempt 1, success on attempt 2",
+            "expected_behavior": "retried with fresh client, succeeds",
+            "actual_behavior": "matched",
+            "retries_attempted": 1,
+            "calls_attempted": 2,
+            "final_stop_state": "returns result",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_retryable_503_retried_with_fresh_client_then_succeeds"
+          },
+          {
+            "id": "B1-2",
+            "injected_condition": "retryable error on every attempt",
+            "expected_behavior": "raises after exactly LLM_CALL_MAX_ATTEMPTS=3 attempts, never infinite",
+            "actual_behavior": "matched",
+            "retries_attempted": 2,
+            "calls_attempted": 3,
+            "final_stop_state": "raises original exception",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_retryable_error_exhausts_all_attempts_then_raises"
+          },
+          {
+            "id": "B1-3",
+            "injected_condition": "non-retryable 401",
+            "expected_behavior": "raised immediately, no retry",
+            "actual_behavior": "matched (invoke.call_count==1)",
+            "retries_attempted": 0,
+            "calls_attempted": 1,
+            "final_stop_state": "raises immediately",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_non_retryable_error_raised_immediately_no_retry"
+          },
+          {
+            "id": "B1-4",
+            "injected_condition": "underlying invoke() never returns (simulated stuck connection)",
+            "expected_behavior": "bounded by hard per-attempt timeout, LLMCallTimeoutError after exhausting attempts, main thread never blocks past attempts*timeout",
+            "actual_behavior": "matched, elapsed < 5s for call_timeout=0.2s*3 attempts",
+            "retries_attempted": 2,
+            "calls_attempted": 3,
+            "final_stop_state": "raises LLMCallTimeoutError",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_hard_timeout_bounds_a_call_that_never_returns"
+          }
+        ]
+      },
+      "B2_cerebras_tool_selection": {
+        "note": "Fully covered in section A above; restated here per Step 8's explicit per-implementation reporting instruction: 0 retries, ever, by design (structural proof: exactly one requests.post call site in call_cerebras_native_tools's source).",
+        "scenarios": [
+          {
+            "id": "B2-1",
+            "injected_condition": "source-level structural check",
+            "expected_behavior": "exactly 1 requests.post call site (no retry loop)",
+            "actual_behavior": "matched",
+            "verdict": "PASS",
+            "test": "test_zero_retry_confirmed_by_source_reading"
+          }
+        ]
+      },
+      "B3_nvidia_judge": {
+        "component": "grounding_eval/judge.py::_invoke_judge (via judge_claim_semantic)",
+        "policy": "bounded retry=2 (for _attempt in range(2)), 60s requests timeout per attempt, raises GroundingJudgeProviderError only after both attempts fail",
+        "scenarios": [
+          {
+            "id": "B3-1",
+            "injected_condition": "HTTP 503 on both attempts",
+            "expected_behavior": "exactly 2 attempts then raise GroundingJudgeProviderError",
+            "actual_behavior": "matched (call_count==2)",
+            "retries_attempted": 1,
+            "calls_attempted": 2,
+            "final_stop_state": "raises GroundingJudgeProviderError",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_retry_exhaustion_raises_provider_error_after_exactly_2_attempts"
+          },
+          {
+            "id": "B3-2",
+            "injected_condition": "HTTP 503 on attempt 1, success on attempt 2",
+            "expected_behavior": "recovers, returns SUPPORTED judgment",
+            "actual_behavior": "matched",
+            "retries_attempted": 1,
+            "calls_attempted": 2,
+            "final_stop_state": "returns ClaimGroundingJudgment",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_succeeds_on_second_attempt_after_first_failure"
+          },
+          {
+            "id": "B3-3",
+            "injected_condition": "response content is not valid JSON, both attempts",
+            "expected_behavior": "raises GroundingJudgeProviderError after retry, no crash",
+            "actual_behavior": "matched",
+            "retries_attempted": 1,
+            "calls_attempted": 2,
+            "final_stop_state": "raises GroundingJudgeProviderError",
+            "fabricated_ids": false,
+            "invalid_ids": false,
+            "uncaught_exception": false,
+            "verdict": "PASS",
+            "test": "test_malformed_json_content_retried_then_fails"
+          }
+        ]
+      }
+    },
+    "C_per_source_tool_faults": {
+      "component": "tools/base_tool.py + utils/retry_handler.py::RetrySession, exercised through each real tool's .session",
+      "scenarios": [
+        {
+          "id": "C1",
+          "source": "PubMed",
+          "injected_condition": "503 on every attempt",
+          "expected_behavior": "RetrySession MAX_RETRIES=3 -> 4 total attempts, then raises HTTPError",
+          "actual_behavior": "matched (4 calls)",
+          "retries_attempted": 3,
+          "calls_attempted": 4,
+          "final_stop_state": "raises requests.HTTPError, caught by BaseTool.execute -> ToolResult(success=False)",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_pubmed_single_source_503_retries_then_exhausts"
+        },
+        {
+          "id": "C2",
+          "source": "ClinicalTrials",
+          "injected_condition": "429 then 200",
+          "expected_behavior": "recovers on 2nd attempt",
+          "actual_behavior": "matched",
+          "retries_attempted": 1,
+          "calls_attempted": 2,
+          "final_stop_state": "returns 200 response",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_clinical_trials_429_then_success_recovers"
+        },
+        {
+          "id": "C3",
+          "source": "ChEMBL",
+          "injected_condition": "404 (non-retryable)",
+          "expected_behavior": "fails fast, 1 attempt only",
+          "actual_behavior": "matched",
+          "retries_attempted": 0,
+          "calls_attempted": 1,
+          "final_stop_state": "raises HTTPError immediately",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_chembl_non_retryable_404_fails_fast_no_retry"
+        },
+        {
+          "id": "C4",
+          "source": "all three (one-fails-others-succeed)",
+          "injected_condition": "PubMed retry-exhausted failure, ClinicalTrials+ChEMBL succeed",
+          "expected_behavior": "each ToolResult independent, one source's failure never taints another's",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_one_source_fails_others_succeed_via_registry"
+        },
+        {
+          "id": "C5",
+          "source": "PubMed",
+          "injected_condition": "empty (well-formed, zero-hit) result",
+          "expected_behavior": "success=True, data=[], never conflated with an error",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_empty_result_is_success_not_error"
+        },
+        {
+          "id": "C6",
+          "source": "ChEMBL",
+          "injected_condition": "malformed payload raising ValueError inside session.get",
+          "expected_behavior": "caught by BaseTool._execute_with_monitoring's try/except, returned as ToolResult(success=False), never an uncaught exception",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_malformed_payload_caught_as_error_not_uncaught_exception"
+        }
+      ]
+    },
+    "D_research_loop_six_injection_points": {
+      "component": "research/loop_control.py::decide_stop_reason + agent/graph.py::build_research_loop_graph (full graph.invoke)",
+      "invariants_checked_every_case": [
+        "no infinite loop",
+        "bounded retry",
+        "explicit stop/failure state",
+        "no fabricated Evidence IDs",
+        "no invalid Evidence IDs",
+        "no false sufficient_evidence"
+      ],
+      "scenarios": [
+        {
+          "id": "D1",
+          "point": "before first Evidence",
+          "injected_condition": "every source call fails from the very first tool_orchestration round",
+          "expected_behavior": "reaches safe_abstention/tool_failure_limit/budget_exhausted, never sufficient_evidence, research_iteration<=MAX_RESEARCH_ITERATIONS=3",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_d1_before_first_evidence_all_sources_fail"
+        },
+        {
+          "id": "D2",
+          "point": "after partial Evidence",
+          "injected_condition": "first tool call succeeds (1 real Evidence record), every subsequent follow-up call fails",
+          "expected_behavior": "the already-obtained partial Evidence is retained (never discarded because a LATER call failed); reaches a terminal stop reason",
+          "actual_behavior": "matched (len(evidence)==1 preserved across failed follow-ups)",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_d2_after_partial_evidence_followup_source_then_fails"
+        },
+        {
+          "id": "D3",
+          "point": "mid-follow-up",
+          "injected_condition": "execute_validated_call raises RuntimeError mid-follow-up (unhandled-by-design at that boundary, simulating a provider client crash)",
+          "expected_behavior": "does not propagate as an uncaught exception out of graph.invoke(); reaches a terminal state or records an error",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_d3_mid_followup_provider_error_does_not_corrupt_state"
+        },
+        {
+          "id": "D4",
+          "point": "final allowed iteration",
+          "injected_condition": "gaps still open at iteration==MAX_RESEARCH_ITERATIONS",
+          "expected_behavior": "StopReason.BUDGET_EXHAUSTED, never a 4th iteration",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_d4_final_allowed_iteration_still_has_gaps / decide_stop_reason unit"
+        },
+        {
+          "id": "D5",
+          "point": "duplicate-only retrieval",
+          "injected_condition": "no plannable action remains for the only outstanding gap (already attempted)",
+          "expected_behavior": "StopReason.NO_PRODUCTIVE_ACTION, never counted as progress",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_d5_duplicate_only_retrieval_never_counted_as_progress"
+        },
+        {
+          "id": "D6",
+          "point": "zero-progress research",
+          "injected_condition": "gaps remain, planned_actions==[]",
+          "expected_behavior": "StopReason.NO_PRODUCTIVE_ACTION, never spins",
+          "actual_behavior": "matched",
+          "fabricated_ids": false,
+          "invalid_ids": false,
+          "uncaught_exception": false,
+          "verdict": "PASS",
+          "test": "test_d6_zero_progress_research_terminates_via_no_productive_action"
+        }
+      ]
+    },
+    "E_state_graph_edge_cases": {
+      "scenarios": [
+        {
+          "id": "E1",
+          "injected_condition": "malformed research action / invalid EvidenceGap.gap_type",
+          "expected_behavior": "pydantic raises at construction, never a silently-malformed downstream action",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_malformed_research_action_missing_field_does_not_crash_planning"
+        },
+        {
+          "id": "E2",
+          "injected_condition": "optional research-loop state keys (research_iteration, research_tool_calls_used, research_consecutive_failure_rounds) missing from state",
+          "expected_behavior": "decide_stop_reason's callers .get(...,0)-default safely, no KeyError",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_missing_optional_state_keys_default_safely"
+        },
+        {
+          "id": "E3",
+          "injected_condition": "invalid Evidence construction (malformed evidence_id, empty source_record_id, invalid URL)",
+          "expected_behavior": "pydantic model_validator rejects at construction",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_invalid_evidence_input_rejected_at_construction"
+        },
+        {
+          "id": "E4",
+          "injected_condition": "recursion-ceiling formula check",
+          "expected_behavior": "(MAX_RESEARCH_ITERATIONS*5)+15 == 30, matches agent/graph.py's documented formula",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_recursion_ceiling_computed_as_documented_formula"
+        },
+        {
+          "id": "E5",
+          "injected_condition": "tool_calls_used==MAX_TOOL_CALLS_TOTAL with gaps still open",
+          "expected_behavior": "StopReason.BUDGET_EXHAUSTED",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_budget_exhaustion_stop_reason_precedence"
+        },
+        {
+          "id": "E6",
+          "injected_condition": "an already-attempted action signature (MAX_REPEATED_ACTION=1 exceeded)",
+          "expected_behavior": "plan_actions returns [] for that gap, never replans it",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_repeated_action_ceiling_prevents_infinite_replanning"
+        },
+        {
+          "id": "E7",
+          "injected_condition": "consecutive_failure_rounds==MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS with gaps still open and an action still plannable",
+          "expected_behavior": "StopReason.TOOL_FAILURE_LIMIT takes precedence over BUDGET_EXHAUSTED per decide_stop_reason's fixed precedence order",
+          "actual_behavior": "matched",
+          "verdict": "PASS",
+          "test": "test_consecutive_tool_failure_limit_stops_before_budget_exhausted"
+        }
+      ]
+    }
+  },
+  "cerebras_503_reconciliation": {
+    "claim_under_investigation": "A real Cerebras 503 was observed ONCE during the Phase-9 Step 6/7 baseline run and reportedly 'absorbed transparently' with no user-visible failure - does this contradict candidate_b_native_tools.py's documented 'zero retry' design?",
+    "evidence_examined": [
+      "artifacts/v2/phase9_baseline_results.json - the 12 baseline case error fields contain NO Cerebras-shaped error string (candidate_b_native_tools.py's own error format is exactly f'HTTP {status}: {text}'); none of the 12 cases' errors match that shape at status 503.",
+      "logs/medagent.log lines 3423-3819+ (session 2026-09-25T00:41:43Z-00:46:17Z) show every 503 occurrence in that session logged by logger='config.llm_config' with message text '[LLM DISPATCH RESULT] ... error=Exception: [###] {\\'message\\': \\'Service temporarily overloaded\\', \\'type\\': \\'Service Unavailable\\', \\'code\\': 503}' followed by '[LLM RETRY] Call failed with a retryable provider error (attempt N/3): ... discarding client and retrying with a fresh connection'.",
+      "The '[###] {...}' message shape is langchain_nvidia_ai_endpoints' own internal error-string format (documented in config/llm_config.py's _RETRYABLE_ERROR_MARKERS comment: '_common.py's _try_raise ... e.g. \"[###] {...code: 503...}\"'), NOT orchestration/candidate_b_native_tools.py's format.",
+      "No log line in the entire session log matches candidate_b_native_tools.py's own error string format with a 503 status anywhere."
+    ],
+    "conclusion": {
+      "exact_call_that_got_the_503": "An NVIDIA NIM ChatNVIDIA.invoke() call (query-analysis/synthesis/report/judge - whichever node's get_llm() call was in flight at 2026-09-25T00:41:43Z), NOT a call_cerebras_native_tools() tool-selection call.",
+      "exact_function_class_handling_it": "config/llm_config.py::_RateLimitedChatNVIDIA.invoke() - its _is_retryable_llm_error() substring match on '503'/'Service Unavailable' classified it retryable, then it discarded the client, constructed a fresh ChatNVIDIA, slept a calculated backoff, and retried (up to LLM_CALL_MAX_ATTEMPTS=3 total attempts).",
+      "tool_selection_or_other_path": "Other path - this is implementation #1 (NVIDIA NIM client), not implementation #2 (Cerebras tool-selection, candidate_b_native_tools.py).",
+      "http_transport_retried": false,
+      "application_code_retried": true,
+      "langgraph_node_level_fallback_absorbed_it": false,
+      "mechanism": "config.llm_config._RateLimitedChatNVIDIA's own bounded retry-with-fresh-client logic (LLM_CALL_MAX_ATTEMPTS=3), not a LangGraph-level or node-level fallback.",
+      "is_zero_retry_still_accurate": true,
+      "verdict_text": "'Zero retry' remains an ACCURATE characterization of call_cerebras_native_tools() specifically. The one real 503 'absorbed transparently' during the Phase-9 baseline run was on a DIFFERENT provider-call implementation (NVIDIA NIM via ChatNVIDIA, implementation #1), which was always designed to retry 429/503-classified errors (see PHASE9_INITIAL_AUDIT.md Section 3, item 1) - this was that mechanism working exactly as documented, not a contradiction of the Cerebras tool-selection path's deliberate zero-retry design (implementation #2). The initial framing in the governing directive's context note ('A real Cerebras 503 was observed') is a mischaracterization of provider attribution, corrected here by direct log evidence; the underlying reliability behavior (a transient 503 being absorbed without a user-visible failure) is real and correctly attributed to implementation #1's retry policy, not implementation #2's absence of one."
+    }
+  },
+  "scenario_count_note": "PRE-OPTIMIZATION CONSISTENCY AUDIT correction: this artifact documents 38 distinct FAULT CONDITION rows across sections A-E (11+8+6+6+7), but pytest collects exactly 37 TEST FUNCTIONS from tests/test_phase9_fault_matrix.py (36 fault-scenario functions + 1 dedicated TestCerebras503Reconciliation test) - the discrepancy is that section A's test_schema_invalid_tool_call_args_never_reaches_execution is ONE test function asserting THREE distinct conditions (A9 unregistered_tool, A10 arguments_json_invalid, A11 schema_invalid), so A contributes 11 documented conditions via only 9 test functions. The original top-level scenario_count value of 37 below was itself inconsistent (it silently equalled the test-function count, not the row-sum of its own 5 section arrays, which is 38) - both numbers are now stated explicitly and separately, and neither is hidden.",
+  "scenario_count_definition": "count of distinct documented fault CONDITIONS (JSON scenario rows) across sections A-E, NOT pytest test functions",
+  "test_function_count": 37,
+  "test_function_count_definition": "exact count of pytest test functions collected from tests/test_phase9_fault_matrix.py (confirmed via `pytest --collect-only -q`), including the 1 dedicated Cerebras503Reconciliation test",
+  "test_function_count_by_section": {
+    "A_cerebras_tool_selection": 9,
+    "B1_nvidia_chatnvidia": 4,
+    "B2_cerebras_tool_selection": 1,
+    "B3_nvidia_judge": 3,
+    "C_per_source_tool_faults": 6,
+    "D_research_loop_six_injection_points": 6,
+    "E_state_graph_edge_cases": 7,
+    "reconciliation_test": 1
+  },
+  "scenario_count_by_section": {
+    "A_cerebras_tool_selection": 11,
+    "B1_nvidia_chatnvidia": 4,
+    "B2_cerebras_tool_selection": 1,
+    "B3_nvidia_judge": 3,
+    "C_per_source_tool_faults": 6,
+    "D_research_loop_six_injection_points": 6,
+    "E_state_graph_edge_cases": 7
+  }
+}

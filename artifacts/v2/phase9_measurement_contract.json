@@ -1,0 +1,84 @@
+{
+  "artifact_name": "phase9_measurement_contract",
+  "purpose": "Every metric defined BEFORE any Phase-9 baseline measurement or optimization, per docs/v2/PHASE9_RELIABILITY_PERFORMANCE_CONTRACT.md.",
+  "statistical_rules": {
+    "n_required_for_p95_p99": 30,
+    "below_n30_report": "raw per-run distribution instead of a percentile claim",
+    "n_below_5_label": "illustrative only",
+    "required_disclosure_per_metric": ["hardware", "concurrency_setting", "power_state_ac_or_battery", "live_network_status", "n"],
+    "battery_vs_ac_comparison": "forbidden - battery-collected numbers are context only, never a baseline for an optimization delta",
+    "raw_timings_preserved": true,
+    "production_representative_requires": "n>=30 AND explicit single-developer-laptop disclosure"
+  },
+  "latency_metrics": [
+    "end_to_end_ms", "query_understanding_ms", "tool_orchestration_ms",
+    "provider_inference_ms_per_call", "rate_limit_wait_ms_per_call",
+    "source_call_latency_ms_pubmed", "source_call_latency_ms_clinical_trials",
+    "source_call_latency_ms_chembl", "retrieval_ms", "evidence_normalization_ms",
+    "generation_ms", "grounding_evaluation_ms", "research_loop_iteration_ms",
+    "report_generation_ms", "local_python_processing_ms_derived"
+  ],
+  "throughput_metrics": [
+    "completed_queries_per_minute", "concurrent_request_throughput",
+    "provider_call_throughput", "tool_call_throughput"
+  ],
+  "concurrency_metrics": [
+    "successful_concurrent_executions", "state_isolation_bool",
+    "race_conditions_observed_count", "shared_client_safety_bool",
+    "duplicate_execution_count"
+  ],
+  "reliability_metrics": [
+    "recovery_rate", "silent_failure_rate", "partial_answer_quality",
+    "retry_amplification", "latency_penalty", "timeout_handling_correctness",
+    "429_handling_correctness", "5xx_handling_correctness",
+    "connection_error_handling_correctness", "malformed_response_handling_correctness",
+    "retry_exhaustion_behavior", "uncaught_exception_rate",
+    "fabricated_evidence_ids", "invalid_evidence_ids"
+  ],
+  "efficiency_metrics": [
+    "llm_calls_per_query", "tool_calls_per_query", "retrieval_calls_per_query",
+    "tokens_per_query", "rate_limit_wait_per_query", "retries_per_query_by_cause",
+    "redundant_calls", "duplicate_evidence_work", "wasted_research_iterations"
+  ],
+  "quality_guardrail_metrics": [
+    "claim_support_precision", "completeness", "citation_precision",
+    "citation_coverage", "fully_grounded_answer_rate",
+    "fabricated_invalid_evidence_ids", "abstention_correctness",
+    "research_loop_correctness", "provenance_integrity"
+  ],
+  "flagged_findings_measurement_plan": {
+    "cerebras_zero_retry": "measure actual failure rate under real conditions + safe network-boundary fault injection before any retry-policy decision",
+    "basetool_cache_race": "measure under actual tested concurrency levels for observable duplicate work or race-attributable failure before any locking change",
+    "no_unified_timeout_budget": "derive mathematically from already-declared constants before any timeout-policy change"
+  },
+  "environment_disclosure_template": {
+    "cpu": "Apple M3",
+    "logical_cores": 8,
+    "ram_gb": 16,
+    "os": "macOS 15.7.4 (Darwin 24.6.0)",
+    "python_version": "3.12.7",
+    "power_state": "MUST be recorded per-run (AC vs battery)",
+    "provider_rate_limits": {
+      "nvidia_nim_rpm": 35,
+      "cerebras_candidate_b_rpm": 5,
+      "pubmed_rps": 3,
+      "clinical_trials_rps": 10,
+      "chembl_rps": 10
+    },
+    "retry_config": {
+      "tool_http_max_retries": 3,
+      "tool_http_backoff_base_s": 2,
+      "tool_http_backoff_max_s": 60,
+      "tool_http_api_timeout_s": 30,
+      "llm_call_timeout_s": 90,
+      "llm_call_max_attempts": 3,
+      "cerebras_tool_selection_timeout_s": 60,
+      "cerebras_tool_selection_max_attempts": 1,
+      "nvidia_judge_timeout_s": 90,
+      "nvidia_judge_max_attempts": 2
+    },
+    "cache_enabled": true,
+    "cache_ttl_s": 3600,
+    "live_network_status": "MUST be recorded per baseline run"
+  }
+}

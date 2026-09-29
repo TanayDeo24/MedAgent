@@ -1,0 +1,512 @@
+{
+  "artifact_name": "phase9_boundedness_analysis",
+  "purpose": "Phase 9 Step 11 - formal worst-case boundedness derivation for the research-loop product path (MedAgent(research_loop=True)), built from real constants read directly from source, not estimated.",
+  "constants_used": {
+    "MAX_RESEARCH_ITERATIONS": {
+      "value": 3,
+      "source": "research/loop_control.py"
+    },
+    "MAX_TOOL_CALLS_TOTAL": {
+      "value": 8,
+      "source": "research/loop_control.py",
+      "note": "counts research_execution_node INVOCATIONS (1 per follow-up iteration), not raw tool calls executed - looser/redundant vs MAX_RESEARCH_ITERATIONS=3, which binds first in practice (3 iterations reached long before 8 invocations could occur, since at most 1 invocation happens per iteration)."
+    },
+    "MAX_REPEATED_ACTION": {
+      "value": 1,
+      "source": "research/loop_control.py"
+    },
+    "MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS": {
+      "value": 2,
+      "source": "research/loop_control.py"
+    },
+    "MAX_ACTIONS_PER_ITERATION": {
+      "value": 1,
+      "source": "research/action_planning.py"
+    },
+    "DECLARED_TOOLS_COUNT": {
+      "value": 6,
+      "source": "orchestration/candidate_b_native_tools.py DECLARED_TOOLS tuple",
+      "note": "SOFT practical per-round tool-call ceiling, not a hard schema/code cap - nothing in tool_orchestration_node's processing of raw_tool_calls limits how many distinct tool_calls a single Cerebras response may return; 6 is the number of distinct declared functions, and duplicate calls to the same function with different arguments are not structurally prevented."
+    },
+    "LLM_CALL_TIMEOUT_SECONDS": {
+      "value": 90,
+      "source": "config/llm_config.py",
+      "applies_to": "NVIDIA ChatNVIDIA calls (synthesis_node, report_generation_node, verification_node[legacy only])"
+    },
+    "LLM_CALL_MAX_ATTEMPTS": {
+      "value": 3,
+      "source": "config/llm_config.py"
+    },
+    "NVIDIA_RATE_LIMIT_RPM": {
+      "value": 35,
+      "source": "config/llm_config.py"
+    },
+    "CEREBRAS_TOOL_SELECTION_TIMEOUT_S": {
+      "value": 60,
+      "source": "orchestration/candidate_b_native_tools.py call_cerebras_native_tools default timeout_seconds"
+    },
+    "CEREBRAS_TOOL_SELECTION_MAX_ATTEMPTS": {
+      "value": 1,
+      "source": "orchestration/candidate_b_native_tools.py - deliberately zero retry"
+    },
+    "CEREBRAS_TOOL_SELECTION_RATE_LIMIT_RPM": {
+      "value": 5,
+      "source": "orchestration/candidate_b_native_tools.py CEREBRAS_RATE_LIMIT_RPS=5/60"
+    },
+    "CEREBRAS_GENERATOR_TIMEOUT_S": {
+      "value": 60,
+      "source": "generation/generator.py _invoke_cerebras_claims default timeout_seconds"
+    },
+    "CEREBRAS_GENERATOR_MAX_ATTEMPTS": {
+      "value": 2,
+      "source": "generation/generator.py 'for _attempt in range(2)'"
+    },
+    "CEREBRAS_GENERATOR_MAX_COMPLETION_TOKENS": {
+      "value": 4096,
+      "source": "generation/generator.py _invoke_cerebras_claims default max_completion_tokens"
+    },
+    "CEREBRAS_JUDGE_TIMEOUT_S": {
+      "value": 60,
+      "source": "grounding_eval/judge.py _invoke_judge requests timeout"
+    },
+    "CEREBRAS_JUDGE_MAX_ATTEMPTS": {
+      "value": 2,
+      "source": "grounding_eval/judge.py 'for _attempt in range(2)'"
+    },
+    "CEREBRAS_NLU_EXTRACTOR_TIMEOUT_S": {
+      "value": 60,
+      "source": "nlu/extractor.py _invoke_cerebras_json default timeout_seconds"
+    },
+    "CEREBRAS_NLU_EXTRACTOR_MAX_ATTEMPTS": {
+      "value": 2,
+      "source": "nlu/extractor.py 'for attempt in range(2)'"
+    },
+    "CEREBRAS_FREE_TRIAL_RATE_LIMIT_RPM": {
+      "value": 5,
+      "source": "shared bucket key 'cerebras_free_trial' used by generator.py, judge.py, nlu/extractor.py"
+    },
+    "TOOL_API_TIMEOUT_S": {
+      "value": 30,
+      "source": "config/settings.py API_TIMEOUT"
+    },
+    "TOOL_MAX_RETRIES": {
+      "value": 3,
+      "source": "config/settings.py MAX_RETRIES (RetrySession -> 4 total attempts)"
+    },
+    "TOOL_RETRY_BACKOFF_BASE_S": {
+      "value": 2,
+      "source": "config/settings.py RETRY_BACKOFF_BASE"
+    },
+    "TOOL_RETRY_BACKOFF_MAX_S": {
+      "value": 60,
+      "source": "config/settings.py RETRY_BACKOFF_MAX"
+    },
+    "PUBMED_RPS": {
+      "value": 3,
+      "source": "config/settings.py PUBMED_RATE_LIMIT"
+    },
+    "CLINICAL_TRIALS_RPS": {
+      "value": 10,
+      "source": "config/settings.py CLINICAL_TRIALS_RATE_LIMIT"
+    },
+    "CHEMBL_RPS": {
+      "value": 10,
+      "source": "config/settings.py CHEMBL_RATE_LIMIT"
+    }
+  },
+  "call_graph_model": {
+    "R_total_orchestration_rounds": "1 (initial) + MAX_RESEARCH_ITERATIONS = 1 + 3 = 4 (query_analysis->tool_orchestration is the initial round; research_execution_node re-invokes tool_orchestration_node once per follow-up iteration, up to 3 times)",
+    "G_generation_gap_cycles": "Same as R = 4: grounded_generation_node/gap_analysis_node run once after the initial evidence_normalization, then once per follow-up iteration after evidence_merge_node (build_research_loop_graph's edges: research_execution->evidence_merge->grounded_generation, bypassing synthesis_node on follow-up rounds).",
+    "synthesis_node_calls": "Exactly 1 per request - only reachable via the initial tool_orchestration->synthesis edge; the follow-up loop never revisits synthesis_node.",
+    "report_generation_node_calls": "Exactly 1 per request - reached once, after finalize_research_answer_node, regardless of stop reason.",
+    "query_analysis_node_calls": "Exactly 1 per request - the graph's single entry point, never revisited."
+  },
+  "formulas": {
+    "1_max_llm_calls_per_request": {
+      "bounded_component": "1 (NLU query_analysis) + 4 (Cerebras tool-selection, 1 per orchestration round x R=4) + 1 (synthesis, NVIDIA) + 4 (grounded_generation, Cerebras, 1 per G=4 cycles) + 1 (report_generation, NVIDIA) = 11 logical LLM call SITES.",
+      "unbounded_component": "+ sum_{g=1..4} C_g, where C_g = number of FACTUAL claims with >=1 evidence_ids in cycle g's GroundedAnswer - each triggers exactly one judge_claim_semantic() call in analyze_gaps(). No code-level maximum exists on C_g (see claim_count_boundedness below).",
+      "formula": "LLM_calls_max = 11 + sum_{g=1}^{4} C_g",
+      "is_finite": "NO - unbounded as a function of model output length per generation call."
+    },
+    "2_max_biomedical_source_calls_per_request": {
+      "formula": "source_calls_max = R * DECLARED_TOOLS_COUNT = 4 * 6 = 24 (SOFT bound - see DECLARED_TOOLS_COUNT note; not a hard schema-enforced ceiling)",
+      "is_finite": "Practically yes (soft, model-behavior-dependent bound); not formally hard-capped in code."
+    },
+    "3_max_retry_amplified_source_calls": {
+      "formula": "source_calls_max * (TOOL_MAX_RETRIES + 1) = 24 * 4 = 96 total HTTP attempts across all biomedical source calls, worst case.",
+      "is_finite": "Yes, for a fixed source_calls_max (itself a soft bound per #2)."
+    },
+    "4_max_research_rounds": {
+      "formula": "R = 1 + MAX_RESEARCH_ITERATIONS = 1 + 3 = 4 total orchestration rounds (1 initial + <=3 follow-up iterations), hard-enforced by decide_stop_reason's BUDGET_EXHAUSTED check at iteration >= MAX_RESEARCH_ITERATIONS.",
+      "is_finite": "Yes, hard-enforced."
+    },
+    "5_max_gap_analysis_judge_calls": {
+      "formula": "judge_calls_max = sum_{g=1}^{4} C_g (each factual claim in each of the 4 generation cycles triggers exactly one judge_claim_semantic call, per research/gap_analysis.py's 'for claim in grounded_answer.claims:' loop with no cap).",
+      "is_finite": "NO - see claim_count_boundedness section. This is PHASE9-DEFECT-001."
+    },
+    "6_max_total_external_calls": {
+      "bounded_component_breakdown": {
+        "nlu_query_analysis": "1 logical call x <=2 attempts = 2",
+        "cerebras_tool_selection": "4 rounds x 1 attempt = 4",
+        "nvidia_synthesis": "1 logical call x <=3 attempts = 3",
+        "biomedical_source_http": "24 logical calls x <=4 attempts = 96",
+        "cerebras_grounded_generation": "4 cycles x <=2 attempts = 8",
+        "nvidia_report_generation": "1 logical call x <=3 attempts = 3"
+      },
+      "bounded_total": "2 + 4 + 3 + 96 + 8 + 3 = 116",
+      "unbounded_component": "+ sum_{g=1}^{4} C_g x <=2 attempts (Cerebras judge bounded retry) = up to 2 * sum(C_g)",
+      "formula": "external_calls_max = 116 + 2 * sum_{g=1}^{4} C_g",
+      "is_finite": "NO - dominated by the same unbounded claim-count term."
+    },
+    "7_max_timeout_driven_wall_clock_time": {
+      "bounded_component_breakdown_seconds": {
+        "nlu_query_analysis": "<=2 attempts x 60s = 120",
+        "cerebras_tool_selection": "4 rounds x 1 attempt x 60s = 240",
+        "nvidia_synthesis": "<=3 attempts x 90s + backoff(attempt0+attempt1, <=1s+2s worst case with jitter) ~= 270 + 3 = 273",
+        "biomedical_source_http": "24 calls x [<=4 attempts x 30s + backoff(3 gaps, each min(2^k,60)*jitter, k=0..2 -> <=1+2+4=7s worst case per call)] ~= 24 x (120 + 7) = 3048",
+        "cerebras_grounded_generation": "4 cycles x <=2 attempts x 60s = 480",
+        "nvidia_report_generation": "<=3 attempts x 90s + backoff ~= 273",
+        "rate_limit_serialization_nvidia_bucket": "<=6 NVIDIA-bucket-consuming attempts (synthesis<=3 + report<=3) x (60/35)s spacing ~= 10.3s",
+        "rate_limit_serialization_cerebras_bucket_bounded_part": "(NLU<=2 + tool-select 4 + grounded_gen<=8) = <=14 attempts x (60/5)s spacing ~= 168s"
+      },
+      "bounded_total_seconds": "~120 + 240 + 273 + 3048 + 480 + 273 + 10.3 + 168 ~= 4612 seconds (~77 minutes) worst-case if EVERY individual call independently maxed out every attempt/timeout/backoff simultaneously - a pathological, not typical, case; real observed Phase-9 baseline cases ranged 58s-603s (see artifacts/v2/phase9_baseline_results.json).",
+      "unbounded_component": "+ sum_{g=1}^{4} C_g x (<=2 attempts x 60s judge timeout + Cerebras-bucket rate-limit spacing ~12s/attempt) ~= sum(C_g) x ~144s per claim, worst case",
+      "formula": "wall_clock_max_seconds = ~4612 + sum_{g=1}^{4} C_g * ~144",
+      "is_finite": "NO, precisely because the call-COUNT term (sum of C_g) is unbounded, even though every INDIVIDUAL call/attempt/backoff/rate-limit-wait in the system is itself individually finite and bounded. There is no outer 'max request duration' deadline anywhere in the code that would independently cap total wall-clock regardless of call count - none was invented here; its absence is confirmed by grep (no timeout/deadline wrapping graph.invoke() in agent/graph.py::MedAgent.run(), only the LangGraph recursion_limit, which bounds NODE VISITS, not wall-clock time)."
+    }
+  },
+  "claim_count_boundedness": {
+    "question": "Does GroundedAnswer.claims have a schema maximum, generation maximum, parser maximum, validation maximum, or runtime maximum anywhere in the code?",
+    "answer": "NO - confirmed absent at every one of the 4 layers checked.",
+    "evidence": [
+      {
+        "layer": "schema (pydantic model)",
+        "file": "generation/models.py",
+        "line": 119,
+        "finding": "GroundedAnswer.claims: List[GroundedClaim] - a plain List[...] type annotation with NO Field(max_length=...) or any other length constraint. Confirmed by direct reading; grep for 'max_length' or 'max_items' anywhere in generation/models.py returns zero matches."
+      },
+      {
+        "layer": "generation JSON schema (the strict-mode contract sent to Cerebras)",
+        "file": "generation/generator.py",
+        "lines": "86-102",
+        "finding": "_CLAIMS_JSON_SCHEMA's 'claims' property is {'type': 'array', 'items': {...}} with NO 'maxItems' key. Confirmed by direct reading; grep for 'maxItems' anywhere in generation/generator.py returns zero matches."
+      },
+      {
+        "layer": "parser (_invoke_cerebras_claims / generate_grounded_answer)",
+        "file": "generation/generator.py",
+        "finding": "claims_raw is checked only for being a list (isinstance(claims_raw, list)) and each entry is passed through GroundedClaim(**c) construction - no length check before or after parsing."
+      },
+      {
+        "layer": "validation (generation/validation.py::validate_claims)",
+        "finding": "validate_claims() checks: (1) every evidence_id reference is known, (2) every FACTUAL claim has >=1 evidence_ids, (3) claim_id uniqueness, (4) no bare source-native ID citation. It performs NO check on len(claims) - confirmed by direct reading of the full function body."
+      },
+      {
+        "layer": "runtime consumer (research/gap_analysis.py::analyze_gaps)",
+        "file": "research/gap_analysis.py",
+        "line": 84,
+        "finding": "'for claim in grounded_answer.claims:' iterates the ENTIRE claims list with no slicing, no early-exit cap, no sampling - every factual claim with evidence_ids triggers one judge_claim_semantic() call."
+      }
+    ],
+    "soft_mitigating_factor_not_a_cap": "generation/generator.py's _invoke_cerebras_claims uses max_completion_tokens=4096 (pipeline default) for the Cerebras claim-generation call, which places an INDIRECT, TOKEN-BUDGET-DERIVED ceiling on total output size - but this is not a deterministic claim-COUNT cap: a model could produce many short claims (e.g. one-sentence claims each citing one evidence_id) within a 4096-token budget, and nothing in the code validates or rejects an unusually large claims array as a distinct failure mode. This does not change the conclusion that no genuine count-based cap exists.",
+    "conclusion": "CORRECTED per the pre-optimization consistency audit: the system is NOT mathematically unbounded when the actually-executed max_completion_tokens=4096 provider ceiling is accounted for. It IS, however, missing any INTENTIONAL, semantically-meaningful application-level claim-evaluation budget - the only ceiling that exists is an accidental byproduct of a token-length setting chosen for unrelated reasons, and its real numeric value (order ~100-150 claims/cycle, ~400-600 across G=4 cycles) is large enough to provide no meaningful reliability guarantee for planning/timeout-budget purposes. This is reframed as an APPLICATION-LEVEL BOUNDEDNESS DEFECT / MISSING CLAIM-EVALUATION BUDGET, not a literal mathematical-infinity claim.",
+    "defect_id": "PHASE9-DEFECT-001",
+    "defect_title": "Missing intentional application-level claim-evaluation budget for gap-analysis judge calls (the only existing ceiling is an incidental, very large, provider-token-budget side effect - not a deliberate reliability safeguard)",
+    "defect_classification": "APPLICATION-LEVEL BOUNDEDNESS DEFECT (reframed from the original 'unbounded 'call-count claim per the pre-optimization consistency audit) - a real Phase-9 finding, not a literal-infinity overclaim; not a correctness/fabrication defect (no fabricated/invalid Evidence ID or silent failure was found anywhere in this pass's fault matrix).",
+    "not_fixed_this_pass": true,
+    "candidate_remedies_analyzed_not_implemented": [
+      {
+        "id": "A",
+        "remedy": "Hard max factual claims per answer (e.g. reject/truncate a generation exceeding N claims)",
+        "safety": "Safe to implement in isolation - a simple post-generation length check.",
+        "semantic_effect": "Could silently discard legitimate claims for an answer that genuinely needs many (e.g. a broad multi-drug-class query with many independently-cited facts) unless truncation is disclosed to the user.",
+        "compatibility_with_frozen_phase6_7_behavior": "Would require touching generation/validation.py or generation/pipeline.py, both frozen Phase-6 artifacts - any change needs its own gate re-review, not a Phase-9-internal decision.",
+        "grounding_quality_impact": "None if claims are truncated by lowest-priority/least-confident (not evaluated by this pass); could reduce completeness if truncation is arbitrary (e.g. simple list slicing).",
+        "latency_impact": "Reduces worst-case gap-analysis latency directly and predictably (bounded judge-call count).",
+        "silent_drop_risk": "HIGH if not paired with explicit disclosure (a dropped/truncated claim must never look like a claim that was never produced) - would need its own qualifier/caveat mechanism, echoing PHASE8-DEFECT-001's fix pattern (finalize_research_answer_node's qualifier propagation).",
+        "user_visible_behavior_change": "Yes - answers that would have had more than N claims would visibly shrink."
+      },
+      {
+        "id": "B",
+        "remedy": "Total gap-analysis evaluation BUDGET (cap total judge calls across the whole request, not per-answer)",
+        "safety": "Safe - a simple running counter compared against a constant, similar in spirit to MAX_TOOL_CALLS_TOTAL's existing pattern.",
+        "semantic_effect": "Once the budget is exhausted, some claims would go un-judged - gap_analysis would need an explicit 'not evaluated' state distinct from 'evaluated and supported', so it is never confused with a false SUFFICIENT_EVIDENCE stop.",
+        "compatibility_with_frozen_phase6_7_behavior": "Does not touch generation/ at all - purely a research/gap_analysis.py + research/loop_control.py change, which are Phase-8-owned (already understood to be extensible for Phase-9-discovered defects per the governing directive's carve-out).",
+        "grounding_quality_impact": "Un-judged claims would neither be confirmed supported nor flagged weak - a real quality-signal gap, needs disclosure.",
+        "latency_impact": "Directly bounds worst-case gap-analysis wall-clock time - the most surgical fix for formula #7's unbounded term.",
+        "silent_drop_risk": "MEDIUM - the claims themselves are not dropped (still rendered in the answer), only their gap-analysis judgment is skipped; risk is a claim silently NOT being flagged weak/contradicted because its judge call never ran, which could look like a false 'this claim was checked and is fine'.",
+        "user_visible_behavior_change": "Only if disclosed - otherwise invisible (the answer text is unchanged, only internal gap detection is capped)."
+      },
+      {
+        "id": "C",
+        "remedy": "Batch claim judging (one Cerebras call judges MULTIPLE claims at once, not one call per claim)",
+        "safety": "Safe in principle - would need a new JSON schema (array of claim+judgment pairs) and careful evidence-block sizing (a batched prompt with many claims' cited Evidence could itself exceed practical context/token limits, trading claim-count unboundedness for prompt-size unboundedness unless ALSO capped).",
+        "semantic_effect": "None if the judge's per-claim semantics are preserved faithfully in the batched schema - would need its own validation pass, out of Phase-9 scope to design here.",
+        "compatibility_with_frozen_phase6_7_behavior": "grounding_eval/judge.py is a Phase-7-frozen artifact (judge_claim_semantic is explicitly 'the same evaluator Phase 7 froze and validated' per research/gap_analysis.py's own docstring) - changing its call shape would require its own re-validation pass, not a Phase-9-internal decision.",
+        "grounding_quality_impact": "Unknown without re-validation - batched judging could change the judge's own accuracy (more context per call, but less isolated attention per claim) and would need the same rigor as Phase 7's original Candidate B vs Candidate E comparison before being trusted.",
+        "latency_impact": "Would reduce the NUMBER of calls (one call for many claims) but each call would take longer and use more tokens - net latency effect is unmeasured, not assumed.",
+        "silent_drop_risk": "LOW if batch responses are validated to cover every submitted claim_id exactly once (similar to today's per-claim try/except-skip-on-failure pattern).",
+        "user_visible_behavior_change": "None expected if judgments are semantically equivalent - but unverified without a dedicated measurement pass."
+      },
+      {
+        "id": "D",
+        "remedy": "Bounded concurrency (issue judge calls for multiple claims in parallel, up to a fixed worker count)",
+        "safety": "Safe from a correctness standpoint if each judge call remains independent (it is - judge_claim_semantic takes only claim text + cited Evidence, no shared mutable state beyond the already-audited rate limiter/HTTP session).",
+        "semantic_effect": "None - does not change WHAT is computed, only WHEN/how many calls run concurrently.",
+        "compatibility_with_frozen_phase6_7_behavior": "Compatible - judge_claim_semantic itself is unchanged; only its caller (research/gap_analysis.py::analyze_gaps) would change from sequential to a bounded thread/task pool.",
+        "grounding_quality_impact": "None (same judge, same inputs, same outputs, only concurrency of invocation changes).",
+        "latency_impact": "Directly reduces WALL-CLOCK time proportionally to worker count for a FIXED claim count, but does NOT change the total CALL COUNT or rate-limiter contention (Cerebras 5 RPM bucket would still serialize actual dispatch regardless of how many threads are waiting) - so this reduces latency only up to the rate limiter's own ceiling, and does nothing for formula #5's unbounded call-COUNT problem.",
+        "silent_drop_risk": "LOW if implemented correctly (a bounded thread pool with proper result collection).",
+        "user_visible_behavior_change": "None expected beyond latency.",
+        "explicitly_out_of_scope_this_pass": "The governing directive explicitly forbids parallelizing gap_analysis in THIS pass - listed here only as a candidate for future evaluation, not evaluated further or implemented."
+      },
+      {
+        "id": "E",
+        "remedy": "Bounded truncation with explicit safe behavior (cap claims array length at generation time, always with a disclosed truncation marker/qualifier)",
+        "safety": "Safe if the truncation marker is itself validated as present whenever truncation occurs (a testable invariant).",
+        "semantic_effect": "Directly analogous to Option A but with the disclosure requirement built in from the start rather than as an afterthought - the answer would explicitly state '(N additional claims omitted)' or similar.",
+        "compatibility_with_frozen_phase6_7_behavior": "Same concern as Option A - touches generation/pipeline.py or generation/validation.py, both frozen, needing its own gate review.",
+        "grounding_quality_impact": "Completeness would visibly decrease for answers that would have exceeded the cap - an honest tradeoff, not a silent one, IF implemented with the disclosure requirement.",
+        "latency_impact": "Same direct benefit as Option A.",
+        "silent_drop_risk": "LOW by construction (this option's entire premise IS the disclosure requirement) - the safest of the generation-side options if a cap must be added there.",
+        "user_visible_behavior_change": "Yes, explicitly and by design."
+      },
+      {
+        "id": "F",
+        "remedy": "Whole-answer gap analysis instead of one-call-per-claim (a single judge call evaluates the ENTIRE GroundedAnswer against its full cited-Evidence set, not each claim independently)",
+        "safety": "Safe from a call-count-boundedness standpoint (exactly 1 call per generation cycle, i.e. exactly G=4 total judge calls, hard-bounded) - but changes the GRANULARITY of what is judged.",
+        "semantic_effect": "SIGNIFICANT - loses per-claim gap_id/related_claim_id attribution, which research/action_planning.py's plan_actions() and finalize_research_answer_node's per-claim qualifier mechanism (PHASE8-DEFECT-001's fix) both depend on. Would require redesigning the EvidenceGap.related_claim_id linkage entirely, not a drop-in swap.",
+        "compatibility_with_frozen_phase6_7_behavior": "Would replace, not extend, grounding_eval/judge.py's frozen per-claim judge_claim_semantic contract - the most invasive of the 6 options relative to Phase-7's frozen validation.",
+        "grounding_quality_impact": "Unknown and likely negative for precision - a whole-answer judgment could not surface WHICH specific claim is weak/contradicted, undermining the existing targeted-follow-up mechanism (research/action_planning.py's whole design is gap-to-claim-to-followup-query, all keyed by claim_id).",
+        "latency_impact": "Best-case reduction (hard-bounded at G=4 total judge calls, independent of claim count) - the strongest latency fix of all 6 options.",
+        "silent_drop_risk": "MEDIUM-HIGH - a whole-answer judgment that says 'partially supported' with no claim-level attribution risks looking like a real, specific finding while actually being a coarser, less actionable one; would need very careful qualifier language to avoid implying more precision than it has.",
+        "user_visible_behavior_change": "Indirect - the final answer's caveat/qualifier granularity would likely become coarser (whole-answer caveats instead of per-claim ones)."
+      }
+    ],
+    "pre_optimization_audit_correction": "The original conclusion ('UNBOUNDED') did not check whether an executed provider-side output-token limit indirectly bounds claim count even though no application-level cap exists. Rechecked: generation/generator.py's _invoke_cerebras_claims sends max_completion_tokens=4096 (its own hard-coded default, confirmed by reading its single call site at generate_grounded_answer -> line 243 - with NO override anywhere in the executed path) inside the actual Cerebras chat-completions request body, using strict JSON-schema mode (response_format.json_schema.strict=True). Standard OpenAI-compatible completions-API behavior (which Cerebras implements) hard-truncates generation at that token count - a real, provider-enforced, executed ceiling, not an invented one.",
+    "answers": {
+      "A_explicitly_bounded_by_application_logic": false,
+      "B_implicitly_bounded_by_configured_provider_output_limit": true,
+      "C_is_that_provider_limit_a_hard_finite_limit_in_the_executed_path": true,
+      "D_strongest_defensible_statement": "OUTCOME #2 of the 3 offered: finite ONLY because of the external/provider max_completion_tokens=4096 output-token ceiling on the Cerebras claim-generation call - NOT because of any deliberate application-level claims budget. Outcome #1 ('truly unbounded') is an overclaim and is WITHDRAWN. Outcome #3 ('a finite application-level bound already exists and was missed') is also false - no code enforces a claim COUNT; only an incidental token-length setting chosen for unrelated cost/latency reasons happens to cap it.",
+      "order_of_magnitude_estimate_of_the_finite_ceiling": "Using each GroundedClaim's required JSON fields (text, evidence_ids, claim_type enum, qualifier) at their most minimal encoding (short text, one short evidence_id, e.g. '{\"text\":\"X.\",\"evidence_ids\":[\"E1\"],\"claim_type\":\"factual\",\"qualifier\":null}' ~25-35 tokens including JSON punctuation/array overhead), 4096 tokens for the WHOLE response (also containing the wrapping object and conflict_detected field) yields an order-of-magnitude ceiling on the order of ~100-150 claims per generation cycle. This is DISCLOSED AS AN ORDER-OF-MAGNITUDE ESTIMATE, not an exact enforced count - actual capacity depends on real evidence_id string length and claim text content, and is NOT independently re-measured empirically in this pass (no live call was made to verify it, per this pass's own no-live-call constraint). A bounded 2-attempt retry on generation failure does not increase this per-cycle ceiling (a retry replaces, never accumulates with, a prior attempt's claims)."
+    }
+  },
+  "time_bound_analysis": {
+    "finding": "Every INDIVIDUAL external call, retry attempt, backoff sleep, and rate-limit wait in the system IS finitely bounded (confirmed by direct reading of every timeout/retry-count/backoff-max/rate-limit constant across config/llm_config.py, orchestration/candidate_b_native_tools.py, grounding_eval/judge.py, generation/generator.py, nlu/extractor.py, utils/retry_handler.py, utils/rate_limiter.py). Research-loop ITERATIONS are also hard-bounded (MAX_RESEARCH_ITERATIONS=3, enforced by research/loop_control.py::decide_stop_reason, proven non-infinite by existing tests). HOWEVER, the total NUMBER of gap-analysis judge calls issued within each of those bounded iterations is NOT bounded, because it is driven by GroundedAnswer.claims' length, which has no cap anywhere in the code (see claim_count_boundedness above). Therefore: the system does NOT currently have a finite, code-enforced wall-clock upper bound on a single request - not because any wait/call path is itself unbounded, but because the TOTAL NUMBER of otherwise-individually-bounded calls is unbounded. No 'max request duration' deadline of any kind exists in the code (confirmed by grep across agent/graph.py, agent/nodes.py, research/*.py for any wrapping timeout/deadline around graph.invoke() or the research loop as a whole) - none is invented or assumed here.",
+    "individually_bounded_paths_confirmed": [
+      "NVIDIA ChatNVIDIA calls: 90s x <=3 attempts, hard daemon-thread-enforced timeout",
+      "Cerebras tool-selection calls: 60s x 1 attempt (never retried)",
+      "Cerebras generator/judge/NLU calls: 60s x <=2 attempts each",
+      "Tool HTTP calls: 30s x <=4 attempts + backoff (base=2s, max=60s per gap)",
+      "Rate-limiter waits: bounded by TokenBucket's own bounded refill math for ANY fixed number of calls (unbounded only insofar as the NUMBER of calls needing tokens is unbounded)",
+      "Research-loop iterations: hard-capped at MAX_RESEARCH_ITERATIONS=3"
+    ],
+    "unbounded_path": "The count of judge_claim_semantic() invocations per gap_analysis_node call (research/gap_analysis.py line 84's uncapped 'for claim in grounded_answer.claims' loop), which is itself driven by the uncapped GroundedAnswer.claims length (PHASE9-DEFECT-001).",
+    "precise_statement": "All individual calls are bounded; the TOTAL NUMBER of calls is not, due exclusively to the claim-count issue. This is a call-count boundedness gap, not a per-call timeout gap - no per-call path was found to hang indefinitely or retry without limit."
+  },
+  "ctl_017_reassessment": {
+    "question": "Is the Phase-9-owned broader portion of CTL-017 (system-wide fault matrix, beyond Phase 8's narrow scope) now satisfied by this pass's Step 8 fault matrix?",
+    "phase8_narrow_scope_already_closed": "3 individually-injected fault classes on the research loop only (timeout, 429, simultaneous 5xx across all 3 sources), per PHASE8_LOCAL_VERIFICATION_AUDIT.md.",
+    "phase9_broader_scope_now_covered": [
+      "All 3 independent LLM client implementations tested SEPARATELY with their distinct retry policies confirmed (NVIDIA: bounded retry+hard timeout; Cerebras tool-selection: zero retry by design; NVIDIA/Cerebras judge: bounded retry=2)",
+      "Per-source tool fault injection (PubMed/ClinicalTrials/ChEMBL) covering single-source failure, one-fails-others-succeed, retry exhaustion, empty result, malformed payload - not just Phase 8's 'simultaneous 5xx across all 3 sources' case",
+      "6 distinct research-loop injection points (before-first-Evidence, after-partial-Evidence, mid-follow-up, final-allowed-iteration, duplicate-only-retrieval, zero-progress-research) vs Phase 8's narrower 3 cases",
+      "State/graph edge cases (malformed research action, missing optional state, invalid Evidence construction, recursion ceiling, budget exhaustion, repeated-action ceiling, consecutive-failure-limit precedence)",
+      "The Cerebras-503-vs-zero-retry discrepancy explicitly reconciled with direct log evidence, closing an open question Phase 8 never addressed"
+    ],
+    "verdict": "SATISFIED for this pass's own scope. CTL-017's Phase-9-owned 'system-wide fault matrix' language is now substantively covered: 37 scenarios across 5 lettered categories (A-E), all PASS, zero defects found in fault-handling correctness (the one defect this pass DID find, PHASE9-DEFECT-001, is a call-COUNT boundedness gap, not a fault-injection-handling failure - every injected fault in the matrix was handled correctly: no fabricated Evidence, no silent failure, no infinite loop, in every one of the 37 scenarios).",
+    "not_claimed": "This does not claim exhaustive coverage of every conceivable fault permutation (e.g. concurrent faults across multiple sources simultaneously under real network conditions, or faults injected mid-real-live-run) - those remain legitimate candidates for a future pass if a specific gap is identified, but nothing in this pass's own exit-gate language requires that additional exhaustiveness."
+  },
+  "ctl_016_ctl_019_status": {
+    "ctl_016": "UNCHANGED (PARTIALLY CLOSED, per PHASE9_INITIAL_AUDIT.md) - this pass used only stubbed/mocked concurrent research-loop runs (safe_abstention outcomes by construction), producing no new organic 3-round LIVE case. No new direct evidence to reassess against CTL-016's specific pre-registered criterion (a real, live 3-round case).",
+    "ctl_019": "UNCHANGED (re-measured in Phase-8 local closure at n=8, explicitly not yet production-representative) - this pass's own measurements (fault matrix, concurrency, rate limiter) are all mock/stub-based by design (per the governing directive's explicit 'do not abuse live public services' instruction) and do not add live-run samples toward CTL-019's n-disclosure bar. Left unchanged, as instructed when in doubt."
+  },
+  "pre_optimization_consistency_audit_corrections": {
+    "tool_vs_source_call_reconciliation": {
+      "question": "What does DECLARED_TOOLS_COUNT=6 represent vs MAX_TOOL_CALLS_TOTAL=8? Are they the same layer? Does one supersede the other?",
+      "DECLARED_TOOLS_COUNT_6": "orchestration/candidate_b_native_tools.py's DECLARED_TOOLS tuple - the number of DISTINCT tool FUNCTION SCHEMAS offered to Cerebras's native tool-calling API in a single tool-selection request. It is NOT an enforced ceiling on how many tool_call entries a single Cerebras response may return - confirmed by reading agent/nodes.py's tool_orchestration_node: 'for i, raw_call in enumerate(raw_tool_calls):' has no length check. Nothing prevents the model from returning duplicate calls to the same function, or an unusually long tool_calls array, in one response.",
+      "MAX_TOOL_CALLS_TOTAL_8": "research/loop_control.py's hard application-level counter, but it counts research_execution_node INVOCATIONS (one per follow-up ROUND: agent/nodes.py:1625 increments state['research_tool_calls_used'] exactly once per research_execution_node call, regardless of how many individual tool calls that round's tool_orchestration_node execution actually made) - NOT individual biomedical tool/source calls. It operates at the ROUND layer, not the per-round-tool-call layer.",
+      "different_layers": true,
+      "one_supersedes_the_other": "Yes: MAX_RESEARCH_ITERATIONS=3 (giving R=4 total rounds: 1 initial + <=3 follow-ups) is the binding constraint on round count, since at most 1 research_execution_node invocation happens per iteration. research_tool_calls_used can therefore reach at most 3 (one per follow-up), never approaching MAX_TOOL_CALLS_TOTAL=8 - MAX_TOOL_CALLS_TOTAL=8 is LOOSER than R and never binds under the current loop structure (effectively dead/redundant, as already flagged in the original constants_used note).",
+      "conflation_found": "Yes - the original report's '24' and '96' formulas treated DECLARED_TOOLS_COUNT=6 as if it were a HARD per-round cap on individual tool_calls (giving a clean-looking R x 6 = 24), when it is only the count of distinct declared FUNCTION NAMES, not an enforced limit on how many tool_call entries (valid or not) a round's Cerebras response may contain. Additionally, 'tool calls' (raw model output entries) and 'source calls' (actual biomedical HTTP requests) were conflated: a tool_call that fails registry validation (unregistered_tool/arguments_json_invalid/schema_invalid - see fault-matrix scenarios A9-A11) NEVER reaches an HTTP call at all, so logical tool_calls attempted is properly an UPPER bound on actual source HTTP calls issued, not an equality.",
+      "corrected_per_round_tool_call_ceiling": "Like the claims-per-cycle case, the ACTUAL executed ceiling on tool_call entries per round is soft and provider-token-budget-derived: orchestration/candidate_b_native_tools.py's call_cerebras_native_tools uses max_completion_tokens=1024 (default, confirmed no override at its single call site, agent/nodes.py:641). Using the same order-of-magnitude reasoning as the claims analysis (each tool_call entry needs a function name + JSON arguments, on the order of tens of tokens), the per-round ceiling is an order-of-magnitude estimate around ~20-30 valid tool_calls, NOT a clean hard-coded '6'.",
+      "true_source_call_maximum": "NOT a single clean hard number. R=4 (hard application constant, from MAX_RESEARCH_ITERATIONS) x per-round-valid-tool-calls (soft, provider-token-budget-bounded, order-of-magnitude ~20-30) = a SOFT, INPUT/OUTPUT-DEPENDENT order-of-magnitude estimate of roughly 80-120 logical biomedical calls per request - NOT the previously-stated hard-sounding '24'. MAX_TOOL_CALLS_TOTAL=8 does not participate in this formula at all (it counts rounds, already captured by R=4, and never binds tighter than R does)."
+    },
+    "rate_limiter_starvation_analysis": {
+      "model_a_closed_workload": {
+        "description": "A finite, known set of N callers arrive once and all wait on the same bucket.",
+        "can_a_specific_caller_be_starved": "No in practice for this codebase's actual usage pattern (a handful of concurrent tasks, single process) - with a fixed N and no NEW callers ever joining, every caller eventually gets a token because the bucket keeps refilling at its configured rate and the total token supply over any sufficiently long window exceeds N.",
+        "is_wait_finitely_bounded": "Yes, for a closed/fixed N: worst case is (N-1) x (1/rate) seconds for the last-scheduled caller, since the unordered spin-wait can only ever make a caller wait behind at most the other N-1 callers' worth of token consumption before the bucket's own deterministic refill math guarantees it a token.",
+        "assumption_required": "N is fixed and finite, and no NEW caller ever joins after the initial N."
+      },
+      "model_b_arbitrary_sustained_arrivals": {
+        "description": "New callers can arrive continuously and indefinitely while earlier callers are still waiting.",
+        "can_a_specific_caller_be_starved": "Yes, in principle - wait_for_token()'s unordered spin-wait (confirmed via source reading: no FIFO queue, no ordering guarantee) means a newly-arriving thread can win a freshly-refilled token before an earlier-arrived, still-waiting thread does, with no fairness mechanism preventing this from recurring indefinitely under sustained new arrivals.",
+        "is_wait_finitely_bounded": "NOT universally, under this model. No per-caller maximum wait time is derivable without an additional assumption bounding the arrival rate/pattern of new callers relative to the bucket's refill rate.",
+        "assumption_required": "A universal finite bound requires ASSUMING either (a) a maximum caller arrival rate strictly less than the bucket's refill rate over any window (so the queue doesn't grow unboundedly), or (b) a fixed, closed set of callers (Model A) - neither of which is enforced or guaranteed anywhere in the code for Model B."
+      },
+      "corrected_conclusion": "The original report's blanket 'rate-limit wait is finite' claim (used inside formula #7's wall-clock derivation) is accurate ONLY under Model A (this codebase's actual current usage pattern: a fixed, small, known number of concurrent MedAgent() tasks per process, confirmed via evaluation/evaluator.py's fresh-instance-per-task pattern - there is no code path today that admits an arbitrary, unbounded stream of NEW concurrent callers into the same rate limiter). It is NOT a universal claim independent of workload model, and should not be read as one.",
+      "classification": "Under Model A (this codebase's actual current usage): a documented scheduling property, not a defect - fairness/ordering was never claimed or required for this project's actual (single-process, small-N) concurrency profile. Under Model B (a hypothetical future arbitrary-arrival-rate scenario, e.g. a multi-tenant service): this WOULD be a reliability/boundedness gap requiring remediation (a fairness/queueing mechanism) before that scenario could rely on a finite per-request wait guarantee - but Model B does not describe this codebase's current, tested usage, so it is NOT classified as a Phase-9 defect requiring remediation now. Flagged as a documented assumption/limitation instead."
+    },
+    "provider_path_terminology_cleanup": {
+      "note": "Corrects the original report's ambiguous 'NVIDIA/Cerebras judge' label - the judge provider is NOT configurable at runtime in the code read this pass; it is a fixed Cerebras-backed implementation despite living in a module named grounding_eval/judge.py.",
+      "paths": [
+        {
+          "function_class": "config/llm_config.py::_RateLimitedChatNVIDIA (wraps langchain_nvidia_ai_endpoints.ChatNVIDIA)",
+          "actual_provider": "NVIDIA NIM",
+          "purpose": "query understanding (NLU fallback), synthesis, report generation, legacy verification",
+          "max_attempts": 3,
+          "timeout": "90s hard daemon-thread timeout per attempt",
+          "limiter": "nvidia_nim_llm bucket, 35 RPM",
+          "retry_policy": "429/503-substring-classified retryable, fresh client per retry"
+        },
+        {
+          "function_class": "orchestration/candidate_b_native_tools.py::call_cerebras_native_tools",
+          "actual_provider": "Cerebras",
+          "purpose": "tool selection (native function-calling)",
+          "max_attempts": 1,
+          "timeout": "60s",
+          "limiter": "cerebras_candidate_b_native_tools bucket, 5 RPM",
+          "retry_policy": "zero retry, by deliberate design"
+        },
+        {
+          "function_class": "generation/generator.py::_invoke_cerebras_claims",
+          "actual_provider": "Cerebras",
+          "purpose": "grounded claim generation (GroundedAnswer.claims)",
+          "max_attempts": 2,
+          "timeout": "60s per attempt",
+          "limiter": "cerebras_free_trial bucket, 5 RPM",
+          "retry_policy": "bounded retry=2, same pattern as the judge"
+        },
+        {
+          "function_class": "grounding_eval/judge.py::_invoke_judge (via judge_claim_semantic)",
+          "actual_provider": "Cerebras (despite the module's generic 'nvidia_judge'-adjacent naming in earlier project history - confirmed Cerebras-backed by reading the actual HTTP call target this pass)",
+          "purpose": "per-claim grounding judgment (gap_analysis's dominant cost driver)",
+          "max_attempts": 2,
+          "timeout": "60s per attempt",
+          "limiter": "cerebras_free_trial bucket, 5 RPM (SHARED with the claim generator above - both draw from the same Cerebras free-trial 5 RPM bucket key)",
+          "retry_policy": "bounded retry=2"
+        },
+        {
+          "function_class": "nlu/extractor.py::_invoke_cerebras_json",
+          "actual_provider": "Cerebras",
+          "purpose": "NLU query extraction (candidate_g_cerebras_qwen path)",
+          "max_attempts": 2,
+          "timeout": "60s per attempt",
+          "limiter": "cerebras_free_trial bucket, 5 RPM (shared with claim generator and judge)",
+          "retry_policy": "bounded retry=2"
+        }
+      ],
+      "corrected_label": "5 distinct LLM call sites, 4 of them Cerebras-backed (3 sharing one 5 RPM bucket) and 1 NVIDIA-NIM-backed - never call any of them collectively 'NVIDIA/Cerebras X' without this table."
+    }
+  },
+  "formulas_post_fix": {
+    "note": "Added by the Phase-9 BOUNDEDNESS HARDENING pass. Every key under 'formulas' (PRE-FIX) above is left completely intact/unmodified - these are the corresponding POST-FIX figures now that CLAIM_EVALUATION_BUDGET and MAX_TOOL_CALLS_PER_ROUND/MAX_TOOL_CALLS_PER_REQUEST exist in research/loop_control.py. See docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's 'BOUNDEDNESS HARDENING' section for the full side-by-side PRE-FIX vs POST-FIX table and narrative.",
+    "1_max_llm_calls_per_request": {
+      "formula": "11 + CLAIM_EVALUATION_BUDGET",
+      "value": 43,
+      "is_finite": "YES - HARD APPLICATION CONSTANT (was input/output-dependent, order-of-magnitude ~611)"
+    },
+    "2_max_logical_biomedical_tool_calls_per_request": {
+      "formula": "MAX_TOOL_CALLS_PER_REQUEST",
+      "value": 24,
+      "is_finite": "YES - HARD APPLICATION CONSTANT (was the same numeric value, 24, but SOFT/mischaracterized pre-fix - DECLARED_TOOLS_COUNT=6 was never actually an enforced per-round cap)"
+    },
+    "3_max_retry_amplified_biomedical_http_attempts": {
+      "formula": "MAX_TOOL_CALLS_PER_REQUEST * (TOOL_MAX_RETRIES + 1)",
+      "value": 96,
+      "is_finite": "YES - HARD APPLICATION CONSTANT (was the same numeric value, 96, but soft pre-fix, inheriting formula 2's soft status)"
+    },
+    "4_max_research_rounds": {
+      "formula": "R = 1 + MAX_RESEARCH_ITERATIONS",
+      "value": 4,
+      "is_finite": "YES - unchanged, already hard pre-fix"
+    },
+    "5_max_gap_analysis_judge_calls_per_request": {
+      "formula": "CLAIM_EVALUATION_BUDGET",
+      "value": 32,
+      "is_finite": "YES - HARD APPLICATION CONSTANT (was input/output-dependent, order-of-magnitude ~600) - this is the direct fix for PHASE9-DEFECT-001"
+    },
+    "6_max_total_external_calls_per_request": {
+      "formula": "116 + (CLAIM_EVALUATION_BUDGET * CEREBRAS_JUDGE_MAX_ATTEMPTS)",
+      "computation": "116 + (32 * 2) = 116 + 64",
+      "value": 180,
+      "is_finite": "YES - HARD APPLICATION CONSTANT (was input/output-dependent, order-of-magnitude ~1316)"
+    },
+    "7_max_timeout_driven_wall_clock_time_seconds": {
+      "formula": "~4612 + (CLAIM_EVALUATION_BUDGET * ~144)",
+      "computation": "4612 + (32 * 144) = 4612 + 4608",
+      "value_seconds": 9220,
+      "value_human": "~2.56 hours (~153.7 minutes)",
+      "is_finite": "YES - a real, defensible, non-order-of-magnitude number for the first time this phase (was input/output-dependent, order-of-magnitude ~91,000s / ~25h, explicitly 'practically unbounded for planning purposes' pre-fix)",
+      "note": "The bounded ~4612s component is UNCHANGED from the pre-fix derivation (no individual per-call timeout/backoff/rate-limit constant changed) - what changed is that its biomedical_source_http sub-term's prior assumption of 24 logical calls is now accurate and hard-enforced (MAX_TOOL_CALLS_PER_REQUEST) instead of an unjustified placeholder."
+    },
+    "supplementary_breakdowns": {
+      "max_llm_provider_attempts_per_request_excluding_biomedical_tools": {
+        "breakdown": "nlu(<=2) + cerebras_tool_selection(4) + nvidia_synthesis(<=3) + cerebras_grounded_generation(<=8) + nvidia_report_generation(<=3) + judge(32*2=64)",
+        "value": 84
+      },
+      "max_biomedical_http_attempts_per_request": {
+        "formula": "MAX_TOOL_CALLS_PER_REQUEST * (TOOL_MAX_RETRIES + 1)",
+        "value": 96
+      },
+      "max_total_external_attempts_per_request": {
+        "formula": "84 + 96",
+        "value": 180,
+        "note": "matches formula 6 above"
+      }
+    },
+    "concurrent_contention_wall_clock_bound": "NOT attempted beyond the existing Model A (closed/fixed-N workload) assumption already established in pre_optimization_consistency_audit_corrections.rate_limiter_starvation_analysis - per the governing directive's explicit instruction not to produce an exact concurrent-contention bound beyond what Model A supports."
+  },
+  "claim_budget_design": {
+    "constant": "research.loop_control.CLAIM_EVALUATION_BUDGET",
+    "value": 32,
+    "scope": "REQUEST-GLOBAL (across all G<=4 generation cycles), not per-cycle",
+    "scope_rationale": [
+      "Directly bounds the actual reliability concern (total judge-call count / wall-clock cost for the WHOLE request) with one clean number.",
+      "Matches the existing request-global-budget naming convention already established by MAX_TOOL_CALLS_TOTAL in the same module.",
+      "A per-cycle-only budget would still need multiplying by the hard cycle count to produce a request-level guarantee, so request-global is the more direct choice, not a more complex one."
+    ],
+    "derivation": "observed single-round max claims in the primary Phase-8 dev/validation corpus (8, n=45 round-level values) x hard MAX_RESEARCH_ITERATIONS-derived cycle count (G=4) = 32 - exactly what a request would need to sustain the corpus's own worst observed single-round rate across every one of its hard-bounded cycles. Already 2x the highest actually-observed CUMULATIVE multi-round total in that same corpus (16, case VAL-F-tool-failure-safe-termination).",
+    "source_data": "artifacts/v2/phase9_claim_and_tool_call_distributions.json",
+    "gap_type_added": "research.models.GapType.EVALUATION_BUDGET_EXHAUSTED",
+    "design_decisions": {
+      "invariant_1_max_evaluations": "Enforced via state['claim_judge_calls_used'], a declared AgentState field (required for correct LangGraph cross-node threading of a request-global counter).",
+      "invariant_2_never_marked_supported": "A distinct EVALUATION_BUDGET_EXHAUSTED gap is produced instead of any SupportLabel judgment.",
+      "invariant_3_never_dropped": "analyze_gaps never touches grounded_answer.claims - the claim stays in claims/rendered_text untouched.",
+      "invariant_4_explicit_state": "One new GapType enum value, reusing EvidenceGap's existing shape - no parallel mechanism.",
+      "invariant_5_reuse_finalize_node": "finalize_research_answer_node's _UNRESOLVED_CLAIM_GAP_TYPES extended with 'evaluation_budget_exhausted', own honest qualifier wording.",
+      "invariant_6_already_judged_unchanged": "analyze_gaps only appends new gaps / advances a local counter - never revisits an already-produced ClaimGroundingJudgment.",
+      "invariant_7_zero_fabricated_evidence_ids": "The budget-exhaustion gap cites only claim.claim_id, never an evidence_id.",
+      "invariant_8_no_false_sufficient_evidence": "decide_stop_reason's pre-existing 'if not gaps: return SUFFICIENT_EVIDENCE' is untouched; plan_actions excludes this gap type from candidate selection so it can never be falsely 'resolved'.",
+      "invariant_9_phase8_defect_001_002_non_regression": "tests/test_research_finalize_answer_defect_fix.py + tests/test_research_integration.py re-run in full after the change: 21 passed, 0 failed (unchanged - files not modified)."
+    },
+    "tests": "tests/test_phase9_claim_budget.py (11 tests, all pass)"
+  },
+  "tool_call_budget_design": {
+    "constants": {
+      "MAX_TOOL_CALLS_PER_ROUND": 12,
+      "MAX_TOOL_CALLS_PER_REQUEST": 24
+    },
+    "derivation": {
+      "MAX_TOOL_CALLS_PER_ROUND": "2x DECLARED_TOOLS_COUNT=6 - headroom for the model to legitimately call the same tool twice with different arguments in one round; coincidentally already covers the single highest real aggregate-per-request n_tool_calls value observed (12, artifacts/v2/phase9_baseline_results.json's F5-research-loop-one-followup case) even under the pessimistic assumption it all concentrated in one round. Well below the soft ~20-30 order-of-magnitude token-derived ceiling (orchestration/candidate_b_native_tools.py's max_completion_tokens=1024), so this is a genuine tightening.",
+      "MAX_TOOL_CALLS_PER_REQUEST": "2x the same observed real max (12). Confirmed MAX_TOOL_CALLS_PER_REQUEST (24) <= MAX_TOOL_CALLS_PER_ROUND * R (12*4=48) - the per-request figure is the tighter, binding constraint in practice."
+    },
+    "source_data": "artifacts/v2/phase9_claim_and_tool_call_distributions.json",
+    "design_decision_invalid_calls_consume_budget": {
+      "decision": "Invalid (registry-rejected) raw_tool_calls[] entries DO consume a budget slot, counted the moment they appear in the array, before parse_and_validate_tool_call ever runs on them.",
+      "rationale": "The alternative (only registry-valid calls consume budget) would let a response padded with many registry-invalid junk entries bypass the budget's real purpose: bounding total processing effort spent on a round's raw model output, not just how many calls reach the HTTP boundary. This is the more conservative, smallest-blast-radius choice.",
+      "proven_by_test": "tests/test_phase9_tool_call_budget.py::TestInvalidCallsConsumeBudget"
+    },
+    "overflow_semantics": [
+      "Overflow entries NEVER parsed, NEVER validated, NEVER executed, NEVER given a fabricated ToolResult.",
+      "Truncation preserves Cerebras's own returned order exactly - no reordering/prioritization.",
+      "A synthetic tool_call_history entry (error_category='tool_call_budget_exhausted') records how many calls were truncated, for observability.",
+      "No new stop reason invented - request-global exhaustion naturally drives 0-productive-tool-calls rounds into the EXISTING TOOL_FAILURE_LIMIT path via research_consecutive_failure_rounds, after MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS=2 such rounds."
+    ],
+    "new_agentstate_fields": [
+      "tool_calls_used_this_request (int, request-global counter, declared in agent/state.py for correct LangGraph cross-node threading)"
+    ],
+    "tests": "tests/test_phase9_tool_call_budget.py (11 tests, all pass)"
+  }
+}

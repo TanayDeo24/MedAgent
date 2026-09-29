@@ -1,0 +1,48 @@
+{
+  "artifact_name": "phase9_process_deviation_003",
+  "deviation_id": "PHASE9-PROCESS-DEV-003",
+  "classification": "methodology/process deviation (TEST HARNESS gap), SUSPECTED not confirmed, NOT a MedAgent product defect",
+  "precise_summary_wording": "Suspected unauthorized live-provider traffic caused by stale deterministic tests after GAP_ANALYSIS_BATCH_SIZE changed from 1 to 2.",
+  "confirmation_status": "SUSPECTED ONLY. No provider-side (billing/usage) confirmation was sought or obtained. No new live call was made to investigate this suspicion, per explicit instruction not to generate additional live traffic to verify it.",
+  "see_also": [
+    "artifacts/v2/phase9_process_deviation_001.json (PHASE9-PROCESS-DEV-001) - unrelated, unauthorized live traffic from scratchpad scripts during an earlier Steps 8-11 pass",
+    "artifacts/v2/phase9_process_deviation_002.json (PHASE9-PROCESS-DEV-002) - unrelated, per-thread monkeypatch race causing one accidental real NVIDIA client construction"
+  ],
+  "discovered_by": "Self-discovered during the Phase-9 FINAL freeze pass, immediately after flipping the production default GAP_ANALYSIS_BATCH_SIZE from 1 to 2 (following the live pair-batching benchmark's accepted result) and launching the full deterministic regression suite to confirm the flip was safe.",
+  "detected_at_phase_step": "Phase 9, FINAL FREEZE pass, immediately after the AC-powered live pair-batching benchmark and the resulting production-default change.",
+  "summary": "The full deterministic suite (pytest tests/ -q -rs) stalled for approximately 12 minutes of wall-clock time while consuming only approximately 13 seconds of CPU time - a signature consistent with the process blocking on I/O (real rate-limiter waits and/or a real network round-trip) rather than performing computational work. The run was interrupted rather than left to run indefinitely. Its captured progress showed approximately 8 failures appearing around the 55-66% mark of the suite.",
+  "affected_files": [
+    {
+      "file": "tests/test_phase9_claim_budget.py",
+      "detail": "All 11 tests mock only the single-claim judge_claim_semantic (never judge_claims_batch), construct between 27 and 320 factual claims per test to exercise CLAIM_EVALUATION_BUDGET, and used zero no_network protection anywhere in the file."
+    },
+    {
+      "file": "tests/test_phase9_quality_non_regression.py",
+      "detail": "One test (test_claim_budget_guard_branch_never_entered_when_under_budget) constructs CLAIM_EVALUATION_BUDGET-1 (31) claims with the same missing-guard pattern; its other two tests are unaffected (0 or 1 judge-eligible claim)."
+    }
+  ],
+  "missing_network_isolation": "Neither affected file used the opt-in tests/conftest.py::no_network fixture on any test. Both relied solely on mocking the single-claim judge_claim_semantic function, which was sufficient isolation before grounding_eval.judge.judge_claims_batch existed.",
+  "why_the_default_flip_exposed_the_stale_mock": "research/gap_analysis.py groups scheduled claims into pairs when GAP_ANALYSIS_BATCH_SIZE=2 and dispatches each pair via grounding_eval.judge.judge_claims_batch - a function that did not exist, and therefore could not have been mocked, when these tests were originally written (before the Phase-9 pair-batching pass). With judge_claims_batch left unmocked, and with settings.CEREBRAS_API_KEY genuinely configured in this development environment (confirmed via direct inspection), the code does not take the 'API key not configured' fast-fail path - it proceeds into the real utils.rate_limiter.wait_for_rate_limit() call (genuine synchronous waits, unmocked) and then attempts a real requests.post() to https://api.cerebras.ai/v1/chat/completions, with nothing in either file positioned to intercept it.",
+  "evidence_supporting_suspicion": [
+    "settings.CEREBRAS_API_KEY is confirmed configured (real key present) in this environment - the 'not configured' fast-fail did not apply.",
+    "tests/test_phase9_claim_budget.py has zero no_network usage across all 11 tests - nothing local would have blocked an outbound call.",
+    "The observed near-zero-CPU/long-wall-clock signature is consistent with genuine blocking I/O (real rate-limiter sleeps and/or real network round-trips), not a deadlock or infinite loop in application code.",
+    "This file's position in pytest's default collection order (file-index 21 of ~40+ test files) is consistent, by cumulative test-count weighting, with the 55-66% progress mark at which the interrupted run's failures appeared.",
+    "The observed failures are fully explained by REAL provider responses not matching what each test's fake single-claim judge was rigged to return - a real Cerebras response for a batch of fabricated placeholder claim text would legitimately cause exactly this kind of assertion mismatch."
+  ],
+  "inability_to_confirm_provider_side_receipt_from_local_logs": "logs/medagent.log shows zero hits for 'cerebras.ai' in the relevant time window, but this is NOT exculpatory. Independently confirmed earlier in this same Phase-9 effort (during the fully-authorized, 23-call live pair-batching benchmark) that grounding_eval/judge.py's requests.post() call site does not route through the application's logging pipeline at all - that benchmark's own real, confirmed live calls also produced zero medagent.log hits. The log's silence therefore says nothing either way about whether a real request left this machine during the interrupted run.",
+  "no_new_live_call_made_to_verify": true,
+  "remediation": {
+    "tests/test_phase9_claim_budget.py": "Added an autouse fixture pinning GAP_ANALYSIS_BATCH_SIZE=1 (this file tests the claim budget, not batching - holding batching at its pre-batching value is correct test isolation) AND a second autouse fixture forcing the pre-existing opt-in no_network guard active for every test in the module, regardless of each test's own signature.",
+    "tests/test_phase9_quality_non_regression.py": "Identical two-fixture remediation (batch-size pin + forced no_network).",
+    "tests/test_phase9_gap_analysis_concurrency.py": "Already carried no_network on every one of its 18 tests - no real traffic could have escaped from this file regardless of the default flip; its symptom was a genuine but harmless hang from real, unmocked rate-limiter waits before the blocked call raised, not a network escape. Received only the batch-size pin, for the same test-isolation reason.",
+    "tests/test_research_models_and_gap_analysis.py": "A precautionary pin was added during initial triage, then REMOVED after a full static audit proved every test in this file schedules at most one judge-eligible factual claim - this file was never actually exposed to the batching code path at any GAP_ANALYSIS_BATCH_SIZE value.",
+    "static_audit_scope": "The full deterministic test suite was searched for any OTHER file constructing 2+ judge-eligible claims while mocking only the single-claim judge function without either no_network protection or being otherwise unreachable. No other file was found to be at risk."
+  },
+  "impact": {
+    "product_conclusions_affected": "NONE. This is a test-harness gap discovered AFTER the live pair-batching benchmark completed and was accepted - it does not touch the benchmark's own methodology, fixtures, or results.",
+    "was_a_genuine_product_defect_found": false,
+    "explicit_confirmation": "Every failure/hang traces to test-harness staleness (a new function introduced by the pair-batching implementation, not yet known to tests written before it existed) or a missing test-level network guard - never to incorrect behavior in research/gap_analysis.py, grounding_eval/judge.py, or the pair-batching implementation itself. tests/test_phase9_pair_batching.py (which mocks both judge functions and uses no_network throughout by design) was not implicated and remains the authoritative deterministic evidence for the batching implementation's correctness."
+  },
+  "was_any_formal_phase9_conclusion_changed_by_this_deviation": false
+}

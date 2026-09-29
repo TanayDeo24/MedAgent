@@ -1,0 +1,950 @@
+{
+  "experiment_name": "gap_analysis_judge_call_concurrency",
+  "purpose": "Pre-registers the FUTURE AC-powered performance-comparison experiment for research/gap_analysis.py::analyze_gaps's configurable GAP_ANALYSIS_MAX_CONCURRENCY (research/loop_control.py), BEFORE any timing data exists, so a later pass cannot redefine the experiment's design after seeing results.",
+  "created_during_pass": "phase9-scheduling-only-pass (battery power, no live network calls permitted)",
+  "scope_note": "This pass implements and deterministically validates the SCHEDULING mechanism only. It does NOT run any live Cerebras/NVIDIA/PubMed/ClinicalTrials/ChEMBL call, does NOT run MedAgent.run(), and does NOT collect or record any timing/latency/throughput number anywhere in this repository.",
+  "candidates": [
+    {
+      "candidate_id": "A",
+      "gap_analysis_max_concurrency": 1,
+      "description": "Sequential baseline - reproduces pre-concurrency-mechanism behavior exactly. This is the current production DEFAULT."
+    },
+    {
+      "candidate_id": "B",
+      "gap_analysis_max_concurrency": 2,
+      "description": "Bounded 2-way concurrent judge dispatch."
+    },
+    {
+      "candidate_id": "C",
+      "gap_analysis_max_concurrency": 4,
+      "description": "Bounded 4-way concurrent judge dispatch."
+    }
+  ],
+  "metrics_to_collect_when_ac_power_is_available": {
+    "gap_analysis_wall_clock_ms": null,
+    "judge_call_count": null,
+    "judge_call_retries": null,
+    "rate_limiter_wait_events": null,
+    "http_429_count": null,
+    "http_5xx_count": null,
+    "semantic_agreement_between_concurrency_levels": null,
+    "ordering_correctness": null,
+    "e2e_confirmation": null
+  },
+  "metrics_are_correctness_checks_not_benchmarks": {
+    "semantic_agreement_between_concurrency_levels": "A correctness check (do candidates A/B/C produce identical gap results on the SAME real judge responses), not a benchmark of model quality.",
+    "ordering_correctness": "A correctness check (is the returned gaps list order identical across candidates), not a timing measurement."
+  },
+  "timing_comparison_status": "COMPLETED",
+  "implementation_status": "BENCHMARKED",
+  "timing_status": "RUN",
+  "reason": "AC power confirmed via `pmset -g batt` before this pass began; live benchmark executed per the pre-registered fixture/order/candidate design above.",
+  "explicit_non_fabrication_notice": "No field under metrics_to_collect_when_ac_power_is_available has ever been populated with a real or placeholder number. All are null by design. This file must not be edited to add fabricated timing values.",
+  "ac_powered_benchmark_pre_registration": {
+    "timestamp_utc": "2026-09-29T00:00:00Z",
+    "environment": {
+      "os": "macOS 15.7.4 (Darwin)",
+      "python_version": "3.12.7",
+      "cpu": "Apple M3",
+      "logical_cores": 8,
+      "ram_gb": 16,
+      "power_state": "AC Power (confirmed via `pmset -g batt` immediately before this pass began)"
+    },
+    "fixture_data_provenance_disclosure": "No repo-tracked artifacts/v2/*.json file contains full serialized GroundedAnswer+Evidence objects (claim text, Evidence content) - every Phase-6/7/8 artifact stores only summary counts (n_factual_claims, claim_support_precision, etc.), confirmed by exhaustive grep/parse of every artifacts/v2/phase*.json file. The only place full serialized objects exist is this session's scratchpad (/private/tmp/.../scratchpad/live_results/LOCAL-0X-*.json), produced by live_runner.py during the already-recorded PHASE9-PROCESS-DEV-001 unauthorized live-traffic incident. Per explicit human authorization obtained before this pass proceeded, these files' real, already-acquired GroundedAnswer+Evidence content are reused here PURELY AS FROZEN INPUT DATA for this pass's own, separately and explicitly authorized judge-call benchmark - no additional MedAgent.run() or biomedical-source call is made to obtain them; they are read from disk exactly as already produced. This is NOT a repeat of PHASE9-PROCESS-DEV-001 - only the judge_claim_semantic calls explicitly authorized by this pass's own governing directive are made live.",
+    "fixtures": [
+      {
+        "size_label": "SMALL",
+        "target_judge_eligible_count": 3,
+        "actual_judge_eligible_count": 4,
+        "disclosure": "Nearest available real fixture has 4 judge-eligible claims, not exactly 3 - no synthetic rewriting performed to force an exact count.",
+        "source_file": "scratchpad/live_results/LOCAL-06-freshmultisource-a.json",
+        "case_id": "LOCAL-06-freshmultisource-a",
+        "query": "What does ChEMBL report about avapritinib's molecular target, and what does ClinicalTrials.gov show about avapritinib trials in gastrointestinal stromal tumors?",
+        "n_evidence": 25,
+        "n_total_claims": 5,
+        "judge_eligible_claim_ids": [
+          "c-0",
+          "c-2",
+          "c-3",
+          "c-4"
+        ]
+      },
+      {
+        "size_label": "MEDIUM",
+        "target_judge_eligible_count": 5,
+        "actual_judge_eligible_count": 5,
+        "disclosure": "Exact match to target.",
+        "source_file": "scratchpad/live_results/LOCAL-04-multi-iter-a.json",
+        "case_id": "LOCAL-04-multi-iter-a",
+        "query": "What does the literature say about niraparib maintenance therapy in ovarian cancer, what does ClinicalTrials.gov show about niraparib trials, and what does ChEMBL report about niraparib's mechanism?",
+        "n_evidence": 69,
+        "n_total_claims": 6,
+        "judge_eligible_claim_ids": [
+          "c-0",
+          "c-1",
+          "c-2",
+          "c-3",
+          "c-4"
+        ]
+      },
+      {
+        "size_label": "LARGE",
+        "target_judge_eligible_count": 8,
+        "actual_judge_eligible_count": 6,
+        "disclosure": "Nearest available real fixture has 6 judge-eligible claims, the highest found across every scratchpad LOCAL-0X file (LOCAL-05 also has 6; LOCAL-02 chosen arbitrarily between the tied pair) - none reaches 8. No synthetic rewriting performed.",
+        "source_file": "scratchpad/live_results/LOCAL-02-ct-gap.json",
+        "case_id": "LOCAL-02-ct-gap",
+        "query": "What does the literature say about lenalidomide in multiple myeloma maintenance therapy, and what does ClinicalTrials.gov show about ongoing lenalidomide maintenance trials?",
+        "n_evidence": 41,
+        "n_total_claims": 7,
+        "judge_eligible_claim_ids": [
+          "c-0",
+          "c-1",
+          "c-2",
+          "c-3",
+          "c-4",
+          "c-5"
+        ]
+      }
+    ],
+    "execution_order_pre_registered": [
+      {
+        "sequence": 1,
+        "fixture": "SMALL",
+        "concurrency_order": [
+          1,
+          2,
+          4
+        ]
+      },
+      {
+        "sequence": 2,
+        "fixture": "MEDIUM",
+        "concurrency_order": [
+          2,
+          4,
+          1
+        ]
+      },
+      {
+        "sequence": 3,
+        "fixture": "LARGE",
+        "concurrency_order": [
+          4,
+          1,
+          2
+        ]
+      }
+    ],
+    "rerun_policy": "No rerun of any completed measurement is permitted, even if inconvenient, unless a run is infrastructure-invalid (e.g. a crash before any judge call completes) - such a case must be preserved with its failure recorded, never silently deleted, per the governing directive.",
+    "expected_logical_judge_call_count": {
+      "small_per_concurrency_level": 4,
+      "medium_per_concurrency_level": 5,
+      "large_per_concurrency_level": 6,
+      "levels_per_fixture": 3,
+      "total_expected": 45,
+      "calculation": "(4+5+6) judge-eligible claims/fixture-set x 3 concurrency levels each = 45 total logical judge calls planned, each call independently up to 2 provider attempts (grounding_eval/judge.py's existing, unmodified bounded retry) if needed."
+    },
+    "method_note": "Benchmarks research/gap_analysis.py::analyze_gaps DIRECTLY (not MedAgent.run()) - state is reconstructed for each run from the fixture's real, already-acquired Evidence + GroundedAnswer objects (via Evidence.model_validate / GroundedAnswer.model_validate), with a FRESH claim_judge_calls_used=0 each invocation (well under CLAIM_EVALUATION_BUDGET=32 for every fixture size used, so budget never binds in this experiment by design - this experiment measures scheduling latency, not budget interaction, which was already deterministically verified in the prior pass). GAP_ANALYSIS_MAX_CONCURRENCY is overridden per-run via monkeypatching research.gap_analysis.GAP_ANALYSIS_MAX_CONCURRENCY (the name as imported into that module's namespace, read fresh at call time inside analyze_gaps - confirmed this resolves dynamically, unlike agent/graph.py's node-function bindings) and restored to the production default (1) between runs."
+  },
+  "actual_live_call_accounting": {
+    "expected_logical_judge_calls": 45,
+    "actual_logical_judge_calls": 45,
+    "match": true,
+    "failures": 0,
+    "retries_observed": 0,
+    "real_429_observed": 0,
+    "real_5xx_observed": 0,
+    "note": "0 failures, 0 retries, 0 429s, 0 5xxs across all 45 real Cerebras judge calls - confirmed via this harness's own per-call instrumentation (evaluator_metadata captured from every real judge_claim_semantic return), not external log inference."
+  },
+  "raw_results": [
+    {
+      "sequence": 1,
+      "fixture": "SMALL",
+      "case_id": "LOCAL-06-freshmultisource-a",
+      "concurrency": 1,
+      "start_timestamp_utc": "2026-09-29T04:37:51Z",
+      "end_timestamp_utc": "2026-09-29T04:38:28Z",
+      "wall_clock_seconds": 36.418517333921045,
+      "logical_judge_calls_made": 4,
+      "claim_judge_calls_used_final": 4,
+      "call_log": [
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 0.00954093411564827,
+          "provider_call_ms": 328.80750007461756,
+          "parsing_validation_ms": 0.041624996811151505,
+          "end_to_end_ms": 328.85866600554436,
+          "wall_start_unix": 1790656671.8925,
+          "wall_elapsed_s": 0.3304373749997467
+        },
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11705.146541935392,
+          "provider_call_ms": 376.70312507543713,
+          "parsing_validation_ms": 0.04529091529548168,
+          "end_to_end_ms": 12081.894957926124,
+          "wall_start_unix": 1790656672.222978,
+          "wall_elapsed_s": 12.083156167063862
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11663.849749951623,
+          "provider_call_ms": 623.7394999479875,
+          "parsing_validation_ms": 0.03279210068285465,
+          "end_to_end_ms": 12287.622042000294,
+          "wall_start_unix": 1790656684.306339,
+          "wall_elapsed_s": 12.28882304194849
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11399.857999989763,
+          "provider_call_ms": 314.57462499383837,
+          "parsing_validation_ms": 0.05050003528594971,
+          "end_to_end_ms": 11714.483125018887,
+          "wall_start_unix": 1790656696.5953732,
+          "wall_elapsed_s": 11.71569250000175
+        }
+      ],
+      "resulting_gaps": [],
+      "resulting_gap_claim_id_order": []
+    },
+    {
+      "sequence": 2,
+      "fixture": "SMALL",
+      "case_id": "LOCAL-06-freshmultisource-a",
+      "concurrency": 2,
+      "start_timestamp_utc": "2026-09-29T04:38:28Z",
+      "end_timestamp_utc": "2026-09-29T04:39:16Z",
+      "wall_clock_seconds": 48.18594600004144,
+      "logical_judge_calls_made": 4,
+      "claim_judge_calls_used_final": 4,
+      "call_log": [
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11687.737624975853,
+          "provider_call_ms": 264.3038750393316,
+          "parsing_validation_ms": 0.034624943509697914,
+          "end_to_end_ms": 11952.076124958694,
+          "wall_start_unix": 1790656708.314086,
+          "wall_elapsed_s": 11.953436458949
+        },
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23690.712708048522,
+          "provider_call_ms": 269.5784589741379,
+          "parsing_validation_ms": 0.03604101948440075,
+          "end_to_end_ms": 23960.327208042145,
+          "wall_start_unix": 1790656708.313962,
+          "wall_elapsed_s": 23.961618875036947
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23791.086915996857,
+          "provider_call_ms": 338.6464590439573,
+          "parsing_validation_ms": 0.03833300434052944,
+          "end_to_end_ms": 24129.771708045155,
+          "wall_start_unix": 1790656720.26772,
+          "wall_elapsed_s": 24.13107029197272
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23848.430707934313,
+          "provider_call_ms": 374.1245421115309,
+          "parsing_validation_ms": 0.03825000021606684,
+          "end_to_end_ms": 24222.59350004606,
+          "wall_start_unix": 1790656732.2759628,
+          "wall_elapsed_s": 24.223898291937076
+        }
+      ],
+      "resulting_gaps": [],
+      "resulting_gap_claim_id_order": []
+    },
+    {
+      "sequence": 3,
+      "fixture": "SMALL",
+      "case_id": "LOCAL-06-freshmultisource-a",
+      "concurrency": 4,
+      "start_timestamp_utc": "2026-09-29T04:39:16Z",
+      "end_timestamp_utc": "2026-09-29T04:40:04Z",
+      "wall_clock_seconds": 48.2290972500341,
+      "logical_judge_calls_made": 4,
+      "claim_judge_calls_used_final": 4,
+      "call_log": [
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11656.311542028561,
+          "provider_call_ms": 331.35262492578477,
+          "parsing_validation_ms": 0.10737497359514236,
+          "end_to_end_ms": 11987.771541927941,
+          "wall_start_unix": 1790656756.503372,
+          "wall_elapsed_s": 11.989740209071897
+        },
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23668.7624999322,
+          "provider_call_ms": 390.27237507980317,
+          "parsing_validation_ms": 0.042208004742860794,
+          "end_to_end_ms": 24059.077083016746,
+          "wall_start_unix": 1790656756.5030751,
+          "wall_elapsed_s": 24.06058504199609
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 35755.53945801221,
+          "provider_call_ms": 377.63658398762345,
+          "parsing_validation_ms": 0.0815410166978836,
+          "end_to_end_ms": 36133.25758301653,
+          "wall_start_unix": 1790656756.503453,
+          "wall_elapsed_s": 36.1353441249812
+        },
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 47791.19300004095,
+          "provider_call_ms": 434.7994999261573,
+          "parsing_validation_ms": 0.13758300337940454,
+          "end_to_end_ms": 48226.130082970485,
+          "wall_start_unix": 1790656756.503266,
+          "wall_elapsed_s": 48.22825437504798
+        }
+      ],
+      "resulting_gaps": [],
+      "resulting_gap_claim_id_order": []
+    },
+    {
+      "sequence": 4,
+      "fixture": "MEDIUM",
+      "case_id": "LOCAL-04-multi-iter-a",
+      "concurrency": 2,
+      "start_timestamp_utc": "2026-09-29T04:40:04Z",
+      "end_timestamp_utc": "2026-09-29T04:41:04Z",
+      "wall_clock_seconds": 60.023163624922745,
+      "logical_judge_calls_made": 5,
+      "claim_judge_calls_used_final": 5,
+      "call_log": [
+        {
+          "claim_id": "c-1",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11559.129624976777,
+          "provider_call_ms": 386.8094580247998,
+          "parsing_validation_ms": 0.06049999501556158,
+          "end_to_end_ms": 11945.999582996592,
+          "wall_start_unix": 1790656804.7395132,
+          "wall_elapsed_s": 11.947912250063382
+        },
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23568.561000050977,
+          "provider_call_ms": 328.35070800501853,
+          "parsing_validation_ms": 0.06354192737489939,
+          "end_to_end_ms": 23896.97524998337,
+          "wall_start_unix": 1790656804.7391732,
+          "wall_elapsed_s": 23.898892082972452
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11736.910250037909,
+          "provider_call_ms": 408.96237501874566,
+          "parsing_validation_ms": 0.06470794323831797,
+          "end_to_end_ms": 12145.937332999893,
+          "wall_start_unix": 1790656828.638479,
+          "wall_elapsed_s": 12.148263500072062
+        },
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 35710.35375003703,
+          "provider_call_ms": 357.82229201868176,
+          "parsing_validation_ms": 0.046915956772863865,
+          "end_to_end_ms": 36068.222958012484,
+          "wall_start_unix": 1790656816.687642,
+          "wall_elapsed_s": 36.069706417038105
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23710.460292058997,
+          "provider_call_ms": 262.8549999790266,
+          "parsing_validation_ms": 0.058999983593821526,
+          "end_to_end_ms": 23973.374292021617,
+          "wall_start_unix": 1790656840.786953,
+          "wall_elapsed_s": 23.975255542085506
+        }
+      ],
+      "resulting_gaps": [],
+      "resulting_gap_claim_id_order": []
+    },
+    {
+      "sequence": 5,
+      "fixture": "MEDIUM",
+      "case_id": "LOCAL-04-multi-iter-a",
+      "concurrency": 4,
+      "start_timestamp_utc": "2026-09-29T04:41:04Z",
+      "end_timestamp_utc": "2026-09-29T04:42:05Z",
+      "wall_clock_seconds": 60.387012292048894,
+      "logical_judge_calls_made": 5,
+      "claim_judge_calls_used_final": 5,
+      "call_log": [
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11744.990541017614,
+          "provider_call_ms": 305.4533749818802,
+          "parsing_validation_ms": 0.06129196844995022,
+          "end_to_end_ms": 12050.505207967944,
+          "wall_start_unix": 1790656864.769921,
+          "wall_elapsed_s": 12.053259709035046
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23792.77749999892,
+          "provider_call_ms": 346.88633296173066,
+          "parsing_validation_ms": 0.052875024266541004,
+          "end_to_end_ms": 24139.716707984917,
+          "wall_start_unix": 1790656864.770167,
+          "wall_elapsed_s": 24.14139999996405
+        },
+        {
+          "claim_id": "c-1",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 35803.92200010829,
+          "provider_call_ms": 278.2333329087123,
+          "parsing_validation_ms": 0.05495804361999035,
+          "end_to_end_ms": 36082.21029106062,
+          "wall_start_unix": 1790656864.769771,
+          "wall_elapsed_s": 36.0843734589871
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 35779.148374916986,
+          "provider_call_ms": 256.4219160703942,
+          "parsing_validation_ms": 0.0969999236986041,
+          "end_to_end_ms": 36035.66729091108,
+          "wall_start_unix": 1790656876.8234031,
+          "wall_elapsed_s": 36.037785749998875
+        },
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 59918.41483407188,
+          "provider_call_ms": 466.38062491547316,
+          "parsing_validation_ms": 0.0577080063521862,
+          "end_to_end_ms": 60384.85316699371,
+          "wall_start_unix": 1790656864.769544,
+          "wall_elapsed_s": 60.386322917067446
+        }
+      ],
+      "resulting_gaps": [],
+      "resulting_gap_claim_id_order": []
+    },
+    {
+      "sequence": 6,
+      "fixture": "MEDIUM",
+      "case_id": "LOCAL-04-multi-iter-a",
+      "concurrency": 1,
+      "start_timestamp_utc": "2026-09-29T04:42:05Z",
+      "end_timestamp_utc": "2026-09-29T04:43:05Z",
+      "wall_clock_seconds": 60.053703290992416,
+      "logical_judge_calls_made": 5,
+      "claim_judge_calls_used_final": 5,
+      "call_log": [
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11541.577416006476,
+          "provider_call_ms": 331.7496250383556,
+          "parsing_validation_ms": 0.053958967328071594,
+          "end_to_end_ms": 11873.38100001216,
+          "wall_start_unix": 1790656925.16161,
+          "wall_elapsed_s": 11.875770000042394
+        },
+        {
+          "claim_id": "c-1",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11676.80770799052,
+          "provider_call_ms": 403.539500082843,
+          "parsing_validation_ms": 0.04966696724295616,
+          "end_to_end_ms": 12080.396875040606,
+          "wall_start_unix": 1790656937.037598,
+          "wall_elapsed_s": 12.081942000077106
+        },
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11678.29408403486,
+          "provider_call_ms": 402.63024996966124,
+          "parsing_validation_ms": 0.08633302059024572,
+          "end_to_end_ms": 12081.010667025112,
+          "wall_start_unix": 1790656949.119753,
+          "wall_elapsed_s": 12.082480791024864
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11690.908624907024,
+          "provider_call_ms": 393.3050420600921,
+          "parsing_validation_ms": 0.06545800715684891,
+          "end_to_end_ms": 12084.279124974273,
+          "wall_start_unix": 1790656961.202448,
+          "wall_elapsed_s": 12.08630958397407
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11690.987417008728,
+          "provider_call_ms": 232.5320829404518,
+          "parsing_validation_ms": 0.07295806426554918,
+          "end_to_end_ms": 11923.592458013445,
+          "wall_start_unix": 1790656973.289002,
+          "wall_elapsed_s": 11.926297708996572
+        }
+      ],
+      "resulting_gaps": [],
+      "resulting_gap_claim_id_order": []
+    },
+    {
+      "sequence": 7,
+      "fixture": "LARGE",
+      "case_id": "LOCAL-02-ct-gap",
+      "concurrency": 4,
+      "start_timestamp_utc": "2026-09-29T04:43:05Z",
+      "end_timestamp_utc": "2026-09-29T04:44:17Z",
+      "wall_clock_seconds": 72.54270470805932,
+      "logical_judge_calls_made": 6,
+      "claim_judge_calls_used_final": 6,
+      "call_log": [
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11768.720166990533,
+          "provider_call_ms": 483.8650409365073,
+          "parsing_validation_ms": 0.0568340765312314,
+          "end_to_end_ms": 12252.642042003572,
+          "wall_start_unix": 1790656985.226198,
+          "wall_elapsed_s": 12.254675999982283
+        },
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "partially_supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23788.931916933507,
+          "provider_call_ms": 344.38962501008064,
+          "parsing_validation_ms": 0.08883303962647915,
+          "end_to_end_ms": 24133.410374983214,
+          "wall_start_unix": 1790656985.225892,
+          "wall_elapsed_s": 24.135396874975413
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 35829.120332957245,
+          "provider_call_ms": 667.8867089794949,
+          "parsing_validation_ms": 0.07520802319049835,
+          "end_to_end_ms": 36497.08224995993,
+          "wall_start_unix": 1790656985.226294,
+          "wall_elapsed_s": 36.49900687497575
+        },
+        {
+          "claim_id": "c-5",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23735.315750003792,
+          "provider_call_ms": 432.8476249938831,
+          "parsing_validation_ms": 0.061583006754517555,
+          "end_to_end_ms": 24168.22495800443,
+          "wall_start_unix": 1790657009.3602948,
+          "wall_elapsed_s": 24.170413332991302
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 47627.45395896491,
+          "provider_call_ms": 476.23825003392994,
+          "parsing_validation_ms": 0.04783296026289463,
+          "end_to_end_ms": 48103.7400419591,
+          "wall_start_unix": 1790656997.4811132,
+          "wall_elapsed_s": 48.10551758296788
+        },
+        {
+          "claim_id": "c-1",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 71900.84445802495,
+          "provider_call_ms": 638.6454169405624,
+          "parsing_validation_ms": 0.06266601849347353,
+          "end_to_end_ms": 72539.552540984,
+          "wall_start_unix": 1790656985.226086,
+          "wall_elapsed_s": 72.54165216698311
+        }
+      ],
+      "resulting_gaps": [
+        {
+          "gap_id": "gap-weak-c-0",
+          "gap_type": "weakly_supported_fact",
+          "description": "Claim 'c-0' is only partially_supported per the frozen Candidate B judge - additional evidence may resolve it.",
+          "target_source_category": null,
+          "related_claim_id": "c-0",
+          "severity": 0.6
+        }
+      ],
+      "resulting_gap_claim_id_order": [
+        "c-0"
+      ]
+    },
+    {
+      "sequence": 8,
+      "fixture": "LARGE",
+      "case_id": "LOCAL-02-ct-gap",
+      "concurrency": 1,
+      "start_timestamp_utc": "2026-09-29T04:44:17Z",
+      "end_timestamp_utc": "2026-09-29T04:45:29Z",
+      "wall_clock_seconds": 72.16960412508342,
+      "logical_judge_calls_made": 6,
+      "claim_judge_calls_used_final": 6,
+      "call_log": [
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "partially_supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11365.906000020914,
+          "provider_call_ms": 303.45424998085946,
+          "parsing_validation_ms": 0.06645801477134228,
+          "end_to_end_ms": 11669.426708016545,
+          "wall_start_unix": 1790657057.744392,
+          "wall_elapsed_s": 11.671367041999474
+        },
+        {
+          "claim_id": "c-1",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11723.862749990076,
+          "provider_call_ms": 371.6041250154376,
+          "parsing_validation_ms": 0.07791700772941113,
+          "end_to_end_ms": 12095.544792013243,
+          "wall_start_unix": 1790657069.4150772,
+          "wall_elapsed_s": 12.09759529097937
+        },
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11698.772792005911,
+          "provider_call_ms": 330.49533294979483,
+          "parsing_validation_ms": 0.07366703357547522,
+          "end_to_end_ms": 12029.341791989282,
+          "wall_start_unix": 1790657081.512387,
+          "wall_elapsed_s": 12.031332458020188
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11695.090541034006,
+          "provider_call_ms": 408.26620894949883,
+          "parsing_validation_ms": 0.06674998439848423,
+          "end_to_end_ms": 12103.423499967903,
+          "wall_start_unix": 1790657093.5436401,
+          "wall_elapsed_s": 12.106420084019192
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11680.266165989451,
+          "provider_call_ms": 307.88624996785074,
+          "parsing_validation_ms": 0.0503340270370245,
+          "end_to_end_ms": 11988.202749984339,
+          "wall_start_unix": 1790657105.650057,
+          "wall_elapsed_s": 11.990223916014656
+        },
+        {
+          "claim_id": "c-5",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11787.347791949287,
+          "provider_call_ms": 481.9327499717474,
+          "parsing_validation_ms": 0.08233299013227224,
+          "end_to_end_ms": 12269.362874911167,
+          "wall_start_unix": 1790657117.6403148,
+          "wall_elapsed_s": 12.271405749954283
+        }
+      ],
+      "resulting_gaps": [
+        {
+          "gap_id": "gap-weak-c-0",
+          "gap_type": "weakly_supported_fact",
+          "description": "Claim 'c-0' is only partially_supported per the frozen Candidate B judge - additional evidence may resolve it.",
+          "target_source_category": null,
+          "related_claim_id": "c-0",
+          "severity": 0.6
+        }
+      ],
+      "resulting_gap_claim_id_order": [
+        "c-0"
+      ]
+    },
+    {
+      "sequence": 9,
+      "fixture": "LARGE",
+      "case_id": "LOCAL-02-ct-gap",
+      "concurrency": 2,
+      "start_timestamp_utc": "2026-09-29T04:45:29Z",
+      "end_timestamp_utc": "2026-09-29T04:46:42Z",
+      "wall_clock_seconds": 72.29625458293594,
+      "logical_judge_calls_made": 6,
+      "claim_judge_calls_used_final": 6,
+      "call_log": [
+        {
+          "claim_id": "c-0",
+          "success": true,
+          "support_label": "partially_supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11564.094000030309,
+          "provider_call_ms": 374.79779100976884,
+          "parsing_validation_ms": 0.09400001727044582,
+          "end_to_end_ms": 11938.985791057348,
+          "wall_start_unix": 1790657129.919302,
+          "wall_elapsed_s": 11.941147250006907
+        },
+        {
+          "claim_id": "c-1",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23594.02612503618,
+          "provider_call_ms": 374.00629196781665,
+          "parsing_validation_ms": 0.05791592411696911,
+          "end_to_end_ms": 23968.090332928114,
+          "wall_start_unix": 1790657129.919559,
+          "wall_elapsed_s": 23.970091208000667
+        },
+        {
+          "claim_id": "c-3",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 11648.173416033387,
+          "provider_call_ms": 311.06266693677753,
+          "parsing_validation_ms": 0.08270808029919863,
+          "end_to_end_ms": 11959.318791050464,
+          "wall_start_unix": 1790657153.889754,
+          "wall_elapsed_s": 11.961449833004735
+        },
+        {
+          "claim_id": "c-2",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 35702.78387493454,
+          "provider_call_ms": 330.2059170091525,
+          "parsing_validation_ms": 0.07054104935377836,
+          "end_to_end_ms": 36033.060332993045,
+          "wall_start_unix": 1790657141.86053,
+          "wall_elapsed_s": 36.034991541993804
+        },
+        {
+          "claim_id": "c-4",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23756.321458960883,
+          "provider_call_ms": 362.5834999838844,
+          "parsing_validation_ms": 0.051915994845330715,
+          "end_to_end_ms": 24118.956874939613,
+          "wall_start_unix": 1790657165.851278,
+          "wall_elapsed_s": 24.121146042016335
+        },
+        {
+          "claim_id": "c-5",
+          "success": true,
+          "support_label": "supported",
+          "llm_calls": 1,
+          "rate_limit_wait_ms": 23744.242165936157,
+          "provider_call_ms": 572.580709005706,
+          "parsing_validation_ms": 0.07295806426554918,
+          "end_to_end_ms": 24316.89583300613,
+          "wall_start_unix": 1790657177.895683,
+          "wall_elapsed_s": 24.319328958983533
+        }
+      ],
+      "resulting_gaps": [
+        {
+          "gap_id": "gap-weak-c-0",
+          "gap_type": "weakly_supported_fact",
+          "description": "Claim 'c-0' is only partially_supported per the frozen Candidate B judge - additional evidence may resolve it.",
+          "target_source_category": null,
+          "related_claim_id": "c-0",
+          "severity": 0.6
+        }
+      ],
+      "resulting_gap_claim_id_order": [
+        "c-0"
+      ]
+    }
+  ],
+  "deltas_vs_concurrency_1_baseline": {
+    "SMALL": {
+      "baseline_concurrency_1_wall_clock_s": 36.419,
+      "concurrency_2_wall_clock_s": 48.186,
+      "concurrency_2_abs_delta_s": 11.767,
+      "concurrency_2_rel_delta": 0.323,
+      "concurrency_4_wall_clock_s": 48.229,
+      "concurrency_4_abs_delta_s": 11.811,
+      "concurrency_4_rel_delta": 0.324,
+      "note": "concurrency=2/4 both ~32% SLOWER than concurrency=1 for this fixture. n=1 per condition (single live run each, per the pre-registered bounded-traffic design) - cannot statistically distinguish a genuine concurrency-caused effect from ordinary run-to-run variance (this benchmark's 9 runs share ONE persistent process-wide utils.rate_limiter token bucket; the SMALL/concurrency=1 run happened to run FIRST in sequence and its first call had rate_limit_wait_ms=0.0 (a still-full bucket), while the concurrency=2/4 runs' first calls already show ~11.7s waits (a partially-depleted bucket carried over from the prior run) - this is a plausible, not confirmed, confound, disclosed honestly rather than asserted as a definitive explanation)."
+    },
+    "MEDIUM": {
+      "baseline_concurrency_1_wall_clock_s": 60.054,
+      "concurrency_2_wall_clock_s": 60.023,
+      "concurrency_2_abs_delta_s": -0.031,
+      "concurrency_2_rel_delta": -0.0005,
+      "concurrency_4_wall_clock_s": 60.387,
+      "concurrency_4_abs_delta_s": 0.333,
+      "concurrency_4_rel_delta": 0.006,
+      "note": "Essentially no difference (well under 1%) across all 3 concurrency levels."
+    },
+    "LARGE": {
+      "baseline_concurrency_1_wall_clock_s": 72.17,
+      "concurrency_2_wall_clock_s": 72.296,
+      "concurrency_2_abs_delta_s": 0.127,
+      "concurrency_2_rel_delta": 0.002,
+      "concurrency_4_wall_clock_s": 72.543,
+      "concurrency_4_abs_delta_s": 0.373,
+      "concurrency_4_rel_delta": 0.005,
+      "note": "Essentially no difference (well under 1%) across all 3 concurrency levels."
+    },
+    "n_per_cell": 1,
+    "p95_p99_reported": false,
+    "p95_p99_reason": "n=1 per (fixture, concurrency) cell - far below the Phase-9 measurement contract's n>=30 requirement for any percentile claim. Only raw per-run values are reported, per that contract's own rule.",
+    "aggregate_headline_given": false,
+    "aggregate_headline_reason": "Explicitly not combined into one misleading cross-fixture number - SMALL, MEDIUM, and LARGE are reported and interpreted separately, per instruction."
+  },
+  "rate_limiter_mechanism_finding": {
+    "observation": "Per-call rate_limit_wait_ms telemetry (captured directly from grounding_eval.judge's own evaluator_metadata, not inferred) shows that under concurrency=2 and concurrency=4, individual threads' wait times STACK ADDITIVELY (e.g. SMALL concurrency=4's 4 calls show rate_limit_wait_ms of approximately 11656/23669/35756/47791 - i.e. ~12s/24s/36s/48s), exactly mirroring the same total serialization time as the fully sequential concurrency=1 case, just distributed differently across threads.",
+    "explanation": "utils.rate_limiter.TokenBucket's capacity=1 for the Cerebras key means only ONE token is EVER available at a time, regardless of how many threads are waiting - the shared limiter fully serializes actual provider dispatch under this configuration. Bounded concurrency at the SCHEDULING layer cannot reduce wall-clock time when the binding constraint is a capacity=1 rate limiter, because there is structurally no way for more than one real provider call to be in flight at once - concurrency only changes WHICH thread is waiting, never HOW LONG the total waiting is.",
+    "no_burst_confirmed": "Zero evidence of any burst above the configured 5 RPM allowance at any concurrency level - every one of the 45 calls' rate_limit_wait_ms values is consistent with strict ~12s minimum spacing, confirming the limiter was not bypassed.",
+    "verdict": "The rate limiter behaved correctly and was not bypassed under concurrency. This is precisely why concurrency=2/4 show no meaningful speedup (MEDIUM/LARGE) or even a slight apparent regression (SMALL, likely bucket-state-carryover confounded) - the scheduling change is safe but does not help under the CURRENT 5 RPM/capacity=1 rate-limit configuration."
+  },
+  "semantic_check": {
+    "method": "Compared exact claim IDs evaluated, gap types, gap-claim-id ordering, and claim_judge_calls_used across all 3 concurrency levels, per fixture.",
+    "LARGE_fixture_gap_consistency": "All 3 concurrency levels (1, 2, 4) independently produced the identical single gap tied to claim c-0 (gap_claim_id_order=['c-0'] in every run) - consistent real judge output (or coincidentally-identical real nondeterministic output; cannot fully distinguish with n=1, but zero indication of scheduler corruption either way).",
+    "SMALL_and_MEDIUM_fixture_gap_consistency": "All 3 concurrency levels produced zero gaps for both fixtures, consistently.",
+    "scheduler_corruption_check": {
+      "missing_claim": "None observed - every scheduled claim in every run produced exactly one call_log entry.",
+      "duplicated_claim": "None observed.",
+      "wrong_claim_id_association": "None observed - every gap's related_claim_id and every call_log entry's claim_id correctly traces to its own claim, verified by direct inspection.",
+      "ordering_corrupted_by_completion_order": "None observed - e.g. LARGE concurrency=4's call_log completion order was c-2,c-0,c-3,c-5,c-4,c-1 (scrambled), yet the single resulting gap (tied to c-0) appears correctly positioned per claim order in the returned gaps list, exactly as concurrency=1/2 also produced.",
+      "budget_mismatch": "None observed - claim_judge_calls_used_final matched logical_judge_calls_made exactly in every one of the 9 runs.",
+      "verdict": "PROVIDER NONDETERMINISM only (if any) - ZERO evidence of SCHEDULER CORRUPTION in any run."
+    }
+  },
+  "candidate_selection": {
+    "criteria_evaluated": {
+      "1_meaningful_latency_improvement": "NOT demonstrated - MEDIUM/LARGE show <1% difference across all levels; SMALL shows concurrency=2/4 ~32% SLOWER than concurrency=1, plausibly confounded by rate-limiter bucket-state carryover between sequential benchmark runs rather than a genuine concurrency-caused effect, but in no case does concurrency=2 or 4 show a clear, positive, defensible improvement.",
+      "2_zero_scheduler_correctness_defect": "PASS - see semantic_check above.",
+      "3_zero_budget_violation": "PASS - claim_judge_calls_used_final == logical_judge_calls_made in every run; CLAIM_EVALUATION_BUDGET=32 never approached (max 6 calls/run).",
+      "4_zero_claim_loss": "PASS - every scheduled claim produced exactly one outcome.",
+      "5_zero_cross_claim_association": "PASS - verified claim_id-keyed throughout.",
+      "6_rate_limiter_respected": "PASS - see rate_limiter_mechanism_finding above.",
+      "7_retry_behavior_preserved": "PASS - 0 retries needed this run, but the mechanism (judge_claim_semantic's own internal 2-attempt bounded retry) was not touched and remains available.",
+      "8_no_meaningful_reliability_regression": "PASS - 0 failures, 0 429s, 0 5xxs across all 45 calls at every concurrency level."
+    },
+    "selected_candidate": "KEEP 1",
+    "reason": "No candidate (2 or 4) demonstrated a meaningful, defensible latency improvement over concurrency=1. MEDIUM and LARGE fixtures show the wall-clock time is effectively identical (<1% difference, within measurement noise) regardless of concurrency setting, because the shared Cerebras rate limiter's capacity=1 bucket fully serializes actual provider dispatch regardless of how many worker threads are waiting - there is structurally no wall-clock benefit available to capture under the CURRENT 5 RPM/capacity=1 rate-limit configuration. SMALL's apparent 32% regression under concurrency=2/4 is not attributed to a genuine concurrency-caused slowdown (disclosed as plausibly confounded by rate-limiter bucket-state carryover between sequential runs sharing one process-wide limiter instance, with n=1 per condition insufficient to distinguish this from a real effect) - but even setting that result aside entirely, MEDIUM and LARGE's null results alone are sufficient to conclude that no meaningful, defensible latency improvement was demonstrated. Per the governing directive's own explicit instruction: 'If neither 2 nor 4 demonstrates a meaningful defensible improvement: keep 1.' This is a mechanical, capacity=1-driven ceiling, not a flaw in the concurrency implementation itself (which remains correct, tested, and available for use if the rate-limit configuration is ever revisited in a future, separately-authorized pass)."
+  },
+  "e2e_confirmation": {
+    "run": false,
+    "reason": "Step 9's candidate selection is KEEP 1 (no change from the current production default, GAP_ANALYSIS_MAX_CONCURRENCY=1). Step 10's E2E comparison is baseline-vs-selected-candidate; since the selected candidate IS the baseline, a live end-to-end comparison would compare GAP_ANALYSIS_MAX_CONCURRENCY=1 against itself, providing zero additional information at the cost of additional live provider traffic. Per the governing directive's own 'keep total live traffic within a reasonable bounded number' instruction and 'do not make hidden exploratory live runs' rule, this redundant comparison was deliberately NOT run - this is a documented decision, not an omission."
+  },
+  "production_default_decision": {
+    "old_default": 1,
+    "new_default": 1,
+    "changed": false,
+    "why": "Live evidence (this benchmark) did not demonstrate a meaningful, defensible latency improvement from raising GAP_ANALYSIS_MAX_CONCURRENCY above 1 under the current Cerebras 5 RPM/capacity=1 rate-limit configuration - the mechanism is structurally rate-limiter-bound, not scheduling-bound, at this rate. Per Step 11's explicit instruction ('If the evidence does not justify changing it: leave default = 1'), the default remains 1. The bounded-concurrency mechanism itself remains implemented, tested, and available (not removed) for a future pass IF the rate-limit configuration is ever revisited - changing the rate limiter is explicitly out of this pass's scope."
+  }
+}

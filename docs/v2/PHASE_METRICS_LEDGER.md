@@ -1192,3 +1192,70 @@ CLOSED (2-round case fully verified live; no organic 3-round case this
 pass, non-blocking, offline-covered). Phase-10 protection reconfirmed
 intact. Phase 9 determined NOT blocked by any remaining Phase-8
 functional-correctness item.
+
+## Phase 9: Reliability/Concurrency/Performance (this session)
+
+Full detail: `docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md`,
+`docs/v2/PHASE9_FAILURE_ANALYSIS.md`, `docs/v2/PHASE9_GATE_PLAN.md`,
+`docs/v2/PHASE9_FINAL_GATE_AUDIT.md`, `artifacts/v2/phase9_*.json`.
+
+**Baseline bottleneck profile** (`artifacts/v2/phase9_baseline_profile.json`):
+gap_analysis 56.3%, report_generation 19.5%, synthesis 17.2%,
+grounded_generation 4.6%, tool/research execution ~2% combined, local
+Python negligible.
+
+**Two boundedness fixes applied:**
+- **PHASE9-DEFECT-001** (missing intentional claim-evaluation budget):
+  `CLAIM_EVALUATION_BUDGET=32`, request-global.
+- **PHASE9-DEFECT-002** (missing intentional tool-call budget):
+  `MAX_TOOL_CALLS_PER_ROUND=12`, `MAX_TOOL_CALLS_PER_REQUEST=24`.
+
+**Two live optimization experiments, AC-powered:**
+
+| Experiment | Candidates | Live result | Decision |
+|---|---|---|---|
+| Judge-call concurrency | `GAP_ANALYSIS_MAX_CONCURRENCY` 1/2/4 | No meaningful improvement - Cerebras rate limiter (capacity=1) fully serializes dispatch regardless of thread count | **KEEP 1** |
+| Judge-call pair batching | `GAP_ANALYSIS_BATCH_SIZE` 1/2 | SMALL -34.1%, MEDIUM -40.4%, LARGE -50.1%; logical calls matched `ceil(n/2)` exactly; zero semantic regression across 23 live calls | **SELECT 2** (new default) |
+
+**Three process deviations** (none a product defect, none changing any
+formal conclusion): PHASE9-PROCESS-DEV-001 (unauthorized live traffic,
+earlier audit pass), PHASE9-PROCESS-DEV-002 (test-harness monkeypatch
+race), PHASE9-PROCESS-DEV-003 (suspected, unconfirmed live traffic from
+stale deterministic tests after the batch-size default flip - remediated
+by adding `no_network` guards and explicit batch-size pins to the affected
+test files).
+
+**Final frozen configuration** (`artifacts/v2/phase9_frozen_config.json`):
+`MAX_RESEARCH_ITERATIONS=3`, `MAX_TOOL_CALLS_TOTAL=8`,
+`MAX_REPEATED_ACTION=1`, `MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS=2`,
+`CLAIM_EVALUATION_BUDGET=32`, `MAX_TOOL_CALLS_PER_ROUND=12`,
+`MAX_TOOL_CALLS_PER_REQUEST=24`, `GAP_ANALYSIS_MAX_CONCURRENCY=1`,
+`GAP_ANALYSIS_BATCH_SIZE=2`.
+
+**Final live validation** (5 fresh cases, frozen config, run once, no
+tuning - `artifacts/v2/phase9_final_validation_manifest.json`): all 5
+reached explicit terminal states (`safe_abstention` x3,
+`sufficient_evidence` x1, `no_productive_action` x1), zero infinite loops,
+zero fabricated Evidence IDs ever accepted, all budgets well within bound
+(`claim_judge_calls_used` in {9,15,0,12,0}, `tool_calls_used_this_request`
+in {7,6,4,6,4}). PHASE8-DEFECT-001's caveat mechanism fired correctly live
+on a real `weakly_supported_fact` gap (VAL9-4). Two cases hit
+`grounded_generation`'s pre-existing hard Evidence-ID gate, which
+correctly rejected a malformed citation both times rather than accepting
+it - a Phase-6/7 generation-layer observation, out of Phase-9's scope, and
+evidence the safety mechanism works as designed, not a new defect.
+**No genuine product defect found.**
+
+**Final regression:** deterministic `643 passed, 0 failed, 7 skipped`
+(unchanged before/after live validation); live-enabled ChEMBL suite
+(`RUN_LIVE_CHEMBL_TESTS=1`) `650 passed, 0 failed, 0 skipped`. No
+unexpected provider traffic observed in either run.
+
+**CTL carryover:** CTL-017 CLOSED (both narrow scope and Phase 9's own
+system-wide fault matrix complete); CTL-016 PARTIALLY CLOSED, unchanged
+(no organic 3-round live `MedAgent.run()` case added this phase); CTL-019
+UNCHANGED (citation-time gate - Phase 9's live measurements were
+gap-analysis-specific micro-benchmarks, not a larger-n Phase-8
+DEV/Validation re-measurement).
+
+Phase 10 and its final benchmark remained untouched throughout.

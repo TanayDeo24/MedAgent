@@ -24,6 +24,32 @@ class GapType(str, Enum):
     WEAKLY_SUPPORTED_FACT = "weakly_supported_fact"
     CONFLICTING_EVIDENCE = "conflicting_evidence"
 
+    # PHASE9-DEFECT-001 fix (Phase-9 boundedness hardening pass, see
+    # docs/v2/PHASE9_FAILURE_ANALYSIS.md and
+    # docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's "BOUNDEDNESS HARDENING"
+    # section): a claim that was never evaluated against its cited Evidence
+    # because the request-global CLAIM_EVALUATION_BUDGET
+    # (research/loop_control.py) was already exhausted by earlier claims in
+    # this same request. This is an EXPLICIT "not evaluated" state - it must
+    # never be confused with "evaluated and supported" (no gap at all) or
+    # with "evaluated and weak/contradicted" (WEAKLY_SUPPORTED_FACT /
+    # CONFLICTING_EVIDENCE above). The real detector for this gap type lives
+    # in research/gap_analysis.py::analyze_gaps.
+    EVALUATION_BUDGET_EXHAUSTED = "evaluation_budget_exhausted"
+
+    # Phase-9 pair-batching pass (see docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's
+    # "GAP-ANALYSIS PAIR BATCHING" section): a claim whose judge attempt
+    # (single-claim OR batch-of-2, per GAP_ANALYSIS_BATCH_SIZE) exhausted its
+    # bounded provider-attempt retries without ever producing a valid,
+    # structurally-correct judgment for that claim - e.g. a batch-of-2
+    # request whose response was malformed/missing an ID/had a duplicate ID
+    # on every attempt. This is distinct from EVALUATION_BUDGET_EXHAUSTED
+    # (which means "never attempted") - this means "attempted, but the
+    # attempt(s) never yielded a usable result". Never fabricates a judgment;
+    # the claim itself is never dropped or marked supported. The real
+    # detector for this gap type lives in research/gap_analysis.py::analyze_gaps.
+    CLAIM_EVALUATION_FAILED = "claim_evaluation_failed"
+
 
 class StopReason(str, Enum):
     """Explicit, non-vague terminal states (contract requirement - never a

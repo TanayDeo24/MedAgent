@@ -1,0 +1,32 @@
+{
+  "artifact_name": "phase9_process_deviation_002",
+  "deviation_id": "PHASE9-PROCESS-DEV-002",
+  "classification": "methodology/process deviation (TEST HARNESS bug), NOT a MedAgent product defect",
+  "see_also": "artifacts/v2/phase9_process_deviation_001.json (PHASE9-PROCESS-DEV-001) - an independent, unrelated deviation from an earlier Steps 8-11 pass (unauthorized live-provider traffic). This record is deliberately kept SEPARATE, not merged - different root cause, different discovery mechanism, different remediation.",
+  "discovered_by": "Self-discovered while writing tests/test_phase9_concurrency_audit.py's TestConcurrentRichStateIsolation coverage during the PRE-OPTIMIZATION CONSISTENCY AUDIT pass that preceded this BOUNDEDNESS HARDENING pass - an earlier, per-thread-monkeypatch version of that test's stub-installation helper intermittently let a real ChatNVIDIA client get constructed mid-test.",
+  "detected_at_phase_step": "Phase 9, PRE-OPTIMIZATION CONSISTENCY AUDIT (the pass immediately preceding this BOUNDEDNESS HARDENING pass)",
+  "summary": "An earlier version of tests/test_phase9_concurrency_audit.py's concurrent-MedAgent-run test stubs installed its monkeypatches PER-THREAD, using a fresh pytest.MonkeyPatch() instance created and torn down (.undo()) inside each worker thread's own task function, around PROCESS-GLOBAL module attributes (agent.nodes.get_llm, agent.nodes.call_cerebras_native_tools, etc.). Because monkeypatch.setattr/.undo() mutate the SAME shared module namespace regardless of which thread calls them, one thread's .undo() call could restore the REAL agent.nodes.get_llm while ANOTHER thread's MedAgent(research_loop=True).run() call was still mid-flight and about to call it - constructing a real ChatNVIDIA client, which itself makes a real network call to NVIDIA's model-listing/validation endpoint as part of its __init__ (a documented langchain_nvidia_ai_endpoints behavior, not something MedAgent's own code does deliberately).",
+  "root_cause": {
+    "pattern": "Per-thread pytest.MonkeyPatch() install/undo racing on a shared, process-global module attribute, in a multi-threaded test (ThreadPoolExecutor-based concurrent MedAgent().run() calls).",
+    "why_it_is_racy": "monkeypatch.setattr(module, name, value) and monkeypatch.undo() both mutate module.__dict__ directly - there is exactly ONE agent.nodes module object shared by every thread in the process. A per-thread MonkeyPatch instance has no way to scope its patch to only the thread that installed it; 'undo' always restores the pre-patch value for EVERY thread still reading that attribute, including ones mid-call.",
+    "empirical_symptom_observed": "A DeprecationWarning / real model-listing HTTP call visible in test output, traced back to a real langchain_nvidia_ai_endpoints.ChatNVIDIA construction happening inside what was supposed to be a fully-stubbed test path."
+  },
+  "accidental_real_endpoint_contacted": {
+    "provider": "NVIDIA NIM",
+    "endpoint_class": "ChatNVIDIA.__init__'s internal available_models property construction / model-listing validation call (langchain_nvidia_ai_endpoints library behavior, not MedAgent application code)",
+    "credentials_used": "Whatever NVIDIA_API_KEY was present in the local test environment at the time - no query/Evidence/biomedical data was sent; this was a model-listing/auth-validation call, not a chat-completion call with real MedAgent query content.",
+    "was_this_a_biomedical_or_provider_data_call": "No - purely a client-initialization/model-listing call, not a real chat-completions request carrying any MedAgent query text or Evidence."
+  },
+  "impact": {
+    "product_conclusions_affected": "NONE. This is a TEST HARNESS bug in how a Phase-9 test stubbed its own dependencies - it says nothing about MedAgent's own reliability/boundedness behavior. No formal Phase-9 finding (fault matrix, concurrency audit, rate-limiter audit, boundedness derivation, or this pass's claim/tool-call budget design) depends on or cites any result produced by the racy version of this test.",
+    "spend_impact": "Negligible - a small number of model-listing calls (not full chat-completions requests), bounded by however many times the race actually manifested during test-authoring iteration, not a sustained or repeated production-scale issue.",
+    "was_the_real_bug_ever_shipped_to_a_test_that_runs_in_ci": "No - the racy per-thread-monkeypatch version was caught and fixed DURING authoring, before being committed/left in place; the version now in tests/test_phase9_concurrency_audit.py (see its _marker_from_query and _install_rich_state_stubs_once docstrings) uses the corrected pattern."
+  },
+  "remediation": {
+    "pattern_applied": "Install every monkeypatch ONCE, globally, on the main thread, BEFORE any worker thread is spawned (never per-thread). Every stub is written as a PURE FUNCTION of its own `state` argument (thread-local by construction, since LangGraph gives every concurrent agent.run() call its own fresh state dict) rather than of which thread happens to be executing it - this eliminates the need for any per-thread patch/undo cycle at all.",
+    "code_location": "tests/test_phase9_concurrency_audit.py::_install_rich_state_stubs_once (and _marker_from_query, which derives per-request behavior from the query string embedded in `state`, not from a closure)",
+    "generalization_for_future_passes": "Documented as a going-forward rule (mirrors PHASE9-PROCESS-DEV-001's own remediation item 6): any test that spawns multiple threads/tasks and needs different stubbed behavior per task must derive that behavior from data already present in each task's own arguments/state, never from a per-thread monkeypatch install/undo cycle around a shared module attribute."
+  },
+  "was_any_formal_phase9_conclusion_changed_by_this_deviation": false,
+  "explicit_confirmation": "This deviation did NOT alter any product/reliability conclusion reached by this pass or any prior Phase-9 pass. It is a test-methodology finding about how a specific test was AUTHORED, fully resolved before that test was finalized - never a claim about MedAgent's own concurrency safety (which Step 9's actual, corrected concurrency-audit tests - using this same fixed pattern - continue to cover with zero data-correctness defects found)."
+}

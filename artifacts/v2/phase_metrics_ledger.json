@@ -1388,5 +1388,158 @@
       "artifacts/v2/phase8_fresh_multisource_validation.json",
       "artifacts/v2/phase8_local_verification_defect_002.json"
     ]
+  },
+  "phase_9_reliability_performance": {
+    "summary": "Reliability/Concurrency/Performance hardening pass. Baseline profiling identified gap_analysis as the dominant bottleneck (56.3% of stage time). Two intentional application-level boundedness fixes were applied (PHASE9-DEFECT-001, PHASE9-DEFECT-002). Two optimization experiments were run live under AC power: bounded concurrency (REJECTED - no benefit under the Cerebras rate limiter) and pair batching (SELECTED - genuine 34-50% latency reduction, zero semantic regression). Three process deviations were discovered, documented, and remediated (none affecting any product conclusion). Final freeze validated live on 5 fresh cases with the locked configuration.",
+    "baseline_bottleneck_profile": {
+      "gap_analysis": "56.3%",
+      "report_generation": "19.5%",
+      "synthesis": "17.2%",
+      "grounded_generation": "4.6%",
+      "tool_research_execution": "~2% combined",
+      "local_python": "negligible",
+      "artifact": "artifacts/v2/phase9_baseline_profile.json"
+    },
+    "defects_fixed": [
+      {
+        "id": "PHASE9-DEFECT-001",
+        "summary": "Missing intentional application-level claim-evaluation budget",
+        "fix": "CLAIM_EVALUATION_BUDGET=32 (request-global), new EVALUATION_BUDGET_EXHAUSTED gap type, excluded from re-targeting, claims caveated in finalization"
+      },
+      {
+        "id": "PHASE9-DEFECT-002",
+        "summary": "Missing intentional application-level tool-call budget for model-emitted tool calls",
+        "fix": "MAX_TOOL_CALLS_PER_ROUND=12, MAX_TOOL_CALLS_PER_REQUEST=24, invalid/rejected calls also consume budget (conservative choice)"
+      }
+    ],
+    "optimization_experiments": [
+      {
+        "name": "gap_analysis_judge_call_concurrency",
+        "candidates": "GAP_ANALYSIS_MAX_CONCURRENCY in {1,2,4}",
+        "live_result": "concurrency=2/4 showed no meaningful latency improvement (Cerebras judge rate limiter capacity=1 fully serializes dispatch; waits stack additively)",
+        "decision": "KEEP 1 (unchanged default)",
+        "artifact": "artifacts/v2/phase9_gap_analysis_concurrency_experiment.json"
+      },
+      {
+        "name": "gap_analysis_judge_call_pair_batching",
+        "candidates": "GAP_ANALYSIS_BATCH_SIZE in {1,2}",
+        "live_result": {
+          "SMALL_4claims": {
+            "batch1_s": 36.592,
+            "batch2_s": 24.113,
+            "delta": "-34.1%"
+          },
+          "MEDIUM_5claims": {
+            "batch1_s": 60.311,
+            "batch2_s": 35.964,
+            "delta": "-40.4%"
+          },
+          "LARGE_6claims": {
+            "batch1_s": 72.645,
+            "batch2_s": 36.213,
+            "delta": "-50.1%"
+          },
+          "n_per_cell": 1,
+          "logical_call_reduction": "matched ceil(n/2) exactly in every case",
+          "semantic_regression": "none - 0 missing/duplicate/wrong-claim-association, 0 evidence contamination, 0 false support, identical support labels to the batch1 control on every claim, 0 failures/retries/429/5xx across all 23 planned live calls"
+        },
+        "decision": "SELECT batch_size=2 (production default changed from 1)",
+        "artifact": "artifacts/v2/phase9_pair_batching_experiment.json"
+      }
+    ],
+    "process_deviations": [
+      {
+        "id": "PHASE9-PROCESS-DEV-001",
+        "summary": "Unauthorized live-provider traffic during an earlier reliability audit (scratchpad scripts)",
+        "product_defect": false
+      },
+      {
+        "id": "PHASE9-PROCESS-DEV-002",
+        "summary": "Test-harness per-thread monkeypatch race causing one accidental real NVIDIA client construction",
+        "product_defect": false
+      },
+      {
+        "id": "PHASE9-PROCESS-DEV-003",
+        "summary": "SUSPECTED (not confirmed) unauthorized live-provider traffic caused by stale deterministic tests after GAP_ANALYSIS_BATCH_SIZE changed from 1 to 2",
+        "product_defect": false
+      }
+    ],
+    "final_frozen_config": {
+      "MAX_RESEARCH_ITERATIONS": 3,
+      "MAX_TOOL_CALLS_TOTAL": 8,
+      "MAX_REPEATED_ACTION": 1,
+      "MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS": 2,
+      "CLAIM_EVALUATION_BUDGET": 32,
+      "MAX_TOOL_CALLS_PER_ROUND": 12,
+      "MAX_TOOL_CALLS_PER_REQUEST": 24,
+      "GAP_ANALYSIS_MAX_CONCURRENCY": 1,
+      "GAP_ANALYSIS_BATCH_SIZE": 2,
+      "artifact": "artifacts/v2/phase9_frozen_config.json"
+    },
+    "final_validation": {
+      "manifest": "artifacts/v2/phase9_final_validation_manifest.json",
+      "n_cases": 5,
+      "results_summary": [
+        {
+          "case": "VAL9-1-simple-successful",
+          "stop_reason": "safe_abstention",
+          "note": "grounded_generation's pre-existing hard Evidence-ID gate correctly rejected a malformed citation twice, triggering safe abstention - safety mechanism confirmed working, not a Phase-9 defect"
+        },
+        {
+          "case": "VAL9-2-multi-source",
+          "stop_reason": "sufficient_evidence",
+          "note": "clean pass, 8 claims, 0 gaps, 1 generation-time caveat unrelated to gaps"
+        },
+        {
+          "case": "VAL9-3-research-loop",
+          "stop_reason": "safe_abstention",
+          "note": "same pre-existing hard-gate rejection pattern as VAL9-1"
+        },
+        {
+          "case": "VAL9-4-multi-iteration",
+          "stop_reason": "no_productive_action",
+          "note": "PHASE8-DEFECT-001's caveat mechanism fired correctly live on a real weakly_supported_fact gap"
+        },
+        {
+          "case": "VAL9-5-safe-abstention",
+          "stop_reason": "safe_abstention",
+          "note": "fictitious-compound query correctly abstained despite some loosely-matched real evidence being retrieved"
+        }
+      ],
+      "boundedness_confirmed": "claim_judge_calls_used in {9,15,0,12,0}, tool_calls_used_this_request in {7,6,4,6,4} - all well within CLAIM_EVALUATION_BUDGET=32 / MAX_TOOL_CALLS_PER_REQUEST=24",
+      "fabricated_evidence_ids_accepted": 0,
+      "genuine_product_defect_found": false,
+      "observation_out_of_scope": "grounded_generation occasionally cites a malformed/mismatched Evidence ID (2 of 5 cases) - a pre-existing Phase-6/7 generation-layer quality behavior, not introduced by and not in scope for Phase 9; its own hard gate correctly rejected it both times rather than accepting a fabricated citation"
+    },
+    "final_regression": {
+      "deterministic": "643 passed, 0 failed, 7 skipped (unchanged before/after live validation)",
+      "live_enabled_chembl": "650 passed, 0 failed, 0 skipped (RUN_LIVE_CHEMBL_TESTS=1)",
+      "unexpected_provider_traffic": "none observed in either run"
+    },
+    "ctl_carryover_final_status": {
+      "CTL-016": "PARTIALLY CLOSED (unchanged) - 1 real 2-round case verified in an earlier Phase-8 pass; no organic 3-round MedAgent.run() case added by Phase 9 (Phase 9's own live traffic called analyze_gaps directly or ran single-round-sufficient validation cases)",
+      "CTL-017": "CLOSED - both its own narrow scope (Phase-8 local-closure pass) and Phase 9's system-wide fault matrix (artifacts/v2/phase9_fault_matrix.json) are complete",
+      "CTL-019": "UNCHANGED - remains a citation-time gate; Phase 9's live measurements were gap-analysis-judge-specific micro-benchmarks, not a larger-n re-run of the Phase-8 DEV/Validation methodology, so this item's specific criterion is not satisfied by this phase's evidence"
+    },
+    "artifacts": [
+      "artifacts/v2/phase9_measurement_contract.json",
+      "artifacts/v2/phase9_workload_manifest.json",
+      "artifacts/v2/phase9_baseline_results.json",
+      "artifacts/v2/phase9_baseline_profile.json",
+      "artifacts/v2/phase9_fault_matrix.json",
+      "artifacts/v2/phase9_concurrency_audit.json",
+      "artifacts/v2/phase9_rate_limiter_audit.json",
+      "artifacts/v2/phase9_boundedness_analysis.json",
+      "artifacts/v2/phase9_process_deviation_001.json",
+      "artifacts/v2/phase9_process_deviation_002.json",
+      "artifacts/v2/phase9_process_deviation_003.json",
+      "artifacts/v2/phase9_claim_and_tool_call_distributions.json",
+      "artifacts/v2/phase9_gap_analysis_concurrency_experiment.json",
+      "artifacts/v2/phase9_next_optimization_decision.json",
+      "artifacts/v2/phase9_gap_analysis_frozen_fixtures.json",
+      "artifacts/v2/phase9_pair_batching_experiment.json",
+      "artifacts/v2/phase9_frozen_config.json",
+      "artifacts/v2/phase9_final_validation_manifest.json"
+    ]
   }
 }

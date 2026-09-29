@@ -1,0 +1,213 @@
+{
+  "artifact_name": "phase9_baseline_results",
+  "purpose": "Raw, unoptimized Phase-9 performance baseline - Step 6.",
+  "environment": {
+    "cpu": "Apple M3",
+    "logical_cores": 8,
+    "ram_gb": 16,
+    "os": "macOS 15.7.4 (Darwin 24.6.0)",
+    "python_version": "3.12.7",
+    "power_state_confirmed_ac": true
+  },
+  "cases": {
+    "F1-simple-pubmed-run1": {
+      "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 405068.9,
+      "research_stop_reason": "no_productive_action",
+      "research_iteration": 1,
+      "final_evidence_count": 46,
+      "evidence_duplicate_count": 85,
+      "n_tool_calls": 5,
+      "total_tokens_used": 23123,
+      "errors": [
+        "Report generation failed: LLM call did not return within 90s (attempt 3/3)"
+      ],
+      "run_error": null
+    },
+    "F2-simple-clinicaltrials": {
+      "query": "What does ClinicalTrials.gov show about trials of zanidatamab in HER2-positive biliary tract cancer?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 104899.6,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 0,
+      "final_evidence_count": 23,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 1,
+      "total_tokens_used": 17714,
+      "errors": [],
+      "run_error": null
+    },
+    "F3-simple-chembl": {
+      "query": "What does ChEMBL report about the molecular target of zanubrutinib?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 64419.5,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 0,
+      "final_evidence_count": 11,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 1,
+      "total_tokens_used": 15307,
+      "errors": [],
+      "run_error": null
+    },
+    "F4-multi-source": {
+      "query": "What does the literature say about lorlatinib in ALK-positive NSCLC, what does ClinicalTrials.gov show about ongoing trials, and what does ChEMBL report about its mechanism?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 250002.9,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 2,
+      "final_evidence_count": 24,
+      "evidence_duplicate_count": 435,
+      "n_tool_calls": 6,
+      "total_tokens_used": 37988,
+      "errors": [],
+      "run_error": null
+    },
+    "F5-research-loop-one-followup": {
+      "query": "What does ChEMBL report about mirikizumab's mechanism of action, and what does the literature say about mirikizumab in ulcerative colitis?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 603244.8,
+      "research_stop_reason": "budget_exhausted",
+      "research_iteration": 3,
+      "final_evidence_count": 34,
+      "evidence_duplicate_count": 131,
+      "n_tool_calls": 12,
+      "total_tokens_used": 87587,
+      "errors": [],
+      "run_error": null
+    },
+    "F6-multi-iteration": {
+      "query": "What does the literature say about aficamten in hypertrophic cardiomyopathy, what does ClinicalTrials.gov show about aficamten trials, and what does ChEMBL report about aficamten's mechanism?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 173481.9,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 0,
+      "final_evidence_count": 35,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 3,
+      "total_tokens_used": 46262,
+      "errors": [],
+      "run_error": null
+    },
+    "F7-no-result-abstention": {
+      "query": "What is known about the fictitious compound QRVX-40417-NOTREAL for a condition with no real biomedical evidence anywhere?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 58143.5,
+      "research_stop_reason": "safe_abstention",
+      "research_iteration": 1,
+      "final_evidence_count": 10,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 4,
+      "total_tokens_used": 17759,
+      "errors": [],
+      "run_error": null
+    },
+    "F8-duplicate-heavy": {
+      "query": "What does the literature say about tirzepatide in obesity management, and what does ClinicalTrials.gov show about tirzepatide obesity trials?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 223933.0,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 0,
+      "final_evidence_count": 169,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 2,
+      "total_tokens_used": 62353,
+      "errors": [],
+      "run_error": null
+    },
+    "F1-simple-pubmed-run2": {
+      "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 222997.3,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 0,
+      "final_evidence_count": 40,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 2,
+      "total_tokens_used": 58748,
+      "errors": [],
+      "run_error": null
+    },
+    "F1-simple-pubmed-run3": {
+      "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 192037.7,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 1,
+      "final_evidence_count": 39,
+      "evidence_duplicate_count": 31,
+      "n_tool_calls": 4,
+      "total_tokens_used": 87929,
+      "errors": [
+        "Grounded generation failed: claim 'c-9' references unknown Evidence ID 'pubmed:39986466' - not present in the Evidence[] supplied to this generation call. This is a hard gate violation (unknown/fabricated Evidence-ID reference), never silently dropped or accepted."
+      ],
+      "run_error": null
+    },
+    "F1-simple-pubmed-run4": {
+      "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 196205.9,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 0,
+      "final_evidence_count": 40,
+      "evidence_duplicate_count": 0,
+      "n_tool_calls": 2,
+      "total_tokens_used": 60023,
+      "errors": [],
+      "run_error": null
+    },
+    "F1-simple-pubmed-run5": {
+      "query": "What does the literature say about finerenone in diabetic kidney disease outcomes?",
+      "power_state_at_run": "Now drawing from 'AC Power'",
+      "end_to_end_ms": 218599.8,
+      "research_stop_reason": "sufficient_evidence",
+      "research_iteration": 1,
+      "final_evidence_count": 35,
+      "evidence_duplicate_count": 35,
+      "n_tool_calls": 4,
+      "total_tokens_used": 88181,
+      "errors": [
+        "Grounded generation failed: claim 'c-3' references unknown Evidence ID 'pubmed:38806171' - not present in the Evidence[] supplied to this generation call. This is a hard gate violation (unknown/fabricated Evidence-ID reference), never silently dropped or accepted."
+      ],
+      "run_error": null
+    }
+  },
+  "f1_simple_pubmed_repeated_distribution": {
+    "n": 5,
+    "note": "n=5, illustrative only per measurement-contract rule (n<30 -> no P95/P99)",
+    "raw_values_ms": [
+      405068.9,
+      222997.3,
+      192037.7,
+      196205.9,
+      218599.8
+    ],
+    "mean_ms": 246981.9,
+    "median_ms": 218599.8,
+    "min_ms": 192037.7,
+    "max_ms": 405068.9,
+    "stdev_ms": 89399.9
+  },
+  "all_functional_cases_e2e_distribution": {
+    "n": 12,
+    "note": "n=12 across 8 DISTINCT query types (not a single repeated workload) - reported as raw spread, not a percentile claim, since these are heterogeneous cases, not repeated trials of the same workload",
+    "raw_values_ms": [
+      405068.9,
+      104899.6,
+      64419.5,
+      250002.9,
+      603244.8,
+      173481.9,
+      58143.5,
+      223933.0,
+      222997.3,
+      192037.7,
+      196205.9,
+      218599.8
+    ],
+    "mean_ms": 226086.2,
+    "min_ms": 58143.5,
+    "max_ms": 603244.8
+  }
+}

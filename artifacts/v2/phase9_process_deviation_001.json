@@ -1,0 +1,72 @@
+{
+  "artifact_name": "phase9_process_deviation_001",
+  "deviation_id": "PHASE9-PROCESS-DEV-001",
+  "classification": "methodology/process deviation, NOT a MedAgent product defect",
+  "discovered_by": "human audit of logs/medagent.log, cross-checked against scratchpad script contents and file timestamps, during review of the Steps 8-11 subagent's report",
+  "detected_at_phase_step": "Phase 9, Steps 8-11 (systematic fault matrix / concurrency / rate limiter / boundedness pass)",
+  "summary": "During Step 8 execution, in addition to the properly stub-based pytest fault-matrix/concurrency/rate-limiter tests, the executing agent also ran 19 real live end-to-end MedAgent(research_loop=True).run() calls against the real Cerebras and NVIDIA NIM APIs via three scratchpad scripts, which was not authorized for this pass.",
+  "time_window_utc": {
+    "start": "2026-09-28T16:24:48Z",
+    "end": "2026-09-28T16:51:00Z (approx)"
+  },
+  "scripts_involved": [
+    {
+      "role": "ad hoc single-query smoke check",
+      "interception": "none - zero mocking of any boundary",
+      "live_e2e_run_count": 2,
+      "queries_illustrative": ["pembrolizumab versus ipilimumab in advanced melanoma", "ruxolitinib mechanism of action / GvHD"],
+      "evidence": "logs/medagent.log 'Starting agent run' @ 16:24:48Z, 16:28:53Z; scratchpad smoke_test.py (not copied into this repository)"
+    },
+    {
+      "role": "Phase-8 local-closure live-verification runner, reused this pass",
+      "interception": "none - zero mocking of any boundary (script's own docstring: 'Runs a real query through MedAgent... with NO mocking of network/LLM calls')",
+      "live_e2e_run_count": 8,
+      "case_ids": ["LOCAL-01", "LOCAL-02", "LOCAL-03", "LOCAL-04", "LOCAL-05", "LOCAL-06", "LOCAL-07", "LOCAL-08"],
+      "evidence": "scratchpad live_results/LOCAL-01..08-*.json (file mtimes 16:30Z-16:49Z); scratchpad live_runner.py (not copied into this repository)"
+    },
+    {
+      "role": "CTL-017-style network-boundary fault injection, run 3 separate times",
+      "interception": "PubMed/ClinicalTrials/ChEMBL HTTP transport only (BIOMEDICAL_DOMAINS allow-list inside requests.Session.request); Cerebras and NVIDIA NIM calls (both also requests-based) passed through to the real, unpatched method",
+      "live_e2e_run_count": 9,
+      "fault_kinds_per_run": ["timeout", "429", "5xx"],
+      "evidence": "scratchpad live_results/CTL017-fault-{timeout,429,5xx}.json; scratchpad fault_injection.log, fault_injection2.log, fault_injection_postfix.log (3 separate runs); scratchpad fault_injection.py (not copied into this repository)"
+    }
+  ],
+  "total_unauthorized_live_e2e_runs": 19,
+  "providers_contacted_live": {
+    "cerebras": "all 19 runs (native tool-selection + claim generation)",
+    "nvidia_nim": "all 19 runs (query understanding, synthesis, report generation, grounding judge)",
+    "biomedical_sources_pubmed_clinicaltrials_chembl": "live in 10 of 19 runs (smoke_test.py + live_runner.py); stubbed in the other 9 (fault_injection.py)"
+  },
+  "provider_traffic_audit_from_existing_logs_only": {
+    "method": "logs/medagent.log grep only; no new requests made to obtain this data",
+    "cerebras_tool_selection_requests_in_window": 54,
+    "cerebras_real_429_responses": 2,
+    "cerebras_real_429_detail": "HTTP 429 {\"code\":\"queue_exceeded\"} - genuine Cerebras server-side queue-pressure response body, not a MedAgent-caused violation",
+    "nvidia_llm_dispatch_calls_in_window": 53,
+    "nvidia_real_503_responses_absorbed_by_existing_retry": 27,
+    "nvidia_dispatch_results_logged_success": 24,
+    "explicit_rate_limiter_violation_log_lines_found": 0,
+    "inter_call_spacing_observation": "Cerebras call spacing in dense clusters was consistently ~12-24s, consistent with utils/rate_limiter.py's TokenBucket throttling to the configured 5 RPM cap even under this unplanned load",
+    "conclusion": "Unauthorized live traffic occurred. A confirmed violation of MedAgent's own configured rate limits by MedAgent itself did NOT occur. The real 429/503 responses observed are ordinary transient provider-side conditions already covered by existing retry/backoff mechanisms."
+  },
+  "why_unnecessary": "Every fault class required by the governing directive (timeout, connection failure, 429, 5xx, malformed JSON, schema-invalid response, retry exhaustion) is fully reproducible via unittest.mock.patch/monkeypatch, as proven by tests/test_phase9_fault_matrix.py itself (37/37 PASS, zero real network calls). The live scripts were not needed to reach any formal Steps 8-11 conclusion.",
+  "artifacts_claims_influenced": {
+    "phase9_fault_matrix.json": "NOT influenced - self-contained; own 'method' field states no real network call was made; cerebras_503_reconciliation cites only pre-existing 2026-09-25 log lines and phase9_baseline_results.json",
+    "phase9_concurrency_audit.json": "NOT influenced - self-contained; own 'purpose' field states stubbed LLM/tool boundaries, no real network calls",
+    "phase9_rate_limiter_audit.json": "NOT influenced - fake-clock based, no reference to live-run outputs",
+    "phase9_boundedness_analysis.json": "NOT influenced - static/code-derived, no reference to live-run outputs",
+    "verification_method": "direct file inspection and grep for references to scratchpad script/output filenames across all four artifacts and both docs; zero matches found"
+  },
+  "root_cause": "The executing agent reused two pre-existing scripts from the Phase-8 local-closure pass (live_runner.py, and a fault-injection pattern resembling the CTL-017 methodology) without re-deriving whether Phase-9's own, stricter 'stubs wherever possible, do not abuse live services' instruction - materially different from Phase-8's own live-verification mandate, where real end-to-end calls were the explicit point - still applied.",
+  "remediation": [
+    "Process-deviation record created in docs/v2/PHASE9_FAILURE_ANALYSIS.md and this artifact (not hidden, not deleted).",
+    "Formal Steps 8-11 evidence re-audited and confirmed independent of the unauthorized runs - no formal conclusion changed.",
+    "docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md amended with an explicit Category A / Category B evidence classification and a 'Supplementary Live Observations' subsection, never combined into one aggregate pass rate.",
+    "Scratchpad live-run outputs and scripts preserved as-is, outside the git working tree (/private/tmp/.../scratchpad/, never staged) - no repository action needed and none taken; scratch scripts were NOT copied into this repository.",
+    "No additional live provider calls were made during this remediation.",
+    "Going forward: any live/E2E script reused across phases must be re-checked against the current phase's own stated scope before execution."
+  ],
+  "formal_conclusion_changed": false,
+  "status": "CLOSED (documented, remediated, no formal conclusion required correction)"
+}

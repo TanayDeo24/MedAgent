@@ -693,6 +693,69 @@ def tool_orchestration_node(state: AgentState) -> AgentState:
         logger.info("[TOOL ORCHESTRATION] No tool calls selected (abstention)")
         return state
 
+    # PHASE9-DEFECT-002 fix (Phase-9 BOUNDEDNESS HARDENING pass - see
+    # docs/v2/PHASE9_FAILURE_ANALYSIS.md /
+    # docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's "BOUNDEDNESS HARDENING"
+    # section): bound the number of LOGICAL model-emitted tool_calls[]
+    # entries this round is allowed to process, by BOTH a per-round cap
+    # (MAX_TOOL_CALLS_PER_ROUND) and the REQUEST-GLOBAL remaining budget
+    # (MAX_TOOL_CALLS_PER_REQUEST - however many have already been consumed
+    # across earlier rounds this run, via `state["tool_calls_used_this_request"]`
+    # - a declared AgentState field so it survives LangGraph's cross-node
+    # state threading, same reasoning as `claim_judge_calls_used`).
+    #
+    # Design decision (documented, not left implicit): overflow entries are
+    # cut BEFORE `parse_and_validate_tool_call` ever runs on them - i.e. the
+    # budget counts every raw_tool_calls[] entry the model emitted, VALID OR
+    # INVALID, not just registry-valid ones. This is deliberately the more
+    # conservative of the two possible designs: counting only valid calls
+    # would let a response mixing many registry-invalid entries with a
+    # smaller number of valid ones bypass the budget's actual purpose (an
+    # upper bound on how much of this round's raw model output
+    # tool_orchestration_node spends any processing effort on at all, not
+    # just how many calls reach the HTTP boundary) - a model/attacker could
+    # otherwise pad a response with junk entries for free. Truncation
+    # preserves Cerebras's own returned order exactly (no reordering/
+    # prioritization) and never fabricates a ToolResult for a cut entry.
+    tool_calls_used_already = state.get("tool_calls_used_this_request", 0)
+    request_remaining = max(0, MAX_TOOL_CALLS_PER_REQUEST - tool_calls_used_already)
+    round_budget = min(MAX_TOOL_CALLS_PER_ROUND, request_remaining)
+
+    total_emitted = len(raw_tool_calls)
+    if total_emitted > round_budget:
+        overflow_count = total_emitted - round_budget
+        logger.warning(
+            f"[TOOL ORCHESTRATION] PHASE9-DEFECT-002: model emitted {total_emitted} "
+            f"tool_call(s) this round; only the first {round_budget} will be "
+            f"processed (round cap={MAX_TOOL_CALLS_PER_ROUND}, request budget "
+            f"remaining={request_remaining} of {MAX_TOOL_CALLS_PER_REQUEST}, "
+            f"already used {tool_calls_used_already} this request) - "
+            f"{overflow_count} overflow call(s) truncated, in original order, "
+            "before any parsing/validation/execution."
+        )
+        state["intermediate_thoughts"].append(
+            f"⚠ Tool-call budget: model emitted {total_emitted} tool call(s) this round; "
+            f"only the first {round_budget} were processed ({overflow_count} truncated "
+            "per MAX_TOOL_CALLS_PER_ROUND/MAX_TOOL_CALLS_PER_REQUEST) - see PHASE9-DEFECT-002."
+        )
+        state["tool_call_history"].append({
+            "call_id": f"step{state['current_step']}-budget-exhausted",
+            "tool": None,
+            "operation": None,
+            "query": None,
+            "params": {},
+            "success": False,
+            "results_count": 0,
+            "error": (
+                f"{overflow_count} model-emitted tool_call(s) truncated this round - "
+                f"MAX_TOOL_CALLS_PER_ROUND={MAX_TOOL_CALLS_PER_ROUND} / "
+                f"MAX_TOOL_CALLS_PER_REQUEST={MAX_TOOL_CALLS_PER_REQUEST} reached."
+            ),
+            "error_category": "tool_call_budget_exhausted",
+            "timestamp": None,
+        })
+        raw_tool_calls = raw_tool_calls[:round_budget]
+
     tool_names: List[str] = []
     orchestration_trace: List[Dict[str, Any]] = []
 
@@ -850,6 +913,12 @@ def tool_orchestration_node(state: AgentState) -> AgentState:
         })
 
     state["tools_to_call"] = tool_names
+    # PHASE9-DEFECT-002 fix: record exactly how many LOGICAL tool_calls[]
+    # entries (valid or invalid) were actually processed this round, added
+    # to the request-global running total - this is what the truncation
+    # logic above checks on the NEXT round/request via
+    # `state["tool_calls_used_this_request"]`.
+    state["tool_calls_used_this_request"] = tool_calls_used_already + len(raw_tool_calls)
 
     try:
         current_plan = json.loads(research_plan)
@@ -1482,7 +1551,12 @@ Please check the logs for details.
 
 from research.gap_analysis import analyze_gaps
 from research.action_planning import plan_actions
-from research.loop_control import attempted_signatures, decide_stop_reason
+from research.loop_control import (
+    MAX_TOOL_CALLS_PER_REQUEST,
+    MAX_TOOL_CALLS_PER_ROUND,
+    attempted_signatures,
+    decide_stop_reason,
+)
 from research.models import ResearchActionStatus
 
 
@@ -1704,7 +1778,22 @@ def evidence_merge_node(state: AgentState) -> AgentState:
 # own residual-gap state must reach the FINAL answer, not just its own
 # internal state. Runs once, after should_continue_research_loop returns
 # "stop", before report_generation.
-_UNRESOLVED_CLAIM_GAP_TYPES = {"weakly_supported_fact", "conflicting_evidence"}
+_UNRESOLVED_CLAIM_GAP_TYPES = {
+    "weakly_supported_fact",
+    "conflicting_evidence",
+    # PHASE9-DEFECT-001 fix (Phase-9 BOUNDEDNESS HARDENING pass): a claim
+    # whose gap_analysis judge call was skipped because CLAIM_EVALUATION_BUDGET
+    # was already exhausted must be caveated exactly like any other
+    # unresolved claim-tied gap - reusing this same, already-frozen
+    # qualifier-setting machinery rather than building a second mechanism.
+    "evaluation_budget_exhausted",
+    # Phase-9 PAIR BATCHING pass: a claim whose batch-of->1 judge attempt
+    # never produced a valid, structurally-correct judgment after bounded
+    # retries must be caveated identically to any other unresolved
+    # claim-tied gap - reusing this same, already-frozen qualifier-setting
+    # machinery.
+    "claim_evaluation_failed",
+}
 
 
 def finalize_research_answer_node(state: AgentState) -> AgentState:
@@ -1782,6 +1871,18 @@ def finalize_research_answer_node(state: AgentState) -> AgentState:
             continue
         if gap["gap_type"] == "conflicting_evidence":
             claim.qualifier = "evidence conflict not resolved by follow-up research - treat with caution"
+        elif gap["gap_type"] == "evaluation_budget_exhausted":
+            # PHASE9-DEFECT-001 fix: distinct, honest wording - this claim
+            # was never evaluated at all (not "not yet confirmed"), because
+            # the request-global CLAIM_EVALUATION_BUDGET was exhausted by
+            # earlier claims, not because follow-up research failed to
+            # confirm it.
+            claim.qualifier = "not evaluated by the grounding judge (request evaluation budget exhausted)"
+        elif gap["gap_type"] == "claim_evaluation_failed":
+            # Phase-9 PAIR BATCHING fix: distinct, honest wording - a real
+            # evaluation attempt was made (unlike evaluation_budget_exhausted's
+            # "never attempted"), but it never produced a usable result.
+            claim.qualifier = "not evaluated by the grounding judge (evaluation attempt failed)"
         else:
             claim.qualifier = "not fully confirmed by follow-up research"
         changed_claim_ids.append(claim.claim_id)

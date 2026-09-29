@@ -1,0 +1,33 @@
+{
+  "artifact_name": "phase9_frozen_config",
+  "purpose": "Records every Phase-9 configuration constant relevant to reliability/concurrency/performance, locked as of the Phase-9 final freeze pass. After this point, no further optimization tuning is authorized within Phase 9.",
+  "frozen_at": "Phase-9 FINAL FREEZE pass, after the AC-powered live pair-batching benchmark, the production-default decision, and remediation of PHASE9-PROCESS-DEV-003 (test-harness gap, not a product defect)",
+  "location": "research/loop_control.py (all constants below live in this single module)",
+  "config": {
+    "MAX_RESEARCH_ITERATIONS": 3,
+    "MAX_TOOL_CALLS_TOTAL": 8,
+    "MAX_REPEATED_ACTION": 1,
+    "MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS": 2,
+    "CLAIM_EVALUATION_BUDGET": 32,
+    "MAX_TOOL_CALLS_PER_ROUND": 12,
+    "MAX_TOOL_CALLS_PER_REQUEST": 24,
+    "GAP_ANALYSIS_MAX_CONCURRENCY": 1,
+    "GAP_ANALYSIS_BATCH_SIZE": 2
+  },
+  "decision_provenance": {
+    "MAX_RESEARCH_ITERATIONS / MAX_TOOL_CALLS_TOTAL / MAX_REPEATED_ACTION / MAX_CONSECUTIVE_TOOL_FAILURE_ROUNDS": "Pre-existing Phase-8 research-loop bounds, unchanged by Phase 9.",
+    "CLAIM_EVALUATION_BUDGET": "PHASE9-DEFECT-001 fix (Boundedness Hardening pass) - derived from real Phase-8 dev/validation corpus claim-count distributions. See docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's 'BOUNDEDNESS HARDENING' section and artifacts/v2/phase9_claim_and_tool_call_distributions.json. UNCHANGED by pair batching (batching groups calls, never changes how many CLAIMS may be judged).",
+    "MAX_TOOL_CALLS_PER_ROUND / MAX_TOOL_CALLS_PER_REQUEST": "PHASE9-DEFECT-002 fix (Boundedness Hardening pass) - derived from real Phase-8/9 baseline aggregate tool-call counts. Same source as above. Unaffected by any later Phase-9 pass.",
+    "GAP_ANALYSIS_MAX_CONCURRENCY": "AC-powered live concurrency experiment (artifacts/v2/phase9_gap_analysis_concurrency_experiment.json) - concurrency=2/4 demonstrated no meaningful latency improvement (Cerebras judge rate-limiter capacity=1 fully serializes dispatch regardless of thread count; waits stack additively). KEPT at the pre-existing default 1. This decision is NOT revisited by this final pass.",
+    "GAP_ANALYSIS_BATCH_SIZE": "AC-powered live pair-batching experiment (artifacts/v2/phase9_pair_batching_experiment.json) - batch_size=2 demonstrated a clear, meaningful latency improvement (SMALL -34%, MEDIUM -40%, LARGE -50%) with zero semantic/safety regression (0 missing/duplicate/wrong-association claims, 0 evidence contamination, 0 false support, identical support-label outcomes to the contemporaneous batch_size=1 control on every claim, 0 failures/retries/429/5xx across all 23 planned live calls). CHANGED from the pre-experiment default 1 to 2, per the pre-registered candidate-selection criteria in that same artifact."
+  },
+  "explicitly_not_changed_this_phase": [
+    "report_generation_node's architecture/provider/prompt",
+    "synthesis_node's architecture/provider/prompt",
+    "BaseTool.cache locking behavior (left as documented LOW PRIORITY - see artifacts/v2/phase9_next_optimization_decision.json)",
+    "Cerebras tool-selection (candidate_b_native_tools) retry policy (left un-retried, by design - see docs/v2/PHASE9_RELIABILITY_PERFORMANCE.md's tool-selection-retry classification)",
+    "The Cerebras rate-limiter's own configuration (5 RPM, capacity=1) for either the judge or tool-selection bucket",
+    "batch_size values other than 1/2 (4, full-answer, adaptive) - explicitly out of scope for this phase, documented as future opportunities only"
+  ],
+  "lock_statement": "As of this artifact, no further Phase-9 optimization tuning is authorized. Any change to the values above requires a new, separately-authorized experiment pass, following the same live-benchmark-before-default-change discipline used throughout Phase 9."
+}

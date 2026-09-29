@@ -92,7 +92,7 @@ docs/artifacts/code before writing this ledger (see each CTL item's
 | CTL-014 | 8 | Live ClinicalTrials.gov iterative-research verification | **CLOSED** (local-closure pass) - 4 real CT-gap cases, 13 distinct real NCT ids, 0 fabricated; `artifacts/v2/phase8_live_clinicaltrials_verification.json` | N/A - closed |
 | CTL-015 | 8 | Live ChEMBL iterative-research verification | **CLOSED** (local-closure pass) - 5 real ChEMBL records, expected-skip (no_match) path exercised live, 0 fabricated; `artifacts/v2/phase8_live_chembl_verification.json` | N/A - closed |
 | CTL-016 | 8 | True live multi-iteration evidence acquisition (real network, not transport-simulated) | **PARTIALLY CLOSED** (local-closure pass) - 1 real 2-round case fully verified (zero fabricated Evidence, correct dedup/bounds/stop); no organic 3-round live case this pass (offline-covered instead); `artifacts/v2/phase8_live_multi_iteration_verification.json` | NO - non-blocking, see audit doc STEP 23 |
-| CTL-017 | 8 | Actual network timeout/retry/429/5xx behavior under the research loop | **CLOSED** (narrow scope only, local-closure pass) - all 3 fault classes safely injected at the network boundary, loop always terminated safely, 0 fabricated Evidence; Phase 9 still owns the system-wide fault matrix; `artifacts/v2/phase8_live_fault_verification.json` | NO - Phase 9's own broader matrix unaffected |
+| CTL-017 | 8 | Actual network timeout/retry/429/5xx behavior under the research loop | **CLOSED** (narrow scope, local-closure pass) - all 3 fault classes safely injected at the network boundary, loop always terminated safely, 0 fabricated Evidence; `artifacts/v2/phase8_live_fault_verification.json`. **Phase 9's own system-wide fault matrix is now ALSO complete** (`artifacts/v2/phase9_fault_matrix.json`, Phase-9 final freeze pass), reinforcing this closure. | N/A - closed (both narrow and broad scope) |
 | CTL-018 | 8 | Live grounding/citation regression after real iterative acquisition | **CLOSED** (local-closure pass) - a genuine live-acquired `weakly_supported_fact` gap correctly caveated its tied claim, 6 unrelated claims untouched; `artifacts/v2/phase8_live_grounding_regression.json` | N/A - closed |
 | CTL-019 | 8 | Phase-8 metrics currently based on simulated transport (DEV + Validation Runs 1/2) | **RE-MEASURED, closed for this session's purpose** (local-closure pass) - 8-case live re-measurement, all metrics corroborated, no material contradiction; still not citable as production-representative until a larger-n sample exists (Phase 9/11); `artifacts/v2/phase8_live_metrics.json` | NO - citation-time gate only, not a Phase-8/9 blocker |
 | CTL-020 | 8 | Phase-8 validation source-inventory exhaustion (no fresh, non-heldout ClinicalTrials.gov or usable ChEMBL record remains in phase5_benchmark_manifest.json) | **CLOSED** (local-closure pass) - 2 fresh, never-before-used multi-source cases (avapritinib/GIST, repotrectinib/ROS1+NSCLC) run cleanly, 0 fabricated; `artifacts/v2/phase8_fresh_multisource_validation.json` | N/A - closed |
@@ -1117,7 +1117,18 @@ file).
   networks reachable; artifact:
   `artifacts/v2/phase8_live_multi_iteration_verification.json`.
 - **Required closure phase:** before Phase 13's final freeze.
-- **Result:** _(pending)_
+- **Result:** **PARTIALLY CLOSED** (unchanged by the Phase-9 final freeze
+  pass) - 1 real 2-round case fully verified (zero fabricated Evidence,
+  correct dedup/bounds/stop) per the local-closure pass recorded in the
+  summary table above; no organic 3-round live `MedAgent.run()` case has
+  been added since. Phase 9's own live traffic in this final pass
+  (the gap-analysis concurrency and pair-batching benchmarks) deliberately
+  called `research/gap_analysis.py::analyze_gaps` DIRECTLY on frozen
+  fixtures, never a full multi-iteration `MedAgent.run()` - so it does NOT
+  satisfy this item's exact criterion ("2 real, multi-iteration cases... via
+  `MedAgent.run()` end-to-end") and is correctly NOT used to close it.
+  Remaining requirement: one organic 3-round live case. Non-blocking (see
+  summary table); owner phase: 8/13.
 
 ### CTL-017 — Actual network timeout/retry/429/5xx behavior under the research loop
 
@@ -1156,7 +1167,18 @@ file).
   Phase 9 owns the SYSTEM-WIDE fault matrix; this item is scoped narrowly
   to the research loop's own bounded response, not general reliability
   engineering.
-- **Result:** _(pending)_
+- **Result:** **CLOSED.** This item's own narrow-scope PASS condition (all
+  3 fault classes observed, correctly categorized, safe bounded loop
+  termination) was satisfied by the local-closure pass recorded in the
+  summary table above (`artifacts/v2/phase8_live_fault_verification.json`).
+  Independently, Phase 9's own SYSTEM-WIDE fault matrix
+  (`artifacts/v2/phase9_fault_matrix.json`, produced during this project's
+  Steps 8-11 pass and reconfirmed via the PHASE9-PROCESS-DEV-001
+  remediation's Category-A-only technical report) is now also complete,
+  reinforcing (not required for, since this item's own criterion was
+  already independently met) this closure. Both this item's own scope AND
+  the broader Phase-9 system-wide matrix are closed as of the Phase-9 final
+  freeze pass.
 
 ### CTL-018 — Live grounding/citation regression after real iterative acquisition
 
@@ -1219,7 +1241,19 @@ file).
   all three tool APIs; artifact: `artifacts/v2/phase8_live_metrics.json`.
 - **Required closure phase:** before Phase 13's final freeze; before
   Phase 11 cites any Phase-8 number as a product-facing claim.
-- **Result:** _(pending)_
+- **Result:** **UNCHANGED by the Phase-9 final freeze pass** - remains
+  "RE-MEASURED, closed for this session's purpose" per the summary table
+  above (8-case live re-measurement, `artifacts/v2/phase8_live_metrics.json`).
+  Phase 9's own live measurements in this final pass (concurrency
+  experiment n=1/cell, pair-batching experiment n=1/cell) are
+  gap-analysis-judge-specific micro-benchmarks, explicitly NOT a
+  re-run of the Phase-8 DEV/Validation methodology at a comparable-or-larger
+  case count, so they do NOT satisfy this item's specific "larger-n
+  re-measurement" criterion and are correctly not used to advance this
+  item's status. This citation-time gate remains open, deferred to Phase 11
+  (or a later Phase-9-adjacent pass) if/when a larger-n live re-measurement
+  is separately authorized. Non-blocking for Phase 9/10 (citation-time gate
+  only).
 
 ### CTL-020 — Phase-8 validation source-inventory exhaustion
 

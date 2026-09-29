@@ -1,0 +1,361 @@
+{
+  "artifact_name": "phase9_baseline_profile",
+  "purpose": "Per-stage (per-LangGraph-node) wall-clock breakdown, captured non-invasively via agent.graph.stream(stream_mode='updates') - zero modification to any frozen Phase 1-8 code.",
+  "method": "time.perf_counter() delta between successive stream() yields; each yield corresponds to exactly one graph node's completion.",
+  "n_runs_profiled": 12,
+  "stage_wall_clock_stats_ms": {
+    "query_analysis": {
+      "n": 12,
+      "values_ms": [
+        456.9,
+        609.0,
+        710.8,
+        764.7,
+        885.4,
+        1359.4,
+        729.6,
+        485.2,
+        455.4,
+        424.9,
+        516.4,
+        427.1
+      ],
+      "mean_ms": 652.1,
+      "min_ms": 424.9,
+      "max_ms": 1359.4,
+      "median_ms": 562.7,
+      "stdev_ms": 270.4,
+      "p95_note": "n=12 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "tool_orchestration": {
+      "n": 12,
+      "values_ms": [
+        3220.8,
+        498.7,
+        959.4,
+        1076.7,
+        1538.5,
+        1861.3,
+        3158.9,
+        1671.8,
+        2499.6,
+        3187.3,
+        3030.5,
+        4979.4
+      ],
+      "mean_ms": 2306.9,
+      "min_ms": 498.7,
+      "max_ms": 4979.4,
+      "median_ms": 2180.4,
+      "stdev_ms": 1273.2,
+      "p95_note": "n=12 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "synthesis": {
+      "n": 12,
+      "values_ms": [
+        53060.0,
+        22258.4,
+        19144.7,
+        30956.2,
+        27354.4,
+        61797.6,
+        12034.9,
+        57808.6,
+        42053.2,
+        41413.4,
+        51852.5,
+        48087.0
+      ],
+      "mean_ms": 38985.1,
+      "min_ms": 12034.9,
+      "max_ms": 61797.6,
+      "median_ms": 41733.3,
+      "stdev_ms": 16337.5,
+      "p95_note": "n=12 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "evidence_normalization": {
+      "n": 12,
+      "values_ms": [
+        7.2,
+        4.9,
+        3.7,
+        4.1,
+        5.1,
+        6.1,
+        4.0,
+        7.9,
+        5.9,
+        4.5,
+        6.4,
+        21.2
+      ],
+      "mean_ms": 6.8,
+      "min_ms": 3.7,
+      "max_ms": 21.2,
+      "median_ms": 5.5,
+      "stdev_ms": 4.7,
+      "p95_note": "n=12 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "grounded_generation": {
+      "n": 21,
+      "values_ms": [
+        3491.4,
+        16373.2,
+        9819.1,
+        1274.8,
+        830.6,
+        11621.6,
+        1133.2,
+        1603.9,
+        9293.8,
+        6539.6,
+        12165.4,
+        1673.6,
+        5417.0,
+        6205.1,
+        5745.7,
+        3035.6,
+        2113.8,
+        10868.2,
+        2265.1,
+        2728.6,
+        10682.5
+      ],
+      "mean_ms": 5946.8,
+      "min_ms": 830.6,
+      "max_ms": 16373.2,
+      "median_ms": 5417.0,
+      "stdev_ms": 4552.9,
+      "p95_note": "n=21 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "gap_analysis": {
+      "n": 21,
+      "values_ms": [
+        130198.5,
+        101516.4,
+        38670.7,
+        23151.5,
+        47663.4,
+        47939.1,
+        59990.7,
+        119353.8,
+        131874.1,
+        119214.7,
+        132039.7,
+        58823.2,
+        1.0,
+        1.3,
+        103239.7,
+        106023.7,
+        2.2,
+        95473.0,
+        106596.9,
+        2.5,
+        106999.0
+      ],
+      "mean_ms": 72798.8,
+      "min_ms": 1.0,
+      "max_ms": 132039.7,
+      "median_ms": 95473.0,
+      "stdev_ms": 48339.2,
+      "p95_note": "n=21 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "research_action_planning": {
+      "n": 9,
+      "values_ms": [
+        0.6,
+        0.7,
+        0.5,
+        0.7,
+        0.7,
+        0.6,
+        0.4,
+        0.6,
+        0.6
+      ],
+      "mean_ms": 0.6,
+      "min_ms": 0.4,
+      "max_ms": 0.7,
+      "median_ms": 0.6,
+      "stdev_ms": 0.1,
+      "p95_note": "n=9 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "research_execution": {
+      "n": 9,
+      "values_ms": [
+        2102.6,
+        903.5,
+        11327.1,
+        3767.7,
+        6681.1,
+        1169.8,
+        962.2,
+        457.1,
+        497.4
+      ],
+      "mean_ms": 3096.5,
+      "min_ms": 457.1,
+      "max_ms": 11327.1,
+      "median_ms": 1169.8,
+      "stdev_ms": 3688.3,
+      "p95_note": "n=9 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "evidence_merge": {
+      "n": 9,
+      "values_ms": [
+        12.1,
+        9.9,
+        10.9,
+        3.3,
+        5.1,
+        2.5,
+        1.8,
+        3.0,
+        3.5
+      ],
+      "mean_ms": 5.8,
+      "min_ms": 1.8,
+      "max_ms": 12.1,
+      "median_ms": 3.5,
+      "stdev_ms": 4.0,
+      "p95_note": "n=9 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "finalize_research_answer": {
+      "n": 12,
+      "values_ms": [
+        1.5,
+        0.6,
+        0.7,
+        0.6,
+        1.5,
+        0.5,
+        0.5,
+        0.6,
+        0.6,
+        0.9,
+        0.4,
+        0.6
+      ],
+      "mean_ms": 0.8,
+      "min_ms": 0.4,
+      "max_ms": 1.5,
+      "median_ms": 0.6,
+      "stdev_ms": 0.4,
+      "p95_note": "n=12 < 30, P95/P99 NOT reported per measurement contract rule"
+    },
+    "report_generation": {
+      "n": 12,
+      "values_ms": [
+        94627.5,
+        33038.2,
+        19173.7,
+        35769.2,
+        29743.1,
+        47959.9,
+        29626.7,
+        54973.4,
+        68923.1,
+        38088.6,
+        31937.5,
+        44169.9
+      ],
+      "mean_ms": 44002.6,
+      "min_ms": 19173.7,
+      "max_ms": 94627.5,
+      "median_ms": 36928.9,
+      "stdev_ms": 20703.5,
+      "p95_note": "n=12 < 30, P95/P99 NOT reported per measurement contract rule"
+    }
+  },
+  "bottleneck_ranking_by_total_time": [
+    {
+      "node": "gap_analysis",
+      "total_ms_across_all_runs": 1528775.1,
+      "pct_of_total_stage_time": 56.3
+    },
+    {
+      "node": "report_generation",
+      "total_ms_across_all_runs": 528030.8,
+      "pct_of_total_stage_time": 19.5
+    },
+    {
+      "node": "synthesis",
+      "total_ms_across_all_runs": 467820.9,
+      "pct_of_total_stage_time": 17.2
+    },
+    {
+      "node": "grounded_generation",
+      "total_ms_across_all_runs": 124881.8,
+      "pct_of_total_stage_time": 4.6
+    },
+    {
+      "node": "research_execution",
+      "total_ms_across_all_runs": 27868.5,
+      "pct_of_total_stage_time": 1.0
+    },
+    {
+      "node": "tool_orchestration",
+      "total_ms_across_all_runs": 27682.9,
+      "pct_of_total_stage_time": 1.0
+    },
+    {
+      "node": "query_analysis",
+      "total_ms_across_all_runs": 7824.8,
+      "pct_of_total_stage_time": 0.3
+    },
+    {
+      "node": "evidence_normalization",
+      "total_ms_across_all_runs": 81.0,
+      "pct_of_total_stage_time": 0.0
+    },
+    {
+      "node": "evidence_merge",
+      "total_ms_across_all_runs": 52.1,
+      "pct_of_total_stage_time": 0.0
+    },
+    {
+      "node": "finalize_research_answer",
+      "total_ms_across_all_runs": 9.0,
+      "pct_of_total_stage_time": 0.0
+    },
+    {
+      "node": "research_action_planning",
+      "total_ms_across_all_runs": 5.4,
+      "pct_of_total_stage_time": 0.0
+    }
+  ],
+  "gap_analysis_deep_dive": {
+    "finding": "gap_analysis is the dominant measured bottleneck (56.3% of all stage time). It runs research/gap_analysis.py::analyze_gaps, which calls grounding_eval.judge.judge_claim_semantic ONCE PER FACTUAL CLAIM, SEQUENTIALLY (research/gap_analysis.py line 84-91: 'for claim in grounded_answer.claims: judgment = judge_claim_semantic(...)') - a real, un-parallelized NVIDIA judge LLM call per claim. This cost compounds on EVERY research-loop iteration (gap_analysis runs after every grounded_generation in the loop), which is why F5 (4 loop passes, budget_exhausted) spent 119-132s on EACH of its 4 gap_analysis calls.",
+    "real_judge_calls_ms": [
+      132039.7,
+      131874.1,
+      130198.5,
+      119353.8,
+      119214.7,
+      106999.0,
+      106596.9,
+      106023.7,
+      103239.7,
+      101516.4,
+      95473.0,
+      59990.7,
+      58823.2,
+      47939.1,
+      47663.4,
+      38670.7,
+      23151.5
+    ],
+    "n_real_judge_calls": 17,
+    "mean_real_judge_call_ms": 89927.5,
+    "min_real_judge_call_ms": 23151.5,
+    "max_real_judge_call_ms": 132039.7,
+    "zero_evidence_guard_calls_ms": [
+      2.2,
+      2.5,
+      1.0,
+      1.3
+    ],
+    "zero_evidence_guard_note": "near-instant (1-2ms) calls correspond to Phase-6's deterministic zero-Evidence guard (F7's abstention case, and empty-evidence rounds) - correctly incurring 0 LLM calls, confirming the guard works as designed and is not part of the bottleneck",
+    "parallelization_candidate": "each claim's judge call is independent of every other claim's (same architecture as the already-safely-parallel tool_calls a single native-tool-calling round issues) - a plausible Step-12 safe-parallelism candidate, NOT implemented in this pass (measurement/profiling only, per explicit instruction)"
+  }
+}
